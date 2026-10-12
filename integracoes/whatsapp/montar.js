@@ -52,7 +52,9 @@ function fluxo() {
   let x = 0;
   const C = IDS.credenciais, T = IDS.tabelas;
   const cred = (nome) => ({ httpHeaderAuth: { id: C[nome], name: nome } });
-  const no = (name, type, typeVersion, parameters, extra = {}) => ({ id: crypto.randomUUID(), name, type, typeVersion, position: [x++ * 260, extra._lin ? extra._lin * 200 : 0], parameters, ...Object.fromEntries(Object.entries(extra).filter(([k]) => k !== '_lin')) });
+  const no = (name, type, typeVersion, parameters, extra = {}) => ({ id: crypto.randomUUID(), name, type, typeVersion, position: [x++ * 260, extra._lin ? extra._lin * 200 : 0], parameters,
+    ...(type === 'n8n-nodes-base.httpRequest' ? { retryOnFail: true, maxTries: 3, waitBetweenTries: 5000 } : {}),   // rede: 3 tentativas, 5 s (12/10/2026)
+    ...Object.fromEntries(Object.entries(extra).filter(([k]) => k !== '_lin')) });
   const tabela = (nome) => ({ __rl: true, value: T[nome], mode: 'id', cachedResultName: nome });
   IDS.whatsapp = IDS.whatsapp || {};
   IDS.whatsapp.caminho = IDS.whatsapp.caminho || 'bmh-whatsapp-' + crypto.randomBytes(12).toString('hex');   // endereço que ninguém adivinha

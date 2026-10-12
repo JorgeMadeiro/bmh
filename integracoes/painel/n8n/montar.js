@@ -29,7 +29,10 @@ const se = (name, expr) => no(name, 'n8n-nodes-base.if', 2.2, { conditions: { op
 // todo fluxo da BMH avisa no Telegram quando falha (o próprio alerta não aponta para si)
 const ajustes = (extra = {}) => ({ executionOrder: 'v1', timezone: 'America/Sao_Paulo', saveDataErrorExecution: 'all', ...(IDS.fluxos?.alerta ? { errorWorkflow: IDS.fluxos.alerta } : {}), ...extra });
 let x = 0; const pos = (col, lin) => [col * 260, lin * 180];
-const no = (name, type, typeVersion, parameters, extra = {}) => ({ id: crypto.randomUUID(), name, type, typeVersion, position: pos(x++, 0), parameters, ...extra });
+// rede: toda chamada HTTP com 3 tentativas a cada 5 s (12/10/2026). Quem não pode repetir (envio a grupo, inserção de
+// linha, disparo de outro fluxo) passa retryOnFail: false, porque repetir depois de um tempo esgotado pode duplicar.
+const REDE = { retryOnFail: true, maxTries: 3, waitBetweenTries: 5000 };
+const no = (name, type, typeVersion, parameters, extra = {}) => ({ id: crypto.randomUUID(), name, type, typeVersion, position: pos(x++, 0), parameters, ...(type === 'n8n-nodes-base.httpRequest' ? REDE : {}), ...extra });
 const codigo = (name, arq, extra = {}) => no(name, 'n8n-nodes-base.code', 2, { jsCode: ler(arq) }, extra);
 const tabela = (nome) => ({ __rl: true, value: T[nome], mode: 'id', cachedResultName: nome });
 const COLUNAS = {
@@ -161,16 +164,24 @@ function fluxoPagina() {
 }
 
 // ---------------- fluxo 5: alerta de falha ----------------
+// Precisa estar ATIVO (esteve desligado de 08 a 12/10/2026 e nenhum alerta saiu). Grava em BMH_falhas (só fluxo, etapa e
+// mensagem mascarada) e avisa no Telegram em HTML. Não guarda execução com sucesso: ela traria o erro cru, sem máscara.
 function fluxoAlerta() {
   x = 0;
+  const COL = ['quando', 'fluxo', 'fluxo_id', 'etapa', 'erro', 'execucao'];
   const n = {
     gatilho: no('Quando um fluxo da BMH falhar', 'n8n-nodes-base.errorTrigger', 1, {}),
     monta: codigo('Monta o alerta', 'alerta-falha.js'),
-    envia: telegram('Avisa no Telegram', '={{ $json.texto }}'),
-    nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Alerta de falha\nÉ o fluxo de erro (Configurações → Error workflow) de todos os fluxos da BMH. Avisa no Telegram (robô BMH alertas) o fluxo, a etapa e o erro, sem dado de paciente.', width: 520, height: 160 }),
+    registra: no('Registra a falha', 'n8n-nodes-base.dataTable', 1.1, { operation: 'insert', dataTableId: tabela('BMH_falhas'),
+      columns: { mappingMode: 'defineBelow', value: Object.fromEntries(COL.map((k) => [k, `={{ $json.${k} }}`])), matchingColumns: [],
+        schema: COL.map((k) => ({ id: k, displayName: k, required: false, defaultMatch: false, display: true, type: 'string', readOnly: false, removed: false })) }, options: {} },
+      { alwaysOutputData: true, onError: 'continueRegularOutput' }),
+    envia: no('Avisa no Telegram', 'n8n-nodes-base.telegram', 1.2, { chatId: CHAT, text: "={{ $('Monta o alerta').first().json.texto }}", additionalFields: { appendAttribution: false, parse_mode: 'HTML' } }, { credentials: TG, ...REDE }),
+    nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Alerta de falha\nÉ o fluxo de erro (Configurações → Error workflow) de todos os fluxos da BMH. Quando um falha: grava em **BMH_falhas** (fluxo, etapa, mensagem do erro, número da execução) e avisa no Telegram (robô BMH alertas, chat privado do Jorge).\n\n**Sem dado de paciente:** e-mail, CPF, telefone e números longos viram marcadores e a mensagem é cortada em 300 caracteres. É o registro de erro dos fluxos que não guardam execução (WhatsApp, painel da diretoria).\n\nTelegram em HTML escapado, com nova tentativa (3x, 5 s). Testado em 12/10/2026 com um fluxo temporário que falhava de propósito. **Precisa estar ATIVO** (esteve desligado de 08 a 12/10/2026 e nenhum alerta saiu). Não guarda execução com sucesso: a execução traria o erro cru, sem máscara; o registro é a tabela BMH_falhas.', width: 720, height: 256 }),
   };
-  const cx = {}; liga(cx, n.gatilho.name, n.monta.name); liga(cx, n.monta.name, n.envia.name);
-  return { name: 'BMH · Alerta de falha', nodes: Object.values(n), connections: cx, settings: { executionOrder: 'v1', timezone: 'America/Sao_Paulo', saveDataSuccessExecution: 'all', saveDataErrorExecution: 'all' } };
+  n.nota.position = [0, -272];
+  const cx = {}; liga(cx, n.gatilho.name, n.monta.name); liga(cx, n.monta.name, n.registra.name); liga(cx, n.registra.name, n.envia.name);
+  return { name: 'BMH · Alerta de falha', nodes: Object.values(n), connections: cx, settings: { executionOrder: 'v1', timezone: 'America/Sao_Paulo', saveDataSuccessExecution: 'none', saveDataErrorExecution: 'all' } };
 }
 
 // ---------------- fluxo 6: botões do Telegram ----------------
@@ -192,7 +203,7 @@ function fluxoBotoes() {
     lePl: codigo('Lê o botão de plantões', '../../plantoes/n8n/botao-plantoes.js'),
     respPl: no('Responde · gerando', 'n8n-nodes-base.telegram', 1.2, { resource: 'callback', operation: 'answerQuery', queryId: '={{ $json.query_id }}', additionalFields: { text: 'Gerando os rascunhos…' } }, { credentials: TG, onError: 'continueRegularOutput' }),
     editaPl: no('Edita · gerando', 'n8n-nodes-base.telegram', 1.2, { resource: 'message', operation: 'editMessageText', messageType: 'message', chatId: "={{ $('Lê o botão de plantões').first().json.chat_id }}", messageId: "={{ $('Lê o botão de plantões').first().json.message_id }}", text: "={{ $('Lê o botão de plantões').first().json.texto }}", replyMarkup: 'none', additionalFields: {} }, { credentials: TG, onError: 'continueRegularOutput' }),
-    chamaPl: no('Chama os e-mails do mês', 'n8n-nodes-base.httpRequest', 4.2, { method: 'GET', url: "={{ '" + process.env.N8N_URL + "/webhook/bmh-plantoes-emails?mes=' + $('Lê o botão de plantões').first().json.mes + '&chave=" + process.env.PLANTOES_CHAVE + "' }}", options: { timeout: 30000 } }, { onError: 'continueRegularOutput' }),
+    chamaPl: no('Chama os e-mails do mês', 'n8n-nodes-base.httpRequest', 4.2, { method: 'GET', url: "={{ '" + process.env.N8N_URL + "/webhook/bmh-plantoes-emails?mes=' + $('Lê o botão de plantões').first().json.mes + '&chave=" + process.env.PLANTOES_CHAVE + "' }}", options: { timeout: 30000 } }, { onError: 'continueRegularOutput', retryOnFail: false }),   // sem repetir: o tempo esgotado pode ter disparado os e-mails
     nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Telegram · botões\nRecebe o toque em Aplicar/Ignorar das propostas do guardião (gd:<código>:a|i), só do chat do Jorge. Aplicar muda no Google Ads na hora, com travas: só a conta da BMH, só pausar ou baixar orçamento, só proposta de hoje ou ontem ainda não decidida, e orçamento só se ainda estiver no valor da proposta. Grava a decisão em BMH_guardiao_registro e edita a mensagem.', width: 560, height: 220 }),
   };
   const cx = {};
@@ -267,13 +278,13 @@ function fluxoMensal() {
     envia: telegram('Telegram (prévia)', "={{ '🧪 PRÉVIA (chamada manual; não foi ao grupo)' + '\\n\\n' + $json.mensagem }}"),
     // grupo da diretoria pelo WhatsApp (mesmo envio do fluxo antigo); liberado pelo Jorge em 09/10/2026
     grupo: no('WhatsApp · grupo da diretoria', 'n8n-nodes-base.httpRequest', 4.2, { method: 'POST', url: 'https://apiwp.cannlink.com.br/message/sendText/Madeiro', authentication: 'genericCredentialType', genericAuthType: 'httpHeaderAuth',
-      sendBody: true, bodyParameters: { parameters: [{ name: 'number', value: '120363205793119192@g.us' }, { name: 'text', value: '={{ $json.mensagem }}' }] }, options: {} }, { credentials: cred('httpHeaderAuth', 'BMH · WhatsApp Evolution (envio aos grupos)') }),
+      sendBody: true, bodyParameters: { parameters: [{ name: 'number', value: '120363205793119192@g.us' }, { name: 'text', value: '={{ $json.mensagem }}' }] }, options: {} }, { credentials: cred('httpHeaderAuth', 'BMH · WhatsApp Evolution (envio aos grupos)'), retryOnFail: false }),   // mensagem no grupo: sem repetir
     // aba Geral da planilha de plantões: mono e multi da Asa Sul (pedido do Jorge, 09/10/2026)
     soGeral: se('Só a Geral?', "={{ $('Qual mês').first().json.so === 'geral' }}"),
     geralLe: planilha('Geral · lê', 'GET', PLANILHA + '/values/Geral!A1:G300?valueRenderOption=FORMULA'),
     geralMonta: codigo('Geral · mono e multi', '../../grupos/geral-camaras.js'),
     geralOk: se('Geral · dá para gravar?', '={{ !$json.falhou }}'),
-    geralGrava: planilha('Geral · grava', 'POST', PLANILHA + ':batchUpdate', "={{ JSON.stringify($('Geral · mono e multi').first().json.corpo) }}"),
+    geralGrava: planilha('Geral · grava', 'POST', PLANILHA + ':batchUpdate', "={{ JSON.stringify($('Geral · mono e multi').first().json.corpo) }}", { retryOnFail: false }),   // pode inserir linha: sem repetir
     geralAviso: telegram('Telegram · Geral não atualizada', "={{ '⚠️ Aba Geral (mono e multi da Asa Sul) de ' + $json.mes + ' não foi atualizada: ' + $json.falhou }}"),
     nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Diretoria · produção do mês\nDia 1 às 8h, sobre o mês anterior, no formato do e-mail mensal do Jorge: sessões por unidade (agenda finalizada, lida dia a dia), faltas (cobradas), avaliações, produzido / convênio faturado / a faturar / particular / recebido da produção (BI do iGut, lógica de DRE) e comparação. Manual: /webhook/bmh-producao-mes?mes=AAAA-MM (prévia no Telegram); &grupo=1 manda ao grupo da diretoria. Código em integracoes/grupos/ no workspace da BMH. Também preenche mono e multi da Asa Sul na aba Geral da planilha de plantões; &so=geral faz só isso, sem mensagem.', width: 560, height: 240 }),
   };
@@ -397,12 +408,12 @@ function fluxoPlantoesEmails() {
     monta: no('Monta os e-mails', 'n8n-nodes-base.code', 2, { jsCode: ler('../../plantoes/emails.js') + '\n' + ler('../../plantoes/n8n/emails.js') }),
     geral: no('Linha da Geral', 'n8n-nodes-base.code', 2, { jsCode: ler('../../plantoes/emails.js') + '\n' + ler('../../plantoes/n8n/geral.js') }),
     geralSe: se('Atualiza a Geral?', '={{ !$json.pular }}'),
-    geralAbre: planilha('Abre a linha na Geral', 'POST', PLANILHA + ':batchUpdate', "={{ JSON.stringify($('Linha da Geral').first().json.abre) }}"),
+    geralAbre: planilha('Abre a linha na Geral', 'POST', PLANILHA + ':batchUpdate', "={{ JSON.stringify($('Linha da Geral').first().json.abre) }}", { retryOnFail: false }),   // insere linha: sem repetir
     geralGrava: planilha('Grava a Geral', 'POST', PLANILHA + '/values:batchUpdate', "={{ JSON.stringify($('Linha da Geral').first().json.grava) }}", { onError: 'continueRegularOutput' }),
     ...(GMAIL ? {
       token: no('Gmail · renova o acesso', 'n8n-nodes-base.httpRequest', 4.2, { method: 'POST', url: 'https://oauth2.googleapis.com/token', authentication: 'genericCredentialType', genericAuthType: 'httpCustomAuth', sendBody: true, contentType: 'json', specifyBody: 'json', jsonBody: '{}', options: {} }, { credentials: GMAIL, executeOnce: true }),
       separa: no('Um por rascunho', 'n8n-nodes-base.code', 2, { jsCode: "return $('Monta os e-mails').first().json.rascunhos.map((r) => ({ json: r }));" }),
-      cria: no('Cria os rascunhos', 'n8n-nodes-base.httpRequest', 4.2, { method: 'POST', url: 'https://gmail.googleapis.com/gmail/v1/users/me/drafts', sendHeaders: true, headerParameters: { parameters: [{ name: 'Authorization', value: "={{ 'Bearer ' + $('Gmail · renova o acesso').first().json.access_token }}" }] }, sendBody: true, specifyBody: 'json', jsonBody: '={{ JSON.stringify($json) }}', options: { timeout: 60000 } }, { onError: 'continueRegularOutput' }),
+      cria: no('Cria os rascunhos', 'n8n-nodes-base.httpRequest', 4.2, { method: 'POST', url: 'https://gmail.googleapis.com/gmail/v1/users/me/drafts', sendHeaders: true, headerParameters: { parameters: [{ name: 'Authorization', value: "={{ 'Bearer ' + $('Gmail · renova o acesso').first().json.access_token }}" }] }, sendBody: true, specifyBody: 'json', jsonBody: '={{ JSON.stringify($json) }}', options: { timeout: 60000 } }, { onError: 'continueRegularOutput', retryOnFail: false }),   // rascunho repetido: sem repetir
     } : {}),
     aviso: codigo('Mensagem para o Jorge', '../../plantoes/n8n/emails-telegram.js'),
     tg: no('Telegram · e-mails', 'n8n-nodes-base.telegram', 1.2, { chatId: CHAT, text: '={{ $json.texto }}', additionalFields: { appendAttribution: false, parse_mode: 'HTML' } }, { credentials: TG }),
@@ -436,7 +447,8 @@ function fluxoPlantoesEmails() {
     fs.writeFileSync(path.join(RAIZ, 'n8n-ids.json'), JSON.stringify(IDS, null, 1));
     if (tagBMH) await api(`workflows/${id}/tags`, 'PUT', [{ id: tagBMH.id }]);
     const atual = await api('workflows/' + id, 'GET');
-    if (!atual.active && chave !== 'alerta') { await api(`workflows/${id}/activate`, 'POST'); console.log('  ligado'); }
+    if (!atual.active) {   // o alerta também: desligado, o n8n não chama o fluxo de erro (conferido em 12/10/2026)
+      await api(`workflows/${id}/activate`, 'POST'); console.log('  ligado'); }
   }
   fs.writeFileSync(path.join(RAIZ, 'n8n-ids.json'), JSON.stringify(IDS, null, 1));
 })().catch((e) => { console.error('ERRO', e.message); process.exit(1); });

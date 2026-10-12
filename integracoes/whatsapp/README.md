@@ -14,4 +14,8 @@ Um mês olhando como a recepção atende hoje (61 3346-6005) antes de desenhar o
   equipe respondeu), `tipo`, `texto` (CPF apagado), `transcrito`, `respondendo`, `apagar_em` (6 meses).
 - **Montar ou atualizar:** `node --env-file=.env integracoes/whatsapp/montar.js` (só a Evolution: `... montar.js so-evolution`).
 - **Teste:** com mensagem real do celular do próprio Jorge. Não inserir linha de teste na tabela (a API do n8n não apaga linha).
+- **Limpeza (12/10/2026):** fluxo "BMH · WhatsApp · apaga conversas vencidas" (`fluxos.limpeza` no `n8n-ids.json`), todo dia
+  às 4h37, apaga as linhas com `apagar_em` até hoje (Brasília) e grava só a contagem em `BMH_limpeza_registro`. Não guarda
+  execução. Rodar à mão: o caminho do "Rodar agora" está na nota do fluxo. Linha de teste só com `apagar_em` vencido ou do
+  dia seguinte (a limpeza tira).
 - Regras de dado e credenciais: `~/.claude/skills/seguranca-credenciais/SKILL.md`.

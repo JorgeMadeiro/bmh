@@ -29,7 +29,10 @@
   "BMH_financeiro_detalhe": "iJuk9paP3YfaEWlD",
   "BMH_prazo_recebimento": "HTYAkcJSxHIGBNQC",
   "BMH_financeiro_paciente": "eqyIECPToIvxDhcm",
-  "BMH_whatsapp_mensagens": "ll7XMHZ9sWkenCgb"
+  "BMH_whatsapp_mensagens": "ll7XMHZ9sWkenCgb",
+  "BMH_falhas": "c5yIwkcwSJXAZMZq",
+  "BMH_limpeza_registro": "JtT1fOn3xrSQmmIU",
+  "BMH_fila_publicacao": "RaABWuNztVAap9AV"
  },
  "fluxos": {
   "grava": "AeQIImClkXtRrWIf",
@@ -45,7 +48,9 @@
   "diretoria": "26y4Uo2WLAAqpK70",
   "plantoes": "QaQ4SIaS2neUfUuS",
   "plantoesEmails": "qNDy08i41junIQk9",
-  "whatsapp": "qDgmqqtt6zn1gARw"
+  "whatsapp": "qDgmqqtt6zn1gARw",
+  "limpeza": "sm7uaiRPM5G5gAhO",
+  "fila": "r6Rib8PXJ0zlSo4z"
  },
  "whatsapp": {
   "caminho": "bmh-whatsapp-daeff8542cee5cef6c6a8832"

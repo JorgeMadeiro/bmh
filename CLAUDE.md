@@ -197,3 +197,14 @@ para todas: escrever na skill global**, não numa cópia local. As cópias antig
 Skills globais acrescentadas em 11/10/2026, depois da conferência de segurança: `marca` (posicionamento, nome, voz, marca pessoal,
 arquitetura de marcas), `linkedin` (perfil de médico e páginas das empresas; nunca publica sozinha), `grill-me` (entrevista em rodadas
 até o plano ficar claro) e `prospeccao` (lista de empresas com contato público, sem serviço pago e sem mandar dado para fora).
+
+## n8n da BMH (atualizado em 12/10/2026)
+
+- Alerta: `BMH · Alerta de falha` (`7u3CuyjESsHmCtMW`), **ativo** (estava desligado e nunca tinha avisado nada), grava em
+  `BMH_falhas` e manda no Telegram do Jorge com máscara de dado pessoal. 27 chamadas HTTP em 11 fluxos com nova tentativa.
+- Novo: `BMH · WhatsApp · apaga conversas vencidas` (`sm7uaiRPM5G5gAhO`, todo dia 4h37, registro em `BMH_limpeza_registro`).
+- Novo e **desligado**: `BMH · Instagram · fila de publicação` (`r6Rib8PXJ0zlSo4z`, tabela `BMH_fila_publicacao`); falta o
+  token da Meta da BMH e o id da conta do Instagram.
+- Cópias de antes de cada alteração em `dados/n8n-copias/` (fora do git; trazem segredos dos nós).
+- "Produção Diaria e Mensal BMH" e "BMH · Diretoria · produção do mês" mandam pela instância **Madeiro** (número pessoal):
+  pela regra de 12/10, migrar para o número de automação quando ele existir.
