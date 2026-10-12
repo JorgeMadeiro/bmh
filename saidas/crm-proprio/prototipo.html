@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CRM BMH (protótipo)</title>
+<style>
+:root{
+  --marinho:#16324F;      /* barra e títulos */
+  --marinho-logo:#002375; /* botão sobre fundo claro */
+  --profundo:#00143F;
+  --oxigenio:#34A9CF;     /* só sobre fundo escuro */
+  --azul-texto:#1A6E93;   /* azul para texto sobre branco */
+  --nevoa:#EEF5FA;
+  --tinta:#142033;
+  --secundario:#4A5568;
+  --borda:#DCE5EE;
+  --branco:#FFFFFF;
+  --atencao:#9A5B00; --atencao-fundo:#FFF4E0;
+  --vencido:#B42318; --vencido-fundo:#FDECEA;
+  --ok:#25704A; --ok-fundo:#E6F4EC;
+  --raio:5px;
+  --fonte:"Libre Franklin", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--nevoa);color:var(--tinta);font-family:var(--fonte);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:var(--azul-texto);text-decoration:none}
+button,select,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--oxigenio);outline-offset:2px}
+h1,h2,h3{margin:0;line-height:1.2;color:var(--marinho)}
+h1{font-size:22px;font-weight:800}
+h2{font-size:17px;font-weight:700}
+h3{font-size:15px;font-weight:700}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* faixa do protótipo */
+.aviso{background:#FFE9A8;color:#3D2E00;text-align:center;font-size:13px;font-weight:600;padding:6px 16px;position:sticky;top:0;z-index:30;border-bottom:1px solid #E8C962}
+
+/* botões */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 20px;border-radius:999px;border:1px solid var(--marinho-logo);background:var(--marinho-logo);color:#fff;font-weight:600;cursor:pointer}
+.btn:hover{background:var(--profundo)}
+.btn.sec{background:#fff;color:var(--marinho-logo)}
+.btn.sec:hover{background:var(--nevoa)}
+.btn.perigo{background:#fff;color:var(--vencido);border-color:#E7B4AE}
+.btn.peq{min-height:36px;padding:0 14px;font-size:14px}
+
+/* login */
+.login{min-height:calc(100vh - 32px);display:grid;grid-template-columns:1fr 1fr}
+.login-marca{background:var(--marinho);color:#fff;padding:48px;display:flex;flex-direction:column;justify-content:space-between}
+.login-marca .sigla{font-size:56px;font-weight:800;letter-spacing:-1px;line-height:1}
+.login-marca .sigla span{color:var(--oxigenio)}
+.login-marca p{max-width:34ch;font-size:20px;line-height:1.35;margin:24px 0 0;color:#E4EEF6}
+.login-marca small{color:#A9C3D9;font-size:13px}
+.login-form{display:flex;align-items:center;justify-content:center;padding:32px 16px;background:#fff}
+.login-form form{width:100%;max-width:360px;display:grid;gap:16px}
+.campo{display:grid;gap:6px}
+.campo label{font-size:14px;font-weight:600;color:var(--secundario)}
+.campo input,.campo select,.campo textarea{min-height:44px;padding:8px 12px;border:1px solid #B9C7D6;border-radius:var(--raio);background:#fff}
+.campo textarea{min-height:72px;resize:vertical}
+.dica{font-size:13px;color:var(--secundario);margin:0}
+.login-form .demo{border-top:1px solid var(--borda);padding-top:16px}
+
+/* barra do sistema */
+.topo{background:var(--marinho);color:#fff;display:flex;align-items:center;gap:16px;padding:0 16px;min-height:56px;position:sticky;top:31px;z-index:20}
+.topo .sigla{font-weight:800;font-size:20px;letter-spacing:-.5px}
+.topo .sigla span{color:var(--oxigenio)}
+.topo nav{display:flex;gap:4px}
+.topo nav button{background:none;border:0;color:#CFE0EE;padding:8px 12px;border-radius:999px;cursor:pointer;font-weight:600}
+.topo nav button[aria-current="page"]{background:rgba(255,255,255,.12);color:#fff}
+.topo .busca{flex:1;max-width:320px;margin-left:auto}
+.topo .busca input{width:100%;min-height:36px;border-radius:999px;border:0;padding:0 14px;background:rgba(255,255,255,.12);color:#fff}
+.topo .busca input::placeholder{color:#A9C3D9}
+.quem{display:flex;align-items:center;gap:8px;font-size:13px;color:#CFE0EE;white-space:nowrap}
+.quem b{color:#fff;font-weight:600}
+.quem button{background:none;border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:999px;padding:4px 10px;cursor:pointer;font-size:13px}
+.pagina{padding:20px 16px 48px;max-width:1440px;margin:0 auto}
+.cab{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px;justify-content:space-between;margin-bottom:16px}
+.cab p{margin:4px 0 0;color:var(--secundario);font-size:14px}
+.filtros{display:flex;flex-wrap:wrap;gap:8px}
+.filtros select{min-height:36px;border:1px solid #B9C7D6;border-radius:999px;padding:0 12px;background:#fff;font-size:14px}
+
+/* funil */
+.etapas-cel{display:none}
+.quadro{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(232px,1fr);gap:12px;overflow-x:auto;padding-bottom:8px}
+.coluna{background:#fff;border:1px solid var(--borda);border-radius:var(--raio);display:flex;flex-direction:column;min-height:420px}
+.coluna header{padding:12px 12px 8px;border-bottom:1px solid var(--borda)}
+.coluna header h2{font-size:14px;display:flex;justify-content:space-between;gap:8px}
+.coluna header h2 span{color:var(--secundario);font-weight:600}
+.coluna header p{margin:2px 0 0;font-size:12px;color:var(--secundario)}
+.coluna.perdido{background:#F7F9FB}
+.cartoes{padding:8px;display:grid;gap:8px;align-content:start}
+.cartao{display:block;width:100%;text-align:left;background:#fff;border:1px solid var(--borda);border-left:4px solid var(--borda);border-radius:var(--raio);padding:10px 12px;cursor:pointer}
+.cartao:hover{border-color:#B9C7D6}
+.cartao.atencao{border-left-color:#E0A23B}
+.cartao.vencido{border-left-color:var(--vencido)}
+.cartao .nome{font-weight:700;color:var(--tinta);display:block}
+.cartao .linha{display:block;font-size:13px;color:var(--secundario);margin-top:2px}
+.cartao .rodape{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.selo{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--nevoa);color:var(--marinho)}
+.selo.atencao{background:var(--atencao-fundo);color:var(--atencao)}
+.selo.vencido{background:var(--vencido-fundo);color:var(--vencido)}
+.selo.ok{background:var(--ok-fundo);color:var(--ok)}
+.selo.ia{background:#E3F2F8;color:#145A78}
+
+/* ficha */
+.voltar{background:none;border:0;color:var(--azul-texto);font-weight:600;cursor:pointer;padding:6px 0;margin-bottom:8px}
+.ficha{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:16px;align-items:start}
+.bloco{background:#fff;border:1px solid var(--borda);border-radius:var(--raio);padding:16px}
+.bloco + .bloco{margin-top:16px}
+.bloco h2{margin-bottom:12px}
+.dados{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:0;font-size:14px}
+.dados dt{color:var(--secundario)}
+.dados dd{margin:0;font-weight:600}
+.dados dd.vazio{color:var(--vencido);font-weight:600}
+.etapa-trilha{display:flex;gap:4px;margin:4px 0 14px}
+.etapa-trilha i{flex:1;height:6px;border-radius:3px;background:var(--borda)}
+.etapa-trilha i.feito{background:var(--azul-texto)}
+.acoes{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.msg-erro{background:var(--vencido-fundo);color:var(--vencido);border-radius:var(--raio);padding:10px 12px;font-size:14px;margin-top:12px}
+.painel-extra{border-top:1px solid var(--borda);margin-top:14px;padding-top:14px;display:grid;gap:10px}
+.lista{list-style:none;margin:0;padding:0}
+.lista li{padding:10px 0;border-bottom:1px solid var(--borda);font-size:14px;display:flex;justify-content:space-between;gap:12px}
+.lista li:last-child{border-bottom:0}
+.nota-aviso{font-size:12px;color:var(--atencao);background:var(--atencao-fundo);padding:6px 10px;border-radius:var(--raio);margin:8px 0 0}
+.tempo{list-style:none;margin:0;padding:0;position:relative}
+.tempo li{position:relative;padding:0 0 14px 22px;font-size:14px}
+.tempo li::before{content:"";position:absolute;left:5px;top:6px;width:9px;height:9px;border-radius:50%;background:#fff;border:2px solid var(--azul-texto)}
+.tempo li::after{content:"";position:absolute;left:10px;top:18px;bottom:0;width:1px;background:var(--borda)}
+.tempo li:last-child::after{display:none}
+.tempo li.novo::before{background:var(--azul-texto)}
+.tempo .quando{display:block;font-size:12px;color:var(--secundario)}
+.tempo .quem-fez{font-weight:700}
+.tempo .mud{display:block;font-size:13px;color:var(--secundario)}
+.conversa{display:grid;gap:8px;max-height:260px;overflow:auto;padding:4px}
+.bolha{max-width:85%;padding:8px 12px;border-radius:12px;font-size:14px}
+.bolha small{display:block;font-size:11px;color:var(--secundario);margin-top:2px}
+.bolha.pac{background:var(--nevoa);justify-self:start;border-bottom-left-radius:3px}
+.bolha.eq{background:#E3F2F8;justify-self:end;border-bottom-right-radius:3px}
+.so-leitura{font-size:12px;color:var(--secundario);margin:8px 0 0}
+
+/* relatório */
+.numeros{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));background:#fff;border:1px solid var(--borda);border-radius:var(--raio);margin-bottom:16px}
+.numeros dl{padding:14px 16px;border-left:1px solid var(--borda)}
+.numeros dl:first-child{border-left:0}
+.numeros dt{font-size:13px;color:var(--secundario)}
+.numeros dd{margin:2px 0 0;font-size:24px;font-weight:800;color:var(--marinho)}
+.numeros dl{margin:0}
+.grade-rel{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start;margin-top:16px}
+.rolagem{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:right;padding:9px 10px;border-bottom:1px solid var(--borda);white-space:nowrap}
+th:first-child,td:first-child{text-align:left;white-space:normal}
+th{font-size:12px;color:var(--secundario);font-weight:600}
+tr.total td{font-weight:800;border-bottom:0}
+td.pago{color:var(--azul-texto);font-weight:600}
+.barras{display:grid;gap:8px}
+.barra{display:grid;grid-template-columns:150px 1fr 48px;gap:10px;align-items:center;font-size:14px}
+.barra .trilho{height:14px;background:var(--nevoa);border-radius:3px;overflow:hidden}
+.barra .trilho b{display:block;height:100%;background:var(--azul-texto)}
+.barra .trilho b.perda{background:#C58B8B}
+.barra span:last-child{text-align:right;font-weight:700}
+.nota-rel{font-size:13px;color:var(--secundario);margin:10px 0 0}
+.restrito{background:var(--atencao-fundo);color:var(--atencao);border-radius:var(--raio);padding:10px 12px;font-size:14px;margin-bottom:16px}
+
+/* celular */
+@media (max-width:760px){
+  .login{grid-template-columns:1fr;min-height:auto}
+  .login-marca{padding:24px 16px}
+  .login-marca .sigla{font-size:40px}
+  .login-marca p{font-size:17px;margin-top:12px}
+  .login-marca small{display:none}
+  .topo{flex-wrap:wrap;gap:8px;padding:8px 16px}
+  .topo .busca{order:3;flex-basis:100%;max-width:none;margin-left:0}
+  .topo nav{order:2;margin-left:auto}
+  .quem span{display:none}
+  .quem{order:4;flex-basis:100%;justify-content:space-between}
+  .etapas-cel{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:8px}
+  .etapas-cel button{flex:0 0 auto;border:1px solid #B9C7D6;background:#fff;border-radius:999px;padding:8px 12px;font-size:13px;font-weight:600;cursor:pointer;color:var(--marinho)}
+  .etapas-cel button[aria-pressed="true"]{background:var(--marinho-logo);border-color:var(--marinho-logo);color:#fff}
+  .quadro{display:block;overflow:visible}
+  .coluna{display:none;min-height:0}
+  .coluna.ativa{display:flex}
+  .ficha,.grade-rel{grid-template-columns:1fr}
+  .numeros{grid-template-columns:1fr 1fr}
+  .numeros dl{border-left:0;border-top:1px solid var(--borda)}
+  .numeros dl:nth-child(-n+2){border-top:0}
+  .numeros dl:nth-child(even){border-left:1px solid var(--borda)}
+  .numeros dl:last-child{grid-column:1 / -1;border-left:0}
+  table.empilha thead{display:none}
+  table.empilha tr{display:block;border-bottom:1px solid var(--borda);padding:8px 0}
+  table.empilha td{display:flex;justify-content:space-between;gap:12px;border:0;padding:3px 0;white-space:normal}
+  table.empilha td:first-child{font-weight:700;font-size:15px}
+  table.empilha td[data-r]::before{content:attr(data-r);color:var(--secundario);font-weight:400}
+  .barra{grid-template-columns:110px 1fr 40px}
+  table.empilha td.sg{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="aviso" role="note">Protótipo, dados fictícios. Nenhum nome, telefone ou número aqui é de paciente real.</div>
+<div id="app"></div>
+
+<script>
+/* Protótipo do CRM da BMH. Tudo em memória: nada é gravado nem enviado. */
+var ETAPAS = [
+  {id:"novo", nome:"Novo contato", limite:"15 min"},
+  {id:"conversa", nome:"Em conversa", limite:"2 dias"},
+  {id:"pedido", nome:"Pedido e autorização", limite:"5 dias"},
+  {id:"agendada", nome:"Avaliação agendada", limite:"até a data"},
+  {id:"avaliou", nome:"Avaliou", limite:"7 dias"},
+  {id:"tratamento", nome:"Em tratamento", limite:"10 dias sem sessão"},
+  {id:"concluiu", nome:"Concluiu", limite:""},
+  {id:"perdido", nome:"Perdido", limite:""}
+];
+var MOTIVOS = [
+  ["CONVENIO","Convênio não cobre ou negou"],["PRECO","Particular achou caro"],["SEM_INDICACAO","Médico não indicou"],
+  ["SUMIU","Parou de responder"],["TEMPO","Agora não dá"],["OUTRO_LUGAR","Foi para outro serviço"],["FORA","Não é caso da BMH"]
+];
+var COMO = ["Cirurgião ou médico","Paciente ou conhecido","Google (anúncio)","Google (busca)","Instagram","Site","Outro"];
+var PERFIS = {
+  recepcao:{nome:"Recepcionista A", desc:"Recepção, Asa Sul", unidade:"Asa Sul"},
+  diretoria:{nome:"Diretor Exemplo", desc:"Diretoria", unidade:null},
+  jorge:{nome:"Jorge", desc:"Administrador", unidade:null}
+};
+
+/* dados fictícios */
+var OPS = [
+ {id:1, nome:"Ana Exemplo", tel:"(61) 90000-0001", unidade:"Asa Sul", caso:"Pós-operatório de cirurgia plástica", pag:"Convênio Amil", etapa:"novo", origem:"Google Ads, pós-operatório", gclid:true, como:"Google (anúncio)", cir:"", resp:"Atendente de IA", parado:"9 min", alerta:"", ia:true, chegou:"21/11 08:51"},
+ {id:2, nome:"Bruna Fictícia", tel:"(61) 90000-0002", unidade:"Taguatinga", caso:"Pós-operatório de cirurgia plástica", pag:"Particular", etapa:"novo", origem:"Instagram, bio", como:"Instagram", cir:"", resp:"Recepcionista B", parado:"41 min", alerta:"vencido", chegou:"21/11 08:19"},
+ {id:3, nome:"Carla Teste", tel:"(61) 90000-0003", unidade:"Asa Sul", caso:"Pós-operatório de cirurgia plástica", pag:"Convênio Cassi", etapa:"conversa", origem:"Google Ads, câmara hiperbárica", gclid:true, como:"", cir:"", resp:"Recepcionista A", parado:"1 dia", alerta:"", chegou:"20/11 14:02"},
+ {id:4, nome:"Débora Modelo", tel:"(61) 90000-0004", unidade:"Asa Sul", caso:"Ferida de difícil cicatrização", pag:"Convênio Saúde BRB", etapa:"conversa", origem:"Indicação, Dr. Cirurgião Exemplo A", como:"Cirurgião ou médico", cir:"Dr. Cirurgião Exemplo A", resp:"Recepcionista A", parado:"3 dias", alerta:"atencao", chegou:"18/11 10:30"},
+ {id:5, nome:"Elisa Inventada", tel:"(61) 90000-0005", unidade:"Taguatinga", caso:"Pós-operatório de cirurgia plástica", pag:"Convênio Bradesco Saúde", etapa:"pedido", origem:"Indicação, Dra. Cirurgiã Exemplo B", como:"Cirurgião ou médico", cir:"Dra. Cirurgiã Exemplo B", resp:"Recepcionista B", parado:"2 dias", alerta:"", tarefa:"Conferir autorização", chegou:"17/11 09:12"},
+ {id:6, nome:"Fábio Fictício", tel:"(61) 90000-0006", unidade:"Asa Sul", caso:"Aptidão para mergulho", pag:"Particular", etapa:"pedido", origem:"Google, busca sem anúncio", como:"Google (busca)", cir:"", resp:"Recepcionista A", parado:"6 dias", alerta:"vencido", tarefa:"Cobrar pedido médico (vencida)", chegou:"13/11 16:40"},
+ {id:7, nome:"Gisele Exemplo", tel:"(61) 90000-0007", unidade:"Asa Sul", caso:"Pós-operatório de cirurgia plástica", pag:"Convênio Amil", etapa:"agendada", origem:"Google Ads, pós-operatório", gclid:true, como:"Google (anúncio)", cir:"Dr. Cirurgião Exemplo A", resp:"Recepcionista A", parado:"avaliação 24/11", alerta:"", chegou:"16/11 11:05"},
+ {id:8, nome:"Helena Teste", tel:"(61) 90000-0008", unidade:"Taguatinga", caso:"Pós-operatório de cirurgia plástica", pag:"Particular", etapa:"agendada", origem:"Paciente ou conhecido", como:"Paciente ou conhecido", cir:"", resp:"Recepcionista B", parado:"avaliação 22/11", alerta:"", chegou:"15/11 15:48"},
+ {id:9, nome:"Íris Modelo", tel:"(61) 90000-0009", unidade:"Asa Sul", caso:"Pós-operatório de cirurgia plástica", pag:"Convênio Cassi", etapa:"avaliou", origem:"Indicação, Dr. Cirurgião Exemplo A", como:"Cirurgião ou médico", cir:"Dr. Cirurgião Exemplo A", resp:"Recepcionista A", parado:"2 dias", alerta:"", chegou:"10/11 08:20"},
+ {id:10, nome:"Joana Inventada", tel:"(61) 90000-0010", unidade:"Asa Sul", caso:"Pós-operatório de cirurgia plástica", pag:"Convênio Saúde BRB", etapa:"tratamento", origem:"Indicação, Dra. Cirurgiã Exemplo B", como:"Cirurgião ou médico", cir:"Dra. Cirurgiã Exemplo B", resp:"Recepcionista A", parado:"sessão 6 de 10", alerta:"", chegou:"03/11 13:15"},
+ {id:11, nome:"Karen Fictícia", tel:"(61) 90000-0011", unidade:"Taguatinga", caso:"Ferida de difícil cicatrização", pag:"Convênio Bradesco Saúde", etapa:"tratamento", origem:"Google Ads, câmara hiperbárica", gclid:true, como:"Google (anúncio)", cir:"", resp:"Recepcionista B", parado:"sessão 12 de 20", alerta:"", chegou:"28/10 10:00"},
+ {id:12, nome:"Lara Exemplo", tel:"(61) 90000-0012", unidade:"Asa Sul", caso:"Pós-operatório de cirurgia plástica", pag:"Particular", etapa:"concluiu", origem:"Indicação, Dr. Cirurgião Exemplo A", como:"Cirurgião ou médico", cir:"Dr. Cirurgião Exemplo A", resp:"Recepcionista A", parado:"concluiu 19/11", alerta:"ok", tarefa:"Pedir avaliação no Google", chegou:"21/10 09:40"},
+ {id:13, nome:"Mário Teste", tel:"(61) 90000-0013", unidade:"Asa Sul", caso:"Pós-operatório de cirurgia plástica", pag:"Convênio Amil", etapa:"perdido", origem:"Google Ads, pós-operatório", gclid:true, como:"Google (anúncio)", cir:"", resp:"Recepcionista A", parado:"SUMIU", alerta:"", chegou:"12/11 18:22", motivo:"SUMIU"},
+ {id:14, nome:"Nina Modelo", tel:"(61) 90000-0014", unidade:"Taguatinga", caso:"Pós-operatório de cirurgia plástica", pag:"Convênio Exemplo", etapa:"perdido", origem:"Site, página de convênios", como:"Site", cir:"", resp:"Recepcionista B", parado:"CONVENIO", alerta:"", chegou:"11/11 12:10", motivo:"CONVENIO"}
+];
+
+OPS.forEach(function(o){o.etapaBase=o.etapa;o.comoBase=o.como;});
+var estado = {perfil:null, etapaCel:"novo", extras:{}, filtroUnidade:"todas"};
+
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];});}
+function etapaIdx(id){for(var i=0;i<ETAPAS.length;i++){if(ETAPAS[i].id===id)return i;}return 0;}
+function etapaNome(id){return ETAPAS[etapaIdx(id)].nome;}
+function op(id){for(var i=0;i<OPS.length;i++){if(OPS[i].id===id)return OPS[i];}return null;}
+function lerPerfilDaUrl(){var m=location.search.match(/perfil=(\w+)/);return m&&PERFIS[m[1]]?m[1]:null;}
+function opsVisiveis(){
+  var p=PERFIS[estado.perfil];
+  return OPS.filter(function(o){
+    if(p.unidade&&o.unidade!==p.unidade)return false;
+    if(estado.filtroUnidade!=="todas"&&o.unidade!==estado.filtroUnidade)return false;
+    return true;
+  });
+}
+
+/* ---------- telas ---------- */
+function telaLogin(){
+  return '<main class="login">'+
+   '<section class="login-marca"><div><div class="sigla">BMH <span>CRM</span></div>'+
+   '<p>Cada pessoa que procurou a BMH, da primeira mensagem ao fim do tratamento.</p></div>'+
+   '<small>Brasília Medicina Hiperbárica, Asa Sul e Taguatinga</small></section>'+
+   '<section class="login-form"><form id="f-login" novalidate>'+
+     '<h1>Entrar</h1>'+
+     '<div class="campo"><label for="email">E-mail</label><input id="email" type="email" value="recepcao.a@exemplo.invalid" autocomplete="username"></div>'+
+     '<div class="campo"><label for="senha">Senha</label><input id="senha" type="password" value="senha-ficticia" autocomplete="current-password"></div>'+
+     '<button class="btn" type="submit">Entrar</button>'+
+     '<a href="#login" onclick="alert(\'No sistema de verdade, chega um e-mail para criar senha nova.\');return false">Esqueci a senha</a>'+
+     '<div class="demo campo"><label for="perfil">Só no protótipo: entrar como</label>'+
+       '<select id="perfil"><option value="recepcao">Recepcionista A (recepção, Asa Sul)</option><option value="diretoria">Diretor Exemplo (diretoria)</option><option value="jorge" selected>Jorge (administrador)</option></select>'+
+       '<p class="dica">Cada perfil vê coisas diferentes. Diretoria e administrador digitam também um código do celular.</p></div>'+
+   '</form></section></main>';
+}
+
+function topo(atual){
+  var p=PERFIS[estado.perfil];
+  function item(id,nome){return '<button type="button" data-ir="'+id+'"'+(atual===id?' aria-current="page"':'')+'>'+nome+'</button>';}
+  return '<header class="topo"><div class="sigla">BMH <span>CRM</span></div>'+
+    '<nav aria-label="Telas">'+item("funil","Funil")+item("relatorio","Relatório")+'</nav>'+
+    '<div class="busca"><label class="sr" for="busca">Buscar</label><input id="busca" placeholder="Buscar por nome ou final do telefone"></div>'+
+    '<div class="quem"><span>Entrou como</span> <b>'+esc(p.nome)+'</b> <span>('+esc(p.desc)+')</span><button type="button" data-ir="login">Sair</button></div>'+
+  '</header>';
+}
+
+function cartao(o){
+  var sel=[];
+  if(o.alerta==="vencido")sel.push('<span class="selo vencido">parado '+esc(o.parado)+'</span>');
+  else if(o.alerta==="atencao")sel.push('<span class="selo atencao">parado '+esc(o.parado)+'</span>');
+  else if(o.etapa==="perdido")sel.push('<span class="selo">motivo '+esc(o.motivo)+'</span>');
+  else sel.push('<span class="selo">'+esc(o.parado)+'</span>');
+  if(o.ia)sel.push('<span class="selo ia">atendente de IA</span>');
+  if(o.tarefa)sel.push('<span class="selo '+(o.tarefa.indexOf("vencida")>-1?"vencido":"ok")+'">'+esc(o.tarefa)+'</span>');
+  return '<button type="button" class="cartao '+(o.alerta||"")+'" data-ficha="'+o.id+'">'+
+    '<span class="nome">'+esc(o.nome)+'</span>'+
+    '<span class="linha">'+esc(o.caso)+'</span>'+
+    '<span class="linha">'+esc(o.pag)+', '+esc(o.unidade)+'</span>'+
+    '<span class="linha">Origem: '+esc(o.origem)+'</span>'+
+    '<span class="rodape">'+sel.join("")+'</span></button>';
+}
+
+function telaFunil(){
+  var p=PERFIS[estado.perfil], lista=opsVisiveis();
+  var chips='<div class="etapas-cel" role="group" aria-label="Escolher etapa">';
+  var cols='<div class="quadro">';
+  ETAPAS.forEach(function(e){
+    var doEtapa=lista.filter(function(o){return o.etapa===e.id;});
+    chips+='<button type="button" data-etapa="'+e.id+'" aria-pressed="'+(estado.etapaCel===e.id)+'">'+e.nome+' ('+doEtapa.length+')</button>';
+    cols+='<section class="coluna'+(e.id==="perdido"?" perdido":"")+(estado.etapaCel===e.id?" ativa":"")+'" aria-label="'+e.nome+'">'+
+      '<header><h2>'+e.nome+' <span>'+doEtapa.length+'</span></h2>'+(e.limite?'<p>Parado demais: '+e.limite+'</p>':'<p>&nbsp;</p>')+'</header>'+
+      '<div class="cartoes">'+doEtapa.map(cartao).join("")+'</div></section>';
+  });
+  chips+='</div>'; cols+='</div>';
+  var unidadeSel=p.unidade?'<select disabled aria-label="Unidade"><option>'+p.unidade+' (sua unidade)</option></select>':
+    '<select id="f-unidade" aria-label="Unidade"><option value="todas">Todas as unidades</option><option'+(estado.filtroUnidade==="Asa Sul"?" selected":"")+'>Asa Sul</option><option'+(estado.filtroUnidade==="Taguatinga"?" selected":"")+'>Taguatinga</option></select>';
+  return topo("funil")+'<main class="pagina">'+
+    '<div class="cab"><div><h1>Funil</h1><p>'+lista.length+' oportunidades. Toque num cartão para abrir a ficha.</p></div>'+
+    '<div class="filtros">'+unidadeSel+
+      '<select aria-label="Responsável"><option>Todos os responsáveis</option><option>Recepcionista A</option><option>Recepcionista B</option><option>Atendente de IA</option></select>'+
+      '<select aria-label="Origem"><option>Todas as origens</option><option>Google Ads</option><option>Indicação</option><option>Instagram</option><option>Site</option></select>'+
+    '</div></div>'+chips+cols+'</main>';
+}
+
+function historico(o){
+  var i=etapaIdx(o.etapaBase), perdeu=o.etapaBase==="perdido", ev=[];
+  var dia=o.chegou;
+  ev.push({q:dia,quem:"Sistema",txt:"criou a oportunidade a partir da primeira mensagem no WhatsApp"});
+  if(o.gclid)ev.push({q:dia,quem:"Sistema",txt:"ligou a conversa ao clique no site",mud:"página /pos-operatorio-cirurgia-plastica/, campanha "+o.origem.replace("Google Ads, ","")+", com gclid"});
+  if(o.ia)ev.push({q:dia,quem:"Atendente de IA",txt:"preencheu o tipo de caso",mud:"de vazio para \""+o.caso+"\""});
+  if(i>=1)ev.push({q:dia,quem:o.resp,txt:"moveu de etapa",mud:"de \"Novo contato\" para \"Em conversa\""});
+  if(i>=1&&o.comoBase)ev.push({q:dia,quem:o.resp,txt:"preencheu como conheceu",mud:"de vazio para \""+o.comoBase+"\""});
+  if(i>=2&&!perdeu)ev.push({q:"um dia depois",quem:o.resp,txt:"moveu de etapa",mud:"de \"Em conversa\" para \"Pedido e autorização\""});
+  if(i>=3&&!perdeu)ev.push({q:"dias depois",quem:"Sistema (iGut)",txt:"moveu de etapa ao ver a avaliação marcada",mud:"de \"Pedido e autorização\" para \"Avaliação agendada\""});
+  if(i>=4&&!perdeu)ev.push({q:"no dia da avaliação",quem:"Sistema (iGut)",txt:"moveu de etapa: avaliação finalizada no iGut",mud:"de \"Avaliação agendada\" para \"Avaliou\""});
+  if(i>=5&&!perdeu)ev.push({q:"dias depois",quem:"Sistema (iGut)",txt:"moveu de etapa: primeira sessão finalizada",mud:"de \"Avaliou\" para \"Em tratamento\""});
+  if(i>=6&&!perdeu)ev.push({q:"19/11 17:02",quem:"Sistema (iGut)",txt:"moveu de etapa: última sessão do protocolo",mud:"de \"Em tratamento\" para \"Concluiu\""});
+  if(perdeu)ev.push({q:"dias depois",quem:o.resp,txt:"marcou como perdido",mud:"motivo "+o.motivo});
+  ev.push({q:"hoje 09:14",quem:"Diretor Exemplo",txt:"abriu a ficha"});
+  return ev.concat(estado.extras[o.id]||[]);
+}
+
+function telaFicha(id){
+  var o=op(id); if(!o)return telaFunil();
+  var i=etapaIdx(o.etapa), trilha="";
+  for(var k=0;k<7;k++)trilha+='<i class="'+(k<=i&&o.etapa!=="perdido"?"feito":"")+'"></i>';
+  var prox=(o.etapa==="perdido"||o.etapa==="concluiu")?null:ETAPAS[i+1];
+  var hist=historico(o).slice().reverse();
+  var p=PERFIS[estado.perfil];
+  return topo("funil")+'<main class="pagina">'+
+   '<button type="button" class="voltar" data-ir="funil">Voltar ao funil</button>'+
+   '<div class="cab"><div><h1>'+esc(o.nome)+'</h1><p>'+esc(o.tel)+', '+esc(o.unidade)+'. Contato fictício.</p></div></div>'+
+   '<div class="ficha"><div>'+
+    '<section class="bloco"><h2>Oportunidade</h2>'+
+      '<div class="etapa-trilha" aria-hidden="true">'+trilha+'</div>'+
+      '<dl class="dados">'+
+        '<dt>Etapa</dt><dd>'+etapaNome(o.etapa)+(o.motivo?" ("+o.motivo+")":"")+'</dd>'+
+        '<dt>Tipo de caso</dt><dd>'+esc(o.caso)+'</dd>'+
+        '<dt>Pagamento</dt><dd>'+esc(o.pag)+'</dd>'+
+        '<dt>Como conheceu</dt>'+(o.como?'<dd>'+esc(o.como)+'</dd>':'<dd class="vazio">falta preencher</dd>')+
+        '<dt>Cirurgião que indicou</dt><dd>'+(o.cir?esc(o.cir):"nenhum")+'</dd>'+
+        '<dt>Responsável</dt><dd>'+esc(o.resp)+'</dd>'+
+      '</dl>'+
+      (prox?'<div class="acoes"><button class="btn" type="button" id="b-mover">Mover para '+prox.nome+'</button><button class="btn perigo" type="button" id="b-perder">Marcar como perdido</button></div>':'')+
+      '<div id="area-acao"></div>'+
+    '</section>'+
+    '<section class="bloco"><h2>Origem</h2><dl class="dados">'+
+      '<dt>Resumo</dt><dd>'+esc(o.origem)+'</dd>'+
+      (o.gclid?'<dt>utm_source</dt><dd>google</dd><dt>utm_medium</dt><dd>cpc</dd><dt>gclid</dt><dd>sim (guardado)</dd><dt>Página de entrada</dt><dd>/pos-operatorio-cirurgia-plastica/</dd><dt>Botão</dt><dd>pos-operatorio, barra do celular</dd>':
+        '<dt>Rastreio automático</dt><dd>sem clique do site; origem informada pela recepção</dd>')+
+    '</dl></section>'+
+    '<section class="bloco"><h2>Tarefas</h2><ul class="lista">'+
+      (o.tarefa?'<li><span>'+esc(o.tarefa)+'</span><span>'+esc(o.resp)+'</span></li>':'')+
+      '<li><span>Responder em até 15 min (criada pelo sistema)</span><span class="selo ok">feita</span></li></ul></section>'+
+    '<section class="bloco"><h2>Notas</h2><ul class="lista"><li><span>Prefere ser chamada à tarde. Pedido do cirurgião chega por e-mail.</span><span>'+esc(o.resp)+'</span></li></ul>'+
+      '<p class="nota-aviso">Não escreva diagnóstico, exame, CPF ou detalhe clínico aqui: isso vai no iGut.</p></section>'+
+   '</div><div>'+
+    '<section class="bloco"><h2>Histórico</h2><ul class="tempo" id="tempo">'+
+      hist.map(function(e){return '<li'+(e.novo?' class="novo"':'')+'><span class="quando">'+esc(e.q)+'</span><span class="quem-fez">'+esc(e.quem)+'</span> '+esc(e.txt)+(e.mud?'<span class="mud">'+esc(e.mud)+'</span>':'')+'</li>';}).join("")+
+    '</ul><p class="so-leitura">Ninguém edita nem apaga o histórico. Abrir a ficha também fica registrado.</p></section>'+
+    '<section class="bloco"><h2>Conversa no WhatsApp</h2><div class="conversa">'+
+      '<div class="bolha pac">Olá, BMH! Vim pelo site e quero saber sobre a câmara no pós-operatório.<small>'+esc(o.chegou)+'</small></div>'+
+      '<div class="bolha eq">Olá! Aqui é da recepção da BMH. Qual o seu convênio e em qual unidade fica melhor?<small>Recepção</small></div>'+
+      '<div class="bolha pac">'+esc(o.pag)+'. '+esc(o.unidade)+' é melhor para mim.<small>em seguida</small></div>'+
+    '</div><p class="so-leitura">Só leitura, mensagens fictícias. A resposta continua sendo dada no celular ou no WhatsApp Web. Conversas somem em 6 meses.</p></section>'+
+   '</div></div></main>';
+}
+
+function telaRelatorio(){
+  var p=PERFIS[estado.perfil], veCusto=estado.perfil!=="recepcao";
+  var linhas=[
+    ["Google Ads, pós-operatório",2150,58,19,15,true],
+    ["Google Ads, câmara hiperbárica",1250,31,7,5,true],
+    ["Google, busca sem anúncio",null,22,9,8],
+    ["Indicação de cirurgião ou médico",null,96,70,64],
+    ["Paciente ou conhecido",null,12,7,6],
+    ["Instagram",null,9,2,1],
+    ["Sem origem",null,6,1,1]
+  ];
+  function rs(v){return "R$ "+v.toLocaleString("pt-BR",{minimumFractionDigits:0,maximumFractionDigits:0});}
+  function custo(g,n){return g&&n?rs(Math.round(g/n)):"sem gasto";}
+  function cls(g){return g?"":' class="sg"';}
+  var cab='<thead><tr><th>Origem</th>'+(veCusto?'<th>Gasto</th>':'')+'<th>Contatos</th><th>Agendaram</th><th>Vieram</th>'+(veCusto?'<th>Por contato</th><th>Por agendado</th><th>Por paciente que veio</th>':'')+'</tr></thead>';
+  var corpo=linhas.map(function(l){
+    return '<tr><td>'+l[0]+'</td>'+(veCusto?'<td data-r="Gasto" class="'+(l[1]?"pago":"")+'">'+(l[1]?rs(l[1]):"sem gasto")+'</td>':'')+
+      '<td data-r="Contatos">'+l[2]+'</td><td data-r="Agendaram">'+l[3]+'</td><td data-r="Vieram">'+l[4]+'</td>'+
+      (veCusto?'<td data-r="Por contato"'+cls(l[1])+'>'+custo(l[1],l[2])+'</td><td data-r="Por agendado"'+cls(l[1])+'>'+custo(l[1],l[3])+'</td><td data-r="Por paciente que veio"'+cls(l[1])+'>'+custo(l[1],l[4])+'</td>':'')+'</tr>';
+  }).join("");
+  corpo+='<tr class="total"><td>Total</td>'+(veCusto?'<td data-r="Gasto">'+rs(3400)+'</td>':'')+'<td data-r="Contatos">234</td><td data-r="Agendaram">115</td><td data-r="Vieram">100</td>'+
+    (veCusto?'<td data-r="Por contato">'+rs(38)+'</td><td data-r="Por agendado">'+rs(131)+'</td><td data-r="Por paciente que veio">'+rs(170)+'</td>':'')+'</tr>';
+  var funil=[["Novo contato",234],["Em conversa",221],["Pedido e autorização",150],["Avaliação agendada",115],["Avaliou",100],["Em tratamento",88],["Concluiu",31]];
+  var barrasFunil=funil.map(function(f){return '<div class="barra"><span>'+f[0]+'</span><span class="trilho"><b style="width:'+Math.round(f[1]/234*100)+'%"></b></span><span>'+f[1]+'</span></div>';}).join("");
+  var perdas=[["SUMIU",34],["CONVENIO",21],["PRECO",12],["TEMPO",9],["FORA",8],["SEM_INDICACAO",6],["OUTRO_LUGAR",4]];
+  var barrasPerda=perdas.map(function(f){return '<div class="barra"><span>'+f[0]+'</span><span class="trilho"><b class="perda" style="width:'+Math.round(f[1]/34*100)+'%"></b></span><span>'+f[1]+'</span></div>';}).join("");
+  var numeros='<div class="numeros"><dl><dt>Contatos novos</dt><dd>234</dd></dl><dl><dt>Agendaram avaliação</dt><dd>115</dd></dl><dl><dt>Vieram à avaliação</dt><dd>100</dd></dl>'+
+    (veCusto?'<dl><dt>Gasto no Google Ads</dt><dd>'+rs(3400)+'</dd></dl><dl><dt>Custo por paciente do anúncio</dt><dd>'+rs(170)+'</dd></dl>':
+      '<dl><dt>Primeira resposta (mediana)</dt><dd>9 min</dd></dl><dl><dt>Tarefas vencidas</dt><dd>3</dd></dl>')+'</div>';
+  return topo("relatorio")+'<main class="pagina">'+
+    '<div class="cab"><div><h1>Relatório de novembro de 2026</h1><p>Números fictícios. Conta pelo mês em que o contato chegou; "vieram" e "iniciaram" vêm do iGut.</p></div>'+
+    '<div class="filtros"><select aria-label="Mês"><option>Novembro de 2026</option><option>Outubro de 2026</option></select>'+
+    (p.unidade?'<select disabled aria-label="Unidade"><option>'+p.unidade+'</option></select>':'<select aria-label="Unidade"><option>As duas unidades</option><option>Asa Sul</option><option>Taguatinga</option></select>')+'</div></div>'+
+    (veCusto?'':'<p class="restrito">O perfil da recepção vê contagens da própria unidade. Gasto e custo por paciente aparecem só para diretoria e administrador.</p>')+
+    numeros+
+    '<section class="bloco"><h2>'+(veCusto?'Origem e custo':'Origem')+'</h2><div class="rolagem"><table class="empilha">'+cab+'<tbody>'+corpo+'</tbody></table></div>'+
+      (veCusto?'<p class="nota-rel">Gasto copiado do painel (Google Ads, por campanha). Só o anúncio tem gasto; indicação e Instagram orgânico aparecem só com contagem. Na linha do total, o custo é só do anúncio.</p>':'')+'</section>'+
+    '<div class="grade-rel"><section class="bloco"><h2>Funil do mês</h2><div class="barras">'+barrasFunil+'</div>'+
+      '<p class="nota-rel">Com menos de 2 a 3 meses de dados, o funil mostra direção, não conclusão.</p></section>'+
+    '<section class="bloco"><h2>Motivos de perda</h2><div class="barras">'+barrasPerda+'</div></section></div>'+
+    '</main>';
+}
+
+/* ---------- navegação ---------- */
+function ir(rota){location.hash=rota;}
+function desenhar(){
+  var h=location.hash.replace("#","")||"login";
+  if(h!=="login"&&!estado.perfil)estado.perfil=lerPerfilDaUrl()||"jorge";
+  var app=document.getElementById("app"), html;
+  if(h==="login")html=telaLogin();
+  else if(h==="relatorio")html=telaRelatorio();
+  else if(h.indexOf("ficha-")===0)html=telaFicha(parseInt(h.split("-")[1],10));
+  else html=telaFunil();
+  app.innerHTML=html;
+  document.title=(h==="login"?"Entrar":h==="relatorio"?"Relatório":h.indexOf("ficha")===0?"Ficha":"Funil")+", CRM BMH (protótipo)";
+  ligar(h);
+  window.scrollTo(0,0);
+}
+function ligar(h){
+  var f=document.getElementById("f-login");
+  if(f)f.addEventListener("submit",function(e){e.preventDefault();estado.perfil=document.getElementById("perfil").value;estado.filtroUnidade="todas";ir("funil");});
+  Array.prototype.forEach.call(document.querySelectorAll("[data-ir]"),function(b){b.addEventListener("click",function(){if(b.getAttribute("data-ir")==="login")estado.perfil=null;ir(b.getAttribute("data-ir"));});});
+  Array.prototype.forEach.call(document.querySelectorAll("[data-ficha]"),function(b){b.addEventListener("click",function(){ir("ficha-"+b.getAttribute("data-ficha"));});});
+  Array.prototype.forEach.call(document.querySelectorAll("[data-etapa]"),function(b){b.addEventListener("click",function(){estado.etapaCel=b.getAttribute("data-etapa");desenhar();});});
+  var fu=document.getElementById("f-unidade");
+  if(fu)fu.addEventListener("change",function(){estado.filtroUnidade=fu.value;desenhar();});
+  if(h.indexOf("ficha-")===0){
+    var o=op(parseInt(h.split("-")[1],10)), area=document.getElementById("area-acao");
+    var bm=document.getElementById("b-mover"), bp=document.getElementById("b-perder");
+    function registrar(txt,mud){(estado.extras[o.id]=estado.extras[o.id]||[]).push({q:"agora",quem:PERFIS[estado.perfil].nome,txt:txt,mud:mud,novo:true});}
+    if(bm)bm.addEventListener("click",function(){
+      if(o.etapa==="conversa"&&!o.como){
+        area.innerHTML='<div class="msg-erro">Preencha "como conheceu a BMH" antes de sair de Em conversa. Sem isso, a indicação do cirurgião some do relatório.</div>'+
+          '<div class="painel-extra"><div class="campo"><label for="s-como">Como conheceu a BMH</label><select id="s-como"><option value="">Escolha</option>'+COMO.map(function(c){return '<option>'+c+'</option>';}).join("")+'</select></div>'+
+          '<div><button class="btn peq" type="button" id="b-como">Salvar</button></div></div>';
+        document.getElementById("b-como").addEventListener("click",function(){
+          var v=document.getElementById("s-como").value; if(!v)return;
+          o.como=v; registrar("preencheu como conheceu","de vazio para \""+v+"\""); desenhar();
+        });
+        return;
+      }
+      var de=etapaNome(o.etapa), para=ETAPAS[etapaIdx(o.etapa)+1];
+      o.etapa=para.id; o.alerta=""; o.parado="agora";
+      registrar("moveu de etapa","de \""+de+"\" para \""+para.nome+"\""); desenhar();
+    });
+    if(bp)bp.addEventListener("click",function(){
+      area.innerHTML='<div class="painel-extra"><div class="campo"><label for="s-mot">Motivo da perda (obrigatório)</label><select id="s-mot"><option value="">Escolha</option>'+
+        MOTIVOS.map(function(m){return '<option value="'+m[0]+'">'+m[0]+': '+m[1]+'</option>';}).join("")+'</select></div>'+
+        '<div><button class="btn peq perigo" type="button" id="b-conf">Confirmar perda</button></div><p class="dica" id="m-mot"></p></div>';
+      document.getElementById("b-conf").addEventListener("click",function(){
+        var v=document.getElementById("s-mot").value;
+        if(!v){document.getElementById("m-mot").textContent="Escolha um motivo: sem ele o cartão não vai para Perdido.";return;}
+        var de=etapaNome(o.etapa); o.etapa="perdido"; o.motivo=v; o.parado=v; o.alerta="";
+        registrar("marcou como perdido","de \""+de+"\" para \"Perdido\", motivo "+v); desenhar();
+      });
+    });
+  }
+}
+window.addEventListener("hashchange",desenhar);
+desenhar();
+</script>
+</body>
+</html>
