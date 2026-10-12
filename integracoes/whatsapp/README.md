@@ -14,4 +14,4 @@ Um mês olhando como a recepção atende hoje (61 3346-6005) antes de desenhar o
   equipe respondeu), `tipo`, `texto` (CPF apagado), `transcrito`, `respondendo`, `apagar_em` (6 meses).
 - **Montar ou atualizar:** `node --env-file=.env integracoes/whatsapp/montar.js` (só a Evolution: `... montar.js so-evolution`).
 - **Teste:** com mensagem real do celular do próprio Jorge. Não inserir linha de teste na tabela (a API do n8n não apaga linha).
-- Regras de dado e credenciais: `.claude/skills/seguranca-credenciais/SKILL.md`.
+- Regras de dado e credenciais: `~/.claude/skills/seguranca-credenciais/SKILL.md`.

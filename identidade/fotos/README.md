@@ -62,6 +62,8 @@ Taguatinga e voltar.
 **Com pessoa deitada na câmara (liberadas em 08/10/2026):** `dr-alberto-interfone-camara.jpg`, `medica-ao-lado-camara.jpg`,
 `medico-ajustando-camara.jpg`, `medico-ao-lado-camara.jpg`, `medico-sentado-camara.jpg`, `tecnico-ao-lado-camara.jpg`.
 O Jorge confirmou que existe autorização de uso da imagem da pessoa. Rosto dela não aparece.
+**Autorização por escrito:** existe (Jorge, 12/10/2026). Local e data do termo: a registrar pelo Jorge (sem nome da
+pessoa). Antes de usar em canal novo, conferir no termo o canal autorizado, o prazo e se não foi revogado.
 
 ## Logo original (`identidade/logo-original/`)
 

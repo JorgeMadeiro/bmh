@@ -133,7 +133,7 @@ marca, avisar o Jorge que ele está na pasta errada antes de produzir.
 **Estrutura de pastas:**
 - `_memoria/` — a clínica, pacientes, foco atual
 - `identidade/` — logo e (a definir) paleta da BMH
-- `identidade/fotos/` — fotos da clínica por unidade (taguatinga, asa-sul, equipe), todas sem paciente; o `README.md` diz o que é cada uma
+- `identidade/fotos/` — fotos da clínica por unidade (taguatinga, asa-sul, equipe, ensaio-2025); o `README.md` diz o que é cada uma e quais têm pessoa na câmara (só com autorização por escrito)
 - `marketing/` — conteúdo, SEO, campanhas (saída das skills)
 - `saidas/` — análises, emails, documentos pontuais
 - `dados/` — arquivos a analisar (CSV, PDF, planilha)
@@ -164,6 +164,19 @@ PATH/EUA). Não inventar número, estudo ou percentual.
 - Todo post nasce com intenção declarada: educativo, autoridade, conversão ou prova social
 - **Foto com paciente não se publica** (site, Instagram, perfil do Google), mesmo sem rosto, sem autorização por escrito: fica em `dados/fotos-com-paciente-nao-publicar/`, que não vai para o GitHub
 - **Site e peças visuais nascem no celular:** desenhar e conferir primeiro em 360 a 390 px (a maior parte dos acessos é pelo celular), com título e botão do WhatsApp na primeira tela; o computador vem depois
+
+## Travas da BMH (12/10/2026)
+
+- **Indicação só da lista aceita (UHMS e CFM).** Nada de indicação fora dela em site, post, anúncio ou material para
+  cirurgião; na dúvida, perguntar ao Jorge.
+- **Sem tom de spa, estética ou bem-estar** ("relaxe", "rejuvenescimento", "detox", antes e depois): a BMH é serviço
+  clínico especializado.
+- **Sem preço em anúncio** (Google, Meta ou qualquer outro).
+- **Foto com paciente só com autorização por escrito**, conferida antes de cada uso (canal, prazo, não revogada). O local
+  do termo fica registrado sem nome em `identidade/fotos/README.md` e no README de `dados/fotos-com-paciente-nao-publicar/`
+  (pasta só do Jorge, permissão 700; o Claude não abre as fotos).
+- **A senha do painel da diretoria continua na mensagem mensal do grupo**, por decisão do Jorge de 12/10/2026. Não mudar
+  sem pedido dele.
 
 ## Ferramentas
 

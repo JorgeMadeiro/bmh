@@ -92,7 +92,7 @@ indexadas, título descritivo, blog, ainda que parado). A Infinita reivindica "h
 ## 5. O que já existe de método, no workspace da Nexo (ler, não copiar texto)
 
 `/Users/jorgemadeiro/Downloads/Nexo_Claude_VSL/`:
-- `.claude/skills/site/` (como o site foi refeito em bloco nativo, peças de layout, lições 1 a 49)
+- `~/.claude/skills/site/` (como o site foi refeito em bloco nativo, peças de layout, lições 1 a 49)
 - `site/plano-site.md` e `site/` (peças `header.html`, `footer.html`, `css-identidade.css`)
 - `integracoes/tag-manager/`, `integracoes/google-analytics/`, `integracoes/conversoes/`,
   `integracoes/bing/`, `integracoes/clarity/` (medição, UTMs, origem do clique no WhatsApp)
