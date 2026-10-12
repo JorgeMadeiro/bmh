@@ -1,0 +1,62 @@
+[
+ {
+  "plugin": "elementor/elementor",
+  "status": "active",
+  "name": "Elementor",
+  "version": "4.3.4"
+ },
+ {
+  "plugin": "elementskit-lite/elementskit-lite",
+  "status": "active",
+  "name": "ElementsKit Lite",
+  "version": "4.0.7"
+ },
+ {
+  "plugin": "envato-elements/envato-elements",
+  "status": "active",
+  "name": "Envato Elements",
+  "version": "2.0.16"
+ },
+ {
+  "plugin": "essential-addons-for-elementor-lite/essential_adons_elementor",
+  "status": "active",
+  "name": "Essential Addons for Elementor",
+  "version": "6.8.5"
+ },
+ {
+  "plugin": "gum-elementor-addon/gum-elementor-addon",
+  "status": "active",
+  "name": "Gum Addon for Elementor",
+  "version": "1.3.18"
+ },
+ {
+  "plugin": "litespeed-cache/litespeed-cache",
+  "status": "active",
+  "name": "LiteSpeed Cache",
+  "version": "7.9.1"
+ },
+ {
+  "plugin": "metform/metform",
+  "status": "active",
+  "name": "MetForm",
+  "version": "4.3.2"
+ },
+ {
+  "plugin": "wp-seopress/seopress",
+  "status": "active",
+  "name": "SEOPress",
+  "version": "10.3"
+ },
+ {
+  "plugin": "google-site-kit/google-site-kit",
+  "status": "active",
+  "name": "Site Kit por Google",
+  "version": "1.189.0"
+ },
+ {
+  "plugin": "stratum/stratum",
+  "status": "active",
+  "name": "Stratum Widgets for Elementor",
+  "version": "1.6.2"
+ }
+]

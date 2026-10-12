@@ -1,0 +1,1 @@
+return [{ json: { texto: `⚠️ Plantões de ${$json.rotuloMes}: a aba "${$json.aba}" já existe na planilha, então não mexi. Para refazer do zero, peça ao Claude ("refazer a aba de plantões de ${$json.rotuloMes}").` } }];

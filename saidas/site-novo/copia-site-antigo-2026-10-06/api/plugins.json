@@ -1,0 +1,299 @@
+[
+ {
+  "plugin": "elementor/elementor",
+  "status": "active",
+  "name": "Elementor",
+  "plugin_uri": "https://elementor.com/?utm_source=wp-plugins&#038;utm_campaign=plugin-uri&#038;utm_medium=wp-dash",
+  "author": "Elementor.com",
+  "author_uri": "https://elementor.com/?utm_source=wp-plugins&#038;utm_campaign=author-uri&#038;utm_medium=wp-dash",
+  "description": {
+   "raw": "The Elementor Website Builder has it all: drag and drop page builder, pixel perfect design, mobile responsive editing, and more. Get started now!",
+   "rendered": "The Elementor Website Builder has it all: drag and drop page builder, pixel perfect design, mobile responsive editing, and more. Get started now! <cite>By <a href=\"https://elementor.com/?utm_source=wp-plugins&#038;utm_campaign=author-uri&#038;utm_medium=wp-dash\">Elementor.com</a>.</cite>"
+  },
+  "version": "3.29.2",
+  "network_only": false,
+  "requires_wp": "",
+  "requires_php": "",
+  "textdomain": "elementor",
+  "_links": {
+   "self": [
+    {
+     "href": "https://hiperbaricabrasilia.com.br/wp-json/wp/v2/plugins/elementor/elementor",
+     "targetHints": {
+      "allow": [
+       "GET",
+       "POST",
+       "PUT",
+       "PATCH",
+       "DELETE"
+      ]
+     }
+    }
+   ]
+  }
+ },
+ {
+  "plugin": "elementskit-lite/elementskit-lite",
+  "status": "active",
+  "name": "ElementsKit Lite",
+  "plugin_uri": "https://products.wpmet.com/elementskit",
+  "author": "Wpmet",
+  "author_uri": "https://wpmet.com/",
+  "description": {
+   "raw": "The most advanced addons for Elementor with tons of widgets, Header builder, Footer builder, Mega menu builder, layout pack and powerful custom controls.",
+   "rendered": "The most advanced addons for Elementor with tons of widgets, Header builder, Footer builder, Mega menu builder, layout pack and powerful custom controls. <cite>By <a href=\"https://wpmet.com/\">Wpmet</a>.</cite>"
+  },
+  "version": "3.5.3",
+  "network_only": false,
+  "requires_wp": "",
+  "requires_php": "",
+  "textdomain": "elementskit-lite",
+  "_links": {
+   "self": [
+    {
+     "href": "https://hiperbaricabrasilia.com.br/wp-json/wp/v2/plugins/elementskit-lite/elementskit-lite",
+     "targetHints": {
+      "allow": [
+       "GET",
+       "POST",
+       "PUT",
+       "PATCH",
+       "DELETE"
+      ]
+     }
+    }
+   ]
+  }
+ },
+ {
+  "plugin": "envato-elements/envato-elements",
+  "status": "active",
+  "name": "Envato Elements",
+  "plugin_uri": "",
+  "author": "Envato",
+  "author_uri": "https://elements.envato.com/extensions/wordpress/?utm_source=extensions&#038;utm_medium=referral&#038;utm_campaign=elements_extensions_wpplugins",
+  "description": {
+   "raw": "Access beautifully designed Template Kits + Photos from Envato Elements.",
+   "rendered": "Access beautifully designed Template Kits + Photos from Envato Elements. <cite>By <a href=\"https://elements.envato.com/extensions/wordpress/?utm_source=extensions&#038;utm_medium=referral&#038;utm_campaign=elements_extensions_wpplugins\">Envato</a>.</cite>"
+  },
+  "version": "2.0.16",
+  "network_only": false,
+  "requires_wp": "",
+  "requires_php": "",
+  "textdomain": "envato-elements",
+  "_links": {
+   "self": [
+    {
+     "href": "https://hiperbaricabrasilia.com.br/wp-json/wp/v2/plugins/envato-elements/envato-elements",
+     "targetHints": {
+      "allow": [
+       "GET",
+       "POST",
+       "PUT",
+       "PATCH",
+       "DELETE"
+      ]
+     }
+    }
+   ]
+  }
+ },
+ {
+  "plugin": "essential-addons-for-elementor-lite/essential_adons_elementor",
+  "status": "active",
+  "name": "Essential Addons for Elementor",
+  "plugin_uri": "https://essential-addons.com/",
+  "author": "WPDeveloper",
+  "author_uri": "https://wpdeveloper.com/",
+  "description": {
+   "raw": "The Essential plugin you install after Elementor! Packed with 100+ stunning elements like Data Table, Event Calendar, Filterable Gallery, WooCommerce.",
+   "rendered": "The Essential plugin you install after Elementor! Packed with 100+ stunning elements like Data Table, Event Calendar, Filterable Gallery, WooCommerce. <cite>By <a href=\"https://wpdeveloper.com/\">WPDeveloper</a>.</cite>"
+  },
+  "version": "6.1.18",
+  "network_only": false,
+  "requires_wp": "",
+  "requires_php": "",
+  "textdomain": "essential-addons-for-elementor-lite",
+  "_links": {
+   "self": [
+    {
+     "href": "https://hiperbaricabrasilia.com.br/wp-json/wp/v2/plugins/essential-addons-for-elementor-lite/essential_adons_elementor",
+     "targetHints": {
+      "allow": [
+       "GET",
+       "POST",
+       "PUT",
+       "PATCH",
+       "DELETE"
+      ]
+     }
+    }
+   ]
+  }
+ },
+ {
+  "plugin": "gum-elementor-addon/gum-elementor-addon",
+  "status": "active",
+  "name": "Gum Elementor Addon",
+  "plugin_uri": "http://themegum.com/",
+  "author": "TemeGUM",
+  "author_uri": "http://themegum.com",
+  "description": {
+   "raw": "Addon widget for Elementor. Slideshow, pricing table, icon list, recent post, blog term, post term, post share, post meta, post related, post adjacent, blog grid, post slider,navigation menu, image box, popover and to top button",
+   "rendered": "Addon widget for Elementor. Slideshow, pricing table, icon list, recent post, blog term, post term, post share, post meta, post related, post adjacent, blog grid, post slider,navigation menu, image box, popover and to top button <cite>By <a href=\"http://themegum.com\">TemeGUM</a>.</cite>"
+  },
+  "version": "1.3.13",
+  "network_only": false,
+  "requires_wp": "3.7",
+  "requires_php": "",
+  "textdomain": "gum-elementor-addon",
+  "_links": {
+   "self": [
+    {
+     "href": "https://hiperbaricabrasilia.com.br/wp-json/wp/v2/plugins/gum-elementor-addon/gum-elementor-addon",
+     "targetHints": {
+      "allow": [
+       "GET",
+       "POST",
+       "PUT",
+       "PATCH",
+       "DELETE"
+      ]
+     }
+    }
+   ]
+  }
+ },
+ {
+  "plugin": "litespeed-cache/litespeed-cache",
+  "status": "active",
+  "name": "LiteSpeed Cache",
+  "plugin_uri": "https://www.litespeedtech.com/products/cache-plugins/wordpress-acceleration",
+  "author": "LiteSpeed Technologies",
+  "author_uri": "https://www.litespeedtech.com",
+  "description": {
+   "raw": "High-performance page caching and site optimization from LiteSpeed",
+   "rendered": "High-performance page caching and site optimization from LiteSpeed <cite>By <a href=\"https://www.litespeedtech.com\">LiteSpeed Technologies</a>.</cite>"
+  },
+  "version": "7.6.2",
+  "network_only": false,
+  "requires_wp": "",
+  "requires_php": "",
+  "textdomain": "litespeed-cache",
+  "_links": {
+   "self": [
+    {
+     "href": "https://hiperbaricabrasilia.com.br/wp-json/wp/v2/plugins/litespeed-cache/litespeed-cache",
+     "targetHints": {
+      "allow": [
+       "GET",
+       "POST",
+       "PUT",
+       "PATCH",
+       "DELETE"
+      ]
+     }
+    }
+   ]
+  }
+ },
+ {
+  "plugin": "metform/metform",
+  "status": "active",
+  "name": "MetForm",
+  "plugin_uri": "http://products.wpmet.com/metform/",
+  "author": "Wpmet",
+  "author_uri": "https://wpmet.com",
+  "description": {
+   "raw": "Most flexible and design friendly form builder for Elementor",
+   "rendered": "Most flexible and design friendly form builder for Elementor <cite>By <a href=\"https://wpmet.com\">Wpmet</a>.</cite>"
+  },
+  "version": "3.9.9",
+  "network_only": false,
+  "requires_wp": "",
+  "requires_php": "",
+  "textdomain": "metform",
+  "_links": {
+   "self": [
+    {
+     "href": "https://hiperbaricabrasilia.com.br/wp-json/wp/v2/plugins/metform/metform",
+     "targetHints": {
+      "allow": [
+       "GET",
+       "POST",
+       "PUT",
+       "PATCH",
+       "DELETE"
+      ]
+     }
+    }
+   ]
+  }
+ },
+ {
+  "plugin": "google-site-kit/google-site-kit",
+  "status": "active",
+  "name": "Site Kit by Google",
+  "plugin_uri": "https://sitekit.withgoogle.com",
+  "author": "Google",
+  "author_uri": "https://opensource.google.com",
+  "description": {
+   "raw": "Site Kit is a one-stop solution for WordPress users to use everything Google has to offer to make them successful on the web.",
+   "rendered": "Site Kit is a one-stop solution for WordPress users to use everything Google has to offer to make them successful on the web. <cite>By <a href=\"https://opensource.google.com\">Google</a>.</cite>"
+  },
+  "version": "1.155.0",
+  "network_only": false,
+  "requires_wp": "5.2",
+  "requires_php": "7.4",
+  "textdomain": "google-site-kit",
+  "_links": {
+   "self": [
+    {
+     "href": "https://hiperbaricabrasilia.com.br/wp-json/wp/v2/plugins/google-site-kit/google-site-kit",
+     "targetHints": {
+      "allow": [
+       "GET",
+       "POST",
+       "PUT",
+       "PATCH",
+       "DELETE"
+      ]
+     }
+    }
+   ]
+  }
+ },
+ {
+  "plugin": "stratum/stratum",
+  "status": "active",
+  "name": "Stratum - Elementor Widgets",
+  "plugin_uri": "https://motopress.com/products/stratum/",
+  "author": "MotoPress",
+  "author_uri": "https://motopress.com/",
+  "description": {
+   "raw": "Advanced Elementor addon to extend page builder capabilities and add more advanced features.",
+   "rendered": "Advanced Elementor addon to extend page builder capabilities and add more advanced features. <cite>By <a href=\"https://motopress.com/\">MotoPress</a>.</cite>"
+  },
+  "version": "1.6.0",
+  "network_only": false,
+  "requires_wp": "",
+  "requires_php": "",
+  "textdomain": "stratum",
+  "_links": {
+   "self": [
+    {
+     "href": "https://hiperbaricabrasilia.com.br/wp-json/wp/v2/plugins/stratum/stratum",
+     "targetHints": {
+      "allow": [
+       "GET",
+       "POST",
+       "PUT",
+       "PATCH",
+       "DELETE"
+      ]
+     }
+    }
+   ]
+  }
+ }
+]

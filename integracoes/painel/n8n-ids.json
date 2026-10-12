@@ -1,0 +1,53 @@
+{
+ "credenciais": {
+  "BMH · Google (conta de serviço) · Search Console e Analytics": "FBl4CEa9ddpndadA",
+  "BMH · Google Ads (renovação do acesso)": "Qewvtjz9JokCUvNy",
+  "BMH · Painel (login)": "sQEO1I3IiInRAY6C",
+  "BMH · iGut (acesso)": "ZezjclTyK2soW4a8",
+  "BMH · iGut (acesso 2, passos soltos)": "0n8OhRsr6o2oHNjW",
+  "BMH · iGut (login ADM)": "XUQ8dIMSb7qVsRnu",
+  "BMH · iGut (login JM)": "Oq9bSHDlc84H7XLP",
+  "BMH · iGut (login ADM1)": "vBFyv797nU6UXcey",
+  "BMH · WhatsApp Evolution (envio aos grupos)": "tqkGMMSnfbUWLIng",
+  "BMH · Telegram (robô BMH alertas)": "SgQHWuJOuMWeVbPi",
+  "BMH · Painel da diretoria (login)": "k6Pl3BeEQY0FqgAf",
+  "BMH · Google (conta de serviço) · Planilha de plantões": "E42Jp1xYUO9zrwNK",
+  "BMH · Evolution · instância BMH Recepção": "GYuNAwU2LuHEWwav",
+  "BMH · OpenAI · transcrição de áudio": "BCQHYmA4sTMnylir"
+ },
+ "tabelas": {
+  "BMH_config": "V4NRHS9mc1kvigix",
+  "BMH_google_anuncios_dia": "1TSLyd68TBzYajYq",
+  "BMH_google_parcela_dia": "R10TsVrnmqQoWrSC",
+  "BMH_site_cliques_dia": "RzSGWyyyutU0N9V9",
+  "BMH_organico_diario": "7DI86hNLA1VY0zFC",
+  "BMH_horas": "iKxqYjd37S1aFvIu",
+  "BMH_igut_dia": "KOrlT3JXdspKlBSo",
+  "BMH_guardiao_registro": "E1ewiB9pcohZpSfw",
+  "BMH_financeiro_mes": "rQ0clF4khF4NMgoO",
+  "BMH_operacao_dia": "ERJrtp3wlgyvO8mK",
+  "BMH_financeiro_detalhe": "iJuk9paP3YfaEWlD",
+  "BMH_prazo_recebimento": "HTYAkcJSxHIGBNQC",
+  "BMH_financeiro_paciente": "eqyIECPToIvxDhcm",
+  "BMH_whatsapp_mensagens": "ll7XMHZ9sWkenCgb"
+ },
+ "fluxos": {
+  "grava": "AeQIImClkXtRrWIf",
+  "pagina": "zwEgF9jUwX6TcHhK",
+  "igut": "gPRwxWVpbMT0q4AP",
+  "guardiao": "J8a8SbtlLzud62fl",
+  "alerta": "7u3CuyjESsHmCtMW",
+  "botoes": "shml1gDwSqcUX2qu",
+  "resumo": "QGDceUjADbnNINb3",
+  "medicao": "atKLrTjcDA2D6iSS",
+  "mensal": "fvEYln7d2wWi4N2S",
+  "numeros": "9D9x6CKFKKPY8qTu",
+  "diretoria": "26y4Uo2WLAAqpK70",
+  "plantoes": "QaQ4SIaS2neUfUuS",
+  "plantoesEmails": "qNDy08i41junIQk9",
+  "whatsapp": "qDgmqqtt6zn1gARw"
+ },
+ "whatsapp": {
+  "caminho": "bmh-whatsapp-daeff8542cee5cef6c6a8832"
+ }
+}

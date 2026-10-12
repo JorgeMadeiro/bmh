@@ -1,0 +1,17 @@
+# WhatsApp da BMH: observação das conversas (09/10/2026)
+
+Um mês olhando como a recepção atende hoje (61 3346-6005) antes de desenhar o SDR da BMH, para depois cruzar com o iGut
+(agendou, compareceu) e com a origem do contato (anúncio, site, cirurgião).
+
+- **Instância** "BMH Recepção" na Evolution da clínica (`apiwp.cannlink.com.br`, v2.3.7), conectada como aparelho do
+  WhatsApp, ao lado do celular e do WhatsApp Web da equipe. **Nunca envia mensagem.** Ajustes: não marca como lida, não
+  fica online (senão o celular para de notificar), ignora grupos, traz histórico ao conectar. Webhook só `MESSAGES_UPSERT`.
+- **Fluxo** "BMH · WhatsApp · observa conversas" (id em `integracoes/painel/n8n-ids.json`, `fluxos.whatsapp`): recebe →
+  prepara (descarta grupo, status, reação e mensagem de sistema) → se for áudio, baixa na Evolution e transcreve
+  (OpenAI `gpt-4o-transcribe`) → grava. Não guarda execução (tem conversa de paciente).
+- **Tabela** `BMH_whatsapp_mensagens`: `chave` (id da mensagem), `momento`, `dia` (Brasília), `telefone`,
+  `numero_oculto` (o WhatsApp escondeu o número: vem o código @lid), `direcao` (paciente ou equipe), `aparelho` (de onde a
+  equipe respondeu), `tipo`, `texto` (CPF apagado), `transcrito`, `respondendo`, `apagar_em` (6 meses).
+- **Montar ou atualizar:** `node --env-file=.env integracoes/whatsapp/montar.js` (só a Evolution: `... montar.js so-evolution`).
+- **Teste:** com mensagem real do celular do próprio Jorge. Não inserir linha de teste na tabela (a API do n8n não apaga linha).
+- Regras de dado e credenciais: `.claude/skills/seguranca-credenciais/SKILL.md`.

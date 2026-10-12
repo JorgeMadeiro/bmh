@@ -1,0 +1,57 @@
+/**
+ * BMH · /llms.txt (preparado em 08/10/2026, ainda não instalado).
+ * Responde https://hiperbaricabrasilia.com.br/llms.txt com o resumo da clínica para assistentes de IA
+ * (ChatGPT, Gemini, Perplexity). O texto é cópia de site/llms.txt: quando mudar lá, colar aqui de novo.
+ * Guardado no plugin Code Snippets. Para desfazer: desligar este código no painel.
+ */
+function bmh_llms_txt() {
+	$caminho = trim( (string) wp_parse_url( $_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH ), '/' );
+	if ( 'llms.txt' !== $caminho ) {
+		return;
+	}
+	header( 'Content-Type: text/plain; charset=utf-8' );
+	header( 'X-Robots-Tag: noindex' );
+	echo <<<'BMH'
+# Brasília Medicina Hiperbárica (BMH)
+
+> Primeira clínica particular de medicina hiperbárica de Brasília, em atividade desde 2004. Oxigenoterapia hiperbárica (câmara hiperbárica) com médico presente na unidade em todas as sessões. Duas unidades no Distrito Federal: Asa Sul e Taguatinga. Atende 50 convênios e particular.
+
+## Fatos
+
+- Nome: Brasília Medicina Hiperbárica (BMH). CNPJ 07.091.027/0001-86.
+- Desde 2004. Primeira clínica particular de medicina hiperbárica de Brasília.
+- Médico presente na unidade em todas as sessões, do início ao fim. Avaliação médica antes da primeira sessão.
+- Horário: todos os dias, inclusive sábado e domingo, das 7h às 19h, nas duas unidades.
+- Telefone e WhatsApp: (61) 3346-6005. E-mail: contato@hiperbaricabrasilia.com.br.
+- Unidade Asa Sul: SGAS 613, Conjunto E, Bloco A, 1º subsolo, Complexo Médico Hospitalar, L2 Sul, Brasília/DF, CEP 70200-730. Câmaras monoplace e multiplace.
+- Unidade Taguatinga: Prédio Prime Excelência Médica, Torre D, Setor C Norte, Taguatinga/DF.
+- Convênios: 50 planos atendidos. Lista: https://hiperbaricabrasilia.com.br/convenios/
+- Direção médica: Dr. Jorge Madeiro, diretor médico (CRM-DF 31687, RQE 26863). Responsáveis técnicos: Dr. Hélio Ivan, Asa Sul (CRM-DF 8164, RQE 26705); Dr. Alberto Jorge, Taguatinga (CRM-DF 7248, RQE 14575).
+
+## O tratamento
+
+- Oxigenoterapia hiperbárica: respirar oxigênio a 100% dentro de uma câmara com pressão maior que a do ar. Com a pressão, mais oxigênio se dissolve no sangue e chega aos tecidos que recebem pouco sangue.
+- Indicações seguidas pela BMH (Resolução CFM 1.457/1995): pós-operatório com retalho ou enxerto comprometido; feridas que não cicatrizam e pé diabético; lesões causadas por radioterapia; infecções graves de pele e músculo; osteomielite; acidente de mergulho (doença descompressiva). Cada caso passa por avaliação médica.
+- A maior parte dos pacientes da BMH vem do pós-operatório de cirurgia plástica, indicados pelo cirurgião.
+- Sessão: cerca de 1h30, contando pressurização e despressurização. Em geral, uma por dia, em dias seguidos.
+- Número de sessões: definido pelo médico na avaliação. Em geral, de 10 a 30 no pós-operatório de cirurgia plástica e de 30 a 60 em feridas que não cicatrizam.
+- Pode fazer a sessão com curativo, cinta e dreno do pós-operatório. A BMH fornece roupa de algodão.
+- A BMH também faz avaliação de aptidão para mergulho.
+
+## Páginas
+
+- Pós-operatório de cirurgia plástica: https://hiperbaricabrasilia.com.br/pos-operatorio-cirurgia-plastica/
+- Perguntas frequentes: https://hiperbaricabrasilia.com.br/perguntas-frequentes/
+- Unidade Asa Sul: https://hiperbaricabrasilia.com.br/hiperbarica-asa-sul/
+- Unidade Taguatinga: https://hiperbaricabrasilia.com.br/hiperbarica-taguatinga/
+- Convênios: https://hiperbaricabrasilia.com.br/convenios/
+
+## Como agendar
+
+- WhatsApp: https://wa.me/556133466005
+- Site: https://hiperbaricabrasilia.com.br/
+- Instagram: https://www.instagram.com/hiperbaricabrasilia/
+BMH;
+	exit;
+}
+add_action( 'init', 'bmh_llms_txt', 1 );

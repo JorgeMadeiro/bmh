@@ -1,0 +1,195 @@
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "MedicalOrganization",
+   "@id": "https://hiperbaricabrasilia.com.br/#organizacao",
+   "name": "Brasília Medicina Hiperbárica",
+   "alternateName": "BMH",
+   "url": "https://hiperbaricabrasilia.com.br/",
+   "logo": "{{img:bmh-logo.png}}",
+   "foundingDate": "2004-11",
+   "telephone": "+55-61-3346-6005",
+   "email": "contato@hiperbaricabrasilia.com.br",
+   "taxID": "07.091.027/0001-86",
+   "description": "Primeira clínica particular de medicina hiperbárica de Brasília, em atividade desde 2004. Oxigenoterapia hiperbárica com médico em todas as sessões, nas unidades Asa Sul e Taguatinga.",
+   "sameAs": [
+    "https://www.instagram.com/hiperbaricabrasilia/"
+   ],
+   "subOrganization": [
+    {
+     "@id": "https://hiperbaricabrasilia.com.br/#asa-sul"
+    },
+    {
+     "@id": "https://hiperbaricabrasilia.com.br/#taguatinga"
+    }
+   ],
+   "knowsAbout": [
+    "Oxigenoterapia hiperbárica",
+    "Câmara hiperbárica",
+    "Medicina hiperbárica",
+    "Pós-operatório de cirurgia plástica",
+    "Feridas que não cicatrizam",
+    "Pé diabético",
+    "Lesões causadas por radioterapia",
+    "Medicina do mergulho"
+   ],
+   "areaServed": {
+    "@type": "AdministrativeArea",
+    "name": "Distrito Federal"
+   },
+   "medicalSpecialty": "Medicina hiperbárica"
+  },
+  {
+   "@type": "MedicalClinic",
+   "@id": "https://hiperbaricabrasilia.com.br/#asa-sul",
+   "name": "BMH Brasília Medicina Hiperbárica · Asa Sul",
+   "parentOrganization": {
+    "@id": "https://hiperbaricabrasilia.com.br/#organizacao"
+   },
+   "url": "https://hiperbaricabrasilia.com.br/",
+   "image": "{{img:bmh-fachada-asa-sul.jpg}}",
+   "telephone": "+55-61-3346-6005",
+   "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "SGAS 613, Conjunto E, Bloco A, 1º subsolo, Complexo Médico Hospitalar, L2 Sul",
+    "addressLocality": "Brasília",
+    "addressRegion": "DF",
+    "postalCode": "70200-730",
+    "addressCountry": "BR"
+   },
+   "openingHoursSpecification": [
+    {
+     "@type": "OpeningHoursSpecification",
+     "dayOfWeek": [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday"
+     ],
+     "opens": "07:00",
+     "closes": "19:00"
+    }
+   ],
+   "isAcceptingNewPatients": true,
+   "availableService": {
+    "@type": "MedicalTherapy",
+    "name": "Oxigenoterapia hiperbárica",
+    "alternateName": [
+     "Câmara hiperbárica",
+     "OHB"
+    ],
+    "description": "Respirar oxigênio a 100% dentro de uma câmara com pressão maior que a do ar. Sessões de cerca de 1h30, com médico presente na unidade em todas as sessões."
+   },
+   "medicalSpecialty": "Medicina hiperbárica"
+  },
+  {
+   "@type": "MedicalClinic",
+   "@id": "https://hiperbaricabrasilia.com.br/#taguatinga",
+   "name": "BMH Brasília Medicina Hiperbárica · Taguatinga",
+   "parentOrganization": {
+    "@id": "https://hiperbaricabrasilia.com.br/#organizacao"
+   },
+   "url": "https://hiperbaricabrasilia.com.br/",
+   "image": "{{img:bmh-fachada-taguatinga.jpg}}",
+   "telephone": "+55-61-3346-6005",
+   "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Prédio Prime Excelência Médica, Torre D, Setor C Norte",
+    "addressLocality": "Taguatinga, Brasília",
+    "addressRegion": "DF",
+    "addressCountry": "BR"
+   },
+   "openingHoursSpecification": [
+    {
+     "@type": "OpeningHoursSpecification",
+     "dayOfWeek": [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday"
+     ],
+     "opens": "07:00",
+     "closes": "19:00"
+    }
+   ],
+   "isAcceptingNewPatients": true,
+   "availableService": {
+    "@type": "MedicalTherapy",
+    "name": "Oxigenoterapia hiperbárica",
+    "alternateName": [
+     "Câmara hiperbárica",
+     "OHB"
+    ],
+    "description": "Respirar oxigênio a 100% dentro de uma câmara com pressão maior que a do ar. Sessões de cerca de 1h30, com médico presente na unidade em todas as sessões."
+   },
+   "medicalSpecialty": "Medicina hiperbárica"
+  },
+  {
+   "@type": "Physician",
+   "name": "Dr. Jorge Madeiro",
+   "jobTitle": "Diretor médico",
+   "identifier": [
+    {
+     "@type": "PropertyValue",
+     "propertyID": "CRM-DF",
+     "value": "31687"
+    },
+    {
+     "@type": "PropertyValue",
+     "propertyID": "RQE",
+     "value": "26863"
+    }
+   ],
+   "worksFor": {
+    "@id": "https://hiperbaricabrasilia.com.br/#organizacao"
+   }
+  },
+  {
+   "@type": "Physician",
+   "name": "Dr. Hélio Ivan",
+   "jobTitle": "Responsável técnico, unidade Asa Sul",
+   "identifier": [
+    {
+     "@type": "PropertyValue",
+     "propertyID": "CRM-DF",
+     "value": "8164"
+    },
+    {
+     "@type": "PropertyValue",
+     "propertyID": "RQE",
+     "value": "26705"
+    }
+   ],
+   "worksFor": {
+    "@id": "https://hiperbaricabrasilia.com.br/#asa-sul"
+   }
+  },
+  {
+   "@type": "Physician",
+   "name": "Dr. Alberto Jorge",
+   "jobTitle": "Responsável técnico, unidade Taguatinga",
+   "identifier": [
+    {
+     "@type": "PropertyValue",
+     "propertyID": "CRM-DF",
+     "value": "7248"
+    },
+    {
+     "@type": "PropertyValue",
+     "propertyID": "RQE",
+     "value": "14575"
+    }
+   ],
+   "worksFor": {
+    "@id": "https://hiperbaricabrasilia.com.br/#taguatinga"
+   }
+  }
+ ]
+}

@@ -1,0 +1,407 @@
+<!-- BMH · página do pós-operatório de cirurgia plástica (fonte), 08/10/2026. Monta com scripts/montar-pagina.js.
+     Briefing: saidas/site-novo/briefing-pos-operatorio.md. Fontes das frases clínicas:
+     marketing/conteudo/bmh-pagina-perguntas-frequentes-2026-10-08/fontes.md (Thom 2011, Francis e Baynosa 2017; rotina
+     confirmada pelo Jorge). Sem promessa de resultado: a evidência no pós-operatório é limitada (Cochrane 2013). -->
+<link rel="preload" as="font" type="font/woff2" href="https://fonts.gstatic.com/s/librefranklin/v20/jizDREVItHgc8qDIbSTKq4XkRiUf2zcZiVbJ.woff2" crossorigin>
+<style>
+/* Letra declarada aqui, sem a folha do Google Fonts que travava a primeira tela. Se o Google mudar a versão (v20),
+   pegar o endereço novo em fonts.googleapis.com/css2?family=Libre+Franklin:wght@400..800&display=swap (bloco "latin"). */
+@font-face{font-family:'Libre Franklin';font-style:normal;font-weight:400 800;font-display:swap;src:url(https://fonts.gstatic.com/s/librefranklin/v20/jizDREVItHgc8qDIbSTKq4XkRiUf2zcZiVbJ.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+/* ---------- tema: some o cabeçalho, o rodapé e o título do Astra nesta página ---------- */
+.site-header,.site-footer,.ast-above-header-wrap,.ast-below-header-wrap,.ast-mobile-header-wrap,.entry-header,#masthead,#colophon{display:none!important}
+.site-content>.ast-container,.ast-container{max-width:none!important;padding:0!important;display:block!important}
+.site-content,#primary,.site-main,article.page,.entry-content{margin:0!important;padding:0!important;max-width:none!important;width:100%!important}
+.entry-content>.wp-block-html,.entry-content>*{margin:0!important;max-width:none!important}
+body{background:#fff}
+/* ---------- marca ---------- */
+.bmh{--navy:#002375;--deep:#00143F;--ink:#142033;--txt:#2B3850;--muted:#4A5568;--oxy:#34A9CF;--oxyt:#1A6E93;--mist:#EEF5FA;--line:#DCE5EE;--light:#9EDCF0;
+  font-family:'Libre Franklin',system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--ink);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.bmh *{box-sizing:border-box}
+.bmh a{color:var(--navy)}
+.bmh a,.bmh a:hover,.bmh a:focus,.bmh a:visited,.entry-content .bmh a{text-decoration:none!important;-webkit-text-decoration:none!important;box-shadow:none}
+.bmh img{max-width:100%;height:auto;display:block}
+/* o tema Astra pinta os títulos: as cores da BMH vencem com !important */
+.bmh h1,.bmh h2,.bmh h3{color:var(--navy)!important;font-family:'Libre Franklin',system-ui,-apple-system,'Segoe UI',sans-serif;letter-spacing:-.015em;margin:0;text-wrap:balance}
+.bmh h1,.bmh h2{font-weight:800!important}
+.bmh h3{font-weight:700!important}
+.bmh .bmh-hero h1,.bmh .bmh-final h2{color:#fff!important}
+.bmh p{margin:0}
+.bmh-w{max-width:1180px;margin:0 auto;padding:0 20px}
+.bmh-sec{padding:48px 0}
+.bmh-mist{background:var(--mist)}
+.bmh .bmh-eye{display:block;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--oxyt);margin:0 0 10px}
+.bmh-h2{font-size:30px;line-height:1.12}
+.bmh .bmh-lead{color:var(--txt);margin-top:14px}
+.bmh-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 24px;border-radius:999px;font-weight:700;font-size:17px;border:0;cursor:pointer;line-height:1.2;text-align:center}
+.bmh-btn svg{width:20px;height:20px;flex:none}
+.bmh-btn--navy{background:var(--navy);color:#fff!important}
+.bmh-btn--oxy{background:var(--oxy);color:var(--deep)!important}
+.bmh-btn--line{border:1px solid var(--navy);color:var(--navy)!important;background:#fff}
+.bmh .bmh-mais{margin-top:22px}
+.bmh-link{font-weight:700;color:var(--navy)}
+.bmh-link:after{content:" \2192";color:var(--oxyt)}
+/* ---------- cabeçalho ---------- */
+.bmh-head{background:#fff;border-bottom:1px solid var(--line);position:relative;z-index:5}
+.bmh-head .bmh-w{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:62px}
+.bmh-logo{display:flex;align-items:center;gap:10px;color:var(--navy)}
+.bmh-logo img{width:64px;height:34px;object-fit:contain}
+.bmh-logo span{font-weight:600;font-size:14px;line-height:1.12;border-left:1px solid var(--line);padding-left:10px}
+.bmh-logo small{display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--oxyt)}
+.bmh-nav{display:none}
+.bmh-menu summary{list-style:none;cursor:pointer;width:44px;height:44px;border:1px solid var(--line);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--navy)}
+.bmh-menu summary::-webkit-details-marker{display:none}
+.bmh-menu nav{position:absolute;left:0;right:0;top:100%;background:#fff;border-bottom:1px solid var(--line);padding:8px 20px 20px;display:flex;flex-direction:column;box-shadow:0 12px 24px rgba(0,20,63,.10)}
+.bmh-menu nav a{padding:12px 0;border-bottom:1px solid var(--line);color:var(--ink);font-weight:600}
+.bmh-menu nav a.bmh-btn{margin-top:14px;border:0;color:#fff}
+/* ---------- topo ---------- */
+.bmh-hero{background:var(--deep);color:#fff}
+.bmh-hero .bmh-w{padding-top:36px;padding-bottom:32px}
+.bmh .bmh-onde{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--light);margin-bottom:14px}
+.bmh-hero h1{font-size:36px;line-height:1.06}
+.bmh .bmh-hero__sub{color:#C3D1EA;font-size:17px;margin-top:16px}
+.bmh .bmh-hero__ctas{display:flex;flex-direction:column;align-items:flex-start;gap:14px;margin-top:26px}
+.bmh-hero__ctas .bmh-btn{width:100%}
+.bmh-hero__ctas .bmh-link{color:#fff}
+.bmh-hero__ctas .bmh-link:after{color:var(--oxy)}
+.bmh .bmh-hero__hora{font-size:14px;color:#9FB2D3;margin-top:14px}
+.bmh-hero__foto{margin-top:28px}
+.bmh-hero__foto img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px}
+/* ---------- três provas ---------- */
+.bmh-provas{border-bottom:1px solid var(--line)}
+.bmh-provas .bmh-w{display:grid;gap:0}
+.bmh-provas .bmh-w>div{padding:18px 0;border-bottom:1px solid var(--line)}
+.bmh-provas .bmh-w>div:last-child{border-bottom:0}
+.bmh-provas b{display:block;font-size:20px;font-weight:800;color:var(--navy);line-height:1.2}
+.bmh-provas span{display:block;font-size:15px;color:var(--muted);margin-top:2px}
+/* ---------- qual é o seu caso ---------- */
+.bmh-tri{display:grid;gap:10px;margin-top:22px}
+.bmh-tri a{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:60px;padding:0 20px;background:#fff;border:1px solid #C9D6E3;border-radius:8px;color:var(--navy);font-weight:700;font-size:17px}
+.bmh-tri a:after{content:"\2192";color:var(--oxyt);font-size:20px}
+.bmh .bmh-tri__n{font-size:15px;color:var(--muted);margin-top:16px}
+.bmh-tri__n a{font-weight:700}
+/* ---------- pós-operatório ---------- */
+.bmh-pos{display:grid;gap:28px}
+.bmh .bmh-pos__ok{margin-top:18px;padding:14px 16px;background:var(--mist);border-radius:8px;font-size:16px;color:var(--txt)}
+.bmh-pos .bmh-btn{margin-top:24px}
+.bmh figure,.bmh .bmh-fig{margin:0}
+.bmh-fig img{width:100%;border-radius:8px;object-fit:cover}
+.bmh-fig figcaption{font-size:14px;color:var(--muted);margin-top:8px}
+.bmh-pos .bmh-fig img{aspect-ratio:4/5}
+/* ---------- como funciona ---------- */
+.bmh-steps{list-style:none;margin:24px 0 0;padding:0;display:grid;gap:12px}
+.bmh-steps li{display:flex;gap:14px;background:#fff;border-radius:8px;padding:18px}
+.bmh-steps i{flex:none;width:32px;height:32px;border-radius:50%;background:var(--navy);color:#fff;font-style:normal;font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center}
+.bmh-steps b{display:block;color:var(--navy);font-size:18px}
+.bmh-steps span{color:var(--txt);font-size:16px}
+.bmh-conv{background:#fff;border:1px solid #C9D6E3;border-radius:8px;padding:22px 20px;margin-top:20px}
+.bmh-conv label{display:block;font-size:21px;font-weight:700;color:var(--navy)}
+.bmh-busca{width:100%;min-height:52px;padding:0 16px;border:1px solid #8FA6C2;border-radius:6px;font:inherit;font-size:17px;color:var(--ink);background:#fff;margin-top:12px}
+.bmh .bmh-res{margin-top:12px;font-size:16px;min-height:1px}
+.bmh-res--ok{color:#0F5B3A;font-weight:700}
+.bmh .bmh-conv__p{font-size:15px;margin-top:12px;color:var(--muted)}
+.bmh-conv__p a{font-weight:700}
+/* ---------- estrutura ---------- */
+.bmh-galeria{display:grid;gap:14px;margin-top:24px}
+.bmh-galeria .bmh-fig img{aspect-ratio:3/2}
+.bmh-galeria__duas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.bmh-galeria__duas .bmh-fig img{aspect-ratio:4/5}
+/* ---------- quem cuida ---------- */
+.bmh-quem{display:grid;gap:26px}
+.bmh-quem .bmh-fig img{aspect-ratio:3/2}
+.bmh-dir{list-style:none;margin:20px 0 0;padding:0;border-top:1px solid var(--line)}
+.bmh-dir li{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.bmh-dir img{width:48px;height:48px;border-radius:50%;object-fit:cover;flex:none}
+.bmh-dir b{display:block;font-size:16px;color:var(--navy)}
+.bmh-dir span{font-size:13px;color:var(--muted)}
+.bmh .bmh-dir__t{font-size:15px;font-weight:700;color:var(--navy);margin-top:24px}
+/* ---------- indicações ---------- */
+.bmh-ind{list-style:none;margin:20px 0 0;padding:0;border-top:1px solid #C9D6E3}
+.bmh-ind li{padding:14px 0;border-bottom:1px solid #C9D6E3;font-weight:600;font-size:18px;color:var(--navy)}
+.bmh .bmh-merg{margin-top:22px;padding:18px;background:#fff;border-radius:8px;font-size:16px;color:var(--txt)}
+.bmh-merg b{color:var(--navy)}
+/* ---------- unidades ---------- */
+.bmh-uni{display:grid;gap:16px;margin-top:22px}
+.bmh-uni article{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+.bmh-uni img{width:100%;height:180px;object-fit:cover}
+.bmh-uni__b{padding:18px 18px 20px}
+.bmh-uni h3{font-size:22px}
+.bmh .bmh-uni p{font-size:15px;margin-top:6px}
+.bmh-two{display:flex;gap:8px;margin-top:16px}
+.bmh-two .bmh-btn{flex:1;padding:0 10px;font-size:15px;min-height:48px}
+/* ---------- perguntas ---------- */
+.bmh-faq{margin-top:22px;border-top:1px solid #C9D6E3}
+.bmh-faq details{border-bottom:1px solid #C9D6E3}
+.bmh-faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 0;font-weight:700;font-size:17px;color:var(--navy)}
+.bmh-faq summary::-webkit-details-marker{display:none}
+.bmh-faq summary:after{content:"+";flex:none;font-size:24px;font-weight:400;color:var(--oxyt);line-height:1}
+.bmh-faq details[open] summary:after{content:"\2212"}
+.bmh .bmh-faq p{padding:0 0 18px;color:var(--txt);font-size:16px}
+/* ---------- cirurgião, final e rodapé ---------- */
+.bmh-cir{border-top:1px solid var(--line)}
+.bmh-cir .bmh-w{padding-top:24px;padding-bottom:24px;display:flex;flex-direction:column;gap:14px}
+.bmh-cir p{font-size:16px;color:var(--txt)}
+.bmh-cir b{color:var(--navy)}
+.bmh-cir .bmh-btn{align-self:flex-start;min-height:46px;font-size:15px}
+.bmh-final{background:var(--deep);color:#fff}
+.bmh-final .bmh-w{padding-top:48px;padding-bottom:48px}
+.bmh-final h2{font-size:30px;line-height:1.12}
+.bmh .bmh-final p{color:#C3D1EA;margin-top:12px}
+.bmh-final .bmh-btn{margin-top:24px}
+.bmh-foot{background:#000E2E;color:#B9C8E4;font-size:14px;padding:32px 0 104px}
+.bmh-foot a{color:#B9C8E4}
+.bmh-foot strong{color:#fff}
+.bmh-foot__logo{width:110px;margin-bottom:18px}
+.bmh-foot__g{display:grid;gap:16px}
+.bmh-foot__g>div{min-width:0;overflow-wrap:anywhere;line-height:1.6}
+.bmh .bmh-foot__legal{margin-top:20px;padding-top:14px;border-top:1px solid #1B2C55;font-size:13px}
+/* barra fixa: aparece depois que o botão do topo sai da tela */
+.bmh-fix{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;gap:10px;padding:10px 16px 14px;background:#fff;border-top:1px solid var(--line);box-shadow:0 -6px 18px rgba(0,20,63,.10);transform:translateY(110%);transition:transform .25s}
+.bmh-fix.bmh-fix--on{transform:none}
+.bmh-fix .bmh-btn{flex:1}
+.bmh-fix .bmh-tel{flex:none;width:52px;height:52px;border-radius:50%;border:1px solid var(--navy);display:flex;align-items:center;justify-content:center;color:var(--navy)}
+.bmh-fix .bmh-tel svg{width:20px;height:20px}
+/* ---------- computador ---------- */
+@media (min-width:860px){
+  .bmh{font-size:18px}
+  .bmh-w{padding:0 28px}
+  .bmh-sec{padding:88px 0}
+  .bmh-h2{font-size:44px;line-height:1.06}
+  .bmh .bmh-lead{margin-top:20px;font-size:19px;max-width:720px}
+  .bmh-head .bmh-w{min-height:78px}
+  .bmh-logo{flex:none}
+  .bmh-logo img{width:94px;height:50px}
+  .bmh-logo span{font-size:18px;padding-left:14px;white-space:nowrap}
+  .bmh-hero .bmh-w{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:56px;align-items:center;padding-top:72px;padding-bottom:72px}
+  .bmh-hero h1{font-size:56px;line-height:1.03}
+  .bmh .bmh-hero__sub{font-size:20px;margin-top:22px;max-width:560px}
+  .bmh .bmh-hero__ctas{flex-direction:row;align-items:center;gap:28px;margin-top:34px}
+  .bmh-hero__ctas .bmh-btn{width:auto;flex:none;white-space:nowrap}
+  .bmh-hero__foto{margin-top:0}
+  .bmh-provas .bmh-w{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .bmh-provas .bmh-w>div{padding:28px 28px 28px 0;border-bottom:0}
+  .bmh-provas .bmh-w>div+div{padding-left:28px;border-left:1px solid var(--line)}
+  .bmh-provas b{font-size:24px}
+  .bmh-tri{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:32px}
+  .bmh-tri a{min-height:72px;font-size:19px;padding:0 26px}
+  .bmh-pos{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:72px;align-items:center}
+  .bmh-steps{grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+  .bmh-steps li{flex-direction:column;padding:26px}
+  .bmh-conv{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:28px;align-items:end;padding:30px}
+  .bmh-galeria{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:18px;margin-top:36px}
+  .bmh-galeria>.bmh-fig img{height:100%;aspect-ratio:auto}
+  .bmh-quem{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:72px;align-items:center}
+  .bmh-dir b{font-size:18px}
+  .bmh-dir span{font-size:15px}
+  .bmh-ind{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:48px}
+  .bmh-ind li{font-size:21px;padding:18px 0}
+  .bmh-uni{grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}
+  .bmh-uni img{height:240px}
+  .bmh-uni__b{padding:26px 30px 30px}
+  .bmh-uni h3{font-size:28px}
+  .bmh-faq{max-width:860px}
+  .bmh-faq summary{font-size:20px;padding:22px 0}
+  .bmh .bmh-faq p{font-size:18px}
+  .bmh-cir .bmh-w{flex-direction:row;align-items:center;justify-content:space-between;gap:32px}
+  .bmh-cir .bmh-btn{align-self:auto;flex:none}
+  .bmh-final .bmh-w{display:flex;justify-content:space-between;align-items:center;gap:48px;padding-top:80px;padding-bottom:80px}
+  .bmh-final h2{font-size:44px;max-width:640px}
+  .bmh-final .bmh-btn{margin-top:0;flex:none}
+  .bmh-foot{padding:56px 0 32px;font-size:15px}
+  .bmh-foot__g{grid-template-columns:repeat(4,minmax(0,1fr));gap:32px}
+  .bmh-fix{display:none}
+}
+@media (min-width:1180px){
+  .bmh-menu{display:none}
+  .bmh-nav{display:flex;flex-wrap:nowrap;align-items:center;gap:22px;white-space:nowrap}
+  .bmh-nav a{color:var(--ink);font-weight:600;font-size:15px}
+  .bmh-nav a.bmh-btn{min-height:46px;padding:0 20px;color:#fff}
+}
+</style>
+<style>
+/* ---------- páginas internas (molde, 08/10/2026) ---------- */
+.bmh .bmh-trilha{font-size:13px;color:#9FB2D3;margin-bottom:14px}
+.bmh-trilha a{color:#C3D1EA!important}
+.bmh-hero--int .bmh-w{padding-top:30px;padding-bottom:36px}
+.bmh-hero--int h1{font-size:32px}
+.bmh-texto{max-width:760px}
+.bmh-w.bmh-texto{max-width:1180px}
+.bmh-w.bmh-texto>*{max-width:760px}
+.bmh-texto h2{font-size:26px;line-height:1.15;margin:40px 0 0!important}
+.bmh-texto h2:first-child{margin-top:0!important}
+.bmh-texto h3{font-size:20px;margin:28px 0 0!important}
+.bmh .bmh-texto p{margin-top:14px;color:var(--txt)}
+.bmh-texto ul{margin:14px 0 0;padding-left:22px;color:var(--txt)}
+.bmh-texto li{margin-top:8px}
+.bmh-texto a{font-weight:700}
+.bmh .bmh-aviso{margin-top:22px;padding:18px;border-left:4px solid var(--oxy);background:var(--mist);border-radius:0 8px 8px 0;color:var(--txt)}
+.bmh-fatos{list-style:none;margin:20px 0 0;padding:0;border-top:1px solid var(--line)}
+.bmh-fatos li{padding:14px 0;border-bottom:1px solid var(--line);display:grid;gap:2px}
+.bmh-fatos b{font-size:14px;font-weight:700;color:var(--oxyt);letter-spacing:.04em;text-transform:uppercase}
+.bmh-fatos span{color:var(--ink)}
+.bmh-rotas{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.bmh-rotas .bmh-btn{min-height:46px;font-size:15px;padding:0 18px}
+.bmh-fotos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:22px}
+.bmh-fotos .bmh-fig img{aspect-ratio:4/3}
+.bmh-fotos .bmh-fig--larga{grid-column:1/-1}
+.bmh-fotos .bmh-fig--larga img{aspect-ratio:3/2}
+.bmh-duas{display:grid;gap:28px}
+@media (min-width:860px){
+  .bmh-hero--int .bmh-w{display:block;padding-top:56px;padding-bottom:64px}
+  .bmh-hero--int h1{font-size:50px;max-width:900px}
+  .bmh-hero--int .bmh-hero__sub{max-width:720px}
+  .bmh-texto h2{font-size:34px;margin-top:56px!important}
+  .bmh-texto h3{font-size:23px}
+  .bmh .bmh-texto p,.bmh-texto ul{font-size:19px}
+  .bmh-fotos{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+  .bmh-duas{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:64px;align-items:start}
+}
+</style>
+
+<div class="bmh">
+<header class="bmh-head"><div class="bmh-w">
+<a class="bmh-logo" href="/"><img src="{{img:bmh-logo.png}}" alt="BMH" width="300" height="159"><span>Brasília Medicina Hiperbárica<small>desde 2004</small></span></a>
+<nav class="bmh-nav" aria-label="Principal">
+<a href="/pos-operatorio-cirurgia-plastica/">Pós-operatório</a>
+<a href="/#como-funciona">Como funciona</a>
+<a href="/hiperbarica-asa-sul/">Asa Sul</a>
+<a href="/hiperbarica-taguatinga/">Taguatinga</a>
+<a href="/convenios/">Convênios</a>
+<a href="/perguntas-frequentes/">Perguntas</a>
+<a class="bmh-btn bmh-btn--navy bmh-whatsapp" href="{{wa:geral}}">{{svg:wa}}Agendar pelo WhatsApp</a>
+</nav>
+<details class="bmh-menu"><summary aria-label="Menu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></summary>
+<nav aria-label="Menu do celular">
+<a href="/pos-operatorio-cirurgia-plastica/">Pós-operatório de cirurgia plástica</a>
+<a href="/#como-funciona">Como funciona</a>
+<a href="/hiperbarica-asa-sul/">Unidade Asa Sul</a>
+<a href="/hiperbarica-taguatinga/">Unidade Taguatinga</a>
+<a href="/convenios/">Convênios</a>
+<a href="/perguntas-frequentes/">Perguntas frequentes</a>
+<a class="bmh-btn bmh-btn--navy bmh-whatsapp" href="{{wa:geral}}">{{svg:wa}}Agendar pelo WhatsApp</a>
+</nav></details>
+</div></header>
+
+<section class="bmh-hero bmh-hero--int"><div class="bmh-w">
+<p class="bmh-trilha"><a href="/">Início</a> › Pós-operatório de cirurgia plástica</p>
+<h1>Câmara hiperbárica no pós-operatório de cirurgia plástica</h1>
+<p class="bmh-hero__sub">Quando a pele sofre depois da cirurgia, o cirurgião pode indicar a oxigenoterapia hiperbárica como complemento do cuidado dele. Na BMH, com médico em todas as sessões, na Asa Sul e em Taguatinga.</p>
+<div class="bmh-hero__ctas">
+<a class="bmh-btn bmh-btn--oxy bmh-whatsapp" href="{{wa:pos}}">{{svg:wa}}Falar sobre o meu pós-operatório</a>
+</div>
+<p class="bmh-hero__hora">Todos os dias, das 7h às 19h. Convênio ou particular.</p>
+</div></section>
+
+<section id="quando" class="bmh-sec"><div class="bmh-w bmh-duas">
+<div class="bmh-texto">
+<h2>Quando o cirurgião costuma indicar</h2>
+<p>Depois de uma cirurgia plástica, algumas áreas da pele podem receber pouco sangue. O cirurgião pode indicar a câmara quando percebe sinais como estes:</p>
+<ul>
+<li>a pele mudou de cor, ficou arroxeada ou escura, ou esfriou numa área operada;</li>
+<li>o ponto abriu ou a cicatriz não fecha;</li>
+<li>um retalho ou enxerto de pele com sofrimento.</li>
+</ul>
+<p class="bmh-aviso">Percebeu alguma dessas mudanças? Fale primeiro com o seu cirurgião. Ele avalia e, se indicar a câmara, a BMH marca a sua avaliação.</p>
+</div>
+<figure class="bmh-fig">
+<img src="{{img:bmh-pos-operatorio-ilustrativa-1080.webp}}" srcset="{{img:bmh-pos-operatorio-ilustrativa-800.webp}} 800w, {{img:bmh-pos-operatorio-ilustrativa-1080.webp}} 1080w" sizes="(min-width:860px) 480px, 100vw" alt="Mulher em casa, no pós-operatório, mandando mensagem pelo celular" width="1080" height="1350" loading="lazy" style="aspect-ratio:4/5">
+<figcaption>Imagem ilustrativa.</figcaption>
+</figure>
+</div></section>
+
+<section id="como-ajuda" class="bmh-sec bmh-mist"><div class="bmh-w bmh-texto">
+<h2>Como o oxigênio sob pressão ajuda</h2>
+<p>Na câmara, você respira oxigênio a 100% com uma pressão maior que a do ar. Com a pressão, muito mais oxigênio se dissolve no sangue e chega às áreas que estão recebendo pouco sangue, como a pele de um retalho depois da cirurgia.</p>
+<p>Esse oxigênio extra ajuda as células que fazem a cicatrização e a formação de novos vasos.</p>
+<p class="bmh-aviso">A câmara é um complemento: não substitui o cuidado do cirurgião, e a resposta muda de pessoa para pessoa. Por isso cada caso passa por avaliação médica antes de começar.</p>
+</div></section>
+
+<section id="na-bmh" class="bmh-sec"><div class="bmh-w">
+<div class="bmh-texto">
+<h2>Como é o tratamento na BMH</h2>
+</div>
+<ul class="bmh-fatos" style="max-width:760px">
+<li><b>Antes de começar</b><span>Um médico da BMH avalia você e define o tratamento junto com o seu cirurgião.</span></li>
+<li><b>Cada sessão</b><span>Cerca de 1h30, contando o tempo de pressurizar e de voltar à pressão normal.</span></li>
+<li><b>Frequência</b><span>Em geral, uma sessão por dia, em dias seguidos.</span></li>
+<li><b>Quantas sessões</b><span>Em geral, de 10 a 30 no pós-operatório de cirurgia plástica. O médico reavalia ao longo do tratamento.</span></li>
+<li><b>Durante a sessão</b><span>Médico presente na unidade em todas as sessões, do início ao fim.</span></li>
+<li><b>Curativo, cinta e dreno</b><span>Pode vir com eles. Não precisa trocar o curativo antes da sessão. A BMH fornece a roupa de algodão.</span></li>
+<li><b>Onde e quando</b><span><a href="/hiperbarica-asa-sul/">Asa Sul</a> e <a href="/hiperbarica-taguatinga/">Taguatinga</a>, todos os dias, das 7h às 19h.</span></li>
+<li><b>Convênio</b><span>A BMH atende 50 convênios. A recepção confere o seu pelo WhatsApp e ajuda com a autorização. <a href="/convenios/">Ver a lista</a></span></li>
+</ul>
+<a class="bmh-btn bmh-btn--navy bmh-whatsapp" href="{{wa:pos}}" style="margin-top:28px">{{svg:wa}}Falar sobre o meu pós-operatório</a>
+</div></section>
+
+<section id="o-que-nao-e" class="bmh-sec bmh-mist"><div class="bmh-w bmh-texto">
+<h2>O que a câmara não é</h2>
+<ul>
+<li><b>Não é tratamento estético.</b> Ela entra quando há uma indicação médica, como um retalho ou enxerto comprometido.</li>
+<li><b>Não substitui o cirurgião.</b> Ele continua conduzindo o seu pós-operatório; a BMH trata junto com ele.</li>
+<li><b>Não tem resultado garantido.</b> A resposta varia de pessoa para pessoa, e o médico acompanha a sua evolução.</li>
+</ul>
+</div></section>
+
+<section id="perguntas" class="bmh-sec"><div class="bmh-w">
+<h2 class="bmh-h2">Perguntas do pós-operatório</h2>
+<div class="bmh-faq">
+<details><summary>Preciso de pedido do cirurgião?</summary><p>O tratamento sempre começa com uma avaliação médica na BMH. Para usar o convênio, o plano pede o pedido do seu médico. Se você ainda não tem pedido, fale com a recepção: ela explica o caminho.</p></details>
+<details><summary>Quantas sessões vou precisar?</summary><p>Depende do seu caso e é definido na avaliação, junto com o seu cirurgião. No pós-operatório de cirurgia plástica, em geral, são de 10 a 30 sessões.</p></details>
+<details><summary>Posso fazer a sessão com curativo, cinta ou dreno?</summary><p>Sim. Não precisa trocar o curativo antes da sessão, e a cinta e o dreno podem ficar. Traga as orientações do seu cirurgião.</p></details>
+<details><summary>Dói? E o ouvido?</summary><p>Não dói. Enquanto a pressão sobe, você sente o ouvido como na descida de um avião, e a equipe ensina a aliviar engolindo ou bocejando. A subida pode ser feita mais devagar, ou pausada, se incomodar.</p></details>
+<details><summary>O convênio cobre?</summary><p>A BMH atende 50 convênios. Em geral, o plano pede o pedido médico com relatório e uma autorização antes de começar. A recepção confere a cobertura do seu plano pelo WhatsApp e ajuda com a autorização.</p></details>
+</div>
+<p class="bmh-mais"><a class="bmh-link" href="/perguntas-frequentes/">Ver todas as perguntas</a></p>
+</div></section>
+
+<div id="cirurgioes" class="bmh-cir"><div class="bmh-w">
+<p><b>É cirurgião?</b> Encaminhe o seu paciente pelo WhatsApp. A avaliação médica confirma a indicação e define as sessões, na unidade mais perto dele.</p>
+<a class="bmh-btn bmh-btn--line bmh-whatsapp" href="{{wa:cirurgiao}}">Encaminhar um paciente</a>
+</div></div>
+
+<section class="bmh-final"><div class="bmh-w">
+<div>
+<h2>Agende a sua avaliação</h2>
+<p>Na Asa Sul ou em Taguatinga, todos os dias, das 7h às 19h.</p>
+</div>
+<a class="bmh-btn bmh-btn--oxy bmh-whatsapp" href="{{wa:geral}}">{{svg:wa}}Agendar pelo WhatsApp</a>
+</div></section>
+
+<footer class="bmh-foot"><div class="bmh-w">
+<img class="bmh-foot__logo" src="{{img:bmh-logo-branco.png}}" alt="BMH" width="300" height="156" loading="lazy">
+<div class="bmh-foot__g">
+<div><strong>Brasília Medicina Hiperbárica</strong><br>Em Brasília desde 2004<br>CNPJ 07.091.027/0001-86</div>
+<div><strong>Asa Sul</strong><br>SGAS 613, Conj. E, Bloco A, 1º subsolo<br>L2 Sul · CEP 70200-730</div>
+<div><strong>Taguatinga</strong><br>Prime Excelência Médica, Torre D<br>Setor C Norte</div>
+<div><strong>Contato</strong><br><a class="bmh-telefone" href="tel:+556133466005">(61) 3346-6005</a><br><a href="mailto:contato@hiperbaricabrasilia.com.br">contato@hiperbaricabrasilia.com.br</a><br><a href="https://www.instagram.com/hiperbaricabrasilia/" target="_blank" rel="noopener me">Instagram @hiperbaricabrasilia</a></div>
+</div>
+<p class="bmh-foot__legal">Responsáveis técnicos: Asa Sul, Dr. Hélio Ivan, CRM-DF 8164, RQE 26705 · Taguatinga, Dr. Alberto Jorge, CRM-DF 7248, RQE 14575 · Diretor médico: Dr. Jorge Madeiro, CRM-DF 31687, RQE 26863 · <a href="/politica-de-privacidade/">Política de privacidade</a></p>
+</div></footer>
+
+<div class="bmh-fix" id="bmh-fix">
+<a class="bmh-btn bmh-btn--navy bmh-whatsapp" href="{{wa:geral}}">{{svg:wa}}Agendar pelo WhatsApp</a>
+<a class="bmh-tel bmh-telefone" href="tel:+556133466005" aria-label="Ligar para a BMH">{{svg:tel}}</a>
+</div>
+
+</div>
+<script>
+(function () {
+  /* barra fixa do celular: aparece depois de rolar um pouco */
+  var fix = document.getElementById('bmh-fix');
+  if (!fix) { return; }
+  var confere = function () { if (window.scrollY > 500) { fix.classList.add('bmh-fix--on'); } else { fix.classList.remove('bmh-fix--on'); } };
+  window.addEventListener('scroll', confere, { passive: true });
+  confere();
+})();
+</script>
+
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[
+{"@type":"MedicalWebPage","@id":"https://hiperbaricabrasilia.com.br/pos-operatorio-cirurgia-plastica/#pagina","url":"https://hiperbaricabrasilia.com.br/pos-operatorio-cirurgia-plastica/","name":"Câmara hiperbárica no pós-operatório de cirurgia plástica","inLanguage":"pt-BR","publisher":{"@id":"https://hiperbaricabrasilia.com.br/#organizacao"},"lastReviewed":"2026-10-08","reviewedBy":{"@type":"Physician","name":"Dr. Jorge Madeiro","identifier":"CRM-DF 31687"},"about":{"@type":"MedicalTherapy","name":"Oxigenoterapia hiperbárica","alternateName":"Câmara hiperbárica"}},
+{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Início","item":"https://hiperbaricabrasilia.com.br/"},{"@type":"ListItem","position":2,"name":"Pós-operatório de cirurgia plástica","item":"https://hiperbaricabrasilia.com.br/pos-operatorio-cirurgia-plastica/"}]},
+{"@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"Preciso de pedido do cirurgião?","acceptedAnswer":{"@type":"Answer","text":"O tratamento sempre começa com uma avaliação médica na BMH. Para usar o convênio, o plano pede o pedido do seu médico. Se você ainda não tem pedido, fale com a recepção: ela explica o caminho."}},
+{"@type":"Question","name":"Quantas sessões vou precisar?","acceptedAnswer":{"@type":"Answer","text":"Depende do seu caso e é definido na avaliação, junto com o seu cirurgião. No pós-operatório de cirurgia plástica, em geral, são de 10 a 30 sessões."}},
+{"@type":"Question","name":"Posso fazer a sessão com curativo, cinta ou dreno?","acceptedAnswer":{"@type":"Answer","text":"Sim. Não precisa trocar o curativo antes da sessão, e a cinta e o dreno podem ficar. Traga as orientações do seu cirurgião."}},
+{"@type":"Question","name":"Dói? E o ouvido?","acceptedAnswer":{"@type":"Answer","text":"Não dói. Enquanto a pressão sobe, você sente o ouvido como na descida de um avião, e a equipe ensina a aliviar engolindo ou bocejando. A subida pode ser feita mais devagar, ou pausada, se incomodar."}},
+{"@type":"Question","name":"O convênio cobre?","acceptedAnswer":{"@type":"Answer","text":"A BMH atende 50 convênios. Em geral, o plano pede o pedido médico com relatório e uma autorização antes de começar. A recepção confere a cobertura do seu plano pelo WhatsApp e ajuda com a autorização."}}
+]}
+]}</script>

@@ -1,0 +1,22 @@
+{
+ "title": "Brasilia Medicina Hiperbarica",
+ "description": "",
+ "url": "https://hiperbaricabrasilia.com.br",
+ "email": "jorgemadeirotorres@gmail.com",
+ "timezone": "America/Sao_Paulo",
+ "date_format": "j \\d\\e F \\d\\e Y",
+ "time_format": "H:i",
+ "start_of_week": 0,
+ "language": "en_US",
+ "use_smilies": true,
+ "default_category": 1,
+ "default_post_format": "0",
+ "posts_per_page": 10,
+ "show_on_front": "page",
+ "page_on_front": 36,
+ "page_for_posts": 0,
+ "default_ping_status": "open",
+ "default_comment_status": "open",
+ "site_logo": 333,
+ "site_icon": 333
+}

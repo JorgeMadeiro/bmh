@@ -1,0 +1,505 @@
+<!-- BMH · home nova (bloco nativo). Gerada a partir da prévia v6 de 06/10/2026.
+     Imagens: {{img:nome}} é trocado pelo endereço da biblioteca do WordPress no envio (scripts/wp-pagina-html.js).
+     WhatsApp: {{wa:chave}} vira https://wa.me/556133466005?text=<mensagem da chave>. -->
+<link rel="preload" as="font" type="font/woff2" href="https://fonts.gstatic.com/s/librefranklin/v20/jizDREVItHgc8qDIbSTKq4XkRiUf2zcZiVbJ.woff2" crossorigin>
+<style>
+/* Letra declarada aqui, sem a folha do Google Fonts que travava a primeira tela (08/10/2026). Arquivo variável único,
+   400 a 800, caracteres do português. Se o Google mudar a versão (v20), pegar o endereço novo em
+   fonts.googleapis.com/css2?family=Libre+Franklin:wght@400..800&display=swap (bloco "latin"). */
+@font-face{font-family:'Libre Franklin';font-style:normal;font-weight:400 800;font-display:swap;src:url(https://fonts.gstatic.com/s/librefranklin/v20/jizDREVItHgc8qDIbSTKq4XkRiUf2zcZiVbJ.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+/* ---------- tema: some o cabeçalho, o rodapé e o título do Astra nesta página ---------- */
+.site-header,.site-footer,.ast-above-header-wrap,.ast-below-header-wrap,.ast-mobile-header-wrap,.entry-header,#masthead,#colophon{display:none!important}
+.site-content>.ast-container,.ast-container{max-width:none!important;padding:0!important;display:block!important}
+.site-content,#primary,.site-main,article.page,.entry-content{margin:0!important;padding:0!important;max-width:none!important;width:100%!important}
+.entry-content>.wp-block-html,.entry-content>*{margin:0!important;max-width:none!important}
+body{background:#fff}
+/* ---------- marca ---------- */
+.bmh{--navy:#002375;--deep:#00143F;--ink:#142033;--txt:#2B3850;--muted:#4A5568;--oxy:#34A9CF;--oxyt:#1A6E93;--mist:#EEF5FA;--line:#DCE5EE;--light:#9EDCF0;
+  font-family:'Libre Franklin',system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--ink);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.bmh *{box-sizing:border-box}
+.bmh a{color:var(--navy)}
+.bmh a,.bmh a:hover,.bmh a:focus,.bmh a:visited,.entry-content .bmh a{text-decoration:none!important;-webkit-text-decoration:none!important;box-shadow:none}
+.bmh-small a,.bmh-tri__n a{font-weight:700}
+.bmh img{max-width:100%;height:auto;display:block}
+/* o tema Astra pinta os títulos: as cores da BMH vencem com !important */
+.bmh h1,.bmh h2,.bmh h3,.bmh .bmh-h2,.bmh .bmh-uni h3{color:var(--navy)!important}
+.bmh .bmh-hero h1,.bmh .bmh-deep .bmh-h2,.bmh .bmh-final h2{color:#fff!important}
+.bmh h1,.bmh h2{font-weight:800!important}
+.bmh h1,.bmh h2,.bmh h3{font-family:'Libre Franklin',system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:600;letter-spacing:-.015em;margin:0;text-wrap:balance}
+.bmh p{margin:0}
+.bmh-w{max-width:1240px;margin:0 auto;padding:0 20px}
+.bmh-sec{padding:40px 0}
+.bmh-eye{display:block;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--oxyt);margin:0 0 8px}
+.bmh-h2{font-size:30px;line-height:1.1;color:var(--navy)}
+.bmh-lead{color:var(--txt);margin-top:12px}
+.bmh-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 24px;border-radius:999px;font-weight:700;font-size:17px;text-decoration:none!important;border:0;cursor:pointer;line-height:1.2;text-align:center}
+.bmh-btn svg{width:20px;height:20px;flex:none}
+.bmh-btn--navy{background:var(--navy);color:#fff!important}
+.bmh-btn--oxy{background:var(--oxy);color:var(--deep)!important}
+.bmh-btn--line{border:1px solid var(--navy);color:var(--navy)!important;background:#fff}
+.bmh-btn--ghost{border:1px solid rgba(255,255,255,.55);color:#fff!important;background:transparent}
+.bmh-btn--full{display:flex;width:100%}
+/* ---------- topo ---------- */
+.bmh-bar{display:none;background:var(--deep);color:#B9C8E4;font-size:14px}
+.bmh-bar .bmh-w{display:flex;flex-wrap:wrap;gap:4px 28px;justify-content:flex-end;padding-top:8px;padding-bottom:8px}
+.bmh-bar a{color:#fff;font-weight:600;text-decoration:none}
+.bmh-head{background:#fff;border-bottom:1px solid var(--line);position:relative;z-index:5}
+.bmh-head .bmh-w{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:62px}
+.bmh-logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--navy)}
+.bmh-logo img{width:64px;height:34px;object-fit:contain}
+.bmh-logo span{font-family:'Libre Franklin',system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:600;font-size:14px;line-height:1.12;border-left:1px solid var(--line);padding-left:10px}
+.bmh-logo small{display:block;font-family:'Libre Franklin',sans-serif;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--oxyt)}
+.bmh-nav{display:none}
+.bmh-menu summary{list-style:none;cursor:pointer;width:44px;height:44px;border:1px solid var(--line);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--navy)}
+.bmh-menu summary::-webkit-details-marker{display:none}
+.bmh-menu nav{position:absolute;left:0;right:0;top:100%;background:#fff;border-bottom:1px solid var(--line);padding:8px 20px 20px;display:flex;flex-direction:column;box-shadow:0 12px 24px rgba(0,20,63,.10)}
+.bmh-menu nav a{padding:12px 0;border-bottom:1px solid var(--line);text-decoration:none;color:var(--ink);font-weight:600}
+.bmh-menu nav a.bmh-btn{margin-top:14px;border:0;color:#fff}
+/* ---------- primeira dobra ---------- */
+.bmh-hero{position:relative;background:var(--deep);color:#fff;overflow:hidden}
+.bmh-hero__img{position:absolute;inset:0;width:100%!important;height:100%!important;object-fit:cover;object-position:62% center}
+.bmh-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,20,63,.35) 0%,rgba(0,20,63,.82) 30%,rgba(0,20,63,.97) 52%)}
+.bmh-hero .bmh-w{position:relative;z-index:1;padding-top:64px;padding-bottom:28px}
+.bmh-chip{display:inline-flex;align-items:center;gap:8px;margin:0 0 14px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--light)}
+.bmh-chip:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--oxy);flex:none}
+.bmh-hero h1{font-size:34px;line-height:1.05;color:#fff}
+.bmh-hero__sub{color:#C3D1EA;font-size:16px;margin-top:10px}
+.bmh-hero__ctas{display:none}
+.bmh-hero__micro{display:none}
+.bmh-tri{background:#fff;color:var(--ink);border-radius:8px;padding:18px 16px 16px;margin-top:22px;box-shadow:0 20px 50px rgba(0,10,40,.35)}
+.bmh-tri__t{font-family:'Libre Franklin',system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:600;font-size:22px;color:var(--navy);line-height:1.15}
+.bmh-tri__s{font-size:14px;color:var(--muted);margin:2px 0 12px!important}
+.bmh-tri a{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:52px;padding:0 16px;border:1px solid #C9D6E3;border-radius:6px;text-decoration:none;color:var(--navy);font-weight:700;font-size:15px;margin-top:8px;letter-spacing:-.005em}
+.bmh-tri a:after{content:"\2192";color:var(--oxyt)}
+.bmh-tri a.bmh-tri--med{background:var(--mist);border-color:var(--mist)}
+.bmh-tri__n{font-size:14px;color:var(--muted);margin-top:12px!important}
+.bmh-tri .bmh-tri__n a{display:inline;min-height:0;padding:0;border:0;margin:0;font-size:14px}
+.bmh-tri .bmh-tri__n a:after{content:none}
+.bmh-proof{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin-top:26px;border-top:1px solid rgba(255,255,255,.22)}
+.bmh-proof div{padding:14px 12px 12px 0;border-bottom:1px solid rgba(255,255,255,.22)}
+.bmh-proof div:nth-child(even){padding-left:14px;border-left:1px solid rgba(255,255,255,.22)}
+.bmh-proof b{display:block;font-family:'Libre Franklin',system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:800;font-size:28px;line-height:1}
+.bmh-proof span{display:block;font-size:13px;color:#B9C8E4;margin-top:4px;line-height:1.35}
+.bmh-proof div:last-child{grid-column:1/-1;border-left:0;padding-left:0;border-bottom:0}
+/* ---------- pós-operatório ---------- */
+.bmh-pos__grid{display:grid;gap:24px}
+.bmh-pos__foto{position:relative}
+.bmh-pos__foto img{width:100%;height:230px;object-fit:cover;border-radius:4px 4px 0 0}
+.bmh-pos__selo{background:var(--navy);color:#fff;padding:14px 16px;border-radius:0 0 4px 4px}
+.bmh-pos__selo b{display:block;font-family:'Libre Franklin',system-ui,-apple-system,'Segoe UI',sans-serif;font-size:18px;line-height:1.3}
+.bmh-pos__selo span{font-size:14px;color:#B9C8E4}
+.bmh-sit{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-top:1px solid var(--line);margin:22px 0}
+.bmh-sit div{padding:14px 12px 14px 0;border-bottom:1px solid var(--line)}
+.bmh-sit div:nth-child(even){padding-left:12px;border-left:1px solid var(--line)}
+.bmh-sit b{display:block;font-family:'Libre Franklin',system-ui,-apple-system,'Segoe UI',sans-serif;font-size:17px;color:var(--navy);line-height:1.25}
+.bmh-sit span{font-size:14px;color:var(--muted)}
+/* ---------- passos e convênio ---------- */
+.bmh-mist{background:var(--mist)}
+.bmh-steps{list-style:none;margin:18px 0 24px;padding:0;border-top:2px solid var(--navy)}
+.bmh-steps li{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #C9D6E3}
+.bmh-steps i{flex:none;width:24px;font-style:normal;font-family:'Libre Franklin',system-ui,-apple-system,'Segoe UI',sans-serif;font-size:24px;line-height:1.1;color:var(--oxyt)}
+.bmh-steps b{color:var(--navy)}
+.bmh-cards{display:grid;gap:14px}
+.bmh-card{background:#fff;border:1px solid #C9D6E3;border-radius:6px;padding:20px}
+.bmh-card--navy{background:var(--navy);border-color:var(--navy);color:#fff}
+.bmh-card__t{font-family:'Libre Franklin',system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:600;font-size:21px;color:var(--navy);display:block;margin-bottom:6px}
+.bmh-card--navy .bmh-card__t{color:#fff}
+.bmh-card--navy p{color:#C3D1EA;font-size:15px;margin-bottom:14px}
+.bmh-busca{width:100%;min-height:52px;padding:0 16px;border:1px solid #8FA6C2;border-radius:6px;font:inherit;font-size:17px;color:var(--ink);background:#fff;margin-top:6px}
+.bmh-res{margin-top:12px!important;font-size:16px;min-height:1px}
+.bmh-res--ok{color:#0F5B3A;font-weight:700}
+.bmh-small{font-size:15px;margin-top:10px!important}
+/* ---------- cirurgião ---------- */
+.bmh-deep{background:var(--deep);color:#fff}
+.bmh-deep .bmh-eye{color:#7FD0EA}
+.bmh-deep .bmh-h2{color:#fff}
+.bmh-ol{list-style:none;margin:20px 0 24px;padding:0;border-top:1px solid rgba(255,255,255,.22)}
+.bmh-ol li{padding:14px 0;border-bottom:1px solid rgba(255,255,255,.22)}
+.bmh-ol i{font-style:normal;font-family:'Libre Franklin',system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--oxy);margin-right:10px}
+.bmh-ol span{display:block;font-size:15px;color:#C3D1EA;margin-top:2px}
+/* ---------- quem cuida ---------- */
+.bmh-dir{list-style:none;margin:6px 0 0;padding:0;border-top:1px solid var(--line)}
+.bmh-dir li{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.bmh-dir img{width:48px;height:48px;border-radius:50%;object-fit:cover;flex:none}
+.bmh-dir b{display:block;font-size:16px;color:var(--navy)}
+.bmh-dir span{font-size:13px;color:var(--muted)}
+/* ---------- mergulho, indicações, unidades ---------- */
+.bmh-line{border-top:1px solid var(--line)}
+.bmh-two{display:flex;gap:8px;margin-top:16px}
+.bmh-two .bmh-btn{flex:1;padding:0 10px;font-size:15px;min-height:48px}
+.bmh-ind{list-style:none;margin:16px 0 0;padding:0;border-top:1px solid #C9D6E3}
+.bmh-ind li{padding:13px 0;border-bottom:1px solid #C9D6E3;font-family:'Libre Franklin',system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:600;font-size:18px;color:var(--navy)}
+.bmh-uni{display:grid;gap:16px;margin-top:18px}
+.bmh-uni article{border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.bmh-uni img{width:100%;height:170px;object-fit:cover}
+.bmh-uni__b{padding:16px 18px}
+.bmh-uni h3{font-size:22px;color:var(--navy);margin-bottom:4px}
+.bmh-uni p{font-size:15px}
+/* ---------- final e rodapé ---------- */
+.bmh-final{position:relative;background:var(--deep);color:#fff;overflow:hidden}
+.bmh-final img{position:absolute;inset:0;width:100%!important;height:100%!important;object-fit:cover;object-position:center 40%;opacity:.18}
+.bmh-final .bmh-w{position:relative;padding-top:44px;padding-bottom:44px}
+.bmh-final h2{font-size:30px;line-height:1.1;margin-bottom:20px!important;color:#fff}
+.bmh-foot{background:#000E2E;color:#B9C8E4;font-size:14px;padding:32px 0 100px}
+.bmh-foot a{color:#B9C8E4}
+.bmh-foot strong{color:#fff}
+.bmh-foot__g{display:grid;gap:14px}
+.bmh-foot__g>div{min-width:0;overflow-wrap:anywhere}
+.bmh-foot__nome{font-family:'Libre Franklin',system-ui,-apple-system,'Segoe UI',sans-serif;font-size:18px}
+.bmh-foot__legal{margin-top:18px!important;padding-top:14px;border-top:1px solid #1B2C55;font-size:13px}
+.bmh-fix{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;gap:10px;padding:10px 16px 14px;background:#fff;border-top:1px solid var(--line);box-shadow:0 -6px 18px rgba(0,20,63,.10)}
+.bmh-fix .bmh-btn{flex:1}
+.bmh-fix .bmh-tel{flex:none;width:52px;height:52px;border-radius:50%;border:1px solid var(--navy);display:flex;align-items:center;justify-content:center;color:var(--navy)}
+.bmh-fix .bmh-tel svg{width:20px;height:20px}
+
+/* ritmo vertical: estas regras precisam vencer o ".bmh p{margin:0}" (07/10/2026) */
+.bmh .bmh-chip{margin:0 0 16px}
+.bmh .bmh-hero__sub{margin-top:14px}
+.bmh .bmh-lead{margin-top:14px;line-height:1.6}
+.bmh .bmh-eye{margin-bottom:10px}
+.bmh .bmh-h2{line-height:1.12}
+.bmh .bmh-sit{margin:24px 0}
+.bmh .bmh-steps{margin-top:22px}
+.bmh .bmh-uni h3{margin-bottom:8px}
+.bmh .bmh-uni p+p{margin-top:6px}
+.bmh .bmh-dir b{margin-bottom:2px}
+.bmh .bmh-foot__g>div{line-height:1.6}
+/* ---------- computador ---------- */
+@media (min-width:860px){
+  .bmh{font-size:18px}
+  .bmh-w{padding:0 24px}
+  .bmh-sec{padding:72px 0}
+  .bmh-h2{font-size:46px;line-height:1.05}
+  .bmh-eye{font-size:13px}
+  .bmh-bar{display:block}
+  .bmh-head .bmh-w{min-height:78px}
+  .bmh-logo img{width:94px;height:50px}
+  .bmh-logo span{font-size:18px;padding-left:14px}
+  .bmh-logo{flex:none}
+  .bmh-logo span{white-space:nowrap}
+  .bmh-hero::after{background:linear-gradient(90deg,rgba(0,20,63,.96) 0%,rgba(0,20,63,.88) 38%,rgba(0,20,63,.45) 66%,rgba(0,20,63,.15) 100%)}
+  .bmh-hero .bmh-w{padding-top:72px;padding-bottom:40px}
+  .bmh-hero__top{display:flex;gap:48px;align-items:center}
+  .bmh-hero__txt{flex:1 1 560px;max-width:660px}
+  .bmh-chip{font-size:13px;padding:8px 16px;border:1px solid rgba(127,208,234,.45);border-radius:999px;margin-bottom:26px}
+  .bmh-hero h1{font-size:58px;line-height:1.04}
+  .bmh-hero__sub{font-size:21px;margin-top:22px;max-width:600px}
+  .bmh-hero__ctas{display:flex;flex-wrap:wrap;gap:14px;margin-top:34px}
+  .bmh-hero__micro{display:block;margin-top:16px!important;font-size:15px;color:#B9C8E4}
+  .bmh-tri{flex:0 1 420px;margin-top:0;padding:28px 26px}
+  .bmh-tri__t{font-size:26px}
+  .bmh-tri a{font-size:17px;min-height:56px}
+  .bmh-proof{grid-template-columns:repeat(5,minmax(0,1fr));margin-top:56px}
+  .bmh-proof div,.bmh-proof div:nth-child(even),.bmh-proof div:last-child{padding:24px 20px 4px;border-left:1px solid rgba(255,255,255,.22);border-bottom:0;grid-column:auto}
+  .bmh-proof div:first-child{padding-left:0;border-left:0}
+  .bmh-proof b{font-size:44px}
+  .bmh-proof span{font-size:15px}
+  .bmh-pos__grid{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:64px;align-items:center}
+  .bmh-pos__foto img{height:500px;border-radius:4px}
+  .bmh-pos__selo{position:absolute;left:-28px;bottom:36px;max-width:290px;border-radius:4px;box-shadow:0 18px 40px rgba(0,20,63,.28);padding:22px 26px}
+  .bmh-pos__selo b{font-size:20px}
+  .bmh-sit b{font-size:21px}
+  .bmh-sit span{font-size:16px}
+  .bmh-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0}
+  .bmh-steps li{flex-direction:column;gap:6px;padding:26px 24px 0 0;border-bottom:0}
+  .bmh-cards{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:28px}
+  .bmh-card{padding:28px 30px}
+  .bmh-card__t{font-size:24px}
+  .bmh-deep__top{display:flex;justify-content:space-between;align-items:flex-end;gap:48px}
+  .bmh-deep__top .bmh-btn{flex:none;white-space:nowrap}
+  .bmh-ol{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:48px}
+  .bmh-ol li{padding:28px 28px 0 0;border-bottom:0}
+  .bmh-ol li+li{padding-left:28px;border-left:1px solid rgba(255,255,255,.22)}
+  .bmh-ol i{display:block;font-size:36px;margin-bottom:8px}
+  .bmh-ol b{font-family:'Libre Franklin',system-ui,-apple-system,'Segoe UI',sans-serif;font-size:23px}
+  .bmh-quem{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:72px;align-items:start}
+  .bmh-dir img{width:56px;height:56px}
+  .bmh-dir b{font-family:'Libre Franklin',system-ui,-apple-system,'Segoe UI',sans-serif;font-size:19px}
+  .bmh-dir span{font-size:15px}
+  .bmh-merg{display:flex;justify-content:space-between;align-items:center;gap:48px}
+  .bmh-merg .bmh-h2{font-size:34px}
+  .bmh-two{flex:none;margin-top:0}
+  .bmh-two .bmh-btn{flex:none;padding:0 22px;font-size:16px;min-height:52px}
+  .bmh-ind{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:48px}
+  .bmh-ind li{font-size:22px;padding:20px 0}
+  .bmh-uni{grid-template-columns:repeat(2,minmax(0,1fr));gap:32px}
+  .bmh-uni img{height:240px}
+  .bmh-uni__b{padding:28px 32px}
+  .bmh-uni h3{font-size:30px}
+  .bmh-final .bmh-w{display:flex;justify-content:space-between;align-items:center;gap:48px;padding-top:88px;padding-bottom:88px}
+  .bmh-final h2{font-size:46px;margin:0!important;max-width:680px}
+  .bmh-foot{padding:56px 0 32px;font-size:15px}
+  .bmh-foot__g{grid-template-columns:repeat(4,minmax(0,1fr));gap:32px}
+  .bmh .bmh-chip{margin-bottom:26px}
+  .bmh .bmh-hero__sub{margin-top:22px}
+  .bmh .bmh-lead{margin-top:20px}
+  .bmh .bmh-eye{margin-bottom:14px}
+  .bmh .bmh-sit{margin:32px 0}
+  .bmh-fix{display:none}
+}
+@media (min-width:1180px){
+  .bmh-menu{display:none}
+  .bmh-nav{display:flex;flex-wrap:nowrap;align-items:center;gap:20px;white-space:nowrap}
+  .bmh-nav a{text-decoration:none;color:var(--ink);font-weight:600;font-size:15px}
+  .bmh-nav a.bmh-btn{min-height:46px;padding:0 20px;color:#fff}
+}
+@media (min-width:1180px) and (max-width:1519px){.bmh-nav .bmh-opc{display:none}}
+</style>
+
+<div class="bmh">
+
+<div class="bmh-bar"><div class="bmh-w">
+<span>Asa Sul · L2 Sul, SGAS 613</span><span>Taguatinga · Setor C Norte</span><span>Todos os dias, 7h às 19h</span><a href="tel:+556133466005">(61) 3346-6005</a>
+</div></div>
+
+<header class="bmh-head"><div class="bmh-w">
+<a class="bmh-logo" href="/"><img src="{{img:bmh-logo.png}}" alt="BMH" width="300" height="159"><span>Brasília Medicina Hiperbárica<small>desde 2004</small></span></a>
+<nav class="bmh-nav" aria-label="Principal">
+<a href="#pos-operatorio">Pós-operatório</a>
+<a class="bmh-opc" href="#indicacoes">Tratamentos</a>
+<a href="#cirurgioes">Para cirurgiões</a>
+<a class="bmh-opc" href="#quem-cuida">Quem cuida de você</a>
+<a href="#unidades">Unidades</a>
+<a href="#convenios">Convênios</a>
+<a class="bmh-btn bmh-btn--navy bmh-whatsapp" href="{{wa:geral}}">{{svg:wa}}Agendar pelo WhatsApp</a>
+</nav>
+<details class="bmh-menu"><summary aria-label="Menu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></summary>
+<nav aria-label="Menu do celular">
+<a href="#pos-operatorio">Pós-operatório</a>
+<a href="#indicacoes">Tratamentos</a>
+<a href="#cirurgioes">Para cirurgiões</a>
+<a href="#quem-cuida">Quem cuida de você</a>
+<a href="#unidades">Unidades</a>
+<a href="#convenios">Convênios</a>
+<a class="bmh-btn bmh-btn--navy bmh-whatsapp" href="{{wa:geral}}">{{svg:wa}}Agendar pelo WhatsApp</a>
+</nav></details>
+</div></header>
+
+<section class="bmh-hero">
+<img class="bmh-hero__img" src="{{img:bmh-camara-asa-sul-1080.webp}}" srcset="{{img:bmh-camara-asa-sul-720.webp}} 720w, {{img:bmh-camara-asa-sul-1080.webp}} 1080w, {{img:bmh-camara-asa-sul-1358.webp}} 1358w" sizes="100vw" alt="" width="1358" height="763" fetchpriority="high">
+<div class="bmh-w">
+<div class="bmh-hero__top">
+<div class="bmh-hero__txt">
+<p class="bmh-chip">Primeira clínica particular de medicina hiperbárica de Brasília</p>
+<h1>A medicina hiperbárica de Brasília, desde 2004.</h1>
+<p class="bmh-hero__sub">Oxigenoterapia hiperbárica com médico em todas as sessões. Duas unidades, na Asa Sul e em Taguatinga, abertas todos os dias, das 7h às 19h.</p>
+<div class="bmh-hero__ctas">
+<a class="bmh-btn bmh-btn--oxy bmh-whatsapp" href="{{wa:geral}}">{{svg:wa}}Agendar avaliação pelo WhatsApp</a>
+<a class="bmh-btn bmh-btn--ghost bmh-telefone" href="tel:+556133466005">{{svg:tel}}Ligar: (61) 3346-6005</a>
+</div>
+<p class="bmh-hero__micro">A recepção responde todos os dias, das 7h às 19h. Convênio ou particular.</p>
+</div>
+<div class="bmh-tri">
+<p class="bmh-tri__t">Qual é o seu caso?</p>
+<p class="bmh-tri__s">Um toque abre o WhatsApp com a mensagem pronta.</p>
+<a class="bmh-whatsapp" href="{{wa:pos}}">Estou no pós-operatório de plástica</a>
+<a class="bmh-whatsapp" href="{{wa:ferida}}">Tenho uma ferida que não cicatriza</a>
+<a class="bmh-whatsapp" href="{{wa:pedido}}">Tenho um pedido médico</a>
+<a class="bmh-whatsapp" href="{{wa:mergulho}}">Sou mergulhador</a>
+<a class="bmh-whatsapp bmh-tri--med" href="{{wa:cirurgiao}}">Sou médico e quero encaminhar</a>
+<p class="bmh-tri__n">Outro motivo ou dúvida: <a class="bmh-whatsapp" href="{{wa:duvida}}">fale com a recepção</a></p>
+</div>
+</div>
+<div class="bmh-proof">
+<div><b>2004</b><span>fundação da BMH, a primeira clínica particular do gênero em Brasília</span></div>
+<div><b>100%</b><span>das sessões com médico presente na unidade</span></div>
+<div><b>50</b><span>convênios atendidos</span></div>
+<div><b>7 dias</b><span>por semana, das 7h às 19h</span></div>
+<div><b>3</b><span>diretores médicos com pós-graduação em medicina hiperbárica</span></div>
+</div>
+</div>
+</section>
+
+<section id="pos-operatorio" class="bmh-sec"><div class="bmh-w bmh-pos__grid">
+<div>
+<span class="bmh-eye">A maior parte dos nossos pacientes</span>
+<h2 class="bmh-h2">Pós-operatório de cirurgia plástica</h2>
+<p class="bmh-lead">Quando a recuperação da cirurgia não segue o caminho esperado, o oxigênio sob pressão pode entrar como complemento do cuidado do cirurgião. Cada caso passa por avaliação médica na BMH.</p>
+<div class="bmh-sit">
+<div><b>Retalho comprometido</b><span>pele que muda de cor ou esfria</span></div>
+<div><b>Falta de circulação</b><span>isquemia na área operada</span></div>
+<div><b>Infecção grave</b><span>na área operada</span></div>
+<div><b>Ferida que não fecha</b><span>abertura da cicatriz</span></div>
+</div>
+<a class="bmh-btn bmh-btn--navy bmh-whatsapp" href="{{wa:pos}}">{{svg:wa}}Falar sobre o meu pós-operatório</a>
+</div>
+<div class="bmh-pos__foto">
+<img src="{{img:bmh-consultorio.jpg}}" alt="Consultório médico da BMH" width="1000" height="788" loading="lazy">
+<div class="bmh-pos__selo"><b>Médico presente na unidade em todas as sessões</b><span>e avaliação médica antes da primeira</span></div>
+</div>
+</div></section>
+
+<section id="convenios" class="bmh-sec bmh-mist"><div class="bmh-w">
+<h2 class="bmh-h2">O que acontece depois que você chama</h2>
+<p class="bmh-lead">Sem cadastro, sem formulário longo. Uma conversa no WhatsApp com a recepção da BMH.</p>
+<ol class="bmh-steps">
+<li><i>1</i><span><b>Você conta o seu caso.</b> A recepção pergunta a cirurgia, a data e o convênio.</span></li>
+<li><i>2</i><span><b>Confere o convênio.</b> A equipe vê o que o seu plano pede, ou explica o valor para particular.</span></li>
+<li><i>3</i><span><b>Marca a avaliação.</b> Na unidade mais perto de você, inclusive no fim de semana.</span></li>
+<li><i>4</i><span><b>Começa o tratamento.</b> O médico define as sessões, com médico presente em todas.</span></li>
+</ol>
+<div class="bmh-cards">
+<div class="bmh-card">
+<label class="bmh-card__t" for="bmh-busca">O seu convênio é atendido?</label>
+<input class="bmh-busca" id="bmh-busca" type="search" placeholder="Digite o plano. Ex.: GEAP" autocomplete="off">
+<p class="bmh-res" id="bmh-res" aria-live="polite"></p>
+<p class="bmh-small"><a href="/convenios/">Ver a lista completa de convênios</a></p>
+</div>
+<div class="bmh-card bmh-card--navy">
+<span class="bmh-card__t">Prefere ligar?</span>
+<p>A recepção atende todos os dias, das 7h às 19h, nas duas unidades.</p>
+<a class="bmh-btn bmh-btn--oxy bmh-btn--full bmh-telefone" href="tel:+556133466005">{{svg:tel}}(61) 3346-6005</a>
+</div>
+</div>
+</div></section>
+
+<section id="cirurgioes" class="bmh-sec bmh-deep"><div class="bmh-w">
+<div class="bmh-deep__top">
+<div>
+<span class="bmh-eye">Para o cirurgião</span>
+<h2 class="bmh-h2">O cirurgião indica. A BMH avalia e trata, com médico em todas as sessões.</h2>
+</div>
+<a class="bmh-btn bmh-btn--oxy bmh-whatsapp" href="{{wa:cirurgiao}}">Encaminhar um paciente</a>
+</div>
+<ol class="bmh-ol">
+<li><i>01</i><b>Encaminhamento</b><span>pelo WhatsApp da BMH, para a unidade mais perto do paciente</span></li>
+<li><i>02</i><b>Avaliação médica</b><span>indicação confirmada, contraindicações conferidas e sessões definidas</span></li>
+<li><i>03</i><b>Sessões</b><span>na Asa Sul ou em Taguatinga, com médico presente na unidade</span></li>
+</ol>
+</div></section>
+
+<section id="quem-cuida" class="bmh-sec"><div class="bmh-w bmh-quem">
+<div>
+<span class="bmh-eye">Segurança em cada sessão</span>
+<h2 class="bmh-h2">Quem cuida de você</h2>
+<p class="bmh-lead">Em todas as sessões, um médico está na unidade, do início ao fim. Os protocolos de cada indicação são definidos pela direção médica da BMH.</p>
+<div class="bmh-card bmh-card--navy" style="margin-top:20px">
+<span class="bmh-card__t">Médico em todas as sessões</span>
+<p style="margin:0">Avalia o paciente antes de começar, acompanha a sessão e responde na hora a qualquer intercorrência.</p>
+</div>
+</div>
+<div>
+<span class="bmh-card__t" style="margin-top:28px">Direção médica</span>
+<p style="font-size:15px;color:var(--muted)">Responsável pelos protocolos e pela equipe.</p>
+<ul class="bmh-dir">
+<li><img src="{{img:bmh-dr-jorge-madeiro.jpg}}" alt="" width="240" height="240" loading="lazy"><div><b>Dr. Jorge Madeiro · diretor médico</b><span>CRM-DF 31687 · RQE 26863 · pós-graduação em medicina hiperbárica no Brasil e no exterior · diretoria da sociedade brasileira da especialidade, 2026/27</span></div></li>
+<li><img src="{{img:bmh-dr-helio-ivan.jpg}}" alt="" width="240" height="240" loading="lazy"><div><b>Dr. Hélio Ivan · responsável técnico, Asa Sul</b><span>CRM-DF 8164 · RQE 26705 · na BMH desde 2004 · pós-graduação em medicina hiperbárica</span></div></li>
+<li><img src="{{img:bmh-dr-alberto-jorge.jpg}}" alt="" width="240" height="240" loading="lazy"><div><b>Dr. Alberto Jorge · responsável técnico, Taguatinga</b><span>CRM-DF 7248 · RQE 14575 · pós-graduação em medicina hiperbárica</span></div></li>
+</ul>
+</div>
+</div></section>
+
+<section id="mergulho" class="bmh-sec bmh-line"><div class="bmh-w bmh-merg">
+<div>
+<span class="bmh-eye">Medicina do mergulho</span>
+<h2 class="bmh-h2">Avaliação de mergulhadores e acidente de mergulho</h2>
+<p class="bmh-lead">Aptidão para mergulho e atendimento ao acidente descompressivo, com direção médica formada em medicina submarina (Marinha do Brasil, DAN).</p>
+</div>
+<div class="bmh-two">
+<a class="bmh-btn bmh-btn--navy bmh-whatsapp" href="{{wa:mergulho}}">Avaliação de aptidão</a>
+<a class="bmh-btn bmh-btn--line bmh-telefone" href="tel:+556133466005">Acidente? Ligue, 7h às 19h</a>
+</div>
+</div></section>
+
+<section id="indicacoes" class="bmh-sec bmh-mist"><div class="bmh-w">
+<h2 class="bmh-h2">Quando a hiperbárica é indicada</h2>
+<p class="bmh-lead">Só as indicações reconhecidas pelo Conselho Federal de Medicina (Resolução 1.457/1995). Cada caso passa por avaliação médica.</p>
+<ul class="bmh-ind">
+<li>Pós-operatório: retalho ou enxerto comprometido</li>
+<li>Feridas que não cicatrizam e pé diabético</li>
+<li>Lesões causadas por radioterapia</li>
+<li>Infecções graves de pele e músculo</li>
+<li>Infecção crônica dos ossos (osteomielite)</li>
+<li>Acidente de mergulho (doença descompressiva)</li>
+</ul>
+<p class="bmh-small" style="margin-top:20px!important"><a class="bmh-whatsapp" href="{{wa:duvida}}">Não achou o seu caso? Pergunte à recepção</a></p>
+</div></section>
+
+<section id="unidades" class="bmh-sec"><div class="bmh-w">
+<h2 class="bmh-h2">Duas unidades, abertas todos os dias</h2>
+<div class="bmh-uni">
+<article>
+<img src="{{img:bmh-fachada-asa-sul.jpg}}" alt="Fachada do Complexo Médico Hospitalar da L2 Sul" width="747" height="513" loading="lazy">
+<div class="bmh-uni__b">
+<h3>Asa Sul</h3>
+<p>SGAS 613, Conjunto E, Bloco A, 1º subsolo<br>Complexo Médico Hospitalar, L2 Sul · CEP 70200-730</p>
+<p style="color:var(--muted)">Todos os dias, das 7h às 19h · (61) 3346-6005</p>
+<div class="bmh-two">
+<a class="bmh-btn bmh-btn--navy bmh-whatsapp" href="{{wa:asasul}}">Agendar na Asa Sul</a>
+<a class="bmh-btn bmh-btn--line bmh-rota" href="https://www.google.com/maps/search/?api=1&query=SGAS+613+Conjunto+E+Bloco+A+Asa+Sul+Bras%C3%ADlia+DF" target="_blank" rel="noopener">Como chegar</a>
+</div>
+</div>
+</article>
+<article>
+<img src="{{img:bmh-fachada-taguatinga.jpg}}" alt="Fachada da unidade Taguatinga da BMH" width="1000" height="837" loading="lazy" style="object-position:center 45%">
+<div class="bmh-uni__b">
+<h3>Taguatinga</h3>
+<p>Prédio Prime Excelência Médica, Torre D<br>Setor C Norte, Taguatinga</p>
+<p style="color:var(--muted)">Todos os dias, das 7h às 19h · (61) 3346-6005</p>
+<div class="bmh-two">
+<a class="bmh-btn bmh-btn--navy bmh-whatsapp" href="{{wa:taguatinga}}">Agendar em Taguatinga</a>
+<a class="bmh-btn bmh-btn--line bmh-rota" href="https://www.google.com/maps/search/?api=1&query=Prime+Excel%C3%AAncia+M%C3%A9dica+Torre+D+Taguatinga+DF" target="_blank" rel="noopener">Como chegar</a>
+</div>
+</div>
+</article>
+</div>
+</div></section>
+
+<section class="bmh-final">
+<img src="{{img:bmh-entrada-taguatinga.jpg}}" alt="" width="1000" height="823" loading="lazy">
+<div class="bmh-w">
+<h2>Agende sua avaliação na Asa Sul ou em Taguatinga</h2>
+<a class="bmh-btn bmh-btn--oxy bmh-whatsapp" href="{{wa:geral}}">{{svg:wa}}Agendar pelo WhatsApp</a>
+</div>
+</section>
+
+<footer class="bmh-foot"><div class="bmh-w">
+<div class="bmh-foot__g">
+<div><strong class="bmh-foot__nome">Brasília Medicina Hiperbárica</strong><br>Em Brasília desde 2004<br>CNPJ 07.091.027/0001-86</div>
+<div><strong>Asa Sul</strong><br>SGAS 613, Conj. E, Bloco A, 1º subsolo<br>L2 Sul · CEP 70200-730</div>
+<div><strong>Taguatinga</strong><br>Prime Excelência Médica, Torre D<br>Setor C Norte</div>
+<div><strong>Contato</strong><br><a class="bmh-telefone" href="tel:+556133466005">(61) 3346-6005</a><br><a href="mailto:contato@hiperbaricabrasilia.com.br">contato@hiperbaricabrasilia.com.br</a><br><a href="https://www.instagram.com/hiperbaricabrasilia/" target="_blank" rel="noopener me">Instagram @hiperbaricabrasilia</a></div>
+</div>
+<p class="bmh-foot__legal">Responsáveis técnicos: Asa Sul, Dr. Hélio Ivan, CRM-DF 8164, RQE 26705 · Taguatinga, Dr. Alberto Jorge, CRM-DF 7248, RQE 14575 · Diretor médico: Dr. Jorge Madeiro, CRM-DF 31687, RQE 26863 · <a href="/politica-de-privacidade/">Política de privacidade</a></p>
+</div></footer>
+
+<div class="bmh-fix">
+<a class="bmh-btn bmh-btn--navy bmh-whatsapp" href="{{wa:geral}}">{{svg:wa}}Agendar pelo WhatsApp</a>
+<a class="bmh-tel bmh-telefone" href="tel:+556133466005" aria-label="Ligar para a BMH">{{svg:tel}}</a>
+</div>
+
+</div>
+
+<script>
+(function () {
+  var planos = {{planos}};
+  var numero = '556133466005';
+  var limpa = function (s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]/g, ''); };
+  var campo = document.getElementById('bmh-busca');
+  var res = document.getElementById('bmh-res');
+  if (!campo) { return; }
+  campo.addEventListener('input', function () {
+    var q = limpa(campo.value);
+    res.className = 'bmh-res';
+    res.textContent = '';
+    if (q.length < 2) { return; }
+    var achado = null;
+    for (var i = 0; i < planos.length; i++) { if (limpa(planos[i]).indexOf(q) !== -1) { achado = planos[i]; break; } }
+    var link = document.createElement('a');
+    link.className = 'bmh-whatsapp';
+    if (achado) {
+      res.className = 'bmh-res bmh-res--ok';
+      res.appendChild(document.createTextNode('Atendemos ' + achado + '. '));
+      link.href = 'https://wa.me/' + numero + '?text=' + encodeURIComponent('Olá! Tenho o convênio ' + achado + ' e quero agendar uma avaliação.');
+      link.textContent = 'Agendar pelo WhatsApp';
+    } else {
+      res.appendChild(document.createTextNode('Não está na lista do site, mas ela muda. '));
+      link.href = 'https://wa.me/' + numero + '?text=' + encodeURIComponent('Olá! Queria saber se a BMH atende o meu convênio.');
+      link.textContent = 'Pergunte à recepção';
+    }
+    res.appendChild(link);
+  });
+})();
+</script>
+
+<script type="application/ld+json">{{schema}}</script>
