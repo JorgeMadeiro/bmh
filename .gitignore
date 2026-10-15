@@ -28,3 +28,81 @@ dados/*
 # Chaves de API (nunca versionar)
 .env
 .env.local
+
+# ---------------------------------------------------------------------------
+# Preparação para o GitHub privado (15/10/2026). Na dúvida, fica fora.
+# ---------------------------------------------------------------------------
+
+# Chaves: .env e todas as variações (só o .env.exemplo vai)
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.exemplo
+!**/.env.exemplo
+*.env.backup
+
+# Chaves, certificados e contas de serviço
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.keystore
+*service-account*.json
+*conta-de-servico*.json
+client_secret*.json
+credentials*.json
+*credenciais*.json
+token*.json
+*-token.json
+
+# Sessão local do Claude Code
+.claude/settings.local.json
+
+# Dependências e ambientes
+node_modules/
+.venv*/
+venv/
+__pycache__/
+*.pyc
+.DS_Store
+
+# Dados brutos (só o README vai)
+dados/*
+!dados/README.md
+**/n8n-copias/
+**/backup-n8n/
+**/n8n-backup*/
+
+# Vídeo e áudio brutos
+dados/**/*.mp4
+dados/**/*.mov
+dados/**/*.MOV
+dados/**/*.m4a
+dados/**/*.wav
+dados/**/*.mp3
+/*.mp4
+/*.mov
+/*.MOV
+/*.m4a
+/*.wav
+/*.mp3
+
+# Dado de paciente, cliente ou comprador (conversas, leads, exportações)
+*conversa*.json
+*conversas*.csv
+*conversas*.xlsx
+*leads*.csv
+*leads*.xlsx
+*export*kommo*
+*kommo*export*
+*export*igut*
+*igut*export*
+*export*evolution*
+*evolution*export*
+*pacientes*.csv
+*pacientes*.xlsx
+*compradores*.csv
+*clientes*.csv
