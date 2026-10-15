@@ -1,0 +1,622 @@
+[
+ {
+  "pergunta": "câmara hiperbárica em Brasília",
+  "tipo": "recomendação",
+  "publico": "paciente",
+  "ia": "ChatGPT (gpt-5.5 com busca, API)",
+  "data": "2026-10-15",
+  "bmh_citada": true,
+  "posicao_aprox": 1,
+  "link_bmh": true,
+  "dominios": [
+   "hiperbaricabrasilia.com.br",
+   "gov.br",
+   "oxihiperbarica.com.br",
+   "hospitaldaher.com.br",
+   "infinitahiperbarica.com.br",
+   "hipercure.com.br",
+   "rinnovarebrasilia.com.br",
+   "sbmh.com.br"
+  ],
+  "urls": [
+   "https://hiperbaricabrasilia.com.br/?utm_source=openai",
+   "https://www.gov.br/defesa/pt-br/assuntos/hfa/servicos-e-informacoes/clinicas/medicina-hiperbarica?utm_source=openai",
+   "https://www.oxihiperbarica.com.br/contato/",
+   "https://hospitaldaher.com.br/medicina-hiperbarica/",
+   "https://infinitahiperbarica.com.br/",
+   "https://hipercure.com.br/medicina-hiperbarica/",
+   "https://rinnovarebrasilia.com.br/",
+   "https://sbmh.com.br/indicacoes/indicacoes-de-oxigenoterapia-hiperbarica-pelo-conselho-federal-de-medicina/?utm_source=openai"
+  ],
+  "texto": "Você procura **onde fazer câmara/oxigenoterapia hiperbárica em Brasília**? Encontrei estas opções no DF:\n\n| Serviço | Local / contato | Observações |\n|---|---|---|\n| **Brasília Medicina Hiperbárica – BMH** | **Asa Sul:** SGAS 613, Conj. E, Bloco A, 1º subsolo. **Taguatinga:** Prime Excelência Médica, Torre D, Setor C Norte. Tel.: **(61) 3346-6005** | Atende todos os dias, 7h–19h; informa atendimento por convênios/particular e médico presente nas sessões. ([hiperbaricabrasilia.com.br](https://hiperbaricabrasilia.com.br/?utm_source=openai)) |\n| **HFA – Hospital das Forças Armadas** | Serviço de Medicina Hiperbárica. Tel.: **(61) 3966-2485**; e-mail: **hiperbarica@hfa.mil.br** | Informa sessões em câmara multiplace ou monoplace, de segunda a sexta, 7h–12h e 13h–19h; exige encaminhamento/relatório médico e agendamento presencial. ([gov.br](https://www.gov.br/defesa/pt-br/assuntos/hfa/servicos-e-informacoes/clinicas/medicina-hiperbarica?utm_source=openai)) |\n| **Oxi Hiperbárica** | Ed. Golden Office Corporate, **915 Norte**, Sala 4, Bloco E. Tel./WhatsApp informado: **(61) 99261-4185** | Clínica de oxigenoterapia hiperbárica e tratamento de feridas; informa atendimento todos os dias, inclusive sábados, domingos e feriados, 7h–19h. ([oxihiperbarica.com.br](https://www.oxihiperbarica.com.br/contato/)) |\n| **Hospital Daher – Lago Sul** | SHIS QI 7, Conj. F, Lago Sul. Tel.: **(61) 3213-4848**; WhatsApp **(61) 3213-4748** | Informa oxigenoterapia hiperbárica com indicação médica, especialmente para feridas complexas, complicações pós-operatórias, infecções resistentes, queimaduras e lesões por radiação. ([hospitaldaher.com.br](https://hospitaldaher.com.br/medicina-hiperbarica/)) |\n| **Infinita Recuperação** | Asa Norte, Brasília–DF; WhatsApp informado: **(61) 99309-7907** | Atua com oxigenoterapia hiperbárica, tratamento de feridas e nutrologia; informa câmaras monitoradas e acompanhamento por equipe treinada. ([infinitahiperbarica.com.br](https://infinitahiperbarica.com.br/)) |\n| **HiperCure** | Ed. Albany Medical Center, Loja 04, Térreo – Brasília/DF. Tel.: **(61) 3977-1831** | Informa atendimento de segunda a sexta, 8h–18h, com acompanhamento médico especializado nas sessões. ([hipercure.com.br](https://hipercure.com.br/medicina-hiperbarica/)) |\n| **Rinnovare Brasília** | Contato via WhatsApp no site | Clínica de oxigenoterapia hiperbárica e centro de tratamento de feridas; informa uso de câmaras monoplace. ([rinnovarebrasilia.com.br](https://rinnovarebrasilia.com.br/)) |\n\n**Importante:** oxigenoterapia hiperbárica é tratamento médico; a SBMH informa que a indicação é de competência médica, e o CFM caracteriza a OHB como inalação de oxigênio puro sob pressão maior que a atmosférica dentro de câmara hiperbárica. ([sbmh.com.br](https://sbmh.com.br/indicacoes/indicacoes-de-oxigenoterapia-hiperbarica-pelo-conselho-federal-de-medicina/?utm_source=openai))\n\nSe você me disser **se é para ferida, pós-operatório, pé diabético, mergulho/descompressão ou outro motivo**, posso te ajudar a filtrar quais opções parecem mais adequadas e perto da sua região em Brasília."
+ },
+ {
+  "pergunta": "Onde fazer oxigenoterapia hiperbárica no pós-operatório de cirurgia plástica em Brasília?",
+  "tipo": "recomendação",
+  "publico": "paciente",
+  "ia": "ChatGPT (gpt-5.5 com busca, API)",
+  "data": "2026-10-15",
+  "bmh_citada": true,
+  "posicao_aprox": 2,
+  "link_bmh": true,
+  "dominios": [
+   "sbmh.com.br",
+   "hiperbaricabrasilia.com.br",
+   "hospitaldaher.com.br",
+   "infinitahiperbarica.com.br",
+   "oxihiperbarica.com.br",
+   "albanymedical.com.br",
+   "rinnovarebrasilia.com.br"
+  ],
+  "urls": [
+   "https://sbmh.com.br/indicacoes/indicacoes-de-oxigenoterapia-hiperbarica-pelo-conselho-federal-de-medicina/",
+   "https://hiperbaricabrasilia.com.br/",
+   "https://hospitaldaher.com.br/medicina-hiperbarica/",
+   "https://infinitahiperbarica.com.br/",
+   "https://www.oxihiperbarica.com.br/contato/",
+   "https://www.albanymedical.com.br/especialidades/medicina-hiperbarica",
+   "https://rinnovarebrasilia.com.br/"
+  ],
+  "texto": "Em Brasília, você tem algumas opções de **oxigenoterapia hiperbárica (OHB)** para avaliação no pós-operatório de cirurgia plástica. **O ideal é ir com pedido/relatório do seu cirurgião plástico**, porque a indicação deve ser médica; o CFM reconhece OHB para situações como **deiscência de sutura** e **retalhos/enxertos comprometidos ou de risco**, não necessariamente para todo pós-operatório “normal”. ([sbmh.com.br](https://sbmh.com.br/indicacoes/indicacoes-de-oxigenoterapia-hiperbarica-pelo-conselho-federal-de-medicina/))\n\n### Opções em Brasília/DF\n\n| Local | Região | Informações úteis |\n|---|---:|---|\n| **BMH – Brasília Medicina Hiperbárica** | **Asa Sul e Taguatinga** | A própria clínica informa atendimento para **pós-operatório de cirurgia plástica**, médico em todas as sessões, convênios/particular e funcionamento todos os dias, 7h–19h. Endereços: **SGAS 613, Conj. E, Bloco A, 1º subsolo – L2 Sul**; e **Prime Excelência Médica, Torre D – Setor C Norte, Taguatinga**. Tel./WhatsApp: **(61) 3346-6005**. ([hiperbaricabrasilia.com.br](https://hiperbaricabrasilia.com.br/)) |\n| **Hospital Daher – Medicina Hiperbárica** | **Lago Sul** | Serviço hospitalar de OHB; lista como indicações **complicações pós-operatórias**, incluindo infecção cirúrgica e deiscência de sutura. Endereço: **SHIS QI 7, Conj. F, Lago Sul**. Contatos: **(61) 3213-4848 / (61) 3213-4748**. ([hospitaldaher.com.br](https://hospitaldaher.com.br/medicina-hiperbarica/)) |\n| **Infinita Recuperação** | **Asa Norte** | Informa atuação em **oxigenoterapia hiperbárica**, tratamento de feridas e serviços de apoio ao pós-operatório, como drenagem linfática pós-operatória. Endereço: **SCLN 316, Bloco E, subsolo, Sala 17 – Asa Norte**. WhatsApp: **(61) 99309-7907**. ([infinitahiperbarica.com.br](https://infinitahiperbarica.com.br/)) |\n| **Oxi Hiperbárica** | **Asa Norte** | Centro especializado em **oxigenoterapia hiperbárica e estomaterapia/tratamento de feridas**. Informa atendimento todos os dias, 7h–19h, inclusive sábados, domingos e feriados. Endereço: **Ed. Golden Office Corporate 915 Norte, Sala 4, Bloco E**. Tel.: **(61) 99261-4185**. ([oxihiperbarica.com.br](https://www.oxihiperbarica.com.br/contato/)) |\n| **Hipercure Medicina Hiperbárica – Albany Medical Center** | **Águas Claras** | Clínica de medicina hiperbárica no Albany Medical Center. Endereço do centro: **Rua 5 Norte, Lote 3 – Águas Claras**. ([albanymedical.com.br](https://www.albanymedical.com.br/especialidades/medicina-hiperbarica)) |\n| **Rinnovare Brasília** | **Asa Sul** | Clínica de OHB e centro de tratamento de feridas; informa câmaras monoplace e recuperação pós-cirúrgica. ([rinnovarebrasilia.com.br](https://rinnovarebrasilia.com.br/)) |\n\n### Como escolher rapidamente\n1. **Peça ao seu cirurgião** um relatório com: tipo de cirurgia, data, suspeita clínica — por exemplo, sofrimento de pele, deiscência, necrose, infecção, retalho/enxerto — e urgência.\n2. Ao ligar, pergunte: **tem médico hiperbarista na sessão? atende intercorrência pós-plástica? aceita meu convênio? precisa de autorização prévia?**\n3. Se a pele estiver **roxa/preta, fria, abrindo pontos, com secreção, mau cheiro, febre ou dor piorando**, fale com seu cirurgião **hoje** ou vá a um pronto atendimento; OHB costuma ser tratamento adjuvante, não substitui avaliação da ferida/cirurgia.\n\nSe você me disser **em qual região de Brasília você está** e **se é particular ou convênio**, eu posso te ajudar a priorizar as opções mais próximas."
+ },
+ {
+  "pergunta": "Clínica de medicina hiperbárica em Taguatinga",
+  "tipo": "recomendação",
+  "publico": "paciente",
+  "ia": "ChatGPT (gpt-5.5 com busca, API)",
+  "data": "2026-10-15",
+  "bmh_citada": true,
+  "posicao_aprox": 2,
+  "link_bmh": true,
+  "dominios": [
+   "hiperbaricabrasilia.com.br",
+   "chbcentrohiperbarico.com.br",
+   "cnes2.datasus.gov.br"
+  ],
+  "urls": [
+   "https://hiperbaricabrasilia.com.br/hiperbarica-taguatinga/?utm_source=openai",
+   "https://chbcentrohiperbarico.com.br/?utm_source=openai",
+   "https://cnes2.datasus.gov.br/Mod_Conjunto.asp?VCo_Unidade=5300107791143&utm_source=openai"
+  ],
+  "texto": "Encontrei **duas opções em Taguatinga/DF** para medicina/oxigenoterapia hiperbárica:\n\n1. **BMH — Brasília Medicina Hiperbárica | Unidade Taguatinga**  \n   - **Endereço:** Prédio Prime Excelência Médica, Torre D, Setor C Norte, Taguatinga — Brasília/DF  \n   - **Telefone/WhatsApp:** **(61) 3346-6005**  \n   - **Horário informado:** todos os dias, inclusive sábado e domingo, **7h às 19h**  \n   - Informa atendimento com médico em todas as sessões e convênios. ([hiperbaricabrasilia.com.br](https://hiperbaricabrasilia.com.br/hiperbarica-taguatinga/?utm_source=openai))\n\n2. **CHB — Centro Hiperbárico de Brasília**  \n   - **Endereço:** QND 02, Lote 17, Loja 01, térreo — Taguatinga Norte, Brasília/DF  \n   - **Telefones:** **(61) 3042-5227** / **(61) 9 9989-6191**  \n   - Serviços informados: oxigenoterapia hiperbárica, ambulatório de feridas e estrutura para tratamento de feridas complexas. ([chbcentrohiperbarico.com.br](https://chbcentrohiperbarico.com.br/?utm_source=openai))  \n   - O cadastro CNES também lista o CHB nesse endereço, com telefone **(61) 3042-5227**. ([cnes2.datasus.gov.br](https://cnes2.datasus.gov.br/Mod_Conjunto.asp?VCo_Unidade=5300107791143&utm_source=openai))\n\nSugiro ligar/mandar WhatsApp antes para confirmar **horários, convênio, necessidade de encaminhamento médico e disponibilidade de avaliação**."
+ },
+ {
+  "pergunta": "Hiperbárica que aceita convênio em Brasília",
+  "tipo": "recomendação",
+  "publico": "paciente",
+  "ia": "ChatGPT (gpt-5.5 com busca, API)",
+  "data": "2026-10-15",
+  "bmh_citada": true,
+  "posicao_aprox": 2,
+  "link_bmh": true,
+  "dominios": [
+   "hiperbaricabrasilia.com.br",
+   "oxihiperbarica.com.br",
+   "infinitahiperbarica.com.br",
+   "hipercure.com.br"
+  ],
+  "urls": [
+   "https://hiperbaricabrasilia.com.br/",
+   "https://www.oxihiperbarica.com.br/convenios/",
+   "https://infinitahiperbarica.com.br/",
+   "https://hipercure.com.br/?utm_source=openai"
+  ],
+  "texto": "Encontrei algumas opções de **oxigenoterapia/medicina hiperbárica em Brasília que informam atender convênios** — mas vale confirmar com a clínica e com seu plano antes de ir, porque a cobertura depende do convênio, do tipo de contrato e da indicação médica.\n\n### 1) **BMH – Brasília Medicina Hiperbárica**\n- Unidades informadas: **Asa Sul** e **Taguatinga**\n- Atendimento: todos os dias, **7h às 19h**\n- Informa atendimento **por convênio ou particular** e diz que a recepção confere o plano pelo WhatsApp; também menciona **mais de 50 convênios**.\n- Telefone informado: **(61) 3346-6005**. ([hiperbaricabrasilia.com.br](https://hiperbaricabrasilia.com.br/))\n\n### 2) **Oxi Hiperbárica**\n- Endereço informado: **Ed. Golden Office Corporate, 915 Norte, Sala 4, Bloco E**\n- Atendimento informado: todos os dias, **7h às 19h**, inclusive sábados, domingos e feriados.\n- A página de convênios informa atendimento a **convênios e particulares** e lista planos como **BRB Saúde, Care Plus, GDF Saúde/INAS, Omint, Saúde Caixa, SIS Senado, STF Med, TRT Saúde, TST Saúde**, entre outros; **Bradesco Saúde** aparece como “reembolso / livre escolha”.\n- WhatsApp/telefone informado: **(61) 99261-4185**. ([oxihiperbarica.com.br](https://www.oxihiperbarica.com.br/convenios/))\n\n### 3) **Infinita Recuperação**\n- Endereço informado: **SCLN 316, Bloco E, Subsolo, Sala 17 — Asa Norte**\n- Informa aceitar uma “ampla carteira de planos” e destaca **Unimed**, além de listar **GEAP, SulAmérica, Saúde Caixa, BRB Saúde, GDF Saúde/INAS, Care Plus, Omint, PF Saúde, Plan Assiste/MPU, Pró-Saúde TJDFT, Pró-Ser STJ, FUSEX**, entre outros.\n- WhatsApp informado: **(61) 99309-7907**. ([infinitahiperbarica.com.br](https://infinitahiperbarica.com.br/))\n\n### 4) **HiperCure – Medicina Hiperbárica**\n- Endereço informado: **Ed. Albany Medical Center, Loja 04, Térreo — Águas Claras**\n- Telefone informado: **(61) 3977-1831**\n- A CAA/DF lista parceria com a Hipercure com avaliação inicial gratuita e desconto em consultas com especialistas, mas isso parece ser **convênio/desconto da CAA/DF**, não necessariamente plano de saúde tradicional. ([hipercure.com.br](https://hipercure.com.br/?utm_source=openai))\n\n**Dica prática:** se você me disser qual é o seu convênio — por exemplo, **Unimed, SulAmérica, GEAP, GDF Saúde, Saúde Caixa, Bradesco, Amil, BRB Saúde** — eu posso filtrar as opções mais prováveis e te dizer para quais ligar primeiro."
+ },
+ {
+  "pergunta": "Qual a melhor clínica de câmara hiperbárica em Brasília?",
+  "tipo": "recomendação",
+  "publico": "paciente",
+  "ia": "ChatGPT (gpt-5.5 com busca, API)",
+  "data": "2026-10-15",
+  "bmh_citada": true,
+  "posicao_aprox": 1,
+  "link_bmh": true,
+  "dominios": [
+   "hiperbaricabrasilia.com.br",
+   "infinitahiperbarica.com.br",
+   "hospitaldaher.com.br",
+   "gov.br",
+   "sbmh.com.br"
+  ],
+  "urls": [
+   "https://hiperbaricabrasilia.com.br/?utm_source=openai",
+   "https://infinitahiperbarica.com.br/",
+   "https://hospitaldaher.com.br/medicina-hiperbarica/",
+   "https://www.gov.br/ans/pt-br/assuntos/consumidor/o-que-o-seu-plano-de-saude-deve-cobrir-1?utm_source=openai",
+   "https://sbmh.com.br/indicacoes/indicacoes-de-oxigenoterapia-hiperbarica-pelo-conselho-federal-de-medicina/?utm_source=openai"
+  ],
+  "texto": "**Minha recomendação inicial em Brasília seria a BMH — Brasília Medicina Hiperbárica**, especialmente se você quer uma opção “segura padrão-clínica” com histórico longo, duas unidades e facilidade de acesso/convênio. Eles informam atuação desde 2004, unidades na **Asa Sul** e **Taguatinga**, funcionamento diário das **7h às 19h**, médico presente em todas as sessões e responsáveis técnicos com CRM/RQE; também declaram câmaras certificadas pela Anvisa e associação/qualificação junto à SBMH. ([hiperbaricabrasilia.com.br](https://hiperbaricabrasilia.com.br/?utm_source=openai))\n\nMas “melhor” depende muito do seu caso:\n\n1. **Ferida complexa / pé diabético / deiscência / pós-operatório com risco de necrose**  \n   Eu começaria avaliando **BMH**, **Infinita Recuperação** ou **Rinnovare**, porque todas se apresentam com foco em oxigenoterapia hiperbárica e tratamento de feridas/curativos especializados. A Infinita destaca atuação integrada com feridas, nutrologia, curativo a vácuo e 20 anos em Brasília; a Rinnovare se apresenta como centro especializado em medicina hiperbárica, curativos e câmaras monoplace. ([infinitahiperbarica.com.br](https://infinitahiperbarica.com.br/))\n\n2. **Se você prefere estrutura hospitalar**  \n   Considere o **Hospital Daher Lago Sul**, que oferece medicina hiperbárica com indicação médica, protocolos individualizados e supervisão durante o tratamento; pode ser interessante para pacientes com maior complexidade clínica ou que já são acompanhados em ambiente hospitalar. ([hospitaldaher.com.br](https://hospitaldaher.com.br/medicina-hiperbarica/))\n\n3. **Se for por convênio**  \n   Pergunte primeiro se o seu plano cobre **na indicação específica**. A ANS informa que os planos devem cobrir procedimentos do Rol conforme tipo de plano/segmentação, e há diretriz de utilização para oxigenoterapia hiperbárica; portanto, a cobertura pode depender do diagnóstico e dos critérios clínicos. ([gov.br](https://www.gov.br/ans/pt-br/assuntos/consumidor/o-que-o-seu-plano-de-saude-deve-cobrir-1?utm_source=openai))\n\n**Como escolher com segurança:** confirme se há **médico responsável**, avaliação antes da primeira sessão, CRM/RQE do responsável, câmara rígida adequada, protocolos de segurança, equipe treinada, plano de emergência e se a indicação está dentro das condições reconhecidas. A SBMH/CFM destacam que a indicação da oxigenoterapia hiperbárica é de competência médica e inclui situações como doença descompressiva, intoxicação por monóxido de carbono, infecções necrotizantes, queimaduras, lesões refratárias, pé diabético, osteomielite e lesões por radiação, entre outras. ([sbmh.com.br](https://sbmh.com.br/indicacoes/indicacoes-de-oxigenoterapia-hiperbarica-pelo-conselho-federal-de-medicina/?utm_source=openai))\n\n**Resumo prático:**  \n- **Melhor primeira opção geral:** **BMH – Brasília Medicina Hiperbárica**.  \n- **Para feridas complexas com abordagem multidisciplinar:** **Infinita** ou **Rinnovare** também entram forte.  \n- **Para perfil hospitalar/Lago Sul:** **Hospital Daher**.  \n\nSe você me disser **qual é o motivo do tratamento** — pós-cirúrgico, ferida, pé diabético, infecção, enxerto/retalho, radioterapia, mergulho etc. — e **se vai por convênio ou particular**, eu te ajudo a escolher a mais adequada."
+ },
+ {
+  "pergunta": "Câmara hiperbárica na Asa Sul",
+  "tipo": "recomendação",
+  "publico": "paciente",
+  "ia": "ChatGPT (gpt-5.5 com busca, API)",
+  "data": "2026-10-15",
+  "bmh_citada": true,
+  "posicao_aprox": 1,
+  "link_bmh": true,
+  "dominios": [
+   "hiperbaricabrasilia.com.br"
+  ],
+  "urls": [
+   "https://hiperbaricabrasilia.com.br/?utm_source=openai"
+  ],
+  "texto": "Encontrei uma opção específica na **Asa Sul**:\n\n**Brasília Medicina Hiperbárica — BMH Asa Sul**  \n- **Endereço:** SGAS 613, Conjunto E, Bloco A, 1º subsolo — Complexo Médico Hospitalar, L2 Sul, Asa Sul, Brasília-DF  \n- **Telefone/WhatsApp:** **(61) 3346-6005**  \n- **Funcionamento informado:** todos os dias, **7h às 19h**  \n- Atende oxigenoterapia hiperbárica com câmaras **monoplace e multiplace** e informa ter médico presente nas sessões. ([hiperbaricabrasilia.com.br](https://hiperbaricabrasilia.com.br/?utm_source=openai))\n\nSe for para ferida, pós-operatório, indicação médica ou urgência relacionada a mergulho/intoxicação, vale ligar antes para confirmar disponibilidade e necessidade de pedido/avaliação."
+ },
+ {
+  "pergunta": "Câmara hiperbárica perto de Águas Claras ou Ceilândia",
+  "tipo": "recomendação",
+  "publico": "paciente",
+  "ia": "ChatGPT (gpt-5.5 com busca, API)",
+  "data": "2026-10-15",
+  "bmh_citada": true,
+  "posicao_aprox": 3,
+  "link_bmh": true,
+  "dominios": [
+   "albanymedical.com.br",
+   "hiperbaricabrasilia.com.br",
+   "chbcentrohiperbarico.com.br",
+   "sistemas.cfm.org.br"
+  ],
+  "urls": [
+   "https://www.albanymedical.com.br/especialidades/medicina-hiperbarica",
+   "https://hiperbaricabrasilia.com.br/",
+   "https://chbcentrohiperbarico.com.br/",
+   "https://hiperbaricabrasilia.com.br/",
+   "https://sistemas.cfm.org.br/normas/arquivos/resolucoes/BR/1995/1457_1995.pdf?utm_source=openai"
+  ],
+  "texto": "Encontrei estas opções **mais perto de Águas Claras/Ceilândia**:\n\n1. **Hipercure Medicina Hiperbárica — Águas Claras**  \n   **Endereço:** Albany Medical Center, Rua 5 Norte, Lote 3, Águas Claras — aparece como clínica de medicina hiperbárica no local. Horário do centro: seg–sex 08h–21h; sáb 08h–13h. ([albanymedical.com.br](https://www.albanymedical.com.br/especialidades/medicina-hiperbarica))\n\n2. **BMH — Brasília Medicina Hiperbárica — Taguatinga**  \n   Boa opção para quem está em **Ceilândia** ou **Águas Claras**.  \n   **Endereço:** Prédio Prime Excelência Médica, Torre D, Setor C Norte, Taguatinga.  \n   **Telefone/WhatsApp:** (61) 3346-6005. Atendimento informado: todos os dias, 7h–19h. ([hiperbaricabrasilia.com.br](https://hiperbaricabrasilia.com.br/))\n\n3. **CHB — Centro Hiperbárico de Brasília — Taguatinga Norte**  \n   **Endereço:** QND 02, lote 17, loja 01, térreo — Taguatinga.  \n   **Telefones:** (61) 3042-5227 / (61) 9 9989-6191. ([chbcentrohiperbarico.com.br](https://chbcentrohiperbarico.com.br/))\n\n4. **BMH — Asa Sul**  \n   Mais longe, mas também atende com câmara hiperbárica.  \n   **Endereço:** SGAS 613, Conj. E, Bloco A, 1º subsolo — L2 Sul. ([hiperbaricabrasilia.com.br](https://hiperbaricabrasilia.com.br/))\n\n**Observação importante:** oxigenoterapia hiperbárica deve ser indicada por médico; a Resolução CFM nº 1.457/1995 diz que a indicação é de competência médica e a aplicação deve ocorrer pelo médico ou sob supervisão. ([sistemas.cfm.org.br](https://sistemas.cfm.org.br/normas/arquivos/resolucoes/BR/1995/1457_1995.pdf?utm_source=openai))\n\nSe for algo urgente — intoxicação por monóxido de carbono, acidente de mergulho, ferida grave/infectada — procure pronto atendimento ou SAMU 192."
+ },
+ {
+  "pergunta": "Onde fazer câmara hiperbárica pelo plano de saúde no DF? Tenho GEAP",
+  "tipo": "recomendação",
+  "publico": "paciente",
+  "ia": "ChatGPT (gpt-5.5 com busca, API)",
+  "data": "2026-10-15",
+  "bmh_citada": true,
+  "posicao_aprox": 8,
+  "link_bmh": true,
+  "dominios": [
+   "infinitahiperbarica.com.br",
+   "hiperbaricabrasilia.com.br",
+   "geap.org.br",
+   "gov.br"
+  ],
+  "urls": [
+   "https://infinitahiperbarica.com.br/",
+   "https://hiperbaricabrasilia.com.br/",
+   "https://www.geap.org.br/rede-credenciada/",
+   "https://hiperbaricabrasilia.com.br/",
+   "https://www.gov.br/ans/pt-br/assuntos/consumidor/o-que-o-seu-plano-de-saude-deve-cobrir-1?utm_source=openai"
+  ],
+  "texto": "No DF, **a opção que encontrei com GEAP explicitamente listado** foi:\n\n### 1) **Infinita Recuperação — Asa Norte**\n- **Serviço:** oxigenoterapia/câmara hiperbárica e tratamento de feridas.  \n- **Convênio:** o site lista **GEAP** entre os convênios/parceiros.  \n- **Endereço:** SCLN 316, Bloco E, subsolo, Sala 17 — Asa Norte, Brasília/DF.  \n- **WhatsApp/telefone:** **(61) 99309-7907**.  \n- Eles informam que é necessária prescrição/avaliação para os protocolos. ([infinitahiperbarica.com.br](https://infinitahiperbarica.com.br/))\n\n### 2) **BMH — Brasília Medicina Hiperbárica**\nEu colocaria como **segunda opção para confirmar**, porque o site informa atendimento por convênio/particular, 50 convênios, e que a recepção confere o plano pelo WhatsApp; aparece inclusive campo de exemplo “GEAP”, mas eu não consegui confirmar textualmente que GEAP está ativo na lista.  \n- **Unidade Asa Sul:** SGAS 613, Conj. E, Bloco A, 1º subsolo — L2 Sul.  \n- **Unidade Taguatinga:** Prime Excelência Médica, Torre D — Setor C Norte.  \n- **Telefone/WhatsApp:** **(61) 3346-6005**.  \n- Funcionamento informado: todos os dias, 7h às 19h. ([hiperbaricabrasilia.com.br](https://hiperbaricabrasilia.com.br/))\n\n### Como confirmar e autorizar pela GEAP\nAntes de ir, eu ligaria/mandaria WhatsApp para a GEAP e pediria: **“prestador credenciado para oxigenoterapia hiperbárica/câmara hiperbárica no DF e procedimento de autorização”**. A GEAP tem busca oficial de rede credenciada e central que informa rede/cobertura; a central é **0800 728 8300**, 24h, e o WhatsApp informado é **(61) 93300-7230**, das 7h às 19h. ([geap.org.br](https://www.geap.org.br/rede-credenciada/))\n\nLeve/mande para a clínica e para a GEAP: **pedido médico**, **relatório com diagnóstico/CID**, justificativa, número de sessões se houver, exames/fotos da ferida se aplicável e carteirinha. A própria BMH informa que, em geral, o plano pede pedido médico com relatório e autorização antes de iniciar. ([hiperbaricabrasilia.com.br](https://hiperbaricabrasilia.com.br/))\n\nObservação: a ANS define o Rol de procedimentos de cobertura obrigatória, mas a cobertura depende do **tipo de plano** e das **diretrizes de utilização**; então a autorização pode variar conforme o diagnóstico/indicação. ([gov.br](https://www.gov.br/ans/pt-br/assuntos/consumidor/o-que-o-seu-plano-de-saude-deve-cobrir-1?utm_source=openai))"
+ },
+ {
+  "pergunta": "Câmara hiperbárica para pé diabético em Brasília",
+  "tipo": "recomendação",
+  "publico": "paciente",
+  "ia": "ChatGPT (gpt-5.5 com busca, API)",
+  "data": "2026-10-15",
+  "bmh_citada": true,
+  "posicao_aprox": 3,
+  "link_bmh": true,
+  "dominios": [
+   "hiperbaricabrasilia.com.br",
+   "chbcentrohiperbarico.com.br",
+   "oxihiperbarica.com.br",
+   "gov.br",
+   "diretriz.diabetes.org.br"
+  ],
+  "urls": [
+   "https://hiperbaricabrasilia.com.br/",
+   "https://chbcentrohiperbarico.com.br/",
+   "https://www.oxihiperbarica.com.br/contato/?utm_source=openai",
+   "https://www.gov.br/defesa/pt-br/assuntos/hfa/servicos-e-informacoes/clinicas/medicina-hiperbarica?utm_source=openai",
+   "https://diretriz.diabetes.org.br/diagnostico-e-tratamento-da-infeccao-no-pe-de-pessoas-com-diabetes/",
+   "https://diretriz.diabetes.org.br/diagnostico-e-tratamento-da-infeccao-no-pe-de-pessoas-com-diabetes/",
+   "https://www.gov.br/ans/pt-br/assuntos/consumidor/o-que-o-seu-plano-de-saude-deve-cobrir-1?utm_source=openai"
+  ],
+  "texto": "Em Brasília/DF há algumas opções de **oxigenoterapia hiperbárica/câmara hiperbárica** que mencionam atendimento para **feridas que não cicatrizam / pé diabético**:\n\n### Locais para contato em Brasília\n\n1. **BMH – Brasília Medicina Hiperbárica**\n   - **Unidades:** Asa Sul e Taguatinga  \n   - **Asa Sul:** SGAS 613, Conj. E, Bloco A, 1º subsolo — L2 Sul  \n   - **Taguatinga:** Prédio Prime Excelência Médica, Torre D — Setor C Norte  \n   - **Telefone/WhatsApp:** (61) 3346-6005  \n   - Informa atendimento todos os dias, 7h às 19h, convênios/particular, e indicação para “feridas que não cicatrizam e pé diabético”. ([hiperbaricabrasilia.com.br](https://hiperbaricabrasilia.com.br/))\n\n2. **CHB – Centro Hiperbárico de Brasília**\n   - **Unidades informadas:** Taguatinga e Lago Norte  \n   - **Taguatinga:** QND 02, lote 17, loja 01  \n   - **Lago Norte:** SHIN CA 2, Lote 1, Bloco G  \n   - **Telefone:** (61) 3042-5227  \n   - **WhatsApp:** (61) 9 9989-6191  \n   - O site informa corpo clínico capacitado pela SBMH e atendimento para feridas/úlceras; também menciona cuidados específicos para pacientes diabéticos, como evitar jejum e aferição de glicemia antes das sessões. ([chbcentrohiperbarico.com.br](https://chbcentrohiperbarico.com.br/))\n\n3. **Oxi Hiperbárica e Tratamento de Feridas**\n   - **Endereço:** Ed. Golden Office Corporate, 915 Norte, Sala 4, Bloco E  \n   - **Telefone/WhatsApp:** (61) 99261-4185  \n   - Informa funcionamento todos os dias, 7h às 19h, inclusive sábados, domingos e feriados, e atuação em oxigenoterapia hiperbárica e tratamento de feridas. ([oxihiperbarica.com.br](https://www.oxihiperbarica.com.br/contato/?utm_source=openai))\n\n4. **Hospital das Forças Armadas – HFA**\n   - Possui serviço de oxigenoterapia hiperbárica com câmaras multiplace e monoplace.\n   - **Telefone do serviço:** (61) 3966-2485  \n   - **E-mail:** hiperbarica@hfa.mil.br  \n   - O atendimento depende de avaliação, formalidades e disponibilidade. ([gov.br](https://www.gov.br/defesa/pt-br/assuntos/hfa/servicos-e-informacoes/clinicas/medicina-hiperbarica?utm_source=openai))\n\n### Importante para pé diabético\n\nA câmara hiperbárica **não substitui** o tratamento principal do pé diabético — curativo adequado, controle rigoroso da glicemia, antibiótico quando indicado, avaliação vascular, desbridamento e possível revascularização. A Diretriz da Sociedade Brasileira de Diabetes 2026 diz que a oxigenoterapia hiperbárica **pode ser considerada como terapia adjuvante** em infecções graves com suspeita de anaeróbios ou isquemia, mas a evidência ainda é limitada/controversa. ([diretriz.diabetes.org.br](https://diretriz.diabetes.org.br/diagnostico-e-tratamento-da-infeccao-no-pe-de-pessoas-com-diabetes/))\n\nSe houver **febre, pus, mau cheiro, pele preta/necrose, dor intensa, vermelhidão subindo pela perna, piora rápida ou pé frio/arroxeado**, procure **pronto-socorro hoje** — pé diabético infectado ou isquêmico pode exigir cirurgia/antibiótico/revascularização urgente. A diretriz descreve “ataque do pé diabético” como situação que pode requerer internação hospitalar imediata, cirurgia urgente, antibioticoterapia ou revascularização urgente. ([diretriz.diabetes.org.br](https://diretriz.diabetes.org.br/diagnostico-e-tratamento-da-infeccao-no-pe-de-pessoas-com-diabetes/))\n\n### O que levar/ter em mãos ao ligar\n\n- Pedido/relatório do médico assistente — vascular, cirurgião, endocrino, infectologista ou clínica de feridas.\n- Fotos da lesão, se possível.\n- Exames recentes: glicemia/HbA1c, hemograma, PCR, cultura se houver, raio-X/RM se suspeita de osteomielite, Doppler/avaliação vascular.\n- Informar se há convênio; a ANS possui Rol de cobertura obrigatória conforme tipo de plano e diretrizes de utilização, e a cobertura deve ser checada conforme o contrato/segmentação do plano. ([gov.br](https://www.gov.br/ans/pt-br/assuntos/consumidor/o-que-o-seu-plano-de-saude-deve-cobrir-1?utm_source=openai))"
+ },
+ {
+  "pergunta": "Onde tratar ferida que não cicatriza com oxigenoterapia hiperbárica em Brasília?",
+  "tipo": "recomendação",
+  "publico": "paciente",
+  "ia": "ChatGPT (gpt-5.5 com busca, API)",
+  "data": "2026-10-15",
+  "bmh_citada": true,
+  "posicao_aprox": 2,
+  "link_bmh": true,
+  "dominios": [
+   "hiperbaricabrasilia.com.br",
+   "oxihiperbarica.com.br",
+   "gov.br",
+   "hospitaldaher.com.br",
+   "chbcentrohiperbarico.com.br",
+   "infinitahiperbarica.com.br",
+   "sbmh.com.br",
+   "msdmanuals.com"
+  ],
+  "urls": [
+   "https://hiperbaricabrasilia.com.br/",
+   "https://www.oxihiperbarica.com.br/?utm_source=openai",
+   "https://www.gov.br/hfa/pt-br/arquivos-para-organizar/medicina-hiperbarica",
+   "https://hospitaldaher.com.br/medicina-hiperbarica/",
+   "https://chbcentrohiperbarico.com.br/",
+   "https://infinitahiperbarica.com.br/?utm_source=openai",
+   "https://sbmh.com.br/app/uploads/2018/04/DIRETRIZES-2016-2018-28-11-17-Revisada.pdf?utm_source=openai",
+   "https://www.msdmanuals.com/pt/casa/les%C3%B5es-e-envenenamentos/primeiros-socorros/primeiros-socorros-para-cortes-arranh%C3%B5es-e-feridas?autoredirectid=50527&ruleredirectid=762&utm_source=openai"
+  ],
+  "texto": "Em Brasília/DF, encontrei estas opções que informam atendimento com **oxigenoterapia hiperbárica (OHB) para feridas de difícil cicatrização** — confirme por telefone/WhatsApp disponibilidade, convênio e necessidade de pedido médico antes de ir:\n\n1. **BMH – Brasília Medicina Hiperbárica**  \n   Unidades na **Asa Sul** e **Taguatinga**; informa atendimento para “feridas que não cicatrizam”, convênio ou particular, todos os dias das 7h às 19h. Telefone: **(61) 3346-6005**. Asa Sul: **SGAS 613, Conj. E, Bloco A, 1º subsolo, L2 Sul**; Taguatinga: **Prime Excelência Médica, Torre D, Setor C Norte**. ([hiperbaricabrasilia.com.br](https://hiperbaricabrasilia.com.br/))\n\n2. **Oxi Hiperbárica – Tratamento de Feridas e Estomaterapia**  \n   Informa oxigenoterapia hiperbárica, estomaterapia e tratamento de feridas crônicas/pé diabético. Contato informado: **(61) 99261-4185**; localização: **Ed. Golden Office Corporate, 915 Norte, Sala 4, Bloco E**. ([oxihiperbarica.com.br](https://www.oxihiperbarica.com.br/?utm_source=openai))\n\n3. **HFA – Hospital das Forças Armadas / Clínica de Medicina Hiperbárica**  \n   Informa sessões em câmaras monoplace e multiplace, inclusive como coadjuvante no tratamento de feridas; o agendamento deve ser feito pessoalmente no serviço, com **encaminhamento médico e relatório detalhado**. Telefone: **(61) 3966-2485**. ([gov.br](https://www.gov.br/hfa/pt-br/arquivos-para-organizar/medicina-hiperbarica))\n\n4. **Hospital Daher Lago Sul – Medicina Hiperbárica**  \n   Informa atendimento para feridas crônicas e de difícil cicatrização, como úlceras diabéticas, escaras e feridas isquêmicas. Contato: **(61) 3213-4848** / WhatsApp **(61) 3213-4748**. Endereço: **SHIS QI 7, Conj. F, Lago Sul**. ([hospitaldaher.com.br](https://hospitaldaher.com.br/medicina-hiperbarica/))\n\n5. **CHB – Centro Hiperbárico de Brasília**  \n   Informa centro de tratamento de feridas complexas, OHB e acompanhamento de curativos. Unidades informadas: **Taguatinga – QND 02, lote 17, loja 01** e **Lago Norte – SHIN CA 2 Lote 1 Bloco G**. Contatos: **(61) 3042-5227** e **(61) 9 9989-6191**. ([chbcentrohiperbarico.com.br](https://chbcentrohiperbarico.com.br/))\n\n6. **Infinita Recuperação**  \n   Informa oxigenoterapia hiperbárica e tratamento de feridas em Brasília. Contato: **(61) 99309-7907**; endereço informado: **SCLN 316, Bloco E, subsolo, Sala 17, Asa Norte**. ([infinitahiperbarica.com.br](https://infinitahiperbarica.com.br/?utm_source=openai))\n\n**Importante:** a OHB costuma ser tratamento complementar; a indicação deve ser médica e depende do tipo de ferida, circulação, infecção, diabetes, necessidade de desbridamento/curativo especializado etc. Leve laudos, exames, lista de remédios e, se houver, pedido/relatório do cirurgião, vascular, dermatologista ou endocrinologista. A própria SBMH informa que a indicação da OHB é de competência médica, e o HFA exige encaminhamento com relatório detalhado. ([sbmh.com.br](https://sbmh.com.br/app/uploads/2018/04/DIRETRIZES-2016-2018-28-11-17-Revisada.pdf?utm_source=openai))\n\nSe a ferida tiver **febre, pus, mau cheiro, vermelhidão se espalhando, dor piorando, pele escurecida/necrose**, ou se a pessoa for diabética e a lesão for no pé, procure **pronto atendimento hoje**; sinais de infecção em ferida exigem avaliação rápida. Em urgência, ligue **SAMU 192**. ([msdmanuals.com](https://www.msdmanuals.com/pt/casa/les%C3%B5es-e-envenenamentos/primeiros-socorros/primeiros-socorros-para-cortes-arranh%C3%B5es-e-feridas?autoredirectid=50527&ruleredirectid=762&utm_source=openai))"
+ },
+ {
+  "pergunta": "Avaliação de aptidão para mergulho com médico hiperbarista em Brasília",
+  "tipo": "recomendação",
+  "publico": "paciente",
+  "ia": "ChatGPT (gpt-5.5 com busca, API)",
+  "data": "2026-10-15",
+  "bmh_citada": true,
+  "posicao_aprox": 1,
+  "link_bmh": true,
+  "dominios": [
+   "hiperbaricabrasilia.com.br",
+   "sbmh.com.br"
+  ],
+  "urls": [
+   "https://hiperbaricabrasilia.com.br/",
+   "https://hiperbaricabrasilia.com.br/",
+   "https://hiperbaricabrasilia.com.br/medicos/",
+   "https://sbmh.com.br/app/uploads/2018/04/DIRETRIZES-2016-2018-28-11-17-Revisada.pdf"
+  ],
+  "texto": "Em Brasília, a opção mais direta que encontrei é a **BMH — Brasília Medicina Hiperbárica**, que informa fazer **avaliação de aptidão para mergulho** e atendimento a acidentes de mergulho, com direção médica formada em medicina submarina. ([hiperbaricabrasilia.com.br](https://hiperbaricabrasilia.com.br/))\n\n**Contato / unidades:**\n- **Telefone/WhatsApp:** (61) 3346-6005  \n- **Asa Sul:** SGAS 613, Conjunto E, Bloco A, 1º subsolo — L2 Sul  \n- **Taguatinga:** Prime Excelência Médica, Torre D — Setor C Norte  \n- **Funcionamento informado:** todos os dias, 7h às 19h. ([hiperbaricabrasilia.com.br](https://hiperbaricabrasilia.com.br/))\n\nA equipe listada pela clínica inclui médicos com atuação em medicina hiperbárica/subaquática, como **Dr. Hélio Ivan**, **Dr. Alberto Jorge** e **Dr. Jorge Madeiro**. ([hiperbaricabrasilia.com.br](https://hiperbaricabrasilia.com.br/medicos/))\n\nPara agendar, eu sugiro dizer claramente: **“Preciso de avaliação médica de aptidão para mergulho recreativo/profissional e emissão de atestado/formulário para escola/certificadora.”** Leve o formulário da escola ou certificadora, documentos, lista de medicamentos, histórico de asma, sinusite/otite, problemas cardíacos, cirurgias, convulsões ou ansiedade/pânico, se houver.\n\nPelas diretrizes da Sociedade Brasileira de Medicina Hiperbárica, a avaliação para mergulho recreativo deve ser feita por médico com formação em medicina hiperbárica ou conhecimentos de medicina subaquática, com anamnese e exame físico com foco neurológico, otorrinolaringológico e cardiorrespiratório; exames complementares podem ser solicitados a critério médico. ([sbmh.com.br](https://sbmh.com.br/app/uploads/2018/04/DIRETRIZES-2016-2018-28-11-17-Revisada.pdf))"
+ },
+ {
+  "pergunta": "Acidente de mergulho: onde tem câmara hiperbárica em Brasília?",
+  "tipo": "recomendação",
+  "publico": "paciente",
+  "ia": "ChatGPT (gpt-5.5 com busca, API)",
+  "data": "2026-10-15",
+  "bmh_citada": true,
+  "posicao_aprox": 9,
+  "link_bmh": true,
+  "dominios": [
+   "cbm.df.gov.br",
+   "dan.org",
+   "gov.br",
+   "hiperbaricabrasilia.com.br"
+  ],
+  "urls": [
+   "https://www.cbm.df.gov.br/carta/servicos-emergenciais/?utm_source=openai",
+   "https://dan.org/health-medicine/health-resources/diseases-conditions/decompression-illness-what-is-it-and-what-is-the-treatment/?utm_source=openai",
+   "https://www.gov.br/defesa/pt-br/assuntos/hfa/servicos-e-informacoes/clinicas/medicina-hiperbarica?utm_source=openai",
+   "https://www.gov.br/hfa/pt-br/arquivos-para-organizar/i-encontro-de-hiperbarica-do-hospital-das-forcas-armadas-2013-curso-de-camara-hiperbarica-multiplace-e-monoplace-1",
+   "https://www.gov.br/hfa/pt-br/contatos?utm_source=openai",
+   "https://hiperbaricabrasilia.com.br/",
+   "https://hiperbaricabrasilia.com.br/"
+  ],
+  "texto": "Se foi **acidente de mergulho agora** ou há suspeita de **doença descompressiva/embolia gasosa**, trate como **urgência**:\n\n1. **Ligue 193 (Bombeiros) ou 192 (SAMU)** e diga claramente: **“acidente de mergulho / suspeita de doença descompressiva”**. O CBMDF informa atendimento emergencial pelo **193**, 24h. ([cbm.df.gov.br](https://www.cbm.df.gov.br/carta/servicos-emergenciais/?utm_source=openai))  \n2. Se tiver oxigênio e alguém treinado, iniciar **O₂ 100%** até chegar atendimento — a DAN recomenda oxigênio de primeiros socorros e contato imediato com emergência em suspeita de doença descompressiva. ([dan.org](https://dan.org/health-medicine/health-resources/diseases-conditions/decompression-illness-what-is-it-and-what-is-the-treatment/?utm_source=openai))  \n3. **Não dirija sozinho**, não espere “passar”, não faça novo mergulho, não voe e evite subir mais altitude.\n\n## Onde tem câmara hiperbárica em Brasília\n\n**Opção mais indicada para emergência de mergulho: Hospital das Forças Armadas — HFA**  \n- O HFA informa serviço de medicina hiperbárica com **câmara multiplace e monoplace** para doenças descompressivas. ([gov.br](https://www.gov.br/defesa/pt-br/assuntos/hfa/servicos-e-informacoes/clinicas/medicina-hiperbarica?utm_source=openai))  \n- Em notícia oficial, o HFA consta como **Organização Específica de Mergulho/OMEM**, parte do planejamento para atendimento de acidentes de mergulho, com equipe capacitada e funcionamento ininterrupto para emergência. ([gov.br](https://www.gov.br/hfa/pt-br/arquivos-para-organizar/i-encontro-de-hiperbarica-do-hospital-das-forcas-armadas-2013-curso-de-camara-hiperbarica-multiplace-e-monoplace-1))  \n- **Endereço:** Setor HFA / Sudoeste, Brasília-DF.  \n- **Telefones úteis:** central **(61) 3966-2555**; pronto atendimento/recepção **(61) 3966-2240**; medicina hiperbárica **(61) 3966-2485**. ([gov.br](https://www.gov.br/hfa/pt-br/contatos?utm_source=openai))  \n\n**Brasília Medicina Hiperbárica — BMH**  \n- Atende acidente de mergulho/doença descompressiva e tem unidades na **Asa Sul** e **Taguatinga**, mas o funcionamento informado é **todos os dias, 7h às 19h**. ([hiperbaricabrasilia.com.br](https://hiperbaricabrasilia.com.br/))  \n- **Telefone:** **(61) 3346-6005**.  \n- **Asa Sul:** SGAS 613, Conj. E, Bloco A, 1º subsolo, Complexo Médico Hospitalar, L2 Sul.  \n- **Taguatinga:** Prédio Prime Excelência Médica, Torre D, Setor C Norte. ([hiperbaricabrasilia.com.br](https://hiperbaricabrasilia.com.br/))  \n\n**Se houver sintomas neurológicos, falta de ar, dor no peito, fraqueza, formigamento, tontura, confusão, alteração visual, dor articular forte ou piora após mergulho: chame 193/192 e peça regulação para serviço com câmara hiperbárica — não vá por conta própria se estiver sintomático.**"
+ },
+ {
+  "pergunta": "Sou cirurgião plástico em Brasília. Para qual serviço de medicina hiperbárica encaminhar uma paciente com sofrimento de retalho depois de abdominoplastia?",
+  "tipo": "recomendação",
+  "publico": "cirurgião",
+  "ia": "ChatGPT (gpt-5.5 com busca, API)",
+  "data": "2026-10-15",
+  "bmh_citada": true,
+  "posicao_aprox": 2,
+  "link_bmh": true,
+  "dominios": [
+   "hiperbaricabrasilia.com.br",
+   "hospitaldaher.com.br",
+   "gov.br",
+   "sbmh.com.br",
+   "uhms.org",
+   "pmc.ncbi.nlm.nih.gov"
+  ],
+  "urls": [
+   "https://hiperbaricabrasilia.com.br/",
+   "https://hiperbaricabrasilia.com.br/",
+   "https://hospitaldaher.com.br/medicina-hiperbarica/",
+   "https://www.gov.br/defesa/pt-br/assuntos/hfa/servicos-e-informacoes/clinicas/medicina-hiperbarica?utm_source=openai",
+   "https://sbmh.com.br/indicacoes/indicacoes-de-oxigenoterapia-hiperbarica-pelo-conselho-federal-de-medicina/",
+   "https://uhms.org/12-compromised-grafts-and-flaps.html?utm_source=openai",
+   "https://pmc.ncbi.nlm.nih.gov/articles/PMC6147240/?utm_source=openai"
+  ],
+  "texto": "Doutor(a), para **sofrimento de retalho pós-abdominoplastia**, eu encaminharia **com urgência para o serviço que conseguir avaliar e iniciar OHB no mesmo dia** — a oxigenoterapia hiperbárica é **adjuvante**, não substitui revisar causa mecânica/cirúrgica: hematoma/seroma sob tensão, infecção, compressão por cinta/curativo, deiscência, necrose já estabelecida etc.\n\n### Minha opção prática em Brasília — se for paciente ambulatorial/particular/convênio\n**Brasília Medicina Hiperbárica — BMH**, especialmente a unidade da **Asa Sul**, por estar explicitamente estruturada para pós-operatório de plástica e “retalho ou enxerto comprometido”, com **câmara monoplace e multiplace**, médico presente durante as sessões, atendimento todos os dias 7h–19h e telefone/WhatsApp **(61) 3346-6005**. A própria página informa que avaliam pós-operatório de cirurgia plástica quando há pele com mudança de cor, resfriamento, abertura de ponto ou cicatriz que não fecha, definindo o tratamento junto ao cirurgião. ([hiperbaricabrasilia.com.br](https://hiperbaricabrasilia.com.br/))\n\n**Endereços BMH:**\n- **Asa Sul:** SGAS 613, Conj. E, Bloco A, 1º subsolo — Complexo Médico Hospitalar, L2 Sul.  \n- **Taguatinga:** Prédio Prime Excelência Médica, Torre D, Setor C Norte. ([hiperbaricabrasilia.com.br](https://hiperbaricabrasilia.com.br/))\n\n### Alternativas hospitalares/estrutura maior\n- **Hospital Daher Lago Sul** — serviço de medicina hiperbárica, com indicações incluindo complicações pós-operatórias, infecções cirúrgicas/deiscência, feridas complexas; contato **(61) 3213-4848 / WhatsApp (61) 3213-4748**, SHIS QI 7 Conj. F, Lago Sul. ([hospitaldaher.com.br](https://hospitaldaher.com.br/medicina-hiperbarica/))  \n- **HFA — Hospital das Forças Armadas** — tem OHB em câmaras **multiplace e monoplace**, atendimento de segunda a sexta 7h–12h e 13h–19h, telefone **(61) 3966-2485**, e-mail **hiperbarica@hfa.mil.br**; exige encaminhamento com relatório detalhado e agendamento no serviço. ([gov.br](https://www.gov.br/defesa/pt-br/assuntos/hfa/servicos-e-informacoes/clinicas/medicina-hiperbarica?utm_source=openai))\n\n### Justificativa técnica rápida\nNo Brasil, a Resolução CFM nº 1.457/95 reconhece **“retalhos ou enxertos comprometidos ou de risco”** como indicação de OHB, e determina que a indicação é de competência médica e sob supervisão médica. ([sbmh.com.br](https://sbmh.com.br/indicacoes/indicacoes-de-oxigenoterapia-hiperbarica-pelo-conselho-federal-de-medicina/)) A UHMS também lista **compromised grafts and flaps** como indicação, destacando que não é para retalhos normais, mas pode ser útil quando há hipoperfusão/hipóxia para maximizar viabilidade tecidual. ([uhms.org](https://uhms.org/12-compromised-grafts-and-flaps.html?utm_source=openai)) O consenso europeu recomenda OHB **o mais rápido possível após o diagnóstico** de enxerto/retalho comprometido. ([pmc.ncbi.nlm.nih.gov](https://pmc.ncbi.nlm.nih.gov/articles/PMC6147240/?utm_source=openai))\n\n### O que eu colocaria no encaminhamento\n> Paciente em pós-operatório de abdominoplastia em DPO __, com sinais de sofrimento isquêmico de retalho abdominal: __. Solicito avaliação urgente para oxigenoterapia hiperbárica como terapia adjuvante para salvamento de retalho/enxerto comprometido, conforme indicação CFM. Informo: tabagismo/SVAT/DM/IMC, intercorrências, presença de dreno, curativos, antibiótico, achados de hematoma/seroma/infecção, fotos seriadas e conduta cirúrgica adotada.\n\n**Na prática:** se a paciente está estável e o objetivo é iniciar rápido, eu ligaria primeiro para a **BMH Asa Sul**; se houver necessidade de retaguarda hospitalar ou intercorrência sistêmica, consideraria **Daher** ou **HFA**, conforme disponibilidade imediata."
+ },
+ {
+  "pergunta": "Clínica de medicina hiperbárica em Brasília com médico presente durante as sessões",
+  "tipo": "recomendação",
+  "publico": "cirurgião",
+  "ia": "ChatGPT (gpt-5.5 com busca, API)",
+  "data": "2026-10-15",
+  "bmh_citada": true,
+  "posicao_aprox": 1,
+  "link_bmh": true,
+  "dominios": [
+   "hiperbaricabrasilia.com.br"
+  ],
+  "urls": [
+   "https://hiperbaricabrasilia.com.br/",
+   "https://hiperbaricabrasilia.com.br/",
+   "https://hiperbaricabrasilia.com.br/?utm_source=openai",
+   "https://hiperbaricabrasilia.com.br/?utm_source=openai"
+  ],
+  "texto": "Em Brasília, a opção que encontrei **declarando explicitamente médico presente durante as sessões** é a **BMH — Brasília Medicina Hiperbárica**.\n\n**BMH — Brasília Medicina Hiperbárica**  \n- **Unidades:** Asa Sul e Taguatinga  \n- **Critério que você pediu:** o site informa que há **“médico em todas as sessões”**, presente na unidade **do início ao fim**, avaliando antes, acompanhando a sessão e respondendo a intercorrências. ([hiperbaricabrasilia.com.br](https://hiperbaricabrasilia.com.br/))  \n- **Horário informado:** todos os dias, das **7h às 19h**. ([hiperbaricabrasilia.com.br](https://hiperbaricabrasilia.com.br/))  \n- **Telefone:** **(61) 3346-6005**. ([hiperbaricabrasilia.com.br](https://hiperbaricabrasilia.com.br/?utm_source=openai))  \n- **Endereços informados:**  \n  - Asa Sul: **SGAS 613, Conjunto E, Bloco A, 1º subsolo — L2 Sul**  \n  - Taguatinga: **Prime Excelência Médica, Torre D — Setor C Norte** ([hiperbaricabrasilia.com.br](https://hiperbaricabrasilia.com.br/?utm_source=openai))  \n\nEu ligaria/mandaria WhatsApp e perguntaria exatamente: **“Durante a minha sessão haverá médico hiperbárico fisicamente presente na unidade do começo ao fim?”** — para confirmar antes de agendar."
+ },
+ {
+  "pergunta": "Serviço de oxigenoterapia hiperbárica em Brasília para encaminhar paciente com necrose de pele após mamoplastia",
+  "tipo": "recomendação",
+  "publico": "cirurgião",
+  "ia": "ChatGPT (gpt-5.5 com busca, API)",
+  "data": "2026-10-15",
+  "bmh_citada": true,
+  "posicao_aprox": 2,
+  "link_bmh": true,
+  "dominios": [
+   "sistemas.cfm.org.br",
+   "hiperbaricabrasilia.com.br",
+   "gov.br",
+   "hospitaldaher.com.br",
+   "infinitahiperbarica.com.br",
+   "oxihiperbarica.com.br",
+   "anfip.org.br"
+  ],
+  "urls": [
+   "https://sistemas.cfm.org.br/normas/arquivos/resolucoes/BR/1995/1457_1995.pdf?utm_source=openai",
+   "https://hiperbaricabrasilia.com.br/",
+   "https://www.gov.br/defesa/pt-br/assuntos/hfa/servicos-e-informacoes/clinicas/medicina-hiperbarica?utm_source=openai",
+   "https://hospitaldaher.com.br/medicina-hiperbarica/",
+   "https://infinitahiperbarica.com.br/",
+   "https://www.oxihiperbarica.com.br/contato/?utm_source=openai",
+   "https://www.anfip.org.br/wp-content/uploads/2019/06/Rede-Bras%C3%ADlia-DF.pdf?utm_source=openai"
+  ],
+  "texto": "Abaixo estão **opções em Brasília/DF** para encaminhar paciente com **necrose cutânea pós-mamoplastia** para avaliação de **oxigenoterapia hiperbárica (OHB)**. A OHB pode ser considerada adjuvante quando há **retalho/enxerto comprometido, deiscência, ferida complexa ou infecção de partes moles**, mas a indicação final deve ser feita por médico — o CFM lista “retalhos ou enxertos comprometidos ou de risco” e “lesões refratárias/deiscências” entre as indicações reconhecidas. ([sistemas.cfm.org.br](https://sistemas.cfm.org.br/normas/arquivos/resolucoes/BR/1995/1457_1995.pdf?utm_source=openai))\n\n## Serviços para contato/encaminhamento em Brasília\n\n| Serviço | Local / contato | Observações úteis |\n|---|---|---|\n| **BMH – Brasília Medicina Hiperbárica** | **Asa Sul:** SGAS 613, Conj. E, Bl. A, 1º subsolo, L2 Sul. **Taguatinga:** Prime Excelência Médica, Torre D, Setor C Norte. **Tel.: (61) 3346-6005** | Informa atendimento para **pós-operatório de cirurgia plástica**, feridas que não cicatrizam, retalhos/enxertos comprometidos; funciona **todos os dias, 7h–19h**, com avaliação médica antes da 1ª sessão. ([hiperbaricabrasilia.com.br](https://hiperbaricabrasilia.com.br/)) |\n| **HFA – Hospital das Forças Armadas / Medicina Hiperbárica** | Setor HFA, Sudoeste. **Tel.: (61) 3966-2485** / e-mail: **hiperbarica@hfa.mil.br** | Serviço com câmaras mono e multiplace; atendimento **segunda a sexta, 7h–12h e 13h–19h**. Exige **encaminhamento médico com relatório detalhado**; agendamento informado como presencial no serviço. ([gov.br](https://www.gov.br/defesa/pt-br/assuntos/hfa/servicos-e-informacoes/clinicas/medicina-hiperbarica?utm_source=openai)) |\n| **Hospital Daher – Medicina Hiperbárica** | SHIS QI 7, Conj. F, Lago Sul. **Tel.: (61) 3213-4848** / WhatsApp **(61) 3213-4748** | Indica OHB para **feridas complexas**, **complicações pós-operatórias**, infecção cirúrgica e deiscência, com protocolos individualizados e supervisão. ([hospitaldaher.com.br](https://hospitaldaher.com.br/medicina-hiperbarica/)) |\n| **Infinita Recuperação** | SCLN 316, Bloco E, subsolo, Sala 17, Asa Norte. WhatsApp **(61) 99309-7907** | Clínica voltada a **OHB + tratamento avançado de feridas**; informa recursos como curativo por pressão negativa, laserterapia e acompanhamento de feridas complexas. ([infinitahiperbarica.com.br](https://infinitahiperbarica.com.br/)) |\n| **Oxi Hiperbárica e Tratamento de Feridas** | Ed. Golden Office Corporate, 915 Norte, Bloco E, Sala 4. **Tel./WhatsApp: (61) 99261-4185** | Centro especializado em **OHB e estomaterapia/tratamento de feridas**; informa funcionamento **todos os dias, 7h–19h**, inclusive fins de semana e feriados. ([oxihiperbarica.com.br](https://www.oxihiperbarica.com.br/contato/?utm_source=openai)) |\n| **CHB – Centro Hiperbárico de Brasília** | Há registros em Taguatinga Norte, QND 02, Lote 17, Loja 01; tel. **(61) 3042-5227** em guias/credenciamentos | Consta em guias como prestador de **oxigenoterapia hiperbárica**; recomendo confirmar endereço/agenda antes do deslocamento, pois cadastros públicos podem estar desatualizados. ([anfip.org.br](https://www.anfip.org.br/wp-content/uploads/2019/06/Rede-Bras%C3%ADlia-DF.pdf?utm_source=openai)) |\n\n## Como eu encaminharia no relatório/pedido\n\n**Pedido:** “Avaliação para oxigenoterapia hiperbárica adjuvante por necrose cutânea/sofrimento de retalho mamário pós-mamoplastia, com deiscência/risco de perda tecidual.”\n\n**Anexar/informar:**\n- Data e tipo da cirurgia, técnica e intercorrências.\n- Lado/localização e extensão da necrose; presença de deiscência, exsudato, odor, celulite.\n- Fotos seriadas, se possível.\n- Comorbidades: diabetes, tabagismo, vasculopatias, anemia, uso de corticoide/imunossupressor.\n- Condutas já feitas: curativos, antibiótico, cultura, desbridamento, drenagem, terapia por pressão negativa.\n- Medicamentos, alergias, exames recentes e sinais vitais se houver infecção.\n\n## Importante\n\nSe houver **dor desproporcional**, progressão rápida da necrose/celulite, febre, instabilidade, crepitação, secreção fétida ou suspeita de infecção necrotizante, a prioridade é **avaliação hospitalar urgente**, desbridamento/controle de foco e antibioticoterapia; a hiperbárica entra como **adjuvante**, não substitui o manejo cirúrgico/infeccioso."
+ },
+ {
+  "pergunta": "Câmara hiperbárica em Brasília que atende Bradesco Saúde ou SulAmérica",
+  "tipo": "recomendação",
+  "publico": "paciente",
+  "ia": "ChatGPT (gpt-5.5 com busca, API)",
+  "data": "2026-10-15",
+  "bmh_citada": true,
+  "posicao_aprox": 1,
+  "link_bmh": true,
+  "dominios": [
+   "hospitaldaher.com.br",
+   "hiperbaricabrasilia.com.br",
+   "sulamerica.com.br",
+   "chbcentrohiperbarico.com.br",
+   "www3.bradescoseguros.com.br"
+  ],
+  "urls": [
+   "https://hospitaldaher.com.br/medicina-hiperbarica/",
+   "https://hospitaldaher.com.br/medicina-hiperbarica/",
+   "https://hiperbaricabrasilia.com.br/",
+   "https://hiperbaricabrasilia.com.br/",
+   "https://sulamerica.com.br/saude/livrete_padrao_MG_DF_MT_MS_GO_TO.pdf",
+   "https://chbcentrohiperbarico.com.br/",
+   "https://www3.bradescoseguros.com.br/clientes/produtos/plano-saude/consulta-de-rede-referenciada?utm_source=openai"
+  ],
+  "texto": "Encontrei **3 opções em Brasília/DF para você ligar agora e confirmar autorização pelo seu plano**:\n\n| Local | Indício de atendimento Bradesco/SulAmérica | Contato / endereço |\n|---|---|---|\n| **Hospital Daher Lago Sul – Medicina Hiperbárica** | O hospital tem página própria de **Medicina Hiperbárica** e lista **Saúde Bradesco** e **Sul América** entre os convênios de ambulatório. É a opção com evidência mais clara para os dois planos. ([hospitaldaher.com.br](https://hospitaldaher.com.br/medicina-hiperbarica/)) | **(61) 3213-4848 / WhatsApp (61) 3213-4748**. SHIS QI 7, Conj. F, Lago Sul. ([hospitaldaher.com.br](https://hospitaldaher.com.br/medicina-hiperbarica/)) |\n| **BMH – Brasília Medicina Hiperbárica** | A clínica informa atendimento por **convênio ou particular**, diz atender **50 convênios** e que a recepção confere a cobertura pelo WhatsApp. A SulAmérica aparece em livreto de rede para “Medicina Hiperbárica” com a BMH; para Bradesco, recomendo confirmar diretamente com a clínica/operadora. ([hiperbaricabrasilia.com.br](https://hiperbaricabrasilia.com.br/)) | **(61) 3346-6005**. Asa Sul: SGAS 613, Conj. E, Bl. A, 1º subsolo. Também informa unidade em Taguatinga. ([hiperbaricabrasilia.com.br](https://hiperbaricabrasilia.com.br/)) |\n| **CHB – Centro Hiperbárico de Brasília** | A SulAmérica aparece em livreto de rede para “Medicina Hiperbárica” com o CHB. O site do CHB informa unidades em Taguatinga e Lago Norte; confirmar Bradesco diretamente. ([sulamerica.com.br](https://sulamerica.com.br/saude/livrete_padrao_MG_DF_MT_MS_GO_TO.pdf)) | **(61) 3042-5227 / (61) 99989-6191**. Taguatinga: QND 02 lote 17 loja 01; Lago Norte: SHIN CA 2 lote 1 bloco G. ([chbcentrohiperbarico.com.br](https://chbcentrohiperbarico.com.br/)) |\n\n**Minha sugestão prática:** comece pelo **Hospital Daher** se você precisa de **Bradesco Saúde ou SulAmérica**, porque ele lista ambos nos convênios do ambulatório e tem serviço de hiperbárica no próprio site. Mesmo assim, antes de ir, pergunte: “Meu plano cobre **oxigenoterapia hiperbárica ambulatorial** nesse prestador? Precisa de autorização prévia? Quais documentos — pedido médico/relatório?”  \n\nRedes credenciadas mudam por produto/plano e podem exigir validação prévia; tanto Bradesco quanto SulAmérica orientam consultar a rede atualizada pelo app/site/central. ([www3.bradescoseguros.com.br](https://www3.bradescoseguros.com.br/clientes/produtos/plano-saude/consulta-de-rede-referenciada?utm_source=openai))"
+ },
+ {
+  "pergunta": "Brasília Medicina Hiperbárica é boa?",
+  "tipo": "marca",
+  "publico": "paciente",
+  "ia": "ChatGPT (gpt-5.5 com busca, API)",
+  "data": "2026-10-15",
+  "bmh_citada": true,
+  "posicao_aprox": 1,
+  "link_bmh": true,
+  "dominios": [
+   "hiperbaricabrasilia.com.br",
+   "cnes2.datasus.gov.br",
+   "hyperbaric.app",
+   "reclameaqui.com.br",
+   "sinj.df.gov.br",
+   "sistemas.cfm.org.br"
+  ],
+  "urls": [
+   "https://hiperbaricabrasilia.com.br/?utm_source=openai",
+   "https://hiperbaricabrasilia.com.br/?utm_source=openai",
+   "https://cnes2.datasus.gov.br/Mod_Conjunto.asp?VCo_Unidade=5300107880510&utm_source=openai",
+   "https://hyperbaric.app/city/brasilia-br?utm_source=openai",
+   "https://www.reclameaqui.com.br/empresa/brasilia-medicina-hiperbarica/lista-reclamacoes/?categoria=0000000000000031&utm_source=openai",
+   "https://www.sinj.df.gov.br/sinj/Diario/c6fca7e150a84be698c160fee1911b03/cda5e732-d004-391a-a8a4-4ade6cc28092/arq/0/visualizar-pdf%2010.pdf?utm_source=openai",
+   "https://sistemas.cfm.org.br/normas/arquivos/resolucoes/BR/1995/1457_1995.pdf?utm_source=openai"
+  ],
+  "texto": "**Pelo que dá para checar publicamente, a Brasília Medicina Hiperbárica / BMH parece uma opção boa e estabelecida em Brasília — mas eu confirmaria alguns pontos antes de fechar.**\n\n**Pontos positivos que encontrei:**\n- A clínica existe há bastante tempo: o próprio site informa atuação em Brasília desde 2004, com unidades na **Asa Sul** e em **Taguatinga**. ([hiperbaricabrasilia.com.br](https://hiperbaricabrasilia.com.br/?utm_source=openai))  \n- O site informa **médico presente em todas as sessões** e lista responsáveis médicos com CRM/RQE. ([hiperbaricabrasilia.com.br](https://hiperbaricabrasilia.com.br/?utm_source=openai))  \n- Consta no **CNES/DataSUS** como clínica/centro de especialidade; a ficha da unidade Asa Sul mostra CNPJ, endereço, alvará da SES e funcionamento todos os dias das 7h às 19h. ([cnes2.datasus.gov.br](https://cnes2.datasus.gov.br/Mod_Conjunto.asp?VCo_Unidade=5300107880510&utm_source=openai))  \n- Em avaliações agregadas, aparece bem avaliada: **BMH Asa Sul 4,9/5 com 185 avaliações** e **BMH Taguatinga 4,9/5 com 68 avaliações** no Hyperbaric.app, que agrega dados do Google. ([hyperbaric.app](https://hyperbaric.app/city/brasilia-br?utm_source=openai))  \n- No Reclame Aqui, encontrei **pouca coisa**: uma reclamação ativa antiga e “sem reputação definida” por falta de volume suficiente de reclamações. Isso não prova excelência, mas também não sugere um histórico público grande de problemas. ([reclameaqui.com.br](https://www.reclameaqui.com.br/empresa/brasilia-medicina-hiperbarica/lista-reclamacoes/?categoria=0000000000000031&utm_source=openai))  \n- Há registro em Diário Oficial de credenciamento da BMH para futura prestação de serviços a usuários do sistema de saúde do Corpo de Bombeiros Militar do DF, o que é um sinal administrativo positivo. ([sinj.df.gov.br](https://www.sinj.df.gov.br/sinj/Diario/c6fca7e150a84be698c160fee1911b03/cda5e732-d004-391a-a8a4-4ade6cc28092/arq/0/visualizar-pdf%2010.pdf?utm_source=openai))  \n\n**Minha leitura:** eu colocaria como **“boa candidata”**, especialmente se você precisa de oxigenoterapia hiperbárica por indicação médica reconhecida — feridas difíceis, pé diabético, retalho/enxerto comprometido, lesão por radioterapia, osteomielite etc. Eu só teria cautela se a indicação for algo mais “estético”, “recuperação geral”, “bem-estar” ou promessa muito ampla.\n\nAntes de começar, eu perguntaria diretamente:\n\n1. **Qual médico vai avaliar e acompanhar?**  \n2. **Qual é a indicação formal no meu caso?**  \n3. **Quantas sessões e qual pressão/tempo por sessão?**  \n4. **A câmara é registrada/certificada e qual o protocolo de emergência?**  \n5. **Meu plano autorizou por escrito?** — importante para evitar cobrança inesperada.  \n6. **Existe contraindicação no meu caso?** Ex.: problemas pulmonares, ouvido, sinusite importante, alguns tipos de pneumotórax, uso de certos medicamentos etc.\n\nTambém vale lembrar: pelo CFM, a **indicação da oxigenoterapia hiperbárica é de competência médica** e a aplicação deve ser feita pelo médico ou sob sua supervisão. ([sistemas.cfm.org.br](https://sistemas.cfm.org.br/normas/arquivos/resolucoes/BR/1995/1457_1995.pdf?utm_source=openai))\n\n**Resumo:** sim, a BMH parece confiável pelos sinais públicos disponíveis; eu consideraria marcar avaliação. Mas só faria o tratamento se houver **indicação médica clara**, orçamento/convênio bem documentado e explicação objetiva do benefício esperado no seu caso."
+ },
+ {
+  "pergunta": "Câmara monoplace ou multiplace: qual a diferença e onde tem em Brasília?",
+  "tipo": "comparação",
+  "publico": "paciente",
+  "ia": "ChatGPT (gpt-5.5 com busca, API)",
+  "data": "2026-10-15",
+  "bmh_citada": true,
+  "posicao_aprox": 4,
+  "link_bmh": true,
+  "dominios": [
+   "sbmh.com.br",
+   "hiperbaricabrasilia.com.br",
+   "chbcentrohiperbarico.com.br",
+   "oxihiperbarica.com.br",
+   "gov.br"
+  ],
+  "urls": [
+   "https://sbmh.com.br/indicacoes/indicacoes-de-oxigenoterapia-hiperbarica-pelo-conselho-federal-de-medicina/",
+   "https://hiperbaricabrasilia.com.br/",
+   "https://chbcentrohiperbarico.com.br/author/chbmed/",
+   "https://www.oxihiperbarica.com.br/contato/?utm_source=openai",
+   "https://www.gov.br/defesa/pt-br/assuntos/hfa/servicos-e-informacoes/clinicas/medicina-hiperbarica?utm_source=openai",
+   "https://sbmh.com.br/indicacoes/indicacoes-de-oxigenoterapia-hiperbarica-pelo-conselho-federal-de-medicina/"
+  ],
+  "texto": "Assumindo que você está falando de **câmara hiperbárica** para oxigenoterapia hiperbárica:\n\n## Diferença: monoplace vs. multiplace\n\n| Tipo | Como é | O que muda para o paciente |\n|---|---|---|\n| **Monoplace / monopaciente** | Câmara individual, geralmente de acrílico transparente; o paciente fica **deitado** e se comunica por interfone. | Mais privacidade; pode ser melhor para quem quer sessão individual. Em geral não entra acompanhante/equipe dentro da câmara. |\n| **Multiplace / multipaciente** | “Sala” pressurizada maior, para mais de uma pessoa; o paciente costuma ficar **sentado** — ou pode haver estrutura para maca, dependendo do serviço. | Mais espaço; permite equipe/profissional dentro ou mais assistência próxima; pode ser melhor para pacientes acamados, crianças, muita ansiedade/claustrofobia ou casos que exigem mais suporte. |\n\n**O tratamento não é “mais forte” por ser mono ou multiplace**: o que importa é a **indicação médica**, pressão, tempo de sessão e protocolo. A escolha costuma ser feita pelo médico conforme seu caso, conforto, mobilidade e disponibilidade. A definição formal do CFM diz que as câmaras podem ser multipaciente, de maior porte e para várias pessoas, ou monopaciente, para acomodar apenas o próprio paciente. ([sbmh.com.br](https://sbmh.com.br/indicacoes/indicacoes-de-oxigenoterapia-hiperbarica-pelo-conselho-federal-de-medicina/))\n\n## Onde tem em Brasília / DF\n\nEncontrei estas opções — recomendo **confirmar por telefone/WhatsApp antes de ir**, porque endereço, convênio e disponibilidade mudam:\n\n1. **BMH – Brasília Medicina Hiperbárica**\n   - **Asa Sul:** SGAS 613, Conjunto E, Bloco A, 1º subsolo, Complexo Médico Hospitalar, L2 Sul.\n   - **Taguatinga:** Prime Excelência Médica, Torre D, Setor C Norte.\n   - O site informa **câmaras monoplace e multiplace**, atendimento todos os dias das 7h às 19h e telefone **(61) 3346-6005**. ([hiperbaricabrasilia.com.br](https://hiperbaricabrasilia.com.br/))\n\n2. **CHB – Centro Hiperbárico de Brasília**\n   - **Taguatinga Norte:** QND 02, Lote 17, Loja 01.\n   - **Lago Norte:** SHIN CA 2, Lote 1, Bloco G / Torre 2, salas 4 a 7.\n   - Contatos informados: **(61) 3042-5227** e **(61) 99989-6191**. O próprio site informa corpo clínico capacitado pela SBMH; o CNES também lista unidade no Lago Norte. ([chbcentrohiperbarico.com.br](https://chbcentrohiperbarico.com.br/author/chbmed/))\n\n3. **Oxi Hiperbárica e Tratamento de Feridas**\n   - **Asa Norte:** Ed. Golden Office Corporate, 915 Norte, Sala 4, Bloco E.\n   - Contato informado: **(61) 99261-4185**; funcionamento divulgado como todos os dias das 7h às 19h. ([oxihiperbarica.com.br](https://www.oxihiperbarica.com.br/contato/?utm_source=openai))\n\n4. **HFA – Hospital das Forças Armadas**\n   - Serviço de Medicina Hiperbárica com sessões em câmara **multiplace ou monoplace**, segundo página do HFA; atendimento informado de segunda a sexta, 7h–12h e 13h–19h, telefone **(61) 3966-2485**. Normalmente exige encaminhamento/relatório médico e agendamento. ([gov.br](https://www.gov.br/defesa/pt-br/assuntos/hfa/servicos-e-informacoes/clinicas/medicina-hiperbarica?utm_source=openai))\n\n## Dica importante de segurança\n\nOxigenoterapia hiperbárica é **tratamento médico**, não “bem-estar”. O CFM lista indicações como doença descompressiva, intoxicação por monóxido de carbono, gangrena gasosa, síndrome de Fournier, infecções necrotizantes, queimaduras, feridas refratárias/pé diabético, lesões por radiação, retalhos/enxertos comprometidos e osteomielite; a **indicação é de competência médica** e a aplicação deve ocorrer pelo médico ou sob sua supervisão. ([sbmh.com.br](https://sbmh.com.br/indicacoes/indicacoes-de-oxigenoterapia-hiperbarica-pelo-conselho-federal-de-medicina/))\n\nSe você me disser **qual é o motivo** — pós-operatório, ferida, pé diabético, mergulho, radioterapia etc. — posso te ajudar a montar uma lista de perguntas para ligar nas clínicas e saber qual tipo de câmara faz mais sentido."
+ },
+ {
+  "pergunta": "Quantas sessões de câmara hiperbárica são necessárias no pós-operatório de cirurgia plástica?",
+  "tipo": "como fazer",
+  "publico": "paciente",
+  "ia": "ChatGPT (gpt-5.5 com busca, API)",
+  "data": "2026-10-15",
+  "bmh_citada": false,
+  "posicao_aprox": null,
+  "link_bmh": false,
+  "dominios": [
+   "sbmh.com.br",
+   "sistemas.cfm.org.br"
+  ],
+  "urls": [
+   "https://sbmh.com.br/app/uploads/2018/04/DIRETRIZES-2016-2018-28-11-17-Revisada.pdf",
+   "https://sbmh.com.br/app/uploads/2018/04/DIRETRIZES-2016-2018-28-11-17-Revisada.pdf",
+   "https://sbmh.com.br/app/uploads/2018/04/DIRETRIZES-2016-2018-28-11-17-Revisada.pdf",
+   "https://sistemas.cfm.org.br/normas/arquivos/resolucoes/BR/1995/1457_1995.pdf"
+  ],
+  "texto": "**Resposta curta:** não existe um número fixo “para pós-operatório de cirurgia plástica”. Se a cirurgia está evoluindo bem, **geralmente não há indicação de câmara hiperbárica só para acelerar a cicatrização normal**; as diretrizes da SBMH dizem que ela **não está indicada para feridas que cicatrizariam normalmente**, e a UHMS também não recomenda para enxertos/retalhos normais e não comprometidos. ([sbmh.com.br](https://sbmh.com.br/app/uploads/2018/04/DIRETRIZES-2016-2018-28-11-17-Revisada.pdf))\n\nQuando há **indicação médica** — por exemplo, **retalho/enxerto em risco ou comprometido**, sofrimento de pele, isquemia, necrose inicial, deiscência ou infecção — o esquema mais citado para cirurgia plástica é: **início imediato**, **reavaliação a cada 5 sessões** e, para retalhos/enxertos comprometidos ou de risco, **10 a 40 sessões em 95% dos casos**. ([sbmh.com.br](https://sbmh.com.br/app/uploads/2018/04/DIRETRIZES-2016-2018-28-11-17-Revisada.pdf))\n\nNa prática, muitos protocolos usam sessões de **90 a 120 minutos**, em torno de **2,0 a 2,5 ATA**, podendo ser **1 vez ao dia** ou, em situações mais urgentes/graves, **2 vezes ao dia nos primeiros dias**, com ajuste conforme a resposta do tecido. ([sbmh.com.br](https://sbmh.com.br/app/uploads/2018/04/DIRETRIZES-2016-2018-28-11-17-Revisada.pdf))\n\nNo Brasil, a indicação da oxigenoterapia hiperbárica é de **competência médica**, e o CFM reconhece “retalhos ou enxertos comprometidos ou de risco” como uma das aplicações; o próprio CFM ressalta que duração, pressão, número total e intervalos variam conforme a patologia e o protocolo. ([sistemas.cfm.org.br](https://sistemas.cfm.org.br/normas/arquivos/resolucoes/BR/1995/1457_1995.pdf))\n\n**Em resumo:**  \n- **Pós-operatório normal:** geralmente **0 sessões**.  \n- **Retalho/enxerto em risco ou sofrimento de pele:** frequentemente **10–40 sessões**, com reavaliações.  \n- **Infecção, necrose ou deiscência:** o número pode mudar bastante e deve ser definido pelo cirurgião plástico junto ao médico hiperbárico.\n\nSe você me disser **qual cirurgia foi feita**, **quantos dias de pós-operatório**, e se há **necrose, escurecimento da pele, bolhas, abertura de pontos, secreção ou dor crescente**, posso te ajudar a entender em qual cenário você provavelmente se encaixa — sem substituir a avaliação médica."
+ },
+ {
+  "pergunta": "Câmara hiperbárica depois da lipoaspiração ou abdominoplastia: quando é indicada?",
+  "tipo": "definição",
+  "publico": "paciente",
+  "ia": "ChatGPT (gpt-5.5 com busca, API)",
+  "data": "2026-10-15",
+  "bmh_citada": false,
+  "posicao_aprox": null,
+  "link_bmh": false,
+  "dominios": [
+   "sbmh.com.br",
+   "uhms.org",
+   "ncbi.nlm.nih.gov"
+  ],
+  "urls": [
+   "https://sbmh.com.br/indicacoes/indicacoes-de-oxigenoterapia-hiperbarica-pelo-conselho-federal-de-medicina/",
+   "https://www.uhms.org/resources/featured-resources/hbo-indications.html?utm_source=openai",
+   "https://sbmh.com.br/indicacoes/indicacoes-de-oxigenoterapia-hiperbarica-pelo-conselho-federal-de-medicina/",
+   "https://sbmh.com.br/indicacoes/indicacoes-de-oxigenoterapia-hiperbarica-pelo-conselho-federal-de-medicina/",
+   "https://www.ncbi.nlm.nih.gov/sites/books/NBK499820/",
+   "https://www.ncbi.nlm.nih.gov/sites/books/NBK499820/"
+  ],
+  "texto": "**Em geral, câmara hiperbárica não é indicada “de rotina” depois de lipoaspiração ou abdominoplastia** só para desinchar, acelerar roxos ou “melhorar a cicatriz” em uma evolução normal. Ela pode ser indicada **como tratamento adjuvante** quando há risco real de falta de oxigenação/vascularização do tecido ou complicação da ferida.\n\n## Quando costuma ser indicada após lipo/abdominoplastia?\n\nPode ser considerada pelo cirurgião plástico em conjunto com médico hiperbarista quando há:\n\n1. **Sofrimento de pele ou do retalho abdominal**\n   - pele arroxeada/acinzentada, fria, muito dolorida ou com bolhas;\n   - áreas escurecendo/pretas, suspeita de **isquemia ou necrose**;\n   - sofrimento do retalho após abdominoplastia, especialmente em áreas de maior tensão.\n\n2. **Retalho ou enxerto comprometido ou “de risco”**\n   - Essa é uma indicação reconhecida no Brasil pela Resolução CFM nº 1.457/95: “retalhos ou enxertos comprometidos ou de risco”; a mesma resolução diz que a indicação é de competência médica. ([sbmh.com.br](https://sbmh.com.br/indicacoes/indicacoes-de-oxigenoterapia-hiperbarica-pelo-conselho-federal-de-medicina/))  \n   - A UHMS também afirma que oxigenoterapia hiperbárica **não é necessária nem recomendada para retalhos/enxertos normais**, mas pode ser útil quando há baixa perfusão ou hipóxia do tecido. ([uhms.org](https://www.uhms.org/resources/featured-resources/hbo-indications.html?utm_source=openai))\n\n3. **Deiscência ou ferida de difícil cicatrização**\n   - abertura de pontos com dificuldade de fechar, especialmente se houver tecido mal vascularizado, necrose ou fatores de risco como diabetes, tabagismo, obesidade, radioterapia prévia etc. O CFM inclui “lesões refratárias” e deiscências de sutura entre aplicações reconhecidas. ([sbmh.com.br](https://sbmh.com.br/indicacoes/indicacoes-de-oxigenoterapia-hiperbarica-pelo-conselho-federal-de-medicina/))\n\n4. **Infecção grave de partes moles**\n   - celulite extensa, fasciite, miosite, síndrome de Fournier ou infecção necrotizante — situações graves em que a hiperbárica pode ser adjuvante, junto com antibiótico, cirurgia/desbridamento e suporte clínico. ([sbmh.com.br](https://sbmh.com.br/indicacoes/indicacoes-de-oxigenoterapia-hiperbarica-pelo-conselho-federal-de-medicina/))\n\n5. **Isquemia traumática/compromisso vascular agudo**\n   - menos comum em cirurgia estética, mas pode entrar na avaliação se houver sofrimento vascular importante do tecido.\n\n## Quando normalmente **não** é indicada?\n\n- Pós-operatório normal de lipo ou abdominoplastia, sem sinais de isquemia, necrose, infecção ou abertura complicada.\n- Apenas para “acelerar recuperação”, “tirar edema”, “melhorar fibrose” ou “prevenir tudo” em paciente sem complicação — a evidência para esse uso estético rotineiro é limitada.\n- Como substituto de condutas essenciais: reavaliar curativo/compressão, drenar coleção/seroma/hematoma, usar antibiótico quando indicado, desbridar necrose ou reoperar quando necessário.\n\n## Sinais de alerta: procure o cirurgião rapidamente\n\nApós lipo ou abdominoplastia, avise seu médico **no mesmo dia** se houver:\n\n- pele ficando roxa escura, preta, fria ou com bolhas;\n- dor desproporcional ou piora súbita;\n- secreção com mau cheiro, pus, febre;\n- abertura da ferida;\n- aumento importante de vermelhidão/calor local;\n- falta de ar, dor no peito, desmaio ou panturrilha dolorida/inchada — nesses casos, pronto atendimento.\n\n## Pontos importantes\n\nA câmara hiperbárica, quando indicada, deve ser iniciada **o quanto antes** em casos de sofrimento de retalho/enxerto, mas sempre após avaliação médica, porque é um tratamento complementar e não corrige sozinho causas mecânicas como tensão excessiva, compressão inadequada, hematoma, seroma ou necrose que precise de desbridamento. Para indicações urgentes, a seleção adequada do paciente e o início precoce tendem a ser mais importantes. ([ncbi.nlm.nih.gov](https://www.ncbi.nlm.nih.gov/sites/books/NBK499820/))\n\nTambém há contraindicações e riscos: pneumotórax não tratado é contraindicação absoluta; e há contraindicações relativas como infecção de vias aéreas/sinusite ativa, claustrofobia, DPOC/asma com retenção de ar, crise convulsiva não controlada, algumas cirurgias oculares recentes e descontrole glicêmico. ([ncbi.nlm.nih.gov](https://www.ncbi.nlm.nih.gov/sites/books/NBK499820/))\n\n**Resumo:** depois de lipoaspiração ou abdominoplastia, câmara hiperbárica é mais bem indicada quando existe **sofrimento vascular da pele/retalho, necrose, deiscência difícil, ferida complicada ou infecção grave** — não como rotina em um pós-operatório normal."
+ },
+ {
+  "pergunta": "Quanto tempo dura uma sessão de câmara hiperbárica?",
+  "tipo": "como fazer",
+  "publico": "paciente",
+  "ia": "ChatGPT (gpt-5.5 com busca, API)",
+  "data": "2026-10-15",
+  "bmh_citada": false,
+  "posicao_aprox": null,
+  "link_bmh": false,
+  "dominios": [],
+  "urls": [],
+  "texto": "Uma sessão de **câmara hiperbárica** geralmente dura **entre 60 e 120 minutos**.\n\nNa prática, é comum que o tempo total fique em torno de:\n\n- **90 minutos** de tratamento efetivo, em muitos protocolos;\n- mais alguns minutos para **pressurização e despressurização** da câmara;\n- em alguns casos, pode chegar a **2 horas ou mais**, dependendo da indicação médica.\n\nA duração varia conforme o motivo do tratamento — por exemplo, feridas de difícil cicatrização, intoxicação por monóxido de carbono, osteomielite, lesões por radioterapia, entre outros — e também conforme o protocolo do serviço.\n\nSe for sua primeira sessão, é normal a equipe explicar o tempo previsto, a pressão usada e os cuidados durante o procedimento."
+ },
+ {
+  "pergunta": "O que é oxigenoterapia hiperbárica e para que serve?",
+  "tipo": "definição",
+  "publico": "paciente",
+  "ia": "ChatGPT (gpt-5.5 com busca, API)",
+  "data": "2026-10-15",
+  "bmh_citada": false,
+  "posicao_aprox": null,
+  "link_bmh": false,
+  "dominios": [
+   "uhms.org",
+   "sistemas.cfm.org.br",
+   "fda.gov"
+  ],
+  "urls": [
+   "https://www.uhms.org/resources/featured-resources/hbo-indications.html?utm_source=openai",
+   "https://www.uhms.org/resources/featured-resources/hbo-indications.html?utm_source=openai",
+   "https://sistemas.cfm.org.br/normas/arquivos/resolucoes/BR/1995/1457_1995.pdf?utm_source=openai",
+   "https://www.fda.gov/medical-devices/letters-health-care-providers/follow-instructions-safe-use-hyperbaric-oxygen-therapy-devices-letter-health-care-providers?utm_source=openai"
+  ],
+  "texto": "**Oxigenoterapia hiperbárica (OHB)** é um tratamento médico em que a pessoa respira **oxigênio em alta concentração** dentro de uma **câmara pressurizada** — ou seja, com pressão maior que a atmosférica. Isso aumenta bastante a quantidade de oxigênio dissolvida no sangue e ajuda a levar oxigênio a tecidos com pouca circulação, infectados ou lesionados. A sessão costuma durar cerca de **90 a 120 minutos**, dependendo da indicação e do protocolo. ([uhms.org](https://www.uhms.org/resources/featured-resources/hbo-indications.html?utm_source=openai))\n\nEla serve principalmente como **tratamento complementar** — não substitui cirurgia, antibiótico, curativos, controle do diabetes etc. — em situações específicas, como:\n\n- **Intoxicação por monóxido de carbono**;\n- **Doença descompressiva** em mergulhadores;\n- **Embolia gasosa/arterial**;\n- **Feridas difíceis de cicatrizar**, especialmente algumas feridas graves em diabéticos;\n- **Infecções graves de tecidos moles**, como gangrena gasosa e fasciíte necrosante;\n- **Lesões por esmagamento** e traumas com comprometimento da circulação;\n- **Osteomielite crônica refratária**;\n- **Lesões tardias por radioterapia**;\n- **Enxertos ou retalhos de pele com risco de perda**. ([uhms.org](https://www.uhms.org/resources/featured-resources/hbo-indications.html?utm_source=openai))\n\nNo Brasil, a indicação é de **competência médica**, e a prática é reconhecida pelo Conselho Federal de Medicina em situações específicas. Para pé diabético, por exemplo, a avaliação precisa ser criteriosa: a CONITEC já apontou que os estudos eram heterogêneos e de qualidade moderada a baixa para algumas situações, então não é um tratamento “automático” para toda ferida. ([sistemas.cfm.org.br](https://sistemas.cfm.org.br/normas/arquivos/resolucoes/BR/1995/1457_1995.pdf?utm_source=openai))\n\n**Como ela ajuda?** O aumento de oxigênio pode favorecer a cicatrização, reduzir edema, melhorar a função de células de defesa, dificultar a proliferação de certas bactérias anaeróbias e auxiliar na recuperação de tecidos com baixa oxigenação.\n\n**Riscos e cuidados:** embora geralmente seja bem tolerada quando bem indicada, pode causar dor/pressão nos ouvidos ou seios da face, barotrauma, alteração visual temporária, crise convulsiva por toxicidade do oxigênio — rara —, claustrofobia e risco de incêndio se normas de segurança não forem seguidas. A FDA alerta que câmaras hiperbáricas devem ser usadas conforme instruções, com medidas rígidas de prevenção de fogo, pois há alto risco com oxigênio em alta concentração. ([fda.gov](https://www.fda.gov/medical-devices/letters-health-care-providers/follow-instructions-safe-use-hyperbaric-oxygen-therapy-devices-letter-health-care-providers?utm_source=openai))\n\nTambém é importante saber que **não é a mesma coisa que ozonioterapia**. A OHB usa oxigênio medicinal sob pressão em câmara própria; ozonioterapia envolve mistura de oxigênio com ozônio e tem indicações/regulações diferentes.\n\nEm resumo: **a oxigenoterapia hiperbárica é útil para algumas condições bem definidas, sobretudo feridas complexas, infecções graves e acidentes relacionados a gases/pressão**, mas deve ser indicada e acompanhada por médico, idealmente com avaliação de um serviço de medicina hiperbárica."
+ },
+ {
+  "pergunta": "Câmara hiperbárica pelo SUS em Brasília",
+  "tipo": "recomendação",
+  "publico": "paciente",
+  "ia": "ChatGPT (gpt-5.5 com busca, API)",
+  "data": "2026-10-15",
+  "bmh_citada": false,
+  "posicao_aprox": null,
+  "link_bmh": false,
+  "dominios": [
+   "saude.df.gov.br",
+   "bvsms.saude.gov.br",
+   "mpdft.mp.br",
+   "wiki.saude.df.gov.br",
+   "agenciabrasilia.df.gov.br",
+   "gov.br"
+  ],
+  "urls": [
+   "https://www.saude.df.gov.br/documents/37101/0/AVISO%2BDE%2BCONTRATA%C3%87%C3%83O%2BDIRETA%2BDL%2B90026.2025.pdf/ce50942b-68d6-c0c3-a606-ab1c14128088?t=1741956054797",
+   "https://bvsms.saude.gov.br/bvs/saudelegis/sctie/2018/prt0061_31_10_2018.html",
+   "https://www.mpdft.mp.br/portal/index.php/comunicacao-menu/sala-de-imprensa/noticias/18075-entenda-a-regulacao-no-sus-e-acompanhe-sua-posicao-nas-filas-da-saude-do-df",
+   "https://wiki.saude.df.gov.br/index.php/Ouvidoria?utm_source=openai",
+   "https://www.mpdft.mp.br/portal/index.php/comunicacao-menu/sala-de-imprensa/noticias/noticias-2026/17746-mpdft-informa-sobre-novo-canal-de-atendimento-da-defensoria-publica?utm_source=openai",
+   "https://agenciabrasilia.df.gov.br/w/entenda-a-diferen%C3%A7a-entre-as-unidades-de-atendimento?utm_source=openai",
+   "https://www.gov.br/defesa/pt-br/assuntos/hfa/servicos-e-informacoes/clinicas/medicina-hiperbarica?utm_source=openai"
+  ],
+  "texto": "**Resumo:** em Brasília/DF, a **oxigenoterapia hiperbárica — “câmara hiperbárica” — não parece estar disponível como oferta regular/padronizada pela rede da SES-DF/SUS**. Documentos da própria SES-DF informam que a Secretaria **não dispõe de estrutura própria**, que o tratamento **não é padronizado na rede** e que não havia serviços conveniados/contratualizados; as contratações localizadas aparecem para **cumprir decisões judiciais**. ([saude.df.gov.br](https://www.saude.df.gov.br/documents/37101/0/AVISO%2BDE%2BCONTRATA%C3%87%C3%83O%2BDIRETA%2BDL%2B90026.2025.pdf/ce50942b-68d6-c0c3-a606-ab1c14128088?t=1741956054797))\n\nAlém disso, no âmbito federal, a Portaria nº 61/2018 revogou a portaria anterior e tornou pública a decisão de **não incorporar** a oxigenoterapia hiperbárica para tratamento de **pé diabético** no SUS. ([bvsms.saude.gov.br](https://bvsms.saude.gov.br/bvs/saudelegis/sctie/2018/prt0061_31_10_2018.html))\n\n### Como tentar pelo SUS/SES-DF\n\n1. **Procure a UBS de referência** ou o hospital público onde o paciente já acompanha o caso.  \n   Peça avaliação/encaminhamento para a especialidade relacionada ao problema — por exemplo: cirurgia vascular, infectologia, dermatologia, cirurgia plástica, ortopedia, cirurgia geral, conforme o caso.\n\n2. **Peça um relatório médico bem completo**, com:\n   - diagnóstico e CID;\n   - motivo da indicação da câmara hiperbárica;\n   - urgência/risco: amputação, infecção grave, necrose, perda de enxerto/retalho etc.;\n   - tratamentos já feitos pelo SUS e por que foram insuficientes;\n   - número estimado de sessões e frequência;\n   - exames, fotos da lesão, laudos e receitas.\n\n3. **Solicite que o pedido seja inserido/encaminhado pela regulação da SES-DF.** No DF, pedidos de consultas, exames ou procedimentos especializados entram no Complexo Regulador, que define prioridade por critérios clínicos. ([mpdft.mp.br](https://www.mpdft.mp.br/portal/index.php/comunicacao-menu/sala-de-imprensa/noticias/18075-entenda-a-regulacao-no-sus-e-acompanhe-sua-posicao-nas-filas-da-saude-do-df))\n\n4. Se disserem que **não há oferta** ou houver demora incompatível com o risco, peça **comprovante/protocolo por escrito** e registre reclamação/solicitação na **Ouvidoria do GDF/SES-DF pelo 162**. ([wiki.saude.df.gov.br](https://wiki.saude.df.gov.br/index.php/Ouvidoria?utm_source=openai))\n\n5. Se for caso grave e a pessoa não puder pagar, procure a **Defensoria Pública do DF**, especialmente para avaliar pedido judicial. O MPDFT informa o WhatsApp oficial da Defensoria: **(61) 98100-7200**. ([mpdft.mp.br](https://www.mpdft.mp.br/portal/index.php/comunicacao-menu/sala-de-imprensa/noticias/noticias-2026/17746-mpdft-informa-sobre-novo-canal-de-atendimento-da-defensoria-publica?utm_source=openai))\n\n### Quando ir direto à emergência\n\nSe houver **infecção grave**, febre, piora rápida da ferida, necrose, suspeita de gangrena, dor intensa, mau cheiro, escurecimento do membro, queimadura grave ou risco de amputação, vá a uma **UPA ou hospital público**; em urgência, acione o **SAMU 192**. A rede pública do DF orienta que UBS/UPA/hospital acionem o Complexo Regulador quando houver necessidade de transferência ou cuidado de maior complexidade. ([agenciabrasilia.df.gov.br](https://agenciabrasilia.df.gov.br/w/entenda-a-diferen%C3%A7a-entre-as-unidades-de-atendimento?utm_source=openai))\n\n### Observação importante\n\nExiste serviço de medicina hiperbárica no **Hospital das Forças Armadas (HFA)**, com sessões em câmara multiplace/monoplace e exigência de encaminhamento médico, mas isso **não significa automaticamente atendimento pelo SUS/SES-DF**; é uma referência local que pode servir para informação técnica ou orçamento, se necessário para laudo/processo. ([gov.br](https://www.gov.br/defesa/pt-br/assuntos/hfa/servicos-e-informacoes/clinicas/medicina-hiperbarica?utm_source=openai))"
+ },
+ {
+  "pergunta": "O plano de saúde cobre câmara hiperbárica? Como pedir a autorização?",
+  "tipo": "como fazer",
+  "publico": "paciente",
+  "ia": "ChatGPT (gpt-5.5 com busca, API)",
+  "data": "2026-10-15",
+  "bmh_citada": false,
+  "posicao_aprox": null,
+  "link_bmh": false,
+  "dominios": [
+   "gov.br",
+   "planalto.gov.br",
+   "agenciagov.ebc.com.br"
+  ],
+  "urls": [
+   "https://www.gov.br/ans/pt-br/arquivos/assuntos/consumidor/o-que-seu-plano-deve-cobrir/Anexo_I_Rol_2021RN_465.2021_RN473_RN478_RN480_RN513_RN536_RN537_RN538_RN539.pdf/%40%40download/file/Anexo_I_Rol_2021RN_465.2021_RN473_RN478_RN480_RN513_RN536_RN537_RN538_RN539.pdf",
+   "https://www.gov.br/ans/pt-br/acesso-a-informacao/participacao-da-sociedade/atualizacao-do-rol-de-procedimentos/Anexo_II_DUT_2021_RN_465.2021_RN610.pdf",
+   "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2022/lei/l14454.htm?utm_source=openai",
+   "https://www.gov.br/ans/pt-br/assuntos/consumidor/prazos-maximos-de-atendimento?utm_source=openai",
+   "https://www.gov.br/ans/pt-br/assuntos/consumidor/prazos-maximos-de-atendimento?utm_source=openai",
+   "https://agenciagov.ebc.com.br/noticias/202507/ans-tem-novas-regras-para-o-relacionamento-entre-operadoras-e-beneficiarios?utm_source=openai",
+   "https://www.gov.br/pt-br/servicos/receber-reclamacoes-sobre-possiveis-praticas-irregulares-de-operadoras-de-planos-privados-de-assistencia-a-saude-inclusive-administradoras-de-beneficios?id=9285&origem=servico&utm_source=openai"
+  ],
+  "texto": "Sim — **o plano de saúde pode ter obrigação de cobrir “câmara hiperbárica”**, tecnicamente **oxigenoterapia hiperbárica**, **quando o seu plano e o seu caso clínico se enquadram nas regras da ANS**.\n\n## 1) Quando o plano deve cobrir?\n\nA oxigenoterapia hiperbárica consta no **Rol da ANS** como procedimento com **Diretriz de Utilização — DUT nº 58**, classificado como **Procedimento de Alta Complexidade (PAC)**, com cobertura para planos **hospitalares com/sem obstetrícia** e **plano referência**. ([gov.br](https://www.gov.br/ans/pt-br/arquivos/assuntos/consumidor/o-que-seu-plano-deve-cobrir/Anexo_I_Rol_2021RN_465.2021_RN473_RN478_RN480_RN513_RN536_RN537_RN538_RN539.pdf/%40%40download/file/Anexo_I_Rol_2021RN_465.2021_RN473_RN478_RN480_RN513_RN536_RN537_RN538_RN539.pdf))\n\nPela DUT 58, a cobertura é obrigatória em situações como: **doença descompressiva**, **embolia gasosa/traumática pelo ar**, **intoxicação por monóxido de carbono ou fumaça**, **envenenamento por gás cianídrico/sulfídrico**, **gangrena gasosa**, **síndrome de Fournier**, **fasciites/celulites/miosites necrotizantes** com gravidade definida, **isquemias traumáticas agudas/lesão por esmagamento/síndrome compartimental/reimplante de extremidades**, algumas **úlceras diabéticas infectadas profundas** sem resposta ao tratamento convencional por pelo menos 1 mês, além de alguns casos de **osteorradionecrose de mandíbula**, **cistite actínica** e **retite/proctite actínica** conforme critérios específicos. ([gov.br](https://www.gov.br/ans/pt-br/acesso-a-informacao/participacao-da-sociedade/atualizacao-do-rol-de-procedimentos/Anexo_II_DUT_2021_RN_465.2021_RN610.pdf))\n\n**Atenção:** se for pedido para “cicatrização pós-cirurgia estética”, “bem-estar”, “performance”, ou indicação fora dos critérios da DUT, o plano costuma negar. Ainda assim, em situações fora do Rol/DUT pode haver discussão se houver prescrição, plano terapêutico e evidência científica nos termos da Lei 14.454/2022, mas isso pode exigir recurso/ANS/medida judicial. ([planalto.gov.br](https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2022/lei/l14454.htm?utm_source=openai))\n\n## 2) Como pedir a autorização — passo a passo\n\n**1. Peça um relatório médico bem completo.**  \nO relatório deve conter, idealmente:\n\n- diagnóstico e **CID**;\n- justificativa da oxigenoterapia hiperbárica;\n- enquadramento na **DUT 58 da ANS**, se aplicável;\n- gravidade do caso e risco de atraso;\n- tratamentos já realizados e falha/insuficiência deles;\n- número estimado de sessões, frequência e urgência;\n- exames, fotos da lesão, laudos de cirurgia/curativos, cultura, doppler, relatório de infectologia/vascular etc., se houver.\n\n**2. Solicite à operadora por canal com protocolo.**  \nUse app, portal, e-mail, WhatsApp oficial ou atendimento telefônico. Guarde:\n\n- número do protocolo;\n- data e hora;\n- cópia dos documentos enviados;\n- nome do atendente ou comprovante de upload.\n\n**3. Peça indicação de prestador credenciado.**  \nSe o plano disser que não tem clínica/câmara hiperbárica na rede, peça por escrito que ele **garanta o atendimento** em prestador apto dentro da área de abrangência do plano. A ANS informa que a operadora deve garantir acesso aos procedimentos de cobertura obrigatória dentro da área do plano. ([gov.br](https://www.gov.br/ans/pt-br/assuntos/consumidor/prazos-maximos-de-atendimento?utm_source=openai))\n\n**4. Observe os prazos.**  \nComo a oxigenoterapia hiperbárica é marcada como **PAC**, o prazo máximo de atendimento costuma ser de **até 21 dias úteis**; em casos de **urgência/emergência**, o atendimento deve ser **imediato**. A ANS também prevê prazo de resposta da operadora em solicitações de PAC/internação eletiva. ([gov.br](https://www.gov.br/ans/pt-br/assuntos/consumidor/prazos-maximos-de-atendimento?utm_source=openai))\n\n## 3) Se o plano negar ou enrolar\n\nPeça a **negativa por escrito**, com o motivo detalhado. As regras atuais exigem que a operadora esclareça por escrito as razões da negativa de cobertura. ([agenciagov.ebc.com.br](https://agenciagov.ebc.com.br/noticias/202507/ans-tem-novas-regras-para-o-relacionamento-entre-operadoras-e-beneficiarios?utm_source=openai))\n\nDepois, faça reclamação na **ANS** com:\n\n- protocolo do plano;\n- pedido médico;\n- relatório/laudos;\n- negativa por escrito, se houver;\n- carteirinha e dados do plano.\n\nA ANS orienta que a reclamação seja registrada quando houver negativa de cobertura ou impedimento de acesso, informando o número de protocolo da operadora; reclamações de cobertura têm prazo de resposta pela operadora no fluxo da ANS. ([gov.br](https://www.gov.br/pt-br/servicos/receber-reclamacoes-sobre-possiveis-praticas-irregulares-de-operadoras-de-planos-privados-de-assistencia-a-saude-inclusive-administradoras-de-beneficios?id=9285&origem=servico&utm_source=openai))\n\n## Modelo curto de pedido ao plano\n\n> Solicito autorização/custeio de **OXIGENOTERAPIA HIPERBÁRICA**, conforme prescrição e relatório médico anexos, em razão do diagnóstico **[CID/diagnóstico]**, com indicação clínica enquadrada na **DUT nº 58 da ANS**. Solicito também a indicação de prestador credenciado habilitado ou, na ausência de rede disponível, a garantia de atendimento em prestador apto, sem ônus adicional. Peço resposta por escrito, com número de protocolo.\n\nSe você me disser **qual é o diagnóstico/indicação** — por exemplo, úlcera diabética, Fournier, radioterapia, ferida cirúrgica, infecção necrotizante etc. — eu posso te ajudar a montar um pedido mais específico e ver quais pontos da DUT precisam aparecer no laudo."
+ },
+ {
+  "pergunta": "Como escolher uma clínica de câmara hiperbárica em Brasília?",
+  "tipo": "como fazer",
+  "publico": "paciente",
+  "ia": "ChatGPT (gpt-5.5 com busca, API)",
+  "data": "2026-10-15",
+  "bmh_citada": true,
+  "posicao_aprox": 10,
+  "link_bmh": true,
+  "dominios": [
+   "sbmh.com.br",
+   "portal.cfm.org.br",
+   "crmvirtual.cfm.org.br",
+   "gov.br",
+   "sinj.df.gov.br",
+   "hiperbaricabrasilia.com.br"
+  ],
+  "urls": [
+   "https://sbmh.com.br/app/uploads/2020/03/DUT-OHB-2019.pdf",
+   "https://portal.cfm.org.br/?page_id=156910",
+   "https://crmvirtual.cfm.org.br/DF/servico/pesquisar-por-medico?utm_source=openai",
+   "https://sbmh.com.br/clinicas-medicos/",
+   "https://www.gov.br/hfa/pt-br/arquivos-para-organizar/medicina-hiperbarica",
+   "https://www.gov.br/anvisa/pt-br/setorregulado/regularizacao/produtos-para-saude/notas-tecnicas/nota-tecnica-gquip-no-01-de-2008.pdf?utm_source=openai",
+   "https://www.sinj.df.gov.br/sinj/Norma/4c3fdab09bcf49e1ae31c20287dcdc13/ses_seas_svs_divisa_int_03_2026.html?utm_source=openai",
+   "https://www.gov.br/hfa/pt-br/arquivos-para-organizar/medicina-hiperbarica",
+   "https://hiperbaricabrasilia.com.br/"
+  ],
+  "texto": "Para escolher uma **clínica de câmara hiperbárica em Brasília**, eu usaria um critério bem prático: **indicação médica correta + equipe qualificada + segurança operacional + logística**.\n\n## 1) Confirme se a indicação faz sentido para o seu caso\n\nA oxigenoterapia hiperbárica — OHB — é a respiração de oxigênio em ambiente pressurizado dentro de câmara hiperbárica; no Brasil, a indicação é de **competência médica** e deve seguir indicações reconhecidas, como doença descompressiva, intoxicação por monóxido de carbono, gangrena gasosa/Síndrome de Fournier, infecções necrotizantes, lesões por esmagamento/isquemia traumática, queimaduras, feridas refratárias — incluindo pé diabético — lesões por radioterapia, retalhos/enxertos comprometidos, osteomielite e anemia aguda quando transfusão é impossível. ([sbmh.com.br](https://sbmh.com.br/app/uploads/2020/03/DUT-OHB-2019.pdf))\n\n**Desconfie** de clínicas que vendem a câmara como “tratamento milagroso”, “anti-idade”, “detox”, “aumenta imunidade”, “cura autismo”, “emagrece” ou “pós-operatório para qualquer cirurgia” sem avaliação médica individual. A pergunta certa é: **“Qual é a indicação formal no meu caso e qual protocolo será usado?”**\n\n## 2) Verifique CRM, RQE e experiência em medicina hiperbárica\n\nAntes de marcar, peça o nome do **médico responsável técnico**, CRM-DF e, se ele se anuncia como especialista/área de atuação, o **RQE**. O CFM orienta que o RQE reconhece oficialmente a qualificação registrada no CRM e habilita o médico a anunciar especialidade/área de atuação; a página do CFM também lista “Medicina Marítima e Hiperbárica” entre áreas de atuação. ([portal.cfm.org.br](https://portal.cfm.org.br/?page_id=156910))\n\nEm Brasília, você pode checar o médico no serviço oficial de busca do CRM-DF/CFM, que permite pesquisar por nome ou CRM+UF. ([crmvirtual.cfm.org.br](https://crmvirtual.cfm.org.br/DF/servico/pesquisar-por-medico?utm_source=openai)) Também vale consultar o diretório da Sociedade Brasileira de Medicina Hiperbárica, que informa clínicas e médicos filiados por estado/cidade. ([sbmh.com.br](https://sbmh.com.br/clinicas-medicos/))\n\n## 3) Exija avaliação médica antes de entrar na câmara\n\nUma boa clínica deve fazer **consulta/avaliação inicial**, revisar o relatório do seu médico assistente, avaliar contraindicações e explicar riscos comuns, como desconforto no ouvido, claustrofobia, barotrauma e intercorrências respiratórias. O Hospital de Força Aérea de Brasília, por exemplo, informa que o paciente deve apresentar encaminhamento com relatório detalhado do médico assistente e que o paciente é avaliado clinicamente pelo médico hiperbárico antes do início do tratamento. ([gov.br](https://www.gov.br/hfa/pt-br/arquivos-para-organizar/medicina-hiperbarica))\n\nPergunte:  \n- “Quem me avalia antes da primeira sessão?”  \n- “Há médico presente durante as sessões?”  \n- “Como vocês lidam com dor de ouvido, falta de ar, ansiedade ou queda de glicemia?”  \n- “Meu médico assistente receberá relatório de evolução?”\n\n## 4) Segurança: equipamento, licença e equipe durante a sessão\n\nA câmara hiperbárica é equipamento médico de risco, então pergunte se a clínica tem **licenciamento sanitário**, plano de manutenção, registro do equipamento, protocolos de emergência, treinamento da equipe e normas rígidas contra materiais inflamáveis dentro da câmara. A Anvisa já orientou que fabricantes de câmaras hiperbáricas só devem comercializar equipamentos com requisitos como registro, AFE e boas práticas aplicáveis a produtos médicos. ([gov.br](https://www.gov.br/anvisa/pt-br/setorregulado/regularizacao/produtos-para-saude/notas-tecnicas/nota-tecnica-gquip-no-01-de-2008.pdf?utm_source=openai)) No DF, o licenciamento sanitário é o documento que autoriza funcionamento de atividade específica sob vigilância sanitária, emitido prioritariamente pelo sistema RLE/Redesim ou, em exceções, via SEI. ([sinj.df.gov.br](https://www.sinj.df.gov.br/sinj/Norma/4c3fdab09bcf49e1ae31c20287dcdc13/ses_seas_svs_divisa_int_03_2026.html?utm_source=openai))\n\n**Sinal positivo:** a clínica explicar claramente o preparo: roupas permitidas, proibição de eletrônicos/cremes/perfumes inflamáveis, conduta em caso de intercorrência e monitoramento durante a sessão.\n\n## 5) Compare logística: muitas vezes são sessões diárias\n\nA OHB costuma exigir várias sessões; por isso, localização, horários e continuidade importam muito. Em Brasília, há serviço no HFA com sessões de segunda a sexta, e o próprio HFA descreve sessões em câmara monoplace ou multiplace, com duração aproximada de 100 minutos. ([gov.br](https://www.gov.br/hfa/pt-br/arquivos-para-organizar/medicina-hiperbarica)) Uma clínica privada local, a Brasília Medicina Hiperbárica, informa unidades na Asa Sul e em Taguatinga, câmaras mono e multiplace, atendimento diário das 7h às 19h e médico na unidade durante as sessões; isso não é recomendação, mas é um exemplo de informação que você deve procurar em qualquer serviço. ([hiperbaricabrasilia.com.br](https://hiperbaricabrasilia.com.br/))\n\n## 6) Perguntas que eu faria antes de escolher\n\n1. **Qual é a indicação médica no meu caso?** Está entre as indicações reconhecidas?  \n2. **Quem é o médico responsável técnico?** Qual CRM e RQE?  \n3. **Há médico presente durante toda a sessão ou apenas à distância?**  \n4. **A câmara é monoplace ou multiplace?** Qual é melhor para meu caso?  \n5. **Qual protocolo será usado?** Pressão, duração, número estimado de sessões e critérios de reavaliação.  \n6. **Vocês emitem relatório para meu cirurgião, vascular, infectologista ou endocrinologista?**  \n7. **A clínica tem licenciamento sanitário e manutenção documentada da câmara?**  \n8. **Meu plano cobre?** Quais documentos o convênio exige?  \n9. **O que acontece se eu tiver dor de ouvido, ansiedade, hipoglicemia ou falta de ar?**  \n10. **Quais são os sinais de que devo ir ao hospital em vez de fazer sessão ambulatorial?**\n\n## 7) Regra prática de decisão\n\nEu escolheria a clínica que cumprir melhor estes pontos:\n\n**Obrigatórios:** indicação médica clara, médico responsável identificável, avaliação prévia, equipe treinada, licenciamento sanitário, equipamento regular e protocolo de emergência.  \n**Desejáveis:** filiação/participação em sociedade da área, boa comunicação com seu médico assistente, facilidade de acesso, horários compatíveis e transparência com custos/convênio.  \n**Evitar:** promessa de cura, pacote vendido sem avaliação, ausência de médico, falta de CRM/RQE, propaganda exagerada ou dificuldade em responder perguntas de segurança.\n\nSe o seu caso for **intoxicação por fumaça/monóxido de carbono, acidente de mergulho, infecção grave, Fournier, esmagamento/isquemia aguda ou piora rápida de ferida**, não trate como “marcação de clínica”: procure **emergência hospitalar** imediatamente."
+ }
+]

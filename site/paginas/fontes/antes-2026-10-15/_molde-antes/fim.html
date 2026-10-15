@@ -1,0 +1,40 @@
+<div id="cirurgioes" class="bmh-cir"><div class="bmh-w">
+<p><b>É cirurgião?</b> Encaminhe o seu paciente pelo WhatsApp. A avaliação médica confirma a indicação e define as sessões, na unidade mais perto dele.</p>
+<a class="bmh-btn bmh-btn--line bmh-whatsapp" href="{{wa:cirurgiao}}">Encaminhar um paciente</a>
+</div></div>
+
+<section class="bmh-final"><div class="bmh-w">
+<div>
+<h2>Agende a sua avaliação</h2>
+<p>Na Asa Sul ou em Taguatinga, todos os dias, das 7h às 19h.</p>
+</div>
+<a class="bmh-btn bmh-btn--oxy bmh-whatsapp" href="{{wa:geral}}">{{svg:wa}}Agendar pelo WhatsApp</a>
+</div></section>
+
+<footer class="bmh-foot"><div class="bmh-w">
+<img class="bmh-foot__logo" src="{{img:bmh-logo-branco.png}}" alt="BMH" width="300" height="156" loading="lazy">
+<div class="bmh-foot__g">
+<div><strong>Brasília Medicina Hiperbárica</strong><br>Em Brasília desde 2004<br>CNPJ 07.091.027/0001-86</div>
+<div><strong>Asa Sul</strong><br>SGAS 613, Conj. E, Bloco A, 1º subsolo<br>L2 Sul · CEP 70200-730</div>
+<div><strong>Taguatinga</strong><br>Prime Excelência Médica, Torre D, Lojas 2 a 5<br>Setor C Norte · CEP 72115-700</div>
+<div><strong>Contato</strong><br><a class="bmh-telefone" href="tel:+556133466005">(61) 3346-6005</a><br><a href="mailto:contato@hiperbaricabrasilia.com.br">contato@hiperbaricabrasilia.com.br</a><br><a href="https://www.instagram.com/hiperbaricabrasilia/" target="_blank" rel="noopener me">Instagram @hiperbaricabrasilia</a></div>
+</div>
+<p class="bmh-foot__legal">Responsáveis técnicos: Asa Sul, Dr. Hélio Ivan, CRM-DF 8164, RQE 26705 · Taguatinga, Dr. Alberto Jorge, CRM-DF 7248, RQE 14575 · Diretor médico: Dr. Jorge Madeiro, CRM-DF 31687, RQE 26863 · <a href="/politica-de-privacidade/">Política de privacidade</a></p>
+</div></footer>
+
+<div class="bmh-fix" id="bmh-fix">
+<a class="bmh-btn bmh-btn--navy bmh-whatsapp" href="{{wa:geral}}">{{svg:wa}}Agendar pelo WhatsApp</a>
+<a class="bmh-tel bmh-telefone" href="tel:+556133466005" aria-label="Ligar para a BMH">{{svg:tel}}</a>
+</div>
+
+</div>
+<script>
+(function () {
+  /* barra fixa do celular: aparece depois de rolar um pouco */
+  var fix = document.getElementById('bmh-fix');
+  if (!fix) { return; }
+  var confere = function () { if (window.scrollY > 500) { fix.classList.add('bmh-fix--on'); } else { fix.classList.remove('bmh-fix--on'); } };
+  window.addEventListener('scroll', confere, { passive: true });
+  confere();
+})();
+</script>

@@ -1,1 +1,2 @@
 5
+8  BMH · nota do Google (site/codigo/nota-google.php.modelo; a chave do n8n entra no envio)

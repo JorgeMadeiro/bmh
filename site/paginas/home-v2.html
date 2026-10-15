@@ -44,6 +44,12 @@ body{background:#fff}
 .bmh-link:after{content:" \2192";color:var(--oxyt)}
 /* ---------- cabeçalho ---------- */
 .bmh-head{background:#fff;border-bottom:1px solid var(--line);position:relative;z-index:5}
+/* mês temático: só vale com a classe no <html> (script do cabeçalho); linha no topo, laço ao lado do nome e etiquetas das
+   seções claras na cor do mês. Botões e cores de marca não mudam. */
+.bmh-laco{display:none}
+.bmh-mes-tematico .bmh-head::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:linear-gradient(90deg,var(--bmh-mes-claro),var(--bmh-mes) 50%,var(--bmh-mes-claro))}
+.bmh-mes-tematico .bmh-laco{display:inline-flex;align-self:center;margin-left:2px}
+.bmh-mes-tematico .bmh .bmh-sec .bmh-eye{color:var(--bmh-mes-etiqueta)}
 .bmh-head .bmh-w{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:62px}
 .bmh-logo{display:flex;align-items:center;gap:10px;color:var(--navy)}
 .bmh-logo img{width:64px;height:34px;object-fit:contain}
@@ -75,6 +81,9 @@ body{background:#fff}
 .bmh-provas .bmh-w>div:last-child{border-bottom:0}
 .bmh-provas b{display:block;font-size:20px;font-weight:800;color:var(--navy);line-height:1.2}
 .bmh-provas span{display:block;font-size:15px;color:var(--muted);margin-top:2px}
+/* nota do Google (snippet "BMH · nota do Google", 14/10/2026) */
+.bmh .bmh-uni__nota{margin-top:10px;font-size:15px}
+.bmh .bmh-uni__nota a{color:var(--navy);font-weight:700;text-decoration:none}
 /* ---------- qual é o seu caso ---------- */
 .bmh-tri{display:grid;gap:10px;margin-top:22px}
 .bmh-tri a{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:60px;padding:0 20px;background:#fff;border:1px solid #C9D6E3;border-radius:8px;color:var(--navy);font-weight:700;font-size:17px}
@@ -156,6 +165,8 @@ body{background:#fff}
 .bmh-foot__g{display:grid;gap:16px}
 .bmh-foot__g>div{min-width:0;overflow-wrap:anywhere;line-height:1.6}
 .bmh .bmh-foot__legal{margin-top:20px;padding-top:14px;border-top:1px solid #1B2C55;font-size:13px}
+.bmh .bmh-foot__links{margin-top:22px;font-size:14px;line-height:1.9}
+.bmh .bmh-foot__links a{color:inherit;text-decoration:underline;text-underline-offset:3px}
 /* barra fixa: aparece depois que o botão do topo sai da tela */
 .bmh-fix{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;gap:10px;padding:10px 16px 14px;background:#fff;border-top:1px solid var(--line);box-shadow:0 -6px 18px rgba(0,20,63,.10);transform:translateY(110%);transition:transform .25s}
 .bmh-fix.bmh-fix--on{transform:none}
@@ -179,7 +190,7 @@ body{background:#fff}
   .bmh .bmh-hero__ctas{flex-direction:row;align-items:center;gap:28px;margin-top:34px}
   .bmh-hero__ctas .bmh-btn{width:auto;flex:none;white-space:nowrap}
   .bmh-hero__foto{margin-top:0}
-  .bmh-provas .bmh-w{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .bmh-provas .bmh-w{grid-template-columns:repeat(4,minmax(0,1fr))}
   .bmh-provas .bmh-w>div{padding:28px 28px 28px 0;border-bottom:0}
   .bmh-provas .bmh-w>div+div{padding-left:28px;border-left:1px solid var(--line)}
   .bmh-provas b{font-size:24px}
@@ -214,7 +225,7 @@ body{background:#fff}
 }
 @media (min-width:1180px){
   .bmh-menu{display:none}
-  .bmh-nav{display:flex;flex-wrap:nowrap;align-items:center;gap:22px;white-space:nowrap}
+  .bmh-nav{display:flex;flex-wrap:nowrap;align-items:center;gap:20px;white-space:nowrap}
   .bmh-nav a{color:var(--ink);font-weight:600;font-size:15px}
   .bmh-nav a.bmh-btn{min-height:46px;padding:0 20px;color:#fff}
 }
@@ -222,11 +233,18 @@ body{background:#fff}
 
 <div class="bmh">
 
+<!-- Mês temático (15/10/2026, Jorge: "pode fazer de todos os meses já"): só cor, sem texto novo. No dia 1º de cada mês liga
+     a classe bmh-mes-tematico e as cores da campanha do mês (hora de Brasília). Mudar campanha ou cor = mudar esta tabela
+     (molde _molde/cabecalho.html e home-v2.html) e reenviar as páginas. Contraste das etiquetas conferido (mínimo 5,2). -->
+<script>(function(){try{var T={1:['#9E9E9E','#E0E0E0','#616161'],2:['#6A1B9A','#CE93D8','#6A1B9A'],3:['#8E44AD','#D7BDE2','#7D3C98'],4:['#29B6F6','#B3E5FC','#01579B'],
+5:['#F9A825','#FFE082','#8A5A00'],6:['#E53935','#EF9A9A','#B71C1C'],7:['#F9A825','#FFE082','#8A5A00'],8:['#C9A227','#F1DE9B','#735A0A'],9:['#F9A825','#FFE082','#8A5A00'],
+10:['#E91E63','#F48FB1','#C2185B'],11:['#1E88E5','#90CAF9','#1565C0'],12:['#C62828','#EF9A9A','#B71C1C']};var m=new Date(Date.now()-3*3600*1000).getUTCMonth()+1,c=T[m];if(!c)return;
+var r=document.documentElement;r.classList.add('bmh-mes-tematico');r.style.setProperty('--bmh-mes',c[0]);r.style.setProperty('--bmh-mes-claro',c[1]);r.style.setProperty('--bmh-mes-etiqueta',c[2])}catch(e){}})();</script>
 <header class="bmh-head"><div class="bmh-w">
-<a class="bmh-logo" href="/"><img src="{{img:bmh-logo.png}}" alt="BMH" width="300" height="159"><span>Brasília Medicina Hiperbárica<small>desde 2004</small></span></a>
+<a class="bmh-logo" href="/"><img src="{{img:bmh-logo.png}}" alt="BMH" width="300" height="159"><span>Brasília Medicina Hiperbárica<small>desde 2004</small></span><span class="bmh-laco" aria-hidden="true"><svg viewBox="0 0 24 36" width="16" height="24" focusable="false"><path fill="var(--bmh-mes,#E91E63)" d="M12 2c-3.3 0-5.5 2.6-5.5 5.6 0 2.3 1.2 4.6 2.8 7.1L3 30l4.2 1.8 4.8-10.6 4.8 10.6L21 30l-6.3-15.3c1.6-2.5 2.8-4.8 2.8-7.1C17.5 4.6 15.3 2 12 2zm0 3.2c1.4 0 2.3 1.1 2.3 2.5 0 1.3-.9 3-2.3 5.2-1.4-2.2-2.3-3.9-2.3-5.2 0-1.4.9-2.5 2.3-2.5z"/></svg></span></a>
 <nav class="bmh-nav" aria-label="Principal">
 <a href="/pos-operatorio-cirurgia-plastica/">Pós-operatório</a>
-<a href="#como-funciona">Como funciona</a>
+<a href="/feridas-que-nao-cicatrizam/">Feridas</a>
 <a href="/hiperbarica-asa-sul/">Asa Sul</a>
 <a href="/hiperbarica-taguatinga/">Taguatinga</a>
 <a href="/convenios/">Convênios</a>
@@ -240,6 +258,8 @@ body{background:#fff}
 <a href="/hiperbarica-asa-sul/">Unidade Asa Sul</a>
 <a href="/hiperbarica-taguatinga/">Unidade Taguatinga</a>
 <a href="/convenios/">Convênios</a>
+<a href="/feridas-que-nao-cicatrizam/">Feridas e pé diabético</a>
+<a href="/equipe-medica/">Equipe médica</a>
 <a href="/perguntas-frequentes/">Perguntas frequentes</a>
 <a class="bmh-btn bmh-btn--navy bmh-whatsapp" href="{{wa:geral}}">{{svg:wa}}Agendar pelo WhatsApp</a>
 </nav></details>
@@ -265,6 +285,7 @@ body{background:#fff}
 <div><b>Desde 2004</b><span>a primeira clínica particular de medicina hiperbárica de Brasília</span></div>
 <div><b>Médico em todas as sessões</b><span>presente na unidade, do início ao fim</span></div>
 <div><b>50 convênios</b><span>a recepção confere o seu pelo WhatsApp</span></div>
+<div><b>[bmh_nota_google unidade="asa-sul" padrao="4,8"] e [bmh_nota_google unidade="taguatinga" padrao="4,9"] no Google</b><span>nota da Asa Sul e de Taguatinga, em [bmh_nota_google unidade="todas" campo="total" padrao="262"] avaliações</span></div>
 </div></div>
 
 <section id="seu-caso" class="bmh-sec bmh-mist"><div class="bmh-w">
@@ -377,6 +398,7 @@ body{background:#fff}
 <div class="bmh-uni__b">
 <h3><a href="/hiperbarica-asa-sul/">Asa Sul</a></h3>
 <p>SGAS 613, Conjunto E, Bloco A, 1º subsolo<br>Complexo Médico Hospitalar, L2 Sul · CEP 70200-730</p>
+<p class="bmh-uni__nota"><a href="https://search.google.com/local/reviews?placeid=ChIJJXS9NUUlWpMRlYawN2nXqeA" target="_blank" rel="noopener">★ [bmh_nota_google unidade="asa-sul" padrao="4,8"] no Google · [bmh_nota_google unidade="asa-sul" campo="total" padrao="192"] avaliações</a></p>
 <div class="bmh-two">
 <a class="bmh-btn bmh-btn--navy bmh-whatsapp" href="{{wa:asasul}}">Agendar na Asa Sul</a>
 <a class="bmh-btn bmh-btn--line bmh-rota" href="https://www.google.com/maps/search/?api=1&query=SGAS+613+Conjunto+E+Bloco+A+Asa+Sul+Bras%C3%ADlia+DF" target="_blank" rel="noopener">Como chegar</a>
@@ -387,7 +409,8 @@ body{background:#fff}
 <img src="{{img:bmh-fachada-taguatinga.jpg}}" alt="Fachada da unidade Taguatinga da BMH" width="1000" height="837" loading="lazy" style="object-position:center 45%">
 <div class="bmh-uni__b">
 <h3><a href="/hiperbarica-taguatinga/">Taguatinga</a></h3>
-<p>Prédio Prime Excelência Médica, Torre D<br>Setor C Norte, Taguatinga</p>
+<p>Prédio Prime Excelência Médica, Torre D, Lojas 2 a 5<br>Setor C Norte, Taguatinga · CEP 72115-700</p>
+<p class="bmh-uni__nota"><a href="https://search.google.com/local/reviews?placeid=ChIJxQ67LUozWpMRRY1izF8vR8Y" target="_blank" rel="noopener">★ [bmh_nota_google unidade="taguatinga" padrao="4,9"] no Google · [bmh_nota_google unidade="taguatinga" campo="total" padrao="70"] avaliações</a></p>
 <div class="bmh-two">
 <a class="bmh-btn bmh-btn--navy bmh-whatsapp" href="{{wa:taguatinga}}">Agendar em Taguatinga</a>
 <a class="bmh-btn bmh-btn--line bmh-rota" href="https://www.google.com/maps/search/?api=1&query=Prime+Excel%C3%AAncia+M%C3%A9dica+Torre+D+Taguatinga+DF" target="_blank" rel="noopener">Como chegar</a>
@@ -429,9 +452,10 @@ body{background:#fff}
 <div class="bmh-foot__g">
 <div><strong>Brasília Medicina Hiperbárica</strong><br>Em Brasília desde 2004<br>CNPJ 07.091.027/0001-86</div>
 <div><strong>Asa Sul</strong><br>SGAS 613, Conj. E, Bloco A, 1º subsolo<br>L2 Sul · CEP 70200-730</div>
-<div><strong>Taguatinga</strong><br>Prime Excelência Médica, Torre D<br>Setor C Norte</div>
+<div><strong>Taguatinga</strong><br>Prime Excelência Médica, Torre D, Lojas 2 a 5<br>Setor C Norte · CEP 72115-700</div>
 <div><strong>Contato</strong><br><a class="bmh-telefone" href="tel:+556133466005">(61) 3346-6005</a><br><a href="mailto:contato@hiperbaricabrasilia.com.br">contato@hiperbaricabrasilia.com.br</a><br><a href="https://www.instagram.com/hiperbaricabrasilia/" target="_blank" rel="noopener me">Instagram @hiperbaricabrasilia</a></div>
 </div>
+<p class="bmh-foot__links"><a href="/pos-operatorio-cirurgia-plastica/">Pós-operatório</a> · <a href="/feridas-que-nao-cicatrizam/">Feridas e pé diabético</a> · <a href="/convenios/">Convênios</a> · <a href="/equipe-medica/">Equipe médica</a> · <a href="/perguntas-frequentes/">Perguntas frequentes</a> · <a href="/hiperbarica-asa-sul/">Unidade Asa Sul</a> · <a href="/hiperbarica-taguatinga/">Unidade Taguatinga</a></p>
 <p class="bmh-foot__legal">Responsáveis técnicos: Asa Sul, Dr. Hélio Ivan, CRM-DF 8164, RQE 26705 · Taguatinga, Dr. Alberto Jorge, CRM-DF 7248, RQE 14575 · Diretor médico: Dr. Jorge Madeiro, CRM-DF 31687, RQE 26863 · <a href="/politica-de-privacidade/">Política de privacidade</a></p>
 </div></footer>
 

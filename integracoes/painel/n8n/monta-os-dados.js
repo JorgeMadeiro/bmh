@@ -37,7 +37,11 @@ const orgLinhas = (ini, fi, ori) => { const m = {}; const k = (d, cn) => (m[d + 
 const tot = (ini, fi) => { const t = {}; for (const r of org) { if (!entre(r.dia, ini, fi)) continue; const kk = r.fonte + '.' + r.metrica; t[kk] = (t[kk] || 0) + num(r.valor); } return t; };
 const visitas = t => Object.entries(t).filter(([k]) => /^site_.*\.sessoes$/.test(k)).reduce((s, [, v]) => s + v, 0);
 const TA = tot(P.inicio, P.fim), TB = tot(P.ant.inicio, P.ant.fim);
-const organico_tot = { atual: TA, anterior: TB, ate_fonte: {}, seguidores: null, medido_desde: org.map(r => r.dia).sort()[0] || '', perfil_desde: '' };
+// Perfil do Google chega com uns 3 dias de atraso: "dados até" e a comparação com os mesmos dias antes (como na Nexo)
+const pg = org.filter(r => r.fonte === 'perfil_google').map(r => r.dia).sort(), pgAte = pg[pg.length - 1] || '';
+const organico_tot = { atual: TA, anterior: TB, ate_fonte: pgAte ? { perfil_google: pgAte } : {}, seguidores: null, medido_desde: org.map(r => r.dia).sort()[0] || '', perfil_desde: pg[0] || '' };
+if (pgAte && pgAte < P.fim) { const n = Math.round((Date.parse(pgAte) - Date.parse(P.inicio)) / 864e5); const fimAnt = new Date(Date.parse(P.ant.inicio) + n * 864e5).toISOString().slice(0, 10);
+  const tb = tot(P.ant.inicio, fimAnt); for (const k of Object.keys(TB)) if (/^perfil_google/.test(k)) TB[k] = tb[k] || 0; }
 // ---------- horas, contatos sem anúncio por dia, iGut ----------
 const grade = Array.from({ length: 7 }, () => Array(24).fill(0)); let totalH = 0;
 for (const r of hor) { if (!entre(r.dia, P.inicio, P.fim)) continue; const ds = num(r.dia_semana) - 1, h = num(r.hora); if (ds < 0 || ds > 6 || h < 0 || h > 23) continue; grade[ds][h] += num(r.cliques); totalH += num(r.cliques); }
@@ -64,7 +68,7 @@ return [{ json: {
     'Botões por caso e por lugar (evento clique_whatsapp) medidos desde 08/10/2026; o painel conta o clique do Analytics, que tem histórico.',
     'Telefone pelo site medido desde 08/10/2026; antes, só as ligações feitas pelo anúncio.',
     'Teto: média do investimento mensal dos últimos 12 meses (out/2025 a set/2026, R$ 3.641), arredondada para R$ ' + teto.toLocaleString('pt-BR') + '.',
-    'Atendidos e receita entram com o iGut. Meta e Instagram, quando o token sair. Perfil do Google, quando o Google aprovar o acesso.',
+    'Atendidos e receita entram com o iGut. Meta e Instagram, quando o token sair. Perfil do Google pela API do Perfil da Empresa desde 14/10/2026 (aprovação do Google), com o histórico que ela guarda.',
     'Números gravados todo dia às 6h10 (BMH · Painel · grava o dia); a página só lê.',
   ],
 } }];

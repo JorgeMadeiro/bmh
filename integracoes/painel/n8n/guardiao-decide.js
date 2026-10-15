@@ -1,7 +1,7 @@
 // Guardião dos anúncios da BMH (08/10/2026), adaptado do guardião da Nexo (fluxo 7Fd3ceQbmAz0Przl). Só Google Ads por
 // enquanto. Lê a conta, aplica as regras e devolve uma linha por ação; quem aplica é o nó seguinte, e só no modo real
 // de cada regra (BMH_config: guardiao_modo_teto, guardiao_modo_pausa; padrão "simulacao").
-// Regras: (1) grupo com R$ 40 em 3 dias sem contato → pausa; (2) orçamento que leva o mês acima do teto → corta na mesma
+// Regras: (1) grupo com R$ 40 em 3 dias sem contato → pausa (menos campanha em teste até a data, EM_TESTE); (2) orçamento que leva o mês acima do teto → corta na mesma
 // proporção (teto atingido → pausa as campanhas); (3) anúncio reprovado → avisa; (4) alteração feita por outra pessoa
 // (ex.: a agência) ontem → avisa; erro de API → avisa. Nunca sobe orçamento: só avisa quando está abaixo do teto.
 const Q = $('Quando').first().json;
@@ -17,10 +17,12 @@ const busca = async q => { let out = [], pt; do { const r = await this.helpers.h
 const custo = l => l.reduce((s, x) => s + Number(x.metrics.costMicros || 0) / 1e6, 0);
 try {
   if (!token) throw new Error('sem acesso (token) do Google Ads');
-  // (1) grupos que gastaram R$ 40 em 3 dias sem contato
-  const grupos = await busca(`SELECT ad_group.resource_name, ad_group.name, campaign.name, metrics.cost_micros, metrics.conversions FROM ad_group WHERE segments.date BETWEEN '${Q.d3}' AND '${Q.ontem}' AND ad_group.status = 'ENABLED' AND campaign.status = 'ENABLED'`);
+  // (1) grupos que gastaram R$ 40 em 3 dias sem contato. Campanha em teste com régua própria fica de fora até a data
+  // (Jorge, 15/10/2026: concorrentes seguem a régua do Bruno, decidir com ~30 cliques ou em 05/11; sem aviso diário antes)
+  const EM_TESTE = { '24333599216': '2026-11-05' };
+  const grupos = await busca(`SELECT ad_group.resource_name, ad_group.name, campaign.id, campaign.name, metrics.cost_micros, metrics.conversions FROM ad_group WHERE segments.date BETWEEN '${Q.d3}' AND '${Q.ontem}' AND ad_group.status = 'ENABLED' AND campaign.status = 'ENABLED'`);
   const gAgg = {};
-  for (const x of grupos) { const k = x.adGroup.resourceName; (gAgg[k] ||= { nome: x.campaign.name + ' › ' + x.adGroup.name, gasto: 0, conv: 0 }); gAgg[k].gasto += Number(x.metrics.costMicros || 0) / 1e6; gAgg[k].conv += Number(x.metrics.conversions || 0); }
+  for (const x of grupos) { if (EM_TESTE[x.campaign.id] && Q.ontem < EM_TESTE[x.campaign.id]) continue; const k = x.adGroup.resourceName; (gAgg[k] ||= { nome: x.campaign.name + ' › ' + x.adGroup.name, gasto: 0, conv: 0 }); gAgg[k].gasto += Number(x.metrics.costMicros || 0) / 1e6; gAgg[k].conv += Number(x.metrics.conversions || 0); }
   for (const [rn, g] of Object.entries(gAgg)) if (g.gasto >= LIM_GASTO && g.conv === 0)
     add({ regra: 'sem_contato_3_dias', tipo: 'grupo', alvo_id: rn, alvo: g.nome, acao: 'pausar', valor_antes: g.gasto.toFixed(2), detalhe: `${brl(g.gasto)} em 3 dias sem nenhum contato`, modo: MODO.pausa });
   // (2) teto do mês: projeção = gasto até ontem + orçamento diário × dias que faltam (com hoje)

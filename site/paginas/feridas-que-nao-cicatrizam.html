@@ -1,0 +1,496 @@
+<!-- wa-da-pagina: ferida -->
+<!-- BMH · página de feridas que não cicatrizam e pé diabético (fonte), RASCUNHO LOCAL de 15/10/2026. Não enviada ao WordPress.
+     Monta com scripts/montar-pagina.js. Endereço sugerido: /feridas-que-nao-cicatrizam/
+     Briefing: intenção conversão; ação principal "Falar sobre a minha ferida" ({{wa:ferida}}); secundária, o médico que
+     encaminha ({{wa:cirurgiao}}). Para quem: a pessoa com diabetes (ou o familiar) com ferida no pé, ou com ferida que não
+     fecha há semanas, vinda da busca ("câmara hiperbárica pé diabético", "ferida que não cicatriza") e do grupo "Feridas"
+     do anúncio. Fontes de cada frase clínica: marketing/conteudo/bmh-pagina-feridas-2026-10-15/fontes.md.
+     Sem promessa: a evidência é de certeza baixa (IWGDF 2023) e a câmara entra junto com o cuidado da ferida.
+     SEO: título "Câmara hiperbárica para feridas e pé diabético | BMH" (52); descrição no fontes.md. -->
+<link rel="preload" as="font" type="font/woff2" href="https://fonts.gstatic.com/s/librefranklin/v20/jizDREVItHgc8qDIbSTKq4XkRiUf2zcZiVbJ.woff2" crossorigin>
+<style>
+/* Letra declarada aqui, sem a folha do Google Fonts que travava a primeira tela. Se o Google mudar a versão (v20),
+   pegar o endereço novo em fonts.googleapis.com/css2?family=Libre+Franklin:wght@400..800&display=swap (bloco "latin"). */
+@font-face{font-family:'Libre Franklin';font-style:normal;font-weight:400 800;font-display:swap;src:url(https://fonts.gstatic.com/s/librefranklin/v20/jizDREVItHgc8qDIbSTKq4XkRiUf2zcZiVbJ.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+/* ---------- tema: some o cabeçalho, o rodapé e o título do Astra nesta página ---------- */
+.site-header,.site-footer,.ast-above-header-wrap,.ast-below-header-wrap,.ast-mobile-header-wrap,.entry-header,#masthead,#colophon{display:none!important}
+.site-content>.ast-container,.ast-container{max-width:none!important;padding:0!important;display:block!important}
+.site-content,#primary,.site-main,article.page,.entry-content{margin:0!important;padding:0!important;max-width:none!important;width:100%!important}
+.entry-content>.wp-block-html,.entry-content>*{margin:0!important;max-width:none!important}
+body{background:#fff}
+/* ---------- marca ---------- */
+.bmh{--navy:#002375;--deep:#00143F;--ink:#142033;--txt:#2B3850;--muted:#4A5568;--oxy:#34A9CF;--oxyt:#1A6E93;--mist:#EEF5FA;--line:#DCE5EE;--light:#9EDCF0;
+  font-family:'Libre Franklin',system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--ink);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.bmh *{box-sizing:border-box}
+.bmh a{color:var(--navy)}
+.bmh a,.bmh a:hover,.bmh a:focus,.bmh a:visited,.entry-content .bmh a{text-decoration:none!important;-webkit-text-decoration:none!important;box-shadow:none}
+.bmh img{max-width:100%;height:auto;display:block}
+/* o tema Astra pinta os títulos: as cores da BMH vencem com !important */
+.bmh h1,.bmh h2,.bmh h3{color:var(--navy)!important;font-family:'Libre Franklin',system-ui,-apple-system,'Segoe UI',sans-serif;letter-spacing:-.015em;margin:0;text-wrap:balance}
+.bmh h1,.bmh h2{font-weight:800!important}
+.bmh h3{font-weight:700!important}
+.bmh .bmh-hero h1,.bmh .bmh-final h2{color:#fff!important}
+.bmh p{margin:0}
+.bmh-w{max-width:1180px;margin:0 auto;padding:0 20px}
+.bmh-sec{padding:48px 0}
+.bmh-mist{background:var(--mist)}
+.bmh .bmh-eye{display:block;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--oxyt);margin:0 0 10px}
+.bmh-h2{font-size:30px;line-height:1.12}
+.bmh .bmh-lead{color:var(--txt);margin-top:14px}
+.bmh-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 24px;border-radius:999px;font-weight:700;font-size:17px;border:0;cursor:pointer;line-height:1.2;text-align:center}
+.bmh-btn svg{width:20px;height:20px;flex:none}
+.bmh-btn--navy{background:var(--navy);color:#fff!important}
+.bmh-btn--oxy{background:var(--oxy);color:var(--deep)!important}
+.bmh-btn--line{border:1px solid var(--navy);color:var(--navy)!important;background:#fff}
+.bmh .bmh-mais{margin-top:22px}
+.bmh-link{font-weight:700;color:var(--navy)}
+.bmh-link:after{content:" \2192";color:var(--oxyt)}
+/* ---------- cabeçalho ---------- */
+.bmh-head{background:#fff;border-bottom:1px solid var(--line);position:relative;z-index:5}
+/* mês temático: só vale com a classe no <html> (script do cabeçalho); linha no topo, laço ao lado do nome e etiquetas das
+   seções claras na cor do mês. Botões e cores de marca não mudam. */
+.bmh-laco{display:none}
+.bmh-mes-tematico .bmh-head::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:linear-gradient(90deg,var(--bmh-mes-claro),var(--bmh-mes) 50%,var(--bmh-mes-claro))}
+.bmh-mes-tematico .bmh-laco{display:inline-flex;align-self:center;margin-left:2px}
+.bmh-mes-tematico .bmh .bmh-sec .bmh-eye{color:var(--bmh-mes-etiqueta)}
+.bmh-head .bmh-w{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:62px}
+.bmh-logo{display:flex;align-items:center;gap:10px;color:var(--navy)}
+.bmh-logo img{width:64px;height:34px;object-fit:contain}
+.bmh-logo span{font-weight:600;font-size:14px;line-height:1.12;border-left:1px solid var(--line);padding-left:10px}
+.bmh-logo small{display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--oxyt)}
+.bmh-nav{display:none}
+.bmh-menu summary{list-style:none;cursor:pointer;width:44px;height:44px;border:1px solid var(--line);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--navy)}
+.bmh-menu summary::-webkit-details-marker{display:none}
+.bmh-menu nav{position:absolute;left:0;right:0;top:100%;background:#fff;border-bottom:1px solid var(--line);padding:8px 20px 20px;display:flex;flex-direction:column;box-shadow:0 12px 24px rgba(0,20,63,.10)}
+.bmh-menu nav a{padding:12px 0;border-bottom:1px solid var(--line);color:var(--ink);font-weight:600}
+.bmh-menu nav a.bmh-btn{margin-top:14px;border:0;color:#fff}
+/* ---------- topo ---------- */
+.bmh-hero{background:var(--deep);color:#fff}
+.bmh-hero .bmh-w{padding-top:36px;padding-bottom:32px}
+.bmh .bmh-onde{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--light);margin-bottom:14px}
+.bmh-hero h1{font-size:36px;line-height:1.06}
+.bmh .bmh-hero__sub{color:#C3D1EA;font-size:17px;margin-top:16px}
+.bmh .bmh-hero__ctas{display:flex;flex-direction:column;align-items:flex-start;gap:14px;margin-top:26px}
+.bmh-hero__ctas .bmh-btn{width:100%}
+.bmh-hero__ctas .bmh-link{color:#fff}
+.bmh-hero__ctas .bmh-link:after{color:var(--oxy)}
+.bmh .bmh-hero__hora{font-size:14px;color:#9FB2D3;margin-top:14px}
+.bmh-hero__foto{margin-top:28px}
+.bmh-hero__foto img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px}
+/* ---------- três provas ---------- */
+.bmh-provas{border-bottom:1px solid var(--line)}
+.bmh-provas .bmh-w{display:grid;gap:0}
+.bmh-provas .bmh-w>div{padding:18px 0;border-bottom:1px solid var(--line)}
+.bmh-provas .bmh-w>div:last-child{border-bottom:0}
+.bmh-provas b{display:block;font-size:20px;font-weight:800;color:var(--navy);line-height:1.2}
+.bmh-provas span{display:block;font-size:15px;color:var(--muted);margin-top:2px}
+/* ---------- qual é o seu caso ---------- */
+.bmh-tri{display:grid;gap:10px;margin-top:22px}
+.bmh-tri a{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:60px;padding:0 20px;background:#fff;border:1px solid #C9D6E3;border-radius:8px;color:var(--navy);font-weight:700;font-size:17px}
+.bmh-tri a:after{content:"\2192";color:var(--oxyt);font-size:20px}
+.bmh .bmh-tri__n{font-size:15px;color:var(--muted);margin-top:16px}
+.bmh-tri__n a{font-weight:700}
+/* ---------- pós-operatório ---------- */
+.bmh-pos{display:grid;gap:28px}
+.bmh .bmh-pos__ok{margin-top:18px;padding:14px 16px;background:var(--mist);border-radius:8px;font-size:16px;color:var(--txt)}
+.bmh-pos .bmh-btn{margin-top:24px}
+.bmh figure,.bmh .bmh-fig{margin:0}
+.bmh-fig img{width:100%;border-radius:8px;object-fit:cover}
+.bmh-fig figcaption{font-size:14px;color:var(--muted);margin-top:8px}
+.bmh-pos .bmh-fig img{aspect-ratio:4/5}
+/* ---------- como funciona ---------- */
+.bmh-steps{list-style:none;margin:24px 0 0;padding:0;display:grid;gap:12px}
+.bmh-steps li{display:flex;gap:14px;background:#fff;border-radius:8px;padding:18px}
+.bmh-steps i{flex:none;width:32px;height:32px;border-radius:50%;background:var(--navy);color:#fff;font-style:normal;font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center}
+.bmh-steps b{display:block;color:var(--navy);font-size:18px}
+.bmh-steps span{color:var(--txt);font-size:16px}
+.bmh-conv{background:#fff;border:1px solid #C9D6E3;border-radius:8px;padding:22px 20px;margin-top:20px}
+.bmh-conv label{display:block;font-size:21px;font-weight:700;color:var(--navy)}
+.bmh-busca{width:100%;min-height:52px;padding:0 16px;border:1px solid #8FA6C2;border-radius:6px;font:inherit;font-size:17px;color:var(--ink);background:#fff;margin-top:12px}
+.bmh .bmh-res{margin-top:12px;font-size:16px;min-height:1px}
+.bmh-res--ok{color:#0F5B3A;font-weight:700}
+.bmh .bmh-conv__p{font-size:15px;margin-top:12px;color:var(--muted)}
+.bmh-conv__p a{font-weight:700}
+/* ---------- estrutura ---------- */
+.bmh-galeria{display:grid;gap:14px;margin-top:24px}
+.bmh-galeria .bmh-fig img{aspect-ratio:3/2}
+.bmh-galeria__duas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.bmh-galeria__duas .bmh-fig img{aspect-ratio:4/5}
+/* ---------- quem cuida ---------- */
+.bmh-quem{display:grid;gap:26px}
+.bmh-quem .bmh-fig img{aspect-ratio:3/2}
+.bmh-dir{list-style:none;margin:20px 0 0;padding:0;border-top:1px solid var(--line)}
+.bmh-dir li{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.bmh-dir img{width:48px;height:48px;border-radius:50%;object-fit:cover;flex:none}
+.bmh-dir b{display:block;font-size:16px;color:var(--navy)}
+.bmh-dir span{font-size:13px;color:var(--muted)}
+.bmh .bmh-dir__t{font-size:15px;font-weight:700;color:var(--navy);margin-top:24px}
+/* ---------- indicações ---------- */
+.bmh-ind{list-style:none;margin:20px 0 0;padding:0;border-top:1px solid #C9D6E3}
+.bmh-ind li{padding:14px 0;border-bottom:1px solid #C9D6E3;font-weight:600;font-size:18px;color:var(--navy)}
+.bmh .bmh-merg{margin-top:22px;padding:18px;background:#fff;border-radius:8px;font-size:16px;color:var(--txt)}
+.bmh-merg b{color:var(--navy)}
+/* ---------- unidades ---------- */
+.bmh-uni{display:grid;gap:16px;margin-top:22px}
+.bmh-uni article{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+.bmh-uni img{width:100%;height:180px;object-fit:cover}
+.bmh-uni__b{padding:18px 18px 20px}
+.bmh-uni h3{font-size:22px}
+.bmh .bmh-uni p{font-size:15px;margin-top:6px}
+.bmh-two{display:flex;gap:8px;margin-top:16px}
+.bmh-two .bmh-btn{flex:1;padding:0 10px;font-size:15px;min-height:48px}
+/* ---------- perguntas ---------- */
+.bmh-faq{margin-top:22px;border-top:1px solid #C9D6E3}
+.bmh-faq details{border-bottom:1px solid #C9D6E3}
+.bmh-faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 0;font-weight:700;font-size:17px;color:var(--navy)}
+.bmh-faq summary::-webkit-details-marker{display:none}
+.bmh-faq summary:after{content:"+";flex:none;font-size:24px;font-weight:400;color:var(--oxyt);line-height:1}
+.bmh-faq details[open] summary:after{content:"\2212"}
+.bmh .bmh-faq p{padding:0 0 18px;color:var(--txt);font-size:16px}
+/* ---------- cirurgião, final e rodapé ---------- */
+.bmh-cir{border-top:1px solid var(--line)}
+.bmh-cir .bmh-w{padding-top:24px;padding-bottom:24px;display:flex;flex-direction:column;gap:14px}
+.bmh-cir p{font-size:16px;color:var(--txt)}
+.bmh-cir b{color:var(--navy)}
+.bmh-cir .bmh-btn{align-self:flex-start;min-height:46px;font-size:15px}
+.bmh-final{background:var(--deep);color:#fff}
+.bmh-final .bmh-w{padding-top:48px;padding-bottom:48px}
+.bmh-final h2{font-size:30px;line-height:1.12}
+.bmh .bmh-final p{color:#C3D1EA;margin-top:12px}
+.bmh-final .bmh-btn{margin-top:24px}
+.bmh-foot{background:#000E2E;color:#B9C8E4;font-size:14px;padding:32px 0 104px}
+.bmh-foot a{color:#B9C8E4}
+.bmh-foot strong{color:#fff}
+.bmh-foot__logo{width:110px;margin-bottom:18px}
+.bmh-foot__g{display:grid;gap:16px}
+.bmh-foot__g>div{min-width:0;overflow-wrap:anywhere;line-height:1.6}
+.bmh .bmh-foot__legal{margin-top:20px;padding-top:14px;border-top:1px solid #1B2C55;font-size:13px}
+.bmh .bmh-foot__links{margin-top:22px;font-size:14px;line-height:1.9}
+.bmh .bmh-foot__links a{color:inherit;text-decoration:underline;text-underline-offset:3px}
+/* barra fixa: aparece depois que o botão do topo sai da tela */
+.bmh-fix{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;gap:10px;padding:10px 16px 14px;background:#fff;border-top:1px solid var(--line);box-shadow:0 -6px 18px rgba(0,20,63,.10);transform:translateY(110%);transition:transform .25s}
+.bmh-fix.bmh-fix--on{transform:none}
+.bmh-fix .bmh-btn{flex:1}
+.bmh-fix .bmh-tel{flex:none;width:52px;height:52px;border-radius:50%;border:1px solid var(--navy);display:flex;align-items:center;justify-content:center;color:var(--navy)}
+.bmh-fix .bmh-tel svg{width:20px;height:20px}
+/* ---------- computador ---------- */
+@media (min-width:860px){
+  .bmh{font-size:18px}
+  .bmh-w{padding:0 28px}
+  .bmh-sec{padding:88px 0}
+  .bmh-h2{font-size:44px;line-height:1.06}
+  .bmh .bmh-lead{margin-top:20px;font-size:19px;max-width:720px}
+  .bmh-head .bmh-w{min-height:78px}
+  .bmh-logo{flex:none}
+  .bmh-logo img{width:94px;height:50px}
+  .bmh-logo span{font-size:18px;padding-left:14px;white-space:nowrap}
+  .bmh-hero .bmh-w{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:56px;align-items:center;padding-top:72px;padding-bottom:72px}
+  .bmh-hero h1{font-size:56px;line-height:1.03}
+  .bmh .bmh-hero__sub{font-size:20px;margin-top:22px;max-width:560px}
+  .bmh .bmh-hero__ctas{flex-direction:row;align-items:center;gap:28px;margin-top:34px}
+  .bmh-hero__ctas .bmh-btn{width:auto;flex:none;white-space:nowrap}
+  .bmh-hero__foto{margin-top:0}
+  .bmh-provas .bmh-w{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .bmh-provas .bmh-w>div{padding:28px 28px 28px 0;border-bottom:0}
+  .bmh-provas .bmh-w>div+div{padding-left:28px;border-left:1px solid var(--line)}
+  .bmh-provas b{font-size:24px}
+  .bmh-tri{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:32px}
+  .bmh-tri a{min-height:72px;font-size:19px;padding:0 26px}
+  .bmh-pos{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:72px;align-items:center}
+  .bmh-steps{grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+  .bmh-steps li{flex-direction:column;padding:26px}
+  .bmh-conv{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:28px;align-items:end;padding:30px}
+  .bmh-galeria{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:18px;margin-top:36px}
+  .bmh-galeria>.bmh-fig img{height:100%;aspect-ratio:auto}
+  .bmh-quem{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:72px;align-items:center}
+  .bmh-dir b{font-size:18px}
+  .bmh-dir span{font-size:15px}
+  .bmh-ind{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:48px}
+  .bmh-ind li{font-size:21px;padding:18px 0}
+  .bmh-uni{grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}
+  .bmh-uni img{height:240px}
+  .bmh-uni__b{padding:26px 30px 30px}
+  .bmh-uni h3{font-size:28px}
+  .bmh-faq{max-width:860px}
+  .bmh-faq summary{font-size:20px;padding:22px 0}
+  .bmh .bmh-faq p{font-size:18px}
+  .bmh-cir .bmh-w{flex-direction:row;align-items:center;justify-content:space-between;gap:32px}
+  .bmh-cir .bmh-btn{align-self:auto;flex:none}
+  .bmh-final .bmh-w{display:flex;justify-content:space-between;align-items:center;gap:48px;padding-top:80px;padding-bottom:80px}
+  .bmh-final h2{font-size:44px;max-width:640px}
+  .bmh-final .bmh-btn{margin-top:0;flex:none}
+  .bmh-foot{padding:56px 0 32px;font-size:15px}
+  .bmh-foot__g{grid-template-columns:repeat(4,minmax(0,1fr));gap:32px}
+  .bmh-fix{display:none}
+}
+@media (min-width:1180px){
+  .bmh-menu{display:none}
+  .bmh-nav{display:flex;flex-wrap:nowrap;align-items:center;gap:20px;white-space:nowrap}
+  .bmh-nav a{color:var(--ink);font-weight:600;font-size:15px}
+  .bmh-nav a.bmh-btn{min-height:46px;padding:0 20px;color:#fff}
+}
+</style>
+<style>
+/* ---------- páginas internas (molde, 08/10/2026) ---------- */
+.bmh .bmh-trilha{font-size:13px;color:#9FB2D3;margin-bottom:14px}
+.bmh-trilha a{color:#C3D1EA!important}
+.bmh-hero--int .bmh-w{padding-top:30px;padding-bottom:36px}
+.bmh-hero--int h1{font-size:32px}
+.bmh-texto{max-width:760px}
+.bmh-w.bmh-texto{max-width:1180px}
+.bmh-w.bmh-texto>*{max-width:760px}
+.bmh-texto h2{font-size:26px;line-height:1.15;margin:40px 0 0!important}
+.bmh-texto h2:first-child{margin-top:0!important}
+.bmh-texto h3{font-size:20px;margin:28px 0 0!important}
+.bmh .bmh-texto p{margin-top:14px;color:var(--txt)}
+.bmh-texto ul{margin:14px 0 0;padding-left:22px;color:var(--txt)}
+.bmh-texto li{margin-top:8px}
+.bmh-texto a{font-weight:700}
+.bmh .bmh-aviso{margin-top:22px;padding:18px;border-left:4px solid var(--oxy);background:var(--mist);border-radius:0 8px 8px 0;color:var(--txt)}
+.bmh-fatos{list-style:none;margin:20px 0 0;padding:0;border-top:1px solid var(--line)}
+.bmh-fatos li{padding:14px 0;border-bottom:1px solid var(--line);display:grid;gap:2px}
+.bmh-fatos b{font-size:14px;font-weight:700;color:var(--oxyt);letter-spacing:.04em;text-transform:uppercase}
+.bmh-fatos span{color:var(--ink)}
+.bmh-rotas{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.bmh-rotas .bmh-btn{min-height:46px;font-size:15px;padding:0 18px}
+.bmh-fotos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:22px}
+.bmh-fotos .bmh-fig img{aspect-ratio:4/3}
+.bmh-fotos .bmh-fig--larga{grid-column:1/-1}
+.bmh-fotos .bmh-fig--larga img{aspect-ratio:3/2}
+.bmh-duas{display:grid;gap:28px}
+@media (min-width:860px){
+  .bmh-hero--int .bmh-w{display:block;padding-top:56px;padding-bottom:64px}
+  .bmh-hero--int h1{font-size:50px;max-width:900px}
+  .bmh-hero--int .bmh-hero__sub{max-width:720px}
+  .bmh-texto h2{font-size:34px;margin-top:56px!important}
+  .bmh-texto h3{font-size:23px}
+  .bmh .bmh-texto p,.bmh-texto ul{font-size:19px}
+  .bmh-fotos{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+  .bmh-duas{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:64px;align-items:start}
+}
+</style>
+<style>
+.bmh .bmh-rev{margin-top:28px;font-size:15px;color:var(--muted)}
+.bmh .bmh-rev b{color:var(--navy)}
+.bmh-refs{margin:16px 0 0;padding-left:22px;font-size:14px;line-height:1.5;color:var(--muted)}
+.bmh-refs li{margin-top:8px;overflow-wrap:anywhere}
+.bmh-refs a{font-weight:600}
+@media (min-width:860px){.bmh-refs{font-size:15px}}
+</style>
+
+<div class="bmh">
+<!-- Mês temático (15/10/2026, Jorge: "pode fazer de todos os meses já"): só cor, sem texto novo. No dia 1º de cada mês liga
+     a classe bmh-mes-tematico e as cores da campanha do mês (hora de Brasília). Mudar campanha ou cor = mudar esta tabela
+     (molde _molde/cabecalho.html e home-v2.html) e reenviar as páginas. Contraste das etiquetas conferido (mínimo 5,2). -->
+<script>(function(){try{var T={1:['#9E9E9E','#E0E0E0','#616161'],2:['#6A1B9A','#CE93D8','#6A1B9A'],3:['#8E44AD','#D7BDE2','#7D3C98'],4:['#29B6F6','#B3E5FC','#01579B'],
+5:['#F9A825','#FFE082','#8A5A00'],6:['#E53935','#EF9A9A','#B71C1C'],7:['#F9A825','#FFE082','#8A5A00'],8:['#C9A227','#F1DE9B','#735A0A'],9:['#F9A825','#FFE082','#8A5A00'],
+10:['#E91E63','#F48FB1','#C2185B'],11:['#1E88E5','#90CAF9','#1565C0'],12:['#C62828','#EF9A9A','#B71C1C']};var m=new Date(Date.now()-3*3600*1000).getUTCMonth()+1,c=T[m];if(!c)return;
+var r=document.documentElement;r.classList.add('bmh-mes-tematico');r.style.setProperty('--bmh-mes',c[0]);r.style.setProperty('--bmh-mes-claro',c[1]);r.style.setProperty('--bmh-mes-etiqueta',c[2])}catch(e){}})();</script>
+<header class="bmh-head"><div class="bmh-w">
+<a class="bmh-logo" href="/"><img src="{{img:bmh-logo.png}}" alt="BMH" width="300" height="159"><span>Brasília Medicina Hiperbárica<small>desde 2004</small></span><span class="bmh-laco" aria-hidden="true"><svg viewBox="0 0 24 36" width="16" height="24" focusable="false"><path fill="var(--bmh-mes,#E91E63)" d="M12 2c-3.3 0-5.5 2.6-5.5 5.6 0 2.3 1.2 4.6 2.8 7.1L3 30l4.2 1.8 4.8-10.6 4.8 10.6L21 30l-6.3-15.3c1.6-2.5 2.8-4.8 2.8-7.1C17.5 4.6 15.3 2 12 2zm0 3.2c1.4 0 2.3 1.1 2.3 2.5 0 1.3-.9 3-2.3 5.2-1.4-2.2-2.3-3.9-2.3-5.2 0-1.4.9-2.5 2.3-2.5z"/></svg></span></a>
+<nav class="bmh-nav" aria-label="Principal">
+<a href="/pos-operatorio-cirurgia-plastica/">Pós-operatório</a>
+<a href="/feridas-que-nao-cicatrizam/">Feridas</a>
+<a href="/hiperbarica-asa-sul/">Asa Sul</a>
+<a href="/hiperbarica-taguatinga/">Taguatinga</a>
+<a href="/convenios/">Convênios</a>
+<a href="/perguntas-frequentes/">Perguntas</a>
+<a class="bmh-btn bmh-btn--navy bmh-whatsapp" href="{{wa:geral}}">{{svg:wa}}Agendar pelo WhatsApp</a>
+</nav>
+<details class="bmh-menu"><summary aria-label="Menu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></summary>
+<nav aria-label="Menu do celular">
+<a href="/pos-operatorio-cirurgia-plastica/">Pós-operatório de cirurgia plástica</a>
+<a href="/hiperbarica-asa-sul/">Unidade Asa Sul</a>
+<a href="/hiperbarica-taguatinga/">Unidade Taguatinga</a>
+<a href="/convenios/">Convênios</a>
+<a href="/feridas-que-nao-cicatrizam/">Feridas e pé diabético</a>
+<a href="/equipe-medica/">Equipe médica</a>
+<a href="/perguntas-frequentes/">Perguntas frequentes</a>
+<a class="bmh-btn bmh-btn--navy bmh-whatsapp" href="{{wa:geral}}">{{svg:wa}}Agendar pelo WhatsApp</a>
+</nav></details>
+</div></header>
+
+
+<section class="bmh-hero bmh-hero--int"><div class="bmh-w">
+<p class="bmh-trilha"><a href="/">Início</a> › Feridas que não cicatrizam</p>
+<h1>Câmara hiperbárica para feridas que não cicatrizam e pé diabético</h1>
+<p class="bmh-hero__sub">A oxigenoterapia hiperbárica é um tratamento complementar para feridas que não cicatrizam e para o pé diabético: você respira oxigênio a 100% numa câmara com pressão maior que a do ar, e mais oxigênio chega ao tecido da ferida. Na BMH, com médico em todas as sessões, na Asa Sul e em Taguatinga.</p>
+<div class="bmh-hero__ctas">
+<a class="bmh-btn bmh-btn--oxy bmh-whatsapp" href="{{wa:ferida}}">{{svg:wa}}Falar sobre a minha ferida</a>
+</div>
+<p class="bmh-hero__hora">Todos os dias, das 7h às 19h. Convênio ou particular.</p>
+</div></section>
+
+<section id="quando" class="bmh-sec"><div class="bmh-w bmh-texto">
+<h2>Quando a ferida não fecha</h2>
+<p>Algumas feridas não seguem o caminho normal da cicatrização. Elas continuam abertas por semanas, mesmo com curativo e acompanhamento, e isso cansa: são semanas de curativo, de idas ao médico e de cuidado com cada passo. Acontece, por exemplo, no pé de quem tem diabetes, em feridas de pele com pouca circulação, nos pontos de uma cirurgia que abriram e em lesões que aparecem meses ou anos depois da radioterapia.</p>
+<p>Nesses casos, o médico que acompanha a ferida pode indicar a câmara hiperbárica como complemento. Ela não entra no lugar do tratamento da ferida: entra junto com ele.</p>
+<p class="bmh-aviso">Tem diabetes e uma ferida no pé? Continue o acompanhamento com o seu médico. Se a ferida não está fechando, a BMH avalia se a câmara pode entrar no seu tratamento.</p>
+</div></section>
+
+<section id="como-ajuda" class="bmh-sec bmh-mist"><div class="bmh-w bmh-texto">
+<h2>Como o oxigênio sob pressão ajuda</h2>
+<p>Uma ferida que não cicatriza costuma ter três problemas: pouco oxigênio no tecido, dificuldade de formar vasos novos e uma inflamação que não termina.</p>
+<p>O oxigênio é parte do que o corpo usa para cicatrizar. Ele é necessário para formar vasos novos, produzir colágeno (a fibra que dá firmeza ao tecido) e fechar a pele por cima da ferida.</p>
+<p>Na câmara, você respira oxigênio a 100% com uma pressão de pelo menos duas vezes a do ar ao nível do mar. Com a pressão, muito mais oxigênio se dissolve no sangue e chega ao tecido que está recebendo pouco sangue. Em estudos de laboratório, esse oxigênio extra também estimula as células que produzem colágeno e ajuda a combater bactérias.</p>
+<p class="bmh-aviso">A câmara é um complemento. A resposta muda de pessoa para pessoa, e por isso cada caso passa por avaliação médica antes de começar.</p>
+</div></section>
+
+<section id="indicacoes" class="bmh-sec"><div class="bmh-w bmh-texto">
+<h2>Quais feridas estão na lista de indicações</h2>
+<p>A BMH segue as indicações reconhecidas pelo Conselho Federal de Medicina (Resolução CFM 1.457/1995). Entre as lesões que não cicatrizam com o tratamento habitual, a resolução inclui:</p>
+<ul>
+<li>ferida no pé de quem tem diabetes (pé diabético);</li>
+<li>úlceras de pele que não fecham;</li>
+<li>lesões por pressão, as escaras;</li>
+<li>úlceras causadas por vasculite autoimune (inflamação dos vasos do sangue);</li>
+<li>pontos de cirurgia que abriram (deiscência de sutura);</li>
+<li>lesões causadas por radiação, como as que aparecem tempos depois da radioterapia.</li>
+</ul>
+<p>A sociedade médica americana de medicina hiperbárica (UHMS) também reconhece as feridas de difícil cicatrização selecionadas e as lesões tardias da radioterapia entre as indicações da câmara.</p>
+<p>Estar na lista não quer dizer que toda ferida desse tipo precisa de câmara. Quem decide é o médico, na avaliação, olhando a ferida, a circulação e o tratamento que você já faz.</p>
+</div></section>
+
+<section id="evidencia" class="bmh-sec bmh-mist"><div class="bmh-w bmh-texto">
+<h2>O que os estudos mostram</h2>
+<p>A maior parte dos estudos sobre câmara hiperbárica em feridas foi feita no pé diabético, e é para ele que existem diretrizes específicas.</p>
+<ul>
+<li><b>Diretriz internacional do pé diabético (IWGDF, 2023).</b> Recomenda considerar a câmara como complemento nas úlceras de pé diabético com circulação comprometida que não cicatrizaram só com o tratamento padrão. É uma recomendação condicional, com evidência de certeza baixa: os estudos ainda têm limitações.</li>
+<li><b>O que pode melhorar.</b> Os estudos de melhor qualidade sugerem que a câmara pode ajudar a fechar a ferida e a diminuir o tamanho dela.</li>
+<li><b>Para quem a evidência é mais forte.</b> A diretriz da UHMS (2015) indica a câmara nas úlceras de pé diabético mais profundas e graves (grau 3 ou mais na classificação de Wagner, que os médicos usam para medir a gravidade) que não melhoraram depois de 30 dias de tratamento, ou logo depois de uma cirurgia de limpeza do pé. Nas úlceras mais superficiais, não encontrou evidência suficiente.</li>
+<li><b>Amputação.</b> Os resultados ainda não são conclusivos: algumas revisões encontraram menos amputações maiores com a câmara, e a diretriz internacional considera que ainda falta prova de boa qualidade.</li>
+<li><b>Lesões da radioterapia.</b> Os estudos são pequenos e sugerem benefício, principalmente em cabeça e pescoço, bexiga e reto.</li>
+</ul>
+<p>Por isso a BMH não promete resultado. O médico explica, na avaliação, o que se espera no seu caso.</p>
+</div></section>
+
+<section id="quem" class="bmh-sec"><div class="bmh-w bmh-texto">
+<h2>Quem pode fazer e o que vem antes</h2>
+<p>A câmara entra quando a ferida não fechou com o tratamento padrão. No pé diabético, esse tratamento inclui:</p>
+<ul>
+<li>limpeza da ferida (desbridamento) e curativo adequado;</li>
+<li>aliviar a pressão sobre a ferida, com o recurso que o médico indicar;</li>
+<li>tratar a infecção, quando houver;</li>
+<li>tratar a circulação da perna, quando ela está comprometida.</li>
+</ul>
+<p>Esse cuidado continua durante as sessões, com a equipe que já acompanha você.</p>
+<p>Toda pessoa passa por avaliação médica antes da primeira sessão. Algumas condições de saúde aumentam o risco e podem impedir o tratamento, e o médico confere isso com calma. As principais contraindicações estão nas <a href="/perguntas-frequentes/">perguntas frequentes</a>.</p>
+</div></section>
+
+<section id="na-bmh" class="bmh-sec bmh-mist"><div class="bmh-w">
+<div class="bmh-texto">
+<h2>Como é o tratamento na BMH</h2>
+</div>
+<ul class="bmh-fatos" style="max-width:760px">
+<li><b>Antes de começar</b><span>Um médico da BMH avalia você e a ferida antes da primeira sessão e define o tratamento.</span></li>
+<li><b>Cada sessão</b><span>Cerca de 1h30, contando o tempo de pressurizar e de voltar à pressão normal.</span></li>
+<li><b>Frequência</b><span>Em geral, uma sessão por dia, em dias seguidos.</span></li>
+<li><b>Quantas sessões</b><span>Em geral, de 30 a 60 em feridas que não cicatrizam. O médico reavalia a ferida ao longo do tratamento.</span></li>
+<li><b>Durante a sessão</b><span>Médico presente na unidade em todas as sessões, do início ao fim.</span></li>
+<li><b>Onde e quando</b><span><a href="/hiperbarica-asa-sul/">Asa Sul</a> (SGAS 613, Conj. E, Bloco A, 1º subsolo, L2 Sul) e <a href="/hiperbarica-taguatinga/">Taguatinga</a> (Prédio Prime Excelência Médica, Torre D, Lojas 2 a 5, Setor C Norte, Taguatinga, CEP 72115-700). Todos os dias, das 7h às 19h.</span></li>
+<li><b>Convênio</b><span>Convênio ou particular. A BMH atende 50 convênios, e a recepção confere o seu pelo WhatsApp e ajuda com a autorização. <a href="/convenios/">Ver a lista</a></span></li>
+</ul>
+<a class="bmh-btn bmh-btn--navy bmh-whatsapp" href="{{wa:ferida}}" style="margin-top:28px">{{svg:wa}}Falar sobre a minha ferida</a>
+<p class="bmh-rev">A recepção responde pelo WhatsApp, confere o convênio e marca a avaliação. Prefere ligar? <a class="bmh-telefone" href="tel:+556133466005">(61) 3346-6005</a></p>
+</div></section>
+
+<section id="o-que-nao-e" class="bmh-sec"><div class="bmh-w bmh-texto">
+<h2>O que a câmara não é</h2>
+<ul>
+<li><b>Não substitui o cuidado da ferida.</b> Curativo, limpeza, alívio do peso e tratamento da circulação e da infecção continuam.</li>
+<li><b>Não é para toda ferida.</b> A indicação depende do tipo de ferida e da avaliação médica.</li>
+<li><b>Não tem resultado garantido.</b> A resposta varia de pessoa para pessoa, e o médico acompanha a evolução da ferida.</li>
+</ul>
+</div></section>
+
+<section id="encaminhar" class="bmh-sec bmh-mist"><div class="bmh-w bmh-texto">
+<h2>Para o médico que acompanha a ferida</h2>
+<p>Endocrinologista, cirurgião vascular, cirurgião, clínico ou equipe de curativos: a BMH recebe o seu paciente para avaliação de oxigenoterapia hiperbárica como complemento do tratamento que você conduz. A avaliação confirma a indicação, define as sessões e escolhe a unidade mais perto dele.</p>
+<a class="bmh-btn bmh-btn--line bmh-whatsapp" href="{{wa:cirurgiao}}" style="margin-top:22px">Encaminhar um paciente</a>
+</div></section>
+
+<section id="perguntas" class="bmh-sec"><div class="bmh-w">
+<h2 class="bmh-h2">Perguntas sobre feridas e pé diabético</h2>
+<div class="bmh-faq">
+<details><summary>Quantas sessões vou precisar?</summary><p>Depende da ferida e é definido na avaliação. Em feridas que não cicatrizam, em geral, são de 30 a 60 sessões, uma por dia, em dias seguidos. O médico reavalia a ferida ao longo do tratamento e pode ajustar esse número.</p></details>
+<details><summary>A câmara substitui o curativo ou o tratamento que já faço?</summary><p>Não. A câmara entra junto com o cuidado da ferida. Curativo, limpeza, alívio do peso sobre o pé e tratamento da circulação e da infecção continuam com a equipe que já acompanha você.</p></details>
+<details><summary>Toda ferida que não cicatriza pode ser tratada na câmara?</summary><p>Não. A BMH segue as indicações do Conselho Federal de Medicina, que incluem pé diabético, úlceras de pele, escaras, pontos que abriram e lesões por radiação. Mesmo nesses casos, o médico avalia a ferida, a circulação e o tratamento atual antes de indicar.</p></details>
+<details><summary>Tenho diabetes. Preciso de algum cuidado na sessão?</summary><p>Sim. Avise a equipe que você tem diabetes e coma algo leve antes da sessão: a glicose pode baixar durante o tratamento.</p></details>
+<details><summary>Quanto tempo dura a sessão?</summary><p>Cada sessão dura cerca de 1h30, contando o tempo de pressurizar e de voltar à pressão normal. Um médico fica na unidade em todas as sessões, do início ao fim.</p></details>
+<details><summary>Precisa de pedido médico? O convênio cobre?</summary><p>O tratamento sempre começa com uma avaliação médica na BMH. Para usar o convênio, o plano pede o pedido do seu médico, em geral com relatório e autorização antes de começar. A BMH atende 50 convênios e particular, e a recepção confere a cobertura do seu plano pelo WhatsApp.</p></details>
+</div>
+<p class="bmh-mais"><a class="bmh-link" href="/perguntas-frequentes/">Ver todas as perguntas</a></p>
+</div></section>
+
+<section id="referencias" class="bmh-sec bmh-mist"><div class="bmh-w bmh-texto">
+<h2>Referências</h2>
+<ol class="bmh-refs">
+<li>Conselho Federal de Medicina. Resolução CFM nº 1.457/1995: oxigenoterapia hiperbárica.</li>
+<li>Undersea and Hyperbaric Medical Society (UHMS). Indicações aprovadas para oxigenoterapia hiperbárica.</li>
+<li>Chen P et al. Guidelines on interventions to enhance healing of foot ulcers in people with diabetes (IWGDF 2023 update). Diabetes Metab Res Rev, 2024. <a href="https://doi.org/10.1002/dmrr.3644" target="_blank" rel="noopener">doi:10.1002/dmrr.3644</a></li>
+<li>Huang ET et al. A clinical practice guideline for the use of hyperbaric oxygen therapy in the treatment of diabetic foot ulcers (UHMS). Undersea Hyperb Med, 2015. <a href="https://pubmed.ncbi.nlm.nih.gov/26152105/" target="_blank" rel="noopener">PMID 26152105</a></li>
+<li>Kranke P et al. Hyperbaric oxygen therapy for chronic wounds. Cochrane Database Syst Rev, 2015. <a href="https://doi.org/10.1002/14651858.CD004123.pub4" target="_blank" rel="noopener">doi:10.1002/14651858.CD004123.pub4</a></li>
+<li>Brouwer RJ et al. A systematic review and meta-analysis of hyperbaric oxygen therapy for diabetic foot ulcers with arterial insufficiency. J Vasc Surg, 2020. <a href="https://doi.org/10.1016/j.jvs.2019.07.082" target="_blank" rel="noopener">doi:10.1016/j.jvs.2019.07.082</a></li>
+<li>Monami M et al. Effectiveness of most common adjuvant wound treatments for hard-to-heal diabetic foot ulcers: a meta-analysis of randomized controlled trials. Acta Diabetol, 2025. <a href="https://doi.org/10.1007/s00592-024-02426-7" target="_blank" rel="noopener">doi:10.1007/s00592-024-02426-7</a></li>
+<li>Lin ZC et al. Hyperbaric oxygen therapy for late radiation tissue injury. Cochrane Database Syst Rev, 2023. <a href="https://doi.org/10.1002/14651858.CD005005.pub5" target="_blank" rel="noopener">doi:10.1002/14651858.CD005005.pub5</a></li>
+<li>Hajhosseini B et al. Hyperbaric oxygen therapy: descriptive review of the technology and current application in chronic wounds. Plast Reconstr Surg Glob Open, 2020. <a href="https://doi.org/10.1097/GOX.0000000000003136" target="_blank" rel="noopener">doi:10.1097/GOX.0000000000003136</a></li>
+<li>Růžička J et al. Hyperbaric oxygen influences chronic wound healing: a cellular level review. Physiol Res, 2021. <a href="https://doi.org/10.33549/physiolres.934822" target="_blank" rel="noopener">doi:10.33549/physiolres.934822</a></li>
+<li>Hadanny A et al. The safety of hyperbaric oxygen treatment: retrospective analysis in 2,334 patients. Undersea Hyperb Med, 2016. <a href="https://pubmed.ncbi.nlm.nih.gov/27265988/" target="_blank" rel="noopener">PMID 27265988</a></li>
+</ol>
+<p class="bmh-rev"><b>Revisado por Dr. Jorge Madeiro, CRM-DF 31687, RQE 26863, em 15/10/2026.</b> Diretor médico da BMH.</p>
+</div></section>
+
+<div id="cirurgioes" class="bmh-cir"><div class="bmh-w">
+<p><b>É cirurgião?</b> Encaminhe o seu paciente pelo WhatsApp. A avaliação médica confirma a indicação e define as sessões, na unidade mais perto dele.</p>
+<a class="bmh-btn bmh-btn--line bmh-whatsapp" href="{{wa:cirurgiao}}">Encaminhar um paciente</a>
+</div></div>
+
+<section class="bmh-final"><div class="bmh-w">
+<div>
+<h2>Agende a sua avaliação</h2>
+<p>Na Asa Sul ou em Taguatinga, todos os dias, das 7h às 19h.</p>
+</div>
+<a class="bmh-btn bmh-btn--oxy bmh-whatsapp" href="{{wa:ferida}}">{{svg:wa}}Agendar pelo WhatsApp</a>
+</div></section>
+
+<footer class="bmh-foot"><div class="bmh-w">
+<img class="bmh-foot__logo" src="{{img:bmh-logo-branco.png}}" alt="BMH" width="300" height="156" loading="lazy">
+<div class="bmh-foot__g">
+<div><strong>Brasília Medicina Hiperbárica</strong><br>Em Brasília desde 2004<br>CNPJ 07.091.027/0001-86</div>
+<div><strong>Asa Sul</strong><br>SGAS 613, Conj. E, Bloco A, 1º subsolo<br>L2 Sul · CEP 70200-730</div>
+<div><strong>Taguatinga</strong><br>Prime Excelência Médica, Torre D, Lojas 2 a 5<br>Setor C Norte · CEP 72115-700</div>
+<div><strong>Contato</strong><br><a class="bmh-telefone" href="tel:+556133466005">(61) 3346-6005</a><br><a href="mailto:contato@hiperbaricabrasilia.com.br">contato@hiperbaricabrasilia.com.br</a><br><a href="https://www.instagram.com/hiperbaricabrasilia/" target="_blank" rel="noopener me">Instagram @hiperbaricabrasilia</a></div>
+</div>
+<p class="bmh-foot__links"><a href="/pos-operatorio-cirurgia-plastica/">Pós-operatório</a> · <a href="/feridas-que-nao-cicatrizam/">Feridas e pé diabético</a> · <a href="/convenios/">Convênios</a> · <a href="/equipe-medica/">Equipe médica</a> · <a href="/perguntas-frequentes/">Perguntas frequentes</a> · <a href="/hiperbarica-asa-sul/">Unidade Asa Sul</a> · <a href="/hiperbarica-taguatinga/">Unidade Taguatinga</a></p>
+<p class="bmh-foot__legal">Responsáveis técnicos: Asa Sul, Dr. Hélio Ivan, CRM-DF 8164, RQE 26705 · Taguatinga, Dr. Alberto Jorge, CRM-DF 7248, RQE 14575 · Diretor médico: Dr. Jorge Madeiro, CRM-DF 31687, RQE 26863 · <a href="/politica-de-privacidade/">Política de privacidade</a></p>
+</div></footer>
+
+<div class="bmh-fix" id="bmh-fix">
+<a class="bmh-btn bmh-btn--navy bmh-whatsapp" href="{{wa:ferida}}">{{svg:wa}}Agendar pelo WhatsApp</a>
+<a class="bmh-tel bmh-telefone" href="tel:+556133466005" aria-label="Ligar para a BMH">{{svg:tel}}</a>
+</div>
+
+</div>
+<script>
+(function () {
+  /* barra fixa do celular: aparece depois de rolar um pouco */
+  var fix = document.getElementById('bmh-fix');
+  if (!fix) { return; }
+  var confere = function () { if (window.scrollY > 500) { fix.classList.add('bmh-fix--on'); } else { fix.classList.remove('bmh-fix--on'); } };
+  window.addEventListener('scroll', confere, { passive: true });
+  confere();
+})();
+</script>
+
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[
+{"@type":"MedicalWebPage","@id":"https://hiperbaricabrasilia.com.br/feridas-que-nao-cicatrizam/#pagina","url":"https://hiperbaricabrasilia.com.br/feridas-que-nao-cicatrizam/","name":"Câmara hiperbárica para feridas que não cicatrizam e pé diabético","inLanguage":"pt-BR","publisher":{"@id":"https://hiperbaricabrasilia.com.br/#organizacao"},"reviewedBy":{"@type":"Physician","name":"Dr. Jorge Madeiro","identifier":"CRM-DF 31687"},"about":{"@type":"MedicalTherapy","name":"Oxigenoterapia hiperbárica","alternateName":"Câmara hiperbárica"}},
+{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Início","item":"https://hiperbaricabrasilia.com.br/"},{"@type":"ListItem","position":2,"name":"Feridas que não cicatrizam","item":"https://hiperbaricabrasilia.com.br/feridas-que-nao-cicatrizam/"}]},
+{"@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"Quantas sessões vou precisar?","acceptedAnswer":{"@type":"Answer","text":"Depende da ferida e é definido na avaliação. Em feridas que não cicatrizam, em geral, são de 30 a 60 sessões, uma por dia, em dias seguidos. O médico reavalia a ferida ao longo do tratamento e pode ajustar esse número."}},
+{"@type":"Question","name":"A câmara substitui o curativo ou o tratamento que já faço?","acceptedAnswer":{"@type":"Answer","text":"Não. A câmara entra junto com o cuidado da ferida. Curativo, limpeza, alívio do peso sobre o pé e tratamento da circulação e da infecção continuam com a equipe que já acompanha você."}},
+{"@type":"Question","name":"Toda ferida que não cicatriza pode ser tratada na câmara?","acceptedAnswer":{"@type":"Answer","text":"Não. A BMH segue as indicações do Conselho Federal de Medicina, que incluem pé diabético, úlceras de pele, escaras, pontos que abriram e lesões por radiação. Mesmo nesses casos, o médico avalia a ferida, a circulação e o tratamento atual antes de indicar."}},
+{"@type":"Question","name":"Tenho diabetes. Preciso de algum cuidado na sessão?","acceptedAnswer":{"@type":"Answer","text":"Sim. Avise a equipe que você tem diabetes e coma algo leve antes da sessão: a glicose pode baixar durante o tratamento."}},
+{"@type":"Question","name":"Quanto tempo dura a sessão?","acceptedAnswer":{"@type":"Answer","text":"Cada sessão dura cerca de 1h30, contando o tempo de pressurizar e de voltar à pressão normal. Um médico fica na unidade em todas as sessões, do início ao fim."}},
+{"@type":"Question","name":"Precisa de pedido médico? O convênio cobre?","acceptedAnswer":{"@type":"Answer","text":"O tratamento sempre começa com uma avaliação médica na BMH. Para usar o convênio, o plano pede o pedido do seu médico, em geral com relatório e autorização antes de começar. A BMH atende 50 convênios e particular, e a recepção confere a cobertura do seu plano pelo WhatsApp."}}
+]}
+]}</script>

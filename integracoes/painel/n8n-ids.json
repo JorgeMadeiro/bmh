@@ -32,7 +32,12 @@
   "BMH_whatsapp_mensagens": "ll7XMHZ9sWkenCgb",
   "BMH_falhas": "c5yIwkcwSJXAZMZq",
   "BMH_limpeza_registro": "JtT1fOn3xrSQmmIU",
-  "BMH_fila_publicacao": "RaABWuNztVAap9AV"
+  "BMH_fila_publicacao": "RaABWuNztVAap9AV",
+  "BMH_avaliacoes_google": "meuAoXOYHo1lt0XQ",
+  "BMH_vigia": "0kBTGpt8EjCjmR9t",
+  "BMH_radar_paginas": "e6QpYasSwLVWh1MR",
+  "BMH_radar_itens": "Z1036OyDW9TMMyQl",
+  "BMH_whatsapp_origens": "tqlqaNTxUe4gW40R"
  },
  "fluxos": {
   "grava": "AeQIImClkXtRrWIf",
@@ -50,9 +55,17 @@
   "plantoesEmails": "qNDy08i41junIQk9",
   "whatsapp": "qDgmqqtt6zn1gARw",
   "limpeza": "sm7uaiRPM5G5gAhO",
-  "fila": "r6Rib8PXJ0zlSo4z"
+  "fila": "r6Rib8PXJ0zlSo4z",
+  "avaliacoes": "yNozxi1jNwRbLhFR",
+  "nota": "uaM8n9o97K5YH9QR",
+  "vigia": "6wNDORbM8I1jGEyU",
+  "organico": "WiOZe3DeyyANNhdr",
+  "radar": "mBwLYNgQIXDz2LYI"
  },
  "whatsapp": {
   "caminho": "bmh-whatsapp-daeff8542cee5cef6c6a8832"
+ },
+ "avaliacoes": {
+  "caminho": "bmh-perfil-avaliacoes-693566a0dd11"
  }
 }

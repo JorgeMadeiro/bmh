@@ -1,0 +1,80 @@
+{
+ "quando": "2026-10-15T14:46:23.920Z",
+ "sairam": [
+  {
+   "grupo": "Asa Sul",
+   "texto": "câmara hiperbárica asa sul",
+   "tipo": "PHRASE"
+  },
+  {
+   "grupo": "Asa Sul",
+   "texto": "hiperbárica l2 sul",
+   "tipo": "PHRASE"
+  },
+  {
+   "grupo": "Asa Sul",
+   "texto": "hiperbárica plano piloto",
+   "tipo": "PHRASE"
+  },
+  {
+   "grupo": "Asa Sul",
+   "texto": "câmara hiperbárica plano piloto",
+   "tipo": "PHRASE"
+  },
+  {
+   "grupo": "Asa Sul",
+   "texto": "câmara hiperbárica asa sul",
+   "tipo": "EXACT"
+  },
+  {
+   "grupo": "Feridas",
+   "texto": "hiperbárica úlcera",
+   "tipo": "PHRASE"
+  },
+  {
+   "grupo": "Pós-operatório",
+   "texto": "oxigenoterapia pós operatório",
+   "tipo": "PHRASE"
+  },
+  {
+   "grupo": "Pós-operatório",
+   "texto": "hiperbárica lipoaspiração",
+   "tipo": "PHRASE"
+  },
+  {
+   "grupo": "Pós-operatório",
+   "texto": "hiperbárica mamoplastia",
+   "tipo": "PHRASE"
+  },
+  {
+   "grupo": "Pós-operatório",
+   "texto": "câmara hiperbárica pós cirurgia",
+   "tipo": "PHRASE"
+  },
+  {
+   "grupo": "Taguatinga",
+   "texto": "clínica hiperbárica taguatinga",
+   "tipo": "PHRASE"
+  },
+  {
+   "grupo": "Taguatinga",
+   "texto": "oxigenoterapia taguatinga",
+   "tipo": "PHRASE"
+  },
+  {
+   "grupo": "Taguatinga",
+   "texto": "hiperbárica samambaia",
+   "tipo": "PHRASE"
+  },
+  {
+   "grupo": "Taguatinga",
+   "texto": "hiperbárica ceilândia",
+   "tipo": "PHRASE"
+  },
+  {
+   "grupo": "Taguatinga",
+   "texto": "hiperbárica águas claras",
+   "tipo": "PHRASE"
+  }
+ ]
+}

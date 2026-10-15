@@ -38,6 +38,12 @@ body{background:#fff}
 .bmh-link:after{content:" \2192";color:var(--oxyt)}
 /* ---------- cabeçalho ---------- */
 .bmh-head{background:#fff;border-bottom:1px solid var(--line);position:relative;z-index:5}
+/* mês temático: só vale com a classe no <html> (script do cabeçalho); linha no topo, laço ao lado do nome e etiquetas das
+   seções claras na cor do mês. Botões e cores de marca não mudam. */
+.bmh-laco{display:none}
+.bmh-mes-tematico .bmh-head::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:linear-gradient(90deg,var(--bmh-mes-claro),var(--bmh-mes) 50%,var(--bmh-mes-claro))}
+.bmh-mes-tematico .bmh-laco{display:inline-flex;align-self:center;margin-left:2px}
+.bmh-mes-tematico .bmh .bmh-sec .bmh-eye{color:var(--bmh-mes-etiqueta)}
 .bmh-head .bmh-w{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:62px}
 .bmh-logo{display:flex;align-items:center;gap:10px;color:var(--navy)}
 .bmh-logo img{width:64px;height:34px;object-fit:contain}
@@ -150,6 +156,8 @@ body{background:#fff}
 .bmh-foot__g{display:grid;gap:16px}
 .bmh-foot__g>div{min-width:0;overflow-wrap:anywhere;line-height:1.6}
 .bmh .bmh-foot__legal{margin-top:20px;padding-top:14px;border-top:1px solid #1B2C55;font-size:13px}
+.bmh .bmh-foot__links{margin-top:22px;font-size:14px;line-height:1.9}
+.bmh .bmh-foot__links a{color:inherit;text-decoration:underline;text-underline-offset:3px}
 /* barra fixa: aparece depois que o botão do topo sai da tela */
 .bmh-fix{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;gap:10px;padding:10px 16px 14px;background:#fff;border-top:1px solid var(--line);box-shadow:0 -6px 18px rgba(0,20,63,.10);transform:translateY(110%);transition:transform .25s}
 .bmh-fix.bmh-fix--on{transform:none}
@@ -208,7 +216,7 @@ body{background:#fff}
 }
 @media (min-width:1180px){
   .bmh-menu{display:none}
-  .bmh-nav{display:flex;flex-wrap:nowrap;align-items:center;gap:22px;white-space:nowrap}
+  .bmh-nav{display:flex;flex-wrap:nowrap;align-items:center;gap:20px;white-space:nowrap}
   .bmh-nav a{color:var(--ink);font-weight:600;font-size:15px}
   .bmh-nav a.bmh-btn{min-height:46px;padding:0 20px;color:#fff}
 }

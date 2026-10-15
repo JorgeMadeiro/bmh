@@ -163,6 +163,8 @@ PATH/EUA). Não inventar número, estudo ou percentual.
 - Conteúdo novo salvar em `marketing/conteudo/bmh-<tipo>-<tema>-<data>/`
 - Todo post nasce com intenção declarada: educativo, autoridade, conversão ou prova social
 - **Foto com paciente não se publica** (site, Instagram, perfil do Google), mesmo sem rosto, sem autorização por escrito: fica em `dados/fotos-com-paciente-nao-publicar/`, que não vai para o GitHub
+- **Nunca alarme falso** (Jorge, 15/10/2026: "posso tomar uma decisão errada"): todo aviso automático (Telegram, painel, relatório) compara com uma base recente e real, e só alarma queda confirmada (duas leituras seguidas ou régua da própria campanha); antes de ligar um aviso novo, testar com os dados de hoje se ele dispararia à toa
+- **Toda mudança de página passa pela conferência** (Jorge, 15/10/2026): Tag Manager (classes `bmh-*`, ids das seções, links `wa.me` com a mensagem pronta de cada caso, `tel:` e links de mapa), Analytics, Clarity, conversão do Google Ads, UTM e código do anúncio (`gclid`) chegando intactos, extensões do anúncio que apontam para a página, painel, dados estruturados, Google e Bing. Mapa e checklist em `marketing/estrategia-site-e-google-ads-2026-10-15.md`, seção 2
 - **Site e peças visuais nascem no celular:** desenhar e conferir primeiro em 360 a 390 px (a maior parte dos acessos é pelo celular), com título e botão do WhatsApp na primeira tela; o computador vem depois
 
 ## Travas da BMH (12/10/2026)

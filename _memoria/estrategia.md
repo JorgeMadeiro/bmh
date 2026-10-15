@@ -37,3 +37,13 @@ Anúncio do Google rodando: ~R$ 3.300 a 3.800/mês, ~R$ 37 por contato (diagnós
 ## Agenda do Jorge na BMH
 
 Terça — Asa Sul. Quinta — Taguatinga.
+
+## Decisões de 15/10/2026
+
+- **CAC de até R$ 200 por paciente novo.** Só o CRM mede (meta: CRM medindo em novembro/2026).
+- **A Triunfo sai** (reunião do Jorge na semana de 19/10); o acesso dela é retirado quando sair.
+- **Google e site 100% antes da Meta.** Verba só sobe depois da estratégia consolidada e do CRM.
+- **Site num pacote só** (as 4 fases de uma vez) e ajustes do Google Ads já, sem esperar 05/11.
+- **Pedido de avaliação** fica para quando houver SDR, como na Nexo.
+- Estratégia completa: `marketing/estrategia-site-e-google-ads-2026-10-15.md`.
+

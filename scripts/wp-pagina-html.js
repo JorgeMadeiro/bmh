@@ -33,6 +33,9 @@ const MENSAGENS = {
   cirurgiao: 'Olá! Sou médico(a) e quero encaminhar um paciente para a BMH.',
   asasul: 'Olá! Quero agendar na unidade Asa Sul.',
   taguatinga: 'Olá! Quero agendar na unidade Taguatinga.',
+  convenio: 'Olá! Quero saber se a BMH atende o meu convênio.',
+  // link "Hiperbárica (BMH)" da bio do Instagram do Dr. Jorge (15/10/2026): a frase é o marcador de origem; não mudar o começo
+  drjorge: 'Olá! Vim pelo Instagram do Dr. Jorge e quero saber sobre a câmara hiperbárica.',
 };
 const SVG = {
   wa: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.4A8.4 8.4 0 1 1 21 11.5z"/></svg>',

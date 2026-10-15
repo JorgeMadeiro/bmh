@@ -22,6 +22,10 @@ for (const nome of process.argv.slice(2)) {
     if (!html.includes(`{{molde:${n}}}`)) throw new Error(`${nome}: falta {{molde:${n}}}`);
     html = html.replace(`{{molde:${n}}}`, () => parte(n));
   }
+  // 15/10/2026: o WhatsApp da chamada final e da barra fixa usa a mensagem do assunto da página (o Tag Manager classifica
+  // o caso pelo texto da mensagem); a fonte declara <!-- wa-da-pagina: chave -->, senão fica "geral"
+  const chave = (fonte.match(/<!--\s*wa-da-pagina:\s*([a-z]+)\s*-->/) || [])[1] || 'geral';
+  html = html.split('{{wa:pagina}}').join('{{wa:' + chave + '}}');
   const saida = path.join(RAIZ, 'site/paginas', nome + '.html');
   fs.writeFileSync(saida, html);
   console.log('montada:', path.relative(RAIZ, saida));

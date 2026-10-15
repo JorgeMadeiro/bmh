@@ -1,0 +1,207 @@
+<!-- wa-da-pagina: convenio -->
+<!-- BMH · página de convênios (fonte), 15/10/2026, RASCUNHO LOCAL (não enviada). Monta com scripts/montar-pagina.js.
+     Mesmo endereço da página antiga do Elementor: /convenios/ (o link do anúncio e o do llms.txt continuam valendo).
+     Lista: _memoria/convenios.md (50, sem Unimed), em ordem alfabética; quando um plano entrar ou sair, mudar aqui, na
+     memória e em site/dados/convenios.json (busca da home). Perguntas geradas de uma lista só, iguais nos dados estruturados.
+     SEO (SEOPress): título "Convênios da câmara hiperbárica em Brasília | BMH"
+     descrição "A BMH atende 50 convênios na câmara hiperbárica em Brasília, nas unidades Asa Sul e Taguatinga. Procure o seu plano e confirme pelo WhatsApp."
+     Busca: funciona sem JavaScript (a lista inteira está no HTML; o campo só aparece com JavaScript). O script não usa o "e" duplo do JavaScript (o WordPress quebra). -->
+{{molde:estilo}}
+<style>
+.bmh-filtro{background:#fff;border:1px solid #C9D6E3;border-radius:8px;padding:20px 18px;margin-top:22px;max-width:760px}
+.bmh-filtro label{display:block;font-size:19px;font-weight:700;color:var(--navy)}
+.bmh .bmh-filtro .bmh-res{margin-top:12px;font-size:16px;color:var(--txt)}
+.bmh .bmh-filtro .bmh-conv__p{margin-top:10px}
+.bmh-planos{list-style:none;margin:22px 0 0;padding:0;columns:2;column-gap:16px}
+.bmh-planos li{break-inside:avoid;padding:10px 0;border-bottom:1px solid var(--line);font-weight:700;font-size:16px;line-height:1.3;color:var(--navy)}
+.bmh-planos li[hidden]{display:none}
+.bmh-planos small{display:block;font-weight:400;font-size:13px;color:var(--muted);margin-top:2px}
+#autorizacao .bmh-steps li{background:var(--mist)}
+@media (min-width:600px){.bmh-planos{columns:3;column-gap:24px}}
+@media (min-width:860px){
+  .bmh-filtro{padding:26px 28px}
+  .bmh-filtro label{font-size:21px}
+  .bmh-planos{columns:4;column-gap:32px;margin-top:32px}
+  .bmh-planos li{font-size:17px}
+}
+</style>
+
+<div class="bmh">
+{{molde:cabecalho}}
+
+<section class="bmh-hero bmh-hero--int"><div class="bmh-w">
+<p class="bmh-trilha"><a href="/">Início</a> › Convênios</p>
+<h1>Convênios atendidos pela BMH em Brasília</h1>
+<p class="bmh-hero__sub">A BMH, Brasília Medicina Hiperbárica, atende 50 convênios para oxigenoterapia hiperbárica (câmara hiperbárica) e também pacientes particulares. Atendemos nas duas unidades, Asa Sul e Taguatinga. A recepção confere o seu plano pelo WhatsApp antes de agendar.</p>
+<div class="bmh-hero__ctas">
+<a class="bmh-btn bmh-btn--oxy bmh-whatsapp" href="{{wa:convenio}}">{{svg:wa}}Confirmar o meu convênio</a>
+<a class="bmh-link" href="#lista">Ver a lista</a>
+</div>
+<p class="bmh-hero__hora">A recepção responde todos os dias, das 7h às 19h.</p>
+</div></section>
+
+<section id="lista" class="bmh-sec"><div class="bmh-w">
+<div class="bmh-texto">
+<h2 id="lista-titulo">Os 50 convênios atendidos</h2>
+<p>A lista vale para as duas unidades e está em ordem alfabética.</p>
+</div>
+<div class="bmh-filtro" id="bmh-filtro" hidden>
+<label for="bmh-busca">Procure o seu plano</label>
+<input class="bmh-busca" id="bmh-busca" type="search" placeholder="Digite o nome. Ex.: GEAP" autocomplete="off" aria-controls="bmh-planos" aria-describedby="bmh-res">
+<p class="bmh-res" id="bmh-res" aria-live="polite"></p>
+<p class="bmh-conv__p">A recepção confere o seu plano antes de agendar. <a class="bmh-whatsapp" href="{{wa:convenio}}">Confirmar pelo WhatsApp</a></p>
+</div>
+<ul class="bmh-planos" id="bmh-planos" aria-labelledby="lista-titulo">
+<li data-nome="AFEB" data-busca="afeb associacao dos funcionarios das empresas brasal brasal">AFEB<small>Associação dos Funcionários das Empresas Brasal</small></li>
+<li data-nome="Affego Saúde" data-busca="affego saude afego">Affego Saúde</li>
+<li data-nome="Amil" data-busca="amil">Amil</li>
+<li data-nome="Assefaz" data-busca="assefaz fundacao assefaz">Assefaz<small>Fundação Assefaz</small></li>
+<li data-nome="Banco Central do Brasil" data-busca="banco central do brasil bacen">Banco Central do Brasil</li>
+<li data-nome="Bradesco Saúde" data-busca="bradesco saude">Bradesco Saúde</li>
+<li data-nome="CAEME" data-busca="caeme">CAEME</li>
+<li data-nome="Caesan" data-busca="caesan">Caesan</li>
+<li data-nome="Camed Saúde" data-busca="camed saude">Camed Saúde</li>
+<li data-nome="Capesesp" data-busca="capesesp">Capesesp</li>
+<li data-nome="Care Plus" data-busca="care plus">Care Plus</li>
+<li data-nome="Casembrapa" data-busca="casembrapa embrapa">Casembrapa</li>
+<li data-nome="Cassi" data-busca="cassi banco do brasil">Cassi</li>
+<li data-nome="CNTI" data-busca="cnti">CNTI</li>
+<li data-nome="Codevasf" data-busca="codevasf">Codevasf</li>
+<li data-nome="Conab" data-busca="conab">Conab</li>
+<li data-nome="E-Vida" data-busca="e vida">E-Vida</li>
+<li data-nome="Fascal" data-busca="fascal">Fascal</li>
+<li data-nome="Funsa" data-busca="funsa">Funsa</li>
+<li data-nome="Fusex" data-busca="fusex fundo de saude do exercito exercito">Fusex<small>Fundo de Saúde do Exército</small></li>
+<li data-nome="GEAP Saúde" data-busca="geap saude">GEAP Saúde</li>
+<li data-nome="Golden Cross" data-busca="golden cross">Golden Cross</li>
+<li data-nome="Gravia" data-busca="gravia">Gravia</li>
+<li data-nome="Inas" data-busca="inas instituto de assistencia a saude do servidor do df gdf saude">Inas<small>Instituto de Assistência à Saúde do Servidor do DF, GDF Saúde</small></li>
+<li data-nome="Life Empresarial Saúde" data-busca="life empresarial saude">Life Empresarial Saúde</li>
+<li data-nome="Mediservice" data-busca="mediservice">Mediservice</li>
+<li data-nome="NotreDame Intermédica" data-busca="notredame intermedica gndi">NotreDame Intermédica</li>
+<li data-nome="Omint Saúde" data-busca="omint saude">Omint Saúde</li>
+<li data-nome="Petrobras" data-busca="petrobras saude petrobras">Petrobras</li>
+<li data-nome="Plan-Assiste" data-busca="plan assiste mpu">Plan-Assiste</li>
+<li data-nome="PMDF" data-busca="pmdf policia militar do distrito federal">PMDF<small>Polícia Militar do Distrito Federal</small></li>
+<li data-nome="Postal Saúde" data-busca="postal saude correios">Postal Saúde<small>Correios</small></li>
+<li data-nome="Prevent Senior" data-busca="prevent senior">Prevent Senior</li>
+<li data-nome="Proasa" data-busca="proasa programa adventista de saude">Proasa<small>Programa Adventista de Saúde</small></li>
+<li data-nome="Pró-Saúde" data-busca="pro saude">Pró-Saúde</li>
+<li data-nome="Real Grandeza" data-busca="real grandeza">Real Grandeza</li>
+<li data-nome="Saúde BRB" data-busca="saude brb">Saúde BRB</li>
+<li data-nome="Saúde Caixa" data-busca="saude caixa caixa economica">Saúde Caixa</li>
+<li data-nome="Serpro" data-busca="serpro">Serpro</li>
+<li data-nome="SIS Senado Federal" data-busca="sis senado federal">SIS Senado Federal</li>
+<li data-nome="Smile Saúde" data-busca="smile saude">Smile Saúde</li>
+<li data-nome="STF-Med" data-busca="stf med">STF-Med</li>
+<li data-nome="STJ" data-busca="stj superior tribunal de justica">STJ<small>Superior Tribunal de Justiça</small></li>
+<li data-nome="STM" data-busca="stm superior tribunal militar">STM<small>Superior Tribunal Militar</small></li>
+<li data-nome="SulAmérica Saúde" data-busca="sulamerica saude">SulAmérica Saúde</li>
+<li data-nome="TJDFT" data-busca="tjdft">TJDFT</li>
+<li data-nome="TRF Pró-Social" data-busca="trf pro social">TRF Pró-Social</li>
+<li data-nome="TRT" data-busca="trt">TRT</li>
+<li data-nome="TST Saúde" data-busca="tst saude">TST Saúde</li>
+<li data-nome="Unafisco Saúde" data-busca="unafisco saude">Unafisco Saúde</li>
+</ul>
+<p class="bmh-mais">Não achou o seu plano? A lista muda de tempos em tempos. <a class="bmh-link bmh-whatsapp" href="{{wa:convenio}}">Pergunte à recepção</a></p>
+</div></section>
+
+<section id="fora-da-lista" class="bmh-sec bmh-mist"><div class="bmh-w bmh-texto">
+<h2>Unimed e atendimento particular</h2>
+<p><b>Não atendemos Unimed.</b> Se esse é o seu plano, ou se o seu plano não está na lista, você pode fazer o tratamento na BMH como particular.</p>
+<p>No particular, o cuidado é o mesmo: avaliação médica antes da primeira sessão e médico na unidade em todas as sessões. O valor depende do motivo do tratamento, e a recepção informa pelo WhatsApp.</p>
+</div></section>
+
+<section id="autorizacao" class="bmh-sec"><div class="bmh-w">
+<div class="bmh-texto">
+<h2>O que o plano costuma pedir</h2>
+<p>Cada plano tem a sua regra. Em geral, para liberar a oxigenoterapia hiperbárica, ele pede três coisas:</p>
+</div>
+<ol class="bmh-steps" style="max-width:980px">
+<li><i>1</i><span><b>Pedido médico</b>O pedido do seu médico, com a indicação da oxigenoterapia hiperbárica.</span></li>
+<li><i>2</i><span><b>Relatório médico</b>Um texto do médico que explica o seu caso e o motivo da indicação.</span></li>
+<li><i>3</i><span><b>Autorização do plano</b>A liberação do plano antes da primeira sessão.</span></li>
+</ol>
+<div class="bmh-texto">
+<p class="bmh-aviso">Quem decide a cobertura é o plano, de acordo com o seu contrato e com a indicação médica. A recepção da BMH confere o que o seu plano pede e ajuda com a autorização. Ainda não tem pedido médico? Fale com a recepção: ela explica o caminho.</p>
+</div>
+<a class="bmh-btn bmh-btn--navy bmh-whatsapp" href="{{wa:convenio}}" style="margin-top:26px">{{svg:wa}}Confirmar o meu convênio</a>
+</div></section>
+
+<section id="unidades" class="bmh-sec bmh-mist"><div class="bmh-w bmh-texto">
+<h2>Os mesmos convênios nas duas unidades</h2>
+<p>A Asa Sul e Taguatinga atendem a mesma lista de convênios. As duas abrem todos os dias, das 7h às 19h, inclusive sábado e domingo.</p>
+<ul class="bmh-fatos">
+<li><b>Asa Sul</b><span>SGAS 613, Conjunto E, Bloco A, 1º subsolo, Complexo Médico Hospitalar, L2 Sul, Brasília/DF, CEP 70200-730. <a href="/hiperbarica-asa-sul/">Ver a unidade</a></span></li>
+<li><b>Taguatinga</b><span>Prédio Prime Excelência Médica, Torre D, Lojas 2 a 5, Setor C Norte, Taguatinga, CEP 72115-700. <a href="/hiperbarica-taguatinga/">Ver a unidade</a></span></li>
+<li><b>Telefone e WhatsApp</b><span><a class="bmh-telefone" href="tel:+556133466005">(61) 3346-6005</a></span></li>
+</ul>
+</div></section>
+
+<section id="perguntas" class="bmh-sec"><div class="bmh-w">
+<h2 class="bmh-h2">Perguntas sobre convênio</h2>
+<div class="bmh-faq">
+<details><summary>Como saber se a BMH atende o meu convênio?</summary><p>A BMH atende os 50 convênios desta página. Procure o nome do seu plano na lista ou mande uma mensagem: a recepção confere o seu plano pelo WhatsApp antes de agendar.</p></details>
+<details><summary>Os convênios valem nas duas unidades?</summary><p>Sim. Atendemos nas duas unidades, <a href="/hiperbarica-asa-sul/">Asa Sul</a> e <a href="/hiperbarica-taguatinga/">Taguatinga</a>, com os mesmos convênios.</p></details>
+<details><summary>A BMH atende Unimed?</summary><p>Não atendemos Unimed. Quem tem Unimed pode fazer o tratamento na BMH como particular, com a mesma avaliação médica e o mesmo acompanhamento.</p></details>
+<details><summary>O que o plano pede para liberar a câmara hiperbárica?</summary><p>Cada plano tem a sua regra. Em geral, ele pede o pedido médico, um relatório do médico sobre o caso e uma autorização antes da primeira sessão. A recepção confere o que o seu plano pede e ajuda com a autorização.</p></details>
+<details><summary>O plano cobre a câmara hiperbárica?</summary><p>A ANS define as indicações em que a cobertura da câmara hiperbárica é obrigatória. Fora delas, a cobertura depende do contrato do seu plano e da indicação médica. A recepção confere o seu caso pelo WhatsApp antes de agendar.</p></details>
+<details><summary>Meu plano não está na lista. E agora?</summary><p>A lista muda de tempos em tempos. Mande o nome do seu plano pelo WhatsApp e a recepção confere. Se ele não for atendido, você pode fazer o tratamento como particular.</p></details>
+<details><summary>Sou particular. Consigo reembolso do meu plano?</summary><p>Quem define o reembolso é o seu plano, e cada contrato tem a sua regra. Antes de começar, pergunte ao plano quais documentos ele pede; a recepção diz o que a BMH entrega.</p></details>
+</div>
+<p class="bmh-mais"><a class="bmh-link" href="/perguntas-frequentes/">Ver todas as perguntas</a></p>
+</div></section>
+
+{{molde:fim}}
+
+<script>
+(function () {
+  /* busca de convênio: filtra a lista que já está na página (sem JavaScript, a lista aparece inteira) */
+  var caixa = document.getElementById('bmh-filtro');
+  var campo = document.getElementById('bmh-busca');
+  var lista = document.getElementById('bmh-planos');
+  var res = document.getElementById('bmh-res');
+  if (!caixa || !campo || !lista || !res) { return; }
+  var de = 'áàâãäéèêëíìîïóòôõöúùûüç';
+  var para = 'aaaaaeeeeiiiiooooouuuuc';
+  var limpa = function (s) {
+    s = String(s || '').toLowerCase();
+    var r = '';
+    for (var i = 0; i < s.length; i++) {
+      var c = s.charAt(i);
+      var k = de.indexOf(c);
+      if (k !== -1) { c = para.charAt(k); }
+      if (/[a-z0-9]/.test(c)) { r += c; }
+    }
+    return r;
+  };
+  var itens = lista.getElementsByTagName('li');
+  var chaves = [];
+  for (var i = 0; i < itens.length; i++) { chaves.push(limpa(itens[i].getAttribute('data-busca'))); }
+  caixa.hidden = false;
+  campo.addEventListener('input', function () {
+    var q = limpa(campo.value);
+    var achados = [];
+    for (var j = 0; j < itens.length; j++) {
+      var mostra = q.length < 2 ? true : chaves[j].indexOf(q) !== -1;
+      itens[j].hidden = !mostra;
+      if (mostra) { achados.push(itens[j].getAttribute('data-nome')); }
+    }
+    res.className = achados.length > 0 ? 'bmh-res bmh-res--ok' : 'bmh-res';
+    if (q.length < 2) { res.className = 'bmh-res'; res.textContent = ''; return; }
+    var unimed = q.length >= 3 ? ('unimed'.indexOf(q) === 0 || q.indexOf('unimed') !== -1) : false;
+    if (unimed) {
+      res.className = 'bmh-res';
+      res.textContent = 'Não atendemos Unimed. Você pode fazer o tratamento como particular.';
+    } else if (achados.length === 1) {
+      res.textContent = 'Atendemos ' + achados[0] + '.';
+    } else if (achados.length > 1) {
+      res.textContent = achados.length + ' convênios da lista têm esse nome.';
+    } else {
+      res.textContent = 'Esse nome não está na lista, mas ela muda. Confirme com a recepção.';
+    }
+  });
+})();
+</script>
+
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"FAQPage","@id":"https://hiperbaricabrasilia.com.br/convenios/#pagina","url":"https://hiperbaricabrasilia.com.br/convenios/","name":"Convênios atendidos pela BMH em Brasília","inLanguage":"pt-BR","publisher":{"@id":"https://hiperbaricabrasilia.com.br/#organizacao"},"mainEntity":[{"@type":"Question","name":"Como saber se a BMH atende o meu convênio?","acceptedAnswer":{"@type":"Answer","text":"A BMH atende os 50 convênios desta página. Procure o nome do seu plano na lista ou mande uma mensagem: a recepção confere o seu plano pelo WhatsApp antes de agendar."}},{"@type":"Question","name":"Os convênios valem nas duas unidades?","acceptedAnswer":{"@type":"Answer","text":"Sim. Atendemos nas duas unidades, Asa Sul e Taguatinga, com os mesmos convênios."}},{"@type":"Question","name":"A BMH atende Unimed?","acceptedAnswer":{"@type":"Answer","text":"Não atendemos Unimed. Quem tem Unimed pode fazer o tratamento na BMH como particular, com a mesma avaliação médica e o mesmo acompanhamento."}},{"@type":"Question","name":"O que o plano pede para liberar a câmara hiperbárica?","acceptedAnswer":{"@type":"Answer","text":"Cada plano tem a sua regra. Em geral, ele pede o pedido médico, um relatório do médico sobre o caso e uma autorização antes da primeira sessão. A recepção confere o que o seu plano pede e ajuda com a autorização."}},{"@type":"Question","name":"O plano cobre a câmara hiperbárica?","acceptedAnswer":{"@type":"Answer","text":"A ANS define as indicações em que a cobertura da câmara hiperbárica é obrigatória. Fora delas, a cobertura depende do contrato do seu plano e da indicação médica. A recepção confere o seu caso pelo WhatsApp antes de agendar."}},{"@type":"Question","name":"Meu plano não está na lista. E agora?","acceptedAnswer":{"@type":"Answer","text":"A lista muda de tempos em tempos. Mande o nome do seu plano pelo WhatsApp e a recepção confere. Se ele não for atendido, você pode fazer o tratamento como particular."}},{"@type":"Question","name":"Sou particular. Consigo reembolso do meu plano?","acceptedAnswer":{"@type":"Answer","text":"Quem define o reembolso é o seu plano, e cada contrato tem a sua regra. Antes de começar, pergunte ao plano quais documentos ele pede; a recepção diz o que a BMH entrega."}}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Início","item":"https://hiperbaricabrasilia.com.br/"},{"@type":"ListItem","position":2,"name":"Convênios","item":"https://hiperbaricabrasilia.com.br/convenios/"}]}]}</script>

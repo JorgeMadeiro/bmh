@@ -1,0 +1,460 @@
+<!-- wa-da-pagina: geral -->
+<!-- BMH · página da equipe médica (fonte), RASCUNHO de 15/10/2026. Monta com scripts/montar-pagina.js.
+     Endereço sugerido: /equipe-medica/. Intenção: autoridade. Ação principal: agendar pelo WhatsApp (chave geral);
+     secundária: médico que encaminha (chave cirurgiao).
+     Fontes de cada frase e revisão em sete passadas: marketing/conteudo/bmh-pagina-equipe-medica-2026-10-15/.
+     Regras: nunca sugerir que o paciente é atendido por um diretor (dizer "médico em todas as sessões");
+     CRM e RQE só com o número; UHMS só nesta página (formação concluída, Jorge 15/10/2026); descrições dos três diretores no mesmo padrão. -->
+<link rel="preload" as="font" type="font/woff2" href="https://fonts.gstatic.com/s/librefranklin/v20/jizDREVItHgc8qDIbSTKq4XkRiUf2zcZiVbJ.woff2" crossorigin>
+<style>
+/* Letra declarada aqui, sem a folha do Google Fonts que travava a primeira tela. Se o Google mudar a versão (v20),
+   pegar o endereço novo em fonts.googleapis.com/css2?family=Libre+Franklin:wght@400..800&display=swap (bloco "latin"). */
+@font-face{font-family:'Libre Franklin';font-style:normal;font-weight:400 800;font-display:swap;src:url(https://fonts.gstatic.com/s/librefranklin/v20/jizDREVItHgc8qDIbSTKq4XkRiUf2zcZiVbJ.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+/* ---------- tema: some o cabeçalho, o rodapé e o título do Astra nesta página ---------- */
+.site-header,.site-footer,.ast-above-header-wrap,.ast-below-header-wrap,.ast-mobile-header-wrap,.entry-header,#masthead,#colophon{display:none!important}
+.site-content>.ast-container,.ast-container{max-width:none!important;padding:0!important;display:block!important}
+.site-content,#primary,.site-main,article.page,.entry-content{margin:0!important;padding:0!important;max-width:none!important;width:100%!important}
+.entry-content>.wp-block-html,.entry-content>*{margin:0!important;max-width:none!important}
+body{background:#fff}
+/* ---------- marca ---------- */
+.bmh{--navy:#002375;--deep:#00143F;--ink:#142033;--txt:#2B3850;--muted:#4A5568;--oxy:#34A9CF;--oxyt:#1A6E93;--mist:#EEF5FA;--line:#DCE5EE;--light:#9EDCF0;
+  font-family:'Libre Franklin',system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--ink);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.bmh *{box-sizing:border-box}
+.bmh a{color:var(--navy)}
+.bmh a,.bmh a:hover,.bmh a:focus,.bmh a:visited,.entry-content .bmh a{text-decoration:none!important;-webkit-text-decoration:none!important;box-shadow:none}
+.bmh img{max-width:100%;height:auto;display:block}
+/* o tema Astra pinta os títulos: as cores da BMH vencem com !important */
+.bmh h1,.bmh h2,.bmh h3{color:var(--navy)!important;font-family:'Libre Franklin',system-ui,-apple-system,'Segoe UI',sans-serif;letter-spacing:-.015em;margin:0;text-wrap:balance}
+.bmh h1,.bmh h2{font-weight:800!important}
+.bmh h3{font-weight:700!important}
+.bmh .bmh-hero h1,.bmh .bmh-final h2{color:#fff!important}
+.bmh p{margin:0}
+.bmh-w{max-width:1180px;margin:0 auto;padding:0 20px}
+.bmh-sec{padding:48px 0}
+.bmh-mist{background:var(--mist)}
+.bmh .bmh-eye{display:block;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--oxyt);margin:0 0 10px}
+.bmh-h2{font-size:30px;line-height:1.12}
+.bmh .bmh-lead{color:var(--txt);margin-top:14px}
+.bmh-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 24px;border-radius:999px;font-weight:700;font-size:17px;border:0;cursor:pointer;line-height:1.2;text-align:center}
+.bmh-btn svg{width:20px;height:20px;flex:none}
+.bmh-btn--navy{background:var(--navy);color:#fff!important}
+.bmh-btn--oxy{background:var(--oxy);color:var(--deep)!important}
+.bmh-btn--line{border:1px solid var(--navy);color:var(--navy)!important;background:#fff}
+.bmh .bmh-mais{margin-top:22px}
+.bmh-link{font-weight:700;color:var(--navy)}
+.bmh-link:after{content:" \2192";color:var(--oxyt)}
+/* ---------- cabeçalho ---------- */
+.bmh-head{background:#fff;border-bottom:1px solid var(--line);position:relative;z-index:5}
+/* mês temático: só vale com a classe no <html> (script do cabeçalho); linha no topo, laço ao lado do nome e etiquetas das
+   seções claras na cor do mês. Botões e cores de marca não mudam. */
+.bmh-laco{display:none}
+.bmh-mes-tematico .bmh-head::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:linear-gradient(90deg,var(--bmh-mes-claro),var(--bmh-mes) 50%,var(--bmh-mes-claro))}
+.bmh-mes-tematico .bmh-laco{display:inline-flex;align-self:center;margin-left:2px}
+.bmh-mes-tematico .bmh .bmh-sec .bmh-eye{color:var(--bmh-mes-etiqueta)}
+.bmh-head .bmh-w{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:62px}
+.bmh-logo{display:flex;align-items:center;gap:10px;color:var(--navy)}
+.bmh-logo img{width:64px;height:34px;object-fit:contain}
+.bmh-logo span{font-weight:600;font-size:14px;line-height:1.12;border-left:1px solid var(--line);padding-left:10px}
+.bmh-logo small{display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--oxyt)}
+.bmh-nav{display:none}
+.bmh-menu summary{list-style:none;cursor:pointer;width:44px;height:44px;border:1px solid var(--line);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--navy)}
+.bmh-menu summary::-webkit-details-marker{display:none}
+.bmh-menu nav{position:absolute;left:0;right:0;top:100%;background:#fff;border-bottom:1px solid var(--line);padding:8px 20px 20px;display:flex;flex-direction:column;box-shadow:0 12px 24px rgba(0,20,63,.10)}
+.bmh-menu nav a{padding:12px 0;border-bottom:1px solid var(--line);color:var(--ink);font-weight:600}
+.bmh-menu nav a.bmh-btn{margin-top:14px;border:0;color:#fff}
+/* ---------- topo ---------- */
+.bmh-hero{background:var(--deep);color:#fff}
+.bmh-hero .bmh-w{padding-top:36px;padding-bottom:32px}
+.bmh .bmh-onde{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--light);margin-bottom:14px}
+.bmh-hero h1{font-size:36px;line-height:1.06}
+.bmh .bmh-hero__sub{color:#C3D1EA;font-size:17px;margin-top:16px}
+.bmh .bmh-hero__ctas{display:flex;flex-direction:column;align-items:flex-start;gap:14px;margin-top:26px}
+.bmh-hero__ctas .bmh-btn{width:100%}
+.bmh-hero__ctas .bmh-link{color:#fff}
+.bmh-hero__ctas .bmh-link:after{color:var(--oxy)}
+.bmh .bmh-hero__hora{font-size:14px;color:#9FB2D3;margin-top:14px}
+.bmh-hero__foto{margin-top:28px}
+.bmh-hero__foto img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px}
+/* ---------- três provas ---------- */
+.bmh-provas{border-bottom:1px solid var(--line)}
+.bmh-provas .bmh-w{display:grid;gap:0}
+.bmh-provas .bmh-w>div{padding:18px 0;border-bottom:1px solid var(--line)}
+.bmh-provas .bmh-w>div:last-child{border-bottom:0}
+.bmh-provas b{display:block;font-size:20px;font-weight:800;color:var(--navy);line-height:1.2}
+.bmh-provas span{display:block;font-size:15px;color:var(--muted);margin-top:2px}
+/* ---------- qual é o seu caso ---------- */
+.bmh-tri{display:grid;gap:10px;margin-top:22px}
+.bmh-tri a{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:60px;padding:0 20px;background:#fff;border:1px solid #C9D6E3;border-radius:8px;color:var(--navy);font-weight:700;font-size:17px}
+.bmh-tri a:after{content:"\2192";color:var(--oxyt);font-size:20px}
+.bmh .bmh-tri__n{font-size:15px;color:var(--muted);margin-top:16px}
+.bmh-tri__n a{font-weight:700}
+/* ---------- pós-operatório ---------- */
+.bmh-pos{display:grid;gap:28px}
+.bmh .bmh-pos__ok{margin-top:18px;padding:14px 16px;background:var(--mist);border-radius:8px;font-size:16px;color:var(--txt)}
+.bmh-pos .bmh-btn{margin-top:24px}
+.bmh figure,.bmh .bmh-fig{margin:0}
+.bmh-fig img{width:100%;border-radius:8px;object-fit:cover}
+.bmh-fig figcaption{font-size:14px;color:var(--muted);margin-top:8px}
+.bmh-pos .bmh-fig img{aspect-ratio:4/5}
+/* ---------- como funciona ---------- */
+.bmh-steps{list-style:none;margin:24px 0 0;padding:0;display:grid;gap:12px}
+.bmh-steps li{display:flex;gap:14px;background:#fff;border-radius:8px;padding:18px}
+.bmh-steps i{flex:none;width:32px;height:32px;border-radius:50%;background:var(--navy);color:#fff;font-style:normal;font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center}
+.bmh-steps b{display:block;color:var(--navy);font-size:18px}
+.bmh-steps span{color:var(--txt);font-size:16px}
+.bmh-conv{background:#fff;border:1px solid #C9D6E3;border-radius:8px;padding:22px 20px;margin-top:20px}
+.bmh-conv label{display:block;font-size:21px;font-weight:700;color:var(--navy)}
+.bmh-busca{width:100%;min-height:52px;padding:0 16px;border:1px solid #8FA6C2;border-radius:6px;font:inherit;font-size:17px;color:var(--ink);background:#fff;margin-top:12px}
+.bmh .bmh-res{margin-top:12px;font-size:16px;min-height:1px}
+.bmh-res--ok{color:#0F5B3A;font-weight:700}
+.bmh .bmh-conv__p{font-size:15px;margin-top:12px;color:var(--muted)}
+.bmh-conv__p a{font-weight:700}
+/* ---------- estrutura ---------- */
+.bmh-galeria{display:grid;gap:14px;margin-top:24px}
+.bmh-galeria .bmh-fig img{aspect-ratio:3/2}
+.bmh-galeria__duas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.bmh-galeria__duas .bmh-fig img{aspect-ratio:4/5}
+/* ---------- quem cuida ---------- */
+.bmh-quem{display:grid;gap:26px}
+.bmh-quem .bmh-fig img{aspect-ratio:3/2}
+.bmh-dir{list-style:none;margin:20px 0 0;padding:0;border-top:1px solid var(--line)}
+.bmh-dir li{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.bmh-dir img{width:48px;height:48px;border-radius:50%;object-fit:cover;flex:none}
+.bmh-dir b{display:block;font-size:16px;color:var(--navy)}
+.bmh-dir span{font-size:13px;color:var(--muted)}
+.bmh .bmh-dir__t{font-size:15px;font-weight:700;color:var(--navy);margin-top:24px}
+/* ---------- indicações ---------- */
+.bmh-ind{list-style:none;margin:20px 0 0;padding:0;border-top:1px solid #C9D6E3}
+.bmh-ind li{padding:14px 0;border-bottom:1px solid #C9D6E3;font-weight:600;font-size:18px;color:var(--navy)}
+.bmh .bmh-merg{margin-top:22px;padding:18px;background:#fff;border-radius:8px;font-size:16px;color:var(--txt)}
+.bmh-merg b{color:var(--navy)}
+/* ---------- unidades ---------- */
+.bmh-uni{display:grid;gap:16px;margin-top:22px}
+.bmh-uni article{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+.bmh-uni img{width:100%;height:180px;object-fit:cover}
+.bmh-uni__b{padding:18px 18px 20px}
+.bmh-uni h3{font-size:22px}
+.bmh .bmh-uni p{font-size:15px;margin-top:6px}
+.bmh-two{display:flex;gap:8px;margin-top:16px}
+.bmh-two .bmh-btn{flex:1;padding:0 10px;font-size:15px;min-height:48px}
+/* ---------- perguntas ---------- */
+.bmh-faq{margin-top:22px;border-top:1px solid #C9D6E3}
+.bmh-faq details{border-bottom:1px solid #C9D6E3}
+.bmh-faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 0;font-weight:700;font-size:17px;color:var(--navy)}
+.bmh-faq summary::-webkit-details-marker{display:none}
+.bmh-faq summary:after{content:"+";flex:none;font-size:24px;font-weight:400;color:var(--oxyt);line-height:1}
+.bmh-faq details[open] summary:after{content:"\2212"}
+.bmh .bmh-faq p{padding:0 0 18px;color:var(--txt);font-size:16px}
+/* ---------- cirurgião, final e rodapé ---------- */
+.bmh-cir{border-top:1px solid var(--line)}
+.bmh-cir .bmh-w{padding-top:24px;padding-bottom:24px;display:flex;flex-direction:column;gap:14px}
+.bmh-cir p{font-size:16px;color:var(--txt)}
+.bmh-cir b{color:var(--navy)}
+.bmh-cir .bmh-btn{align-self:flex-start;min-height:46px;font-size:15px}
+.bmh-final{background:var(--deep);color:#fff}
+.bmh-final .bmh-w{padding-top:48px;padding-bottom:48px}
+.bmh-final h2{font-size:30px;line-height:1.12}
+.bmh .bmh-final p{color:#C3D1EA;margin-top:12px}
+.bmh-final .bmh-btn{margin-top:24px}
+.bmh-foot{background:#000E2E;color:#B9C8E4;font-size:14px;padding:32px 0 104px}
+.bmh-foot a{color:#B9C8E4}
+.bmh-foot strong{color:#fff}
+.bmh-foot__logo{width:110px;margin-bottom:18px}
+.bmh-foot__g{display:grid;gap:16px}
+.bmh-foot__g>div{min-width:0;overflow-wrap:anywhere;line-height:1.6}
+.bmh .bmh-foot__legal{margin-top:20px;padding-top:14px;border-top:1px solid #1B2C55;font-size:13px}
+.bmh .bmh-foot__links{margin-top:22px;font-size:14px;line-height:1.9}
+.bmh .bmh-foot__links a{color:inherit;text-decoration:underline;text-underline-offset:3px}
+/* barra fixa: aparece depois que o botão do topo sai da tela */
+.bmh-fix{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;gap:10px;padding:10px 16px 14px;background:#fff;border-top:1px solid var(--line);box-shadow:0 -6px 18px rgba(0,20,63,.10);transform:translateY(110%);transition:transform .25s}
+.bmh-fix.bmh-fix--on{transform:none}
+.bmh-fix .bmh-btn{flex:1}
+.bmh-fix .bmh-tel{flex:none;width:52px;height:52px;border-radius:50%;border:1px solid var(--navy);display:flex;align-items:center;justify-content:center;color:var(--navy)}
+.bmh-fix .bmh-tel svg{width:20px;height:20px}
+/* ---------- computador ---------- */
+@media (min-width:860px){
+  .bmh{font-size:18px}
+  .bmh-w{padding:0 28px}
+  .bmh-sec{padding:88px 0}
+  .bmh-h2{font-size:44px;line-height:1.06}
+  .bmh .bmh-lead{margin-top:20px;font-size:19px;max-width:720px}
+  .bmh-head .bmh-w{min-height:78px}
+  .bmh-logo{flex:none}
+  .bmh-logo img{width:94px;height:50px}
+  .bmh-logo span{font-size:18px;padding-left:14px;white-space:nowrap}
+  .bmh-hero .bmh-w{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:56px;align-items:center;padding-top:72px;padding-bottom:72px}
+  .bmh-hero h1{font-size:56px;line-height:1.03}
+  .bmh .bmh-hero__sub{font-size:20px;margin-top:22px;max-width:560px}
+  .bmh .bmh-hero__ctas{flex-direction:row;align-items:center;gap:28px;margin-top:34px}
+  .bmh-hero__ctas .bmh-btn{width:auto;flex:none;white-space:nowrap}
+  .bmh-hero__foto{margin-top:0}
+  .bmh-provas .bmh-w{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .bmh-provas .bmh-w>div{padding:28px 28px 28px 0;border-bottom:0}
+  .bmh-provas .bmh-w>div+div{padding-left:28px;border-left:1px solid var(--line)}
+  .bmh-provas b{font-size:24px}
+  .bmh-tri{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:32px}
+  .bmh-tri a{min-height:72px;font-size:19px;padding:0 26px}
+  .bmh-pos{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:72px;align-items:center}
+  .bmh-steps{grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+  .bmh-steps li{flex-direction:column;padding:26px}
+  .bmh-conv{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:28px;align-items:end;padding:30px}
+  .bmh-galeria{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:18px;margin-top:36px}
+  .bmh-galeria>.bmh-fig img{height:100%;aspect-ratio:auto}
+  .bmh-quem{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:72px;align-items:center}
+  .bmh-dir b{font-size:18px}
+  .bmh-dir span{font-size:15px}
+  .bmh-ind{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:48px}
+  .bmh-ind li{font-size:21px;padding:18px 0}
+  .bmh-uni{grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}
+  .bmh-uni img{height:240px}
+  .bmh-uni__b{padding:26px 30px 30px}
+  .bmh-uni h3{font-size:28px}
+  .bmh-faq{max-width:860px}
+  .bmh-faq summary{font-size:20px;padding:22px 0}
+  .bmh .bmh-faq p{font-size:18px}
+  .bmh-cir .bmh-w{flex-direction:row;align-items:center;justify-content:space-between;gap:32px}
+  .bmh-cir .bmh-btn{align-self:auto;flex:none}
+  .bmh-final .bmh-w{display:flex;justify-content:space-between;align-items:center;gap:48px;padding-top:80px;padding-bottom:80px}
+  .bmh-final h2{font-size:44px;max-width:640px}
+  .bmh-final .bmh-btn{margin-top:0;flex:none}
+  .bmh-foot{padding:56px 0 32px;font-size:15px}
+  .bmh-foot__g{grid-template-columns:repeat(4,minmax(0,1fr));gap:32px}
+  .bmh-fix{display:none}
+}
+@media (min-width:1180px){
+  .bmh-menu{display:none}
+  .bmh-nav{display:flex;flex-wrap:nowrap;align-items:center;gap:20px;white-space:nowrap}
+  .bmh-nav a{color:var(--ink);font-weight:600;font-size:15px}
+  .bmh-nav a.bmh-btn{min-height:46px;padding:0 20px;color:#fff}
+}
+</style>
+<style>
+/* ---------- páginas internas (molde, 08/10/2026) ---------- */
+.bmh .bmh-trilha{font-size:13px;color:#9FB2D3;margin-bottom:14px}
+.bmh-trilha a{color:#C3D1EA!important}
+.bmh-hero--int .bmh-w{padding-top:30px;padding-bottom:36px}
+.bmh-hero--int h1{font-size:32px}
+.bmh-texto{max-width:760px}
+.bmh-w.bmh-texto{max-width:1180px}
+.bmh-w.bmh-texto>*{max-width:760px}
+.bmh-texto h2{font-size:26px;line-height:1.15;margin:40px 0 0!important}
+.bmh-texto h2:first-child{margin-top:0!important}
+.bmh-texto h3{font-size:20px;margin:28px 0 0!important}
+.bmh .bmh-texto p{margin-top:14px;color:var(--txt)}
+.bmh-texto ul{margin:14px 0 0;padding-left:22px;color:var(--txt)}
+.bmh-texto li{margin-top:8px}
+.bmh-texto a{font-weight:700}
+.bmh .bmh-aviso{margin-top:22px;padding:18px;border-left:4px solid var(--oxy);background:var(--mist);border-radius:0 8px 8px 0;color:var(--txt)}
+.bmh-fatos{list-style:none;margin:20px 0 0;padding:0;border-top:1px solid var(--line)}
+.bmh-fatos li{padding:14px 0;border-bottom:1px solid var(--line);display:grid;gap:2px}
+.bmh-fatos b{font-size:14px;font-weight:700;color:var(--oxyt);letter-spacing:.04em;text-transform:uppercase}
+.bmh-fatos span{color:var(--ink)}
+.bmh-rotas{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.bmh-rotas .bmh-btn{min-height:46px;font-size:15px;padding:0 18px}
+.bmh-fotos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:22px}
+.bmh-fotos .bmh-fig img{aspect-ratio:4/3}
+.bmh-fotos .bmh-fig--larga{grid-column:1/-1}
+.bmh-fotos .bmh-fig--larga img{aspect-ratio:3/2}
+.bmh-duas{display:grid;gap:28px}
+@media (min-width:860px){
+  .bmh-hero--int .bmh-w{display:block;padding-top:56px;padding-bottom:64px}
+  .bmh-hero--int h1{font-size:50px;max-width:900px}
+  .bmh-hero--int .bmh-hero__sub{max-width:720px}
+  .bmh-texto h2{font-size:34px;margin-top:56px!important}
+  .bmh-texto h3{font-size:23px}
+  .bmh .bmh-texto p,.bmh-texto ul{font-size:19px}
+  .bmh-fotos{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+  .bmh-duas{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:64px;align-items:start}
+}
+</style>
+<style>
+/* ---------- página da equipe médica (15/10/2026) ---------- */
+.bmh .bmh-hero__hora a{color:#fff!important;font-weight:700}
+.bmh-dirs{list-style:none;margin:24px 0 0;padding:0;display:grid;gap:14px}
+.bmh-dirs>li{background:#fff;border:1px solid var(--line);border-radius:8px;padding:20px}
+.bmh-dirs__topo{display:flex;gap:14px;align-items:center}
+.bmh-dirs img{width:88px;height:88px;border-radius:50%;object-fit:cover;flex:none}
+.bmh-dirs h3{font-size:21px;line-height:1.2}
+.bmh .bmh-dirs__cargo{font-size:15px;font-weight:700;color:var(--oxyt);margin-top:4px;line-height:1.3}
+.bmh .bmh-dirs__reg{font-size:14px;color:var(--muted);margin-top:4px}
+.bmh-dirs ul{margin:16px 0 0;padding-left:20px;color:var(--txt);font-size:16px}
+.bmh-dirs ul li{margin-top:6px}
+.bmh .bmh-nota{font-size:15px;color:var(--muted);margin-top:20px;max-width:760px}
+.bmh-fatos a{font-weight:700}
+@media (min-width:860px){
+  .bmh-dirs{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:36px}
+  .bmh-dirs>li{padding:26px}
+  .bmh-dirs img{width:104px;height:104px}
+  .bmh-dirs ul{font-size:17px}
+}
+</style>
+
+<div class="bmh">
+<!-- Mês temático (15/10/2026, Jorge: "pode fazer de todos os meses já"): só cor, sem texto novo. No dia 1º de cada mês liga
+     a classe bmh-mes-tematico e as cores da campanha do mês (hora de Brasília). Mudar campanha ou cor = mudar esta tabela
+     (molde _molde/cabecalho.html e home-v2.html) e reenviar as páginas. Contraste das etiquetas conferido (mínimo 5,2). -->
+<script>(function(){try{var T={1:['#9E9E9E','#E0E0E0','#616161'],2:['#6A1B9A','#CE93D8','#6A1B9A'],3:['#8E44AD','#D7BDE2','#7D3C98'],4:['#29B6F6','#B3E5FC','#01579B'],
+5:['#F9A825','#FFE082','#8A5A00'],6:['#E53935','#EF9A9A','#B71C1C'],7:['#F9A825','#FFE082','#8A5A00'],8:['#C9A227','#F1DE9B','#735A0A'],9:['#F9A825','#FFE082','#8A5A00'],
+10:['#E91E63','#F48FB1','#C2185B'],11:['#1E88E5','#90CAF9','#1565C0'],12:['#C62828','#EF9A9A','#B71C1C']};var m=new Date(Date.now()-3*3600*1000).getUTCMonth()+1,c=T[m];if(!c)return;
+var r=document.documentElement;r.classList.add('bmh-mes-tematico');r.style.setProperty('--bmh-mes',c[0]);r.style.setProperty('--bmh-mes-claro',c[1]);r.style.setProperty('--bmh-mes-etiqueta',c[2])}catch(e){}})();</script>
+<header class="bmh-head"><div class="bmh-w">
+<a class="bmh-logo" href="/"><img src="{{img:bmh-logo.png}}" alt="BMH" width="300" height="159"><span>Brasília Medicina Hiperbárica<small>desde 2004</small></span><span class="bmh-laco" aria-hidden="true"><svg viewBox="0 0 24 36" width="16" height="24" focusable="false"><path fill="var(--bmh-mes,#E91E63)" d="M12 2c-3.3 0-5.5 2.6-5.5 5.6 0 2.3 1.2 4.6 2.8 7.1L3 30l4.2 1.8 4.8-10.6 4.8 10.6L21 30l-6.3-15.3c1.6-2.5 2.8-4.8 2.8-7.1C17.5 4.6 15.3 2 12 2zm0 3.2c1.4 0 2.3 1.1 2.3 2.5 0 1.3-.9 3-2.3 5.2-1.4-2.2-2.3-3.9-2.3-5.2 0-1.4.9-2.5 2.3-2.5z"/></svg></span></a>
+<nav class="bmh-nav" aria-label="Principal">
+<a href="/pos-operatorio-cirurgia-plastica/">Pós-operatório</a>
+<a href="/feridas-que-nao-cicatrizam/">Feridas</a>
+<a href="/hiperbarica-asa-sul/">Asa Sul</a>
+<a href="/hiperbarica-taguatinga/">Taguatinga</a>
+<a href="/convenios/">Convênios</a>
+<a href="/perguntas-frequentes/">Perguntas</a>
+<a class="bmh-btn bmh-btn--navy bmh-whatsapp" href="{{wa:geral}}">{{svg:wa}}Agendar pelo WhatsApp</a>
+</nav>
+<details class="bmh-menu"><summary aria-label="Menu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></summary>
+<nav aria-label="Menu do celular">
+<a href="/pos-operatorio-cirurgia-plastica/">Pós-operatório de cirurgia plástica</a>
+<a href="/hiperbarica-asa-sul/">Unidade Asa Sul</a>
+<a href="/hiperbarica-taguatinga/">Unidade Taguatinga</a>
+<a href="/convenios/">Convênios</a>
+<a href="/feridas-que-nao-cicatrizam/">Feridas e pé diabético</a>
+<a href="/equipe-medica/">Equipe médica</a>
+<a href="/perguntas-frequentes/">Perguntas frequentes</a>
+<a class="bmh-btn bmh-btn--navy bmh-whatsapp" href="{{wa:geral}}">{{svg:wa}}Agendar pelo WhatsApp</a>
+</nav></details>
+</div></header>
+
+
+<section class="bmh-hero bmh-hero--int"><div class="bmh-w">
+<p class="bmh-trilha"><a href="/">Início</a> › Equipe médica</p>
+<h1>Equipe médica da BMH</h1>
+<p class="bmh-hero__sub">Médico em todas as sessões de oxigenoterapia hiperbárica, na Asa Sul e em Taguatinga. Os protocolos são definidos pela direção médica, formada por três médicos com pós-graduação em medicina hiperbárica.</p>
+<div class="bmh-hero__ctas">
+<a class="bmh-btn bmh-btn--oxy bmh-whatsapp" href="{{wa:geral}}">{{svg:wa}}Agendar pelo WhatsApp</a>
+<a class="bmh-link bmh-whatsapp" href="{{wa:cirurgiao}}">Sou médico e quero encaminhar um paciente</a>
+</div>
+<p class="bmh-hero__hora">Todos os dias, das 7h às 19h. Telefone e WhatsApp: <a class="bmh-telefone" href="tel:+556133466005">(61) 3346-6005</a>.</p>
+</div></section>
+
+<section id="equipe" class="bmh-sec"><div class="bmh-w bmh-duas">
+<div class="bmh-texto">
+<h2>Médico em todas as sessões</h2>
+<p>Em todas as sessões, um médico da equipe da BMH está na unidade, do início ao fim. Ele avalia você antes de começar, acompanha a sessão e responde na hora a qualquer imprevisto.</p>
+<p>Se você sentir qualquer desconforto durante a sessão, quem responde é um médico, ali mesmo, na unidade.</p>
+<p>Os médicos da equipe seguem os mesmos protocolos nas duas unidades, em qualquer dia e horário. Quem define esses protocolos é a direção médica.</p>
+</div>
+<figure class="bmh-fig">
+<img src="{{img:bmh-equipe-medica-sala-monoplace-1200.webp}}" srcset="{{img:bmh-equipe-medica-sala-monoplace-800.webp}} 800w, {{img:bmh-equipe-medica-sala-monoplace-1200.webp}} 1200w" sizes="(min-width:860px) 480px, 100vw" alt="Sete médicos da equipe da BMH, de jaleco branco, lado a lado na sala das câmaras monoplace da unidade Asa Sul" width="1200" height="800" loading="lazy">
+<figcaption>Parte da equipe médica da BMH na sala das câmaras monoplace, na Asa Sul (2025).</figcaption>
+</figure>
+</div></section>
+
+<section id="direcao" class="bmh-sec bmh-mist"><div class="bmh-w">
+<div class="bmh-texto">
+<h2>Direção médica</h2>
+<p>A direção médica responde pelos protocolos da BMH: quem tem indicação para a oxigenoterapia hiperbárica, como cada sessão é conduzida e como a equipe age diante de um imprevisto.</p>
+</div>
+<ul class="bmh-dirs">
+<li>
+<div class="bmh-dirs__topo">
+<img src="{{img:bmh-dr-jorge-madeiro.jpg}}" alt="Retrato do Dr. Jorge Madeiro, diretor médico da BMH" width="240" height="240" loading="lazy">
+<div><h3>Dr. Jorge Madeiro</h3><p class="bmh-dirs__cargo">Diretor médico</p><p class="bmh-dirs__reg">CRM-DF 31687 · RQE 26863</p></div>
+</div>
+<ul>
+<li>Pós-graduação em medicina hiperbárica.</li>
+<li>Integra a direção médica, que responde pelos protocolos da BMH.</li>
+</ul>
+</li>
+<li>
+<div class="bmh-dirs__topo">
+<img src="{{img:bmh-dr-helio-ivan.jpg}}" alt="Retrato do Dr. Hélio Ivan, responsável técnico da unidade Asa Sul da BMH" width="240" height="240" loading="lazy">
+<div><h3>Dr. Hélio Ivan</h3><p class="bmh-dirs__cargo">Responsável técnico · unidade Asa Sul</p><p class="bmh-dirs__reg">CRM-DF 8164 · RQE 26705</p></div>
+</div>
+<ul>
+<li>Pós-graduação em medicina hiperbárica.</li>
+<li>Integra a direção médica, que responde pelos protocolos da BMH.</li>
+</ul>
+</li>
+<li>
+<div class="bmh-dirs__topo">
+<img src="{{img:bmh-dr-alberto-jorge.jpg}}" alt="Retrato do Dr. Alberto Jorge, responsável técnico da unidade Taguatinga da BMH" width="240" height="240" loading="lazy">
+<div><h3>Dr. Alberto Jorge</h3><p class="bmh-dirs__cargo">Responsável técnico · unidade Taguatinga</p><p class="bmh-dirs__reg">CRM-DF 7248 · RQE 14575</p></div>
+</div>
+<ul>
+<li>Pós-graduação em medicina hiperbárica.</li>
+<li>Integra a direção médica, que responde pelos protocolos da BMH.</li>
+</ul>
+</li>
+</ul>
+<p class="bmh-nota">Os três diretores têm pós-graduação em medicina hiperbárica no Brasil. O Dr. Jorge Madeiro fez a dele pela Santa Casa e também concluiu nos Estados Unidos a formação <i>The UHMS Program for Advanced Training in Hyperbaric Medicine</i>. Ele integra a diretoria da Sociedade Brasileira de Medicina Marítima e Hiperbárica, chapa 2026/27.</p>
+<p class="bmh-nota">Cada unidade tem um responsável técnico: o médico que responde por ela perante o Conselho Regional de Medicina do Distrito Federal. CRM é o número de registro no conselho; RQE, o Registro de Qualificação de Especialista.</p>
+</div></section>
+
+<section id="clinica" class="bmh-sec"><div class="bmh-w bmh-texto">
+<h2>Desde 2004 em Brasília</h2>
+<p>A BMH foi a primeira clínica particular de oxigenoterapia hiperbárica de Brasília e atende desde 2004. Hoje são duas unidades, abertas todos os dias, inclusive sábado e domingo, das 7h às 19h.</p>
+<ul class="bmh-fatos">
+<li><b>Asa Sul</b><span>SGAS 613, Conjunto E, Bloco A, 1º subsolo, Complexo Médico Hospitalar, L2 Sul, CEP 70200-730. <a href="/hiperbarica-asa-sul/">Ver a unidade Asa Sul</a></span></li>
+<li><b>Taguatinga</b><span>Prédio Prime Excelência Médica, Torre D, Lojas 2 a 5, Setor C Norte, Taguatinga, CEP 72115-700. <a href="/hiperbarica-taguatinga/">Ver a unidade Taguatinga</a></span></li>
+<li><b>Convênios</b><span>50 convênios atendidos. <a href="/convenios/">Ver a lista</a></span></li>
+</ul>
+</div></section>
+
+<section id="perguntas" class="bmh-sec bmh-mist"><div class="bmh-w">
+<div class="bmh-texto"><h2>Perguntas sobre a equipe</h2></div>
+<div class="bmh-faq">
+<details><summary>Quem acompanha a minha sessão?</summary><p>Um médico da equipe da BMH, que fica na unidade do início ao fim da sessão. Todos os médicos da equipe seguem os protocolos definidos pela direção médica.</p></details>
+<details><summary>Tem médico durante a sessão inteira?</summary><p>Sim. Em todas as sessões, nas duas unidades, um médico está presente do começo ao fim, e não só na avaliação.</p></details>
+<details><summary>Como confiro o registro dos médicos?</summary><p>Pelo número do CRM, na busca de médicos do site do Conselho Federal de Medicina. Os números da direção médica estão nesta página e no rodapé do site.</p></details>
+<details><summary>Qual unidade fica mais perto de mim?</summary><p>A Asa Sul fica no Complexo Médico Hospitalar da L2 Sul. A unidade Taguatinga é a mais perto de quem mora em Taguatinga, Ceilândia, Samambaia, Águas Claras e Vicente Pires. As duas têm médico em todas as sessões.</p></details>
+</div>
+<p class="bmh-nota">A recepção responde pelo WhatsApp, confere o seu convênio e marca a avaliação na unidade que você preferir.</p>
+<a class="bmh-btn bmh-btn--navy bmh-whatsapp" href="{{wa:geral}}" style="margin-top:20px">{{svg:wa}}Agendar pelo WhatsApp</a>
+</div></section>
+
+<div id="cirurgioes" class="bmh-cir"><div class="bmh-w">
+<p><b>É cirurgião?</b> Encaminhe o seu paciente pelo WhatsApp. A avaliação médica confirma a indicação e define as sessões, na unidade mais perto dele.</p>
+<a class="bmh-btn bmh-btn--line bmh-whatsapp" href="{{wa:cirurgiao}}">Encaminhar um paciente</a>
+</div></div>
+
+<section class="bmh-final"><div class="bmh-w">
+<div>
+<h2>Agende a sua avaliação</h2>
+<p>Na Asa Sul ou em Taguatinga, todos os dias, das 7h às 19h.</p>
+</div>
+<a class="bmh-btn bmh-btn--oxy bmh-whatsapp" href="{{wa:geral}}">{{svg:wa}}Agendar pelo WhatsApp</a>
+</div></section>
+
+<footer class="bmh-foot"><div class="bmh-w">
+<img class="bmh-foot__logo" src="{{img:bmh-logo-branco.png}}" alt="BMH" width="300" height="156" loading="lazy">
+<div class="bmh-foot__g">
+<div><strong>Brasília Medicina Hiperbárica</strong><br>Em Brasília desde 2004<br>CNPJ 07.091.027/0001-86</div>
+<div><strong>Asa Sul</strong><br>SGAS 613, Conj. E, Bloco A, 1º subsolo<br>L2 Sul · CEP 70200-730</div>
+<div><strong>Taguatinga</strong><br>Prime Excelência Médica, Torre D, Lojas 2 a 5<br>Setor C Norte · CEP 72115-700</div>
+<div><strong>Contato</strong><br><a class="bmh-telefone" href="tel:+556133466005">(61) 3346-6005</a><br><a href="mailto:contato@hiperbaricabrasilia.com.br">contato@hiperbaricabrasilia.com.br</a><br><a href="https://www.instagram.com/hiperbaricabrasilia/" target="_blank" rel="noopener me">Instagram @hiperbaricabrasilia</a></div>
+</div>
+<p class="bmh-foot__links"><a href="/pos-operatorio-cirurgia-plastica/">Pós-operatório</a> · <a href="/feridas-que-nao-cicatrizam/">Feridas e pé diabético</a> · <a href="/convenios/">Convênios</a> · <a href="/equipe-medica/">Equipe médica</a> · <a href="/perguntas-frequentes/">Perguntas frequentes</a> · <a href="/hiperbarica-asa-sul/">Unidade Asa Sul</a> · <a href="/hiperbarica-taguatinga/">Unidade Taguatinga</a></p>
+<p class="bmh-foot__legal">Responsáveis técnicos: Asa Sul, Dr. Hélio Ivan, CRM-DF 8164, RQE 26705 · Taguatinga, Dr. Alberto Jorge, CRM-DF 7248, RQE 14575 · Diretor médico: Dr. Jorge Madeiro, CRM-DF 31687, RQE 26863 · <a href="/politica-de-privacidade/">Política de privacidade</a></p>
+</div></footer>
+
+<div class="bmh-fix" id="bmh-fix">
+<a class="bmh-btn bmh-btn--navy bmh-whatsapp" href="{{wa:geral}}">{{svg:wa}}Agendar pelo WhatsApp</a>
+<a class="bmh-tel bmh-telefone" href="tel:+556133466005" aria-label="Ligar para a BMH">{{svg:tel}}</a>
+</div>
+
+</div>
+<script>
+(function () {
+  /* barra fixa do celular: aparece depois de rolar um pouco */
+  var fix = document.getElementById('bmh-fix');
+  if (!fix) { return; }
+  var confere = function () { if (window.scrollY > 500) { fix.classList.add('bmh-fix--on'); } else { fix.classList.remove('bmh-fix--on'); } };
+  window.addEventListener('scroll', confere, { passive: true });
+  confere();
+})();
+</script>
+
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [
+{"@type": "MedicalOrganization", "@id": "https://hiperbaricabrasilia.com.br/#organizacao", "name": "Brasília Medicina Hiperbárica", "alternateName": "BMH", "url": "https://hiperbaricabrasilia.com.br/", "logo": "{{img:bmh-logo.png}}", "foundingDate": "2004-11", "telephone": "+55-61-3346-6005", "medicalSpecialty": "Medicina hiperbárica", "member": [{"@id": "https://hiperbaricabrasilia.com.br/equipe-medica/#jorge-madeiro"}, {"@id": "https://hiperbaricabrasilia.com.br/equipe-medica/#helio-ivan"}, {"@id": "https://hiperbaricabrasilia.com.br/equipe-medica/#alberto-jorge"}]},
+{"@type": "Physician", "@id": "https://hiperbaricabrasilia.com.br/equipe-medica/#jorge-madeiro", "name": "Dr. Jorge Madeiro", "description": "Diretor médico da BMH Brasília Medicina Hiperbárica. Pós-graduação em medicina hiperbárica. Integra a direção médica, que responde pelos protocolos da BMH.", "url": "https://hiperbaricabrasilia.com.br/equipe-medica/", "image": "{{img:bmh-dr-jorge-madeiro.jpg}}", "identifier": [{"@type": "PropertyValue", "propertyID": "CRM-DF", "value": "31687"}, {"@type": "PropertyValue", "propertyID": "RQE", "value": "26863"}], "knowsAbout": ["Medicina hiperbárica", "Oxigenoterapia hiperbárica"], "memberOf": [{"@id": "https://hiperbaricabrasilia.com.br/#organizacao"}, {"@type": "MedicalOrganization", "name": "Sociedade Brasileira de Medicina Marítima e Hiperbárica"}]},
+{"@type": "Physician", "@id": "https://hiperbaricabrasilia.com.br/equipe-medica/#helio-ivan", "name": "Dr. Hélio Ivan", "description": "Responsável técnico da unidade Asa Sul da BMH Brasília Medicina Hiperbárica. Pós-graduação em medicina hiperbárica. Integra a direção médica, que responde pelos protocolos da BMH.", "url": "https://hiperbaricabrasilia.com.br/equipe-medica/", "image": "{{img:bmh-dr-helio-ivan.jpg}}", "identifier": [{"@type": "PropertyValue", "propertyID": "CRM-DF", "value": "8164"}, {"@type": "PropertyValue", "propertyID": "RQE", "value": "26705"}], "knowsAbout": ["Medicina hiperbárica", "Oxigenoterapia hiperbárica"], "memberOf": {"@id": "https://hiperbaricabrasilia.com.br/#organizacao"}},
+{"@type": "Physician", "@id": "https://hiperbaricabrasilia.com.br/equipe-medica/#alberto-jorge", "name": "Dr. Alberto Jorge", "description": "Responsável técnico da unidade Taguatinga da BMH Brasília Medicina Hiperbárica. Pós-graduação em medicina hiperbárica. Integra a direção médica, que responde pelos protocolos da BMH.", "url": "https://hiperbaricabrasilia.com.br/equipe-medica/", "image": "{{img:bmh-dr-alberto-jorge.jpg}}", "identifier": [{"@type": "PropertyValue", "propertyID": "CRM-DF", "value": "7248"}, {"@type": "PropertyValue", "propertyID": "RQE", "value": "14575"}], "knowsAbout": ["Medicina hiperbárica", "Oxigenoterapia hiperbárica"], "memberOf": {"@id": "https://hiperbaricabrasilia.com.br/#organizacao"}},
+{"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Início", "item": "https://hiperbaricabrasilia.com.br/"}, {"@type": "ListItem", "position": 2, "name": "Equipe médica", "item": "https://hiperbaricabrasilia.com.br/equipe-medica/"}]}
+]}</script>

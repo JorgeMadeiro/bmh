@@ -511,10 +511,10 @@ function desenharOrganico() {
       ${num('Posição média', pos ? pos.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) : '—', 'quanto menor, mais no topo', pos && posA ? delta(pos, posA, true, x => x.toFixed(1)) : '')}
     </div></section>
 
-    <section class="grupo"><div class="cab"><h2>Perfil do Google</h2><span class="sub fino">${d.bmh ? 'entra quando o Google aprovar o acesso (caso 0-3334000041584)' : 'API do Perfil da Empresa · chega com uns 3 dias de atraso'}${(T.ate_fonte || {}).perfil_google && (T.ate_fonte || {}).perfil_google < d.fim ? ' · dados até ' + br((T.ate_fonte || {}).perfil_google) + ', comparado com os mesmos dias antes' : ''}</span></div><div class="nums">
-      ${num('Toques em ligar', int(v(t, 'perfil_google.ligacoes')), 'quem tocou em ligar no perfil (não é ligação atendida)', delta(v(t, 'perfil_google.ligacoes'), v(T.anterior || {}, 'perfil_google.ligacoes'), false, int))}
-      ${num('Pedidos de rota', int(v(t, 'perfil_google.rotas')), 'quem pediu o caminho até a clínica', delta(v(t, 'perfil_google.rotas'), v(T.anterior || {}, 'perfil_google.rotas'), false, int))}
-      ${num('Cliques no site', int(v(t, 'perfil_google.cliques_site')), 'quem foi do perfil para o site', delta(v(t, 'perfil_google.cliques_site'), v(T.anterior || {}, 'perfil_google.cliques_site'), false, int))}
+    <section class="grupo"><div class="cab"><h2>Perfil do Google</h2><span class="sub fino">${d.bmh ? 'Asa Sul e Taguatinga somadas · chega com uns 3 dias de atraso' : 'API do Perfil da Empresa · chega com uns 3 dias de atraso'}${(T.ate_fonte || {}).perfil_google && (T.ate_fonte || {}).perfil_google < d.fim ? ' · dados até ' + br((T.ate_fonte || {}).perfil_google) + ', comparado com os mesmos dias antes' : ''}</span></div><div class="nums">
+      ${num('Toques em ligar', int(v(t, 'perfil_google.ligacoes')), d.bmh ? 'Asa Sul ' + int(v(t, 'perfil_google_asa_sul.ligacoes')) + ' · Taguatinga ' + int(v(t, 'perfil_google_taguatinga.ligacoes')) : 'quem tocou em ligar no perfil (não é ligação atendida)', delta(v(t, 'perfil_google.ligacoes'), v(T.anterior || {}, 'perfil_google.ligacoes'), false, int))}
+      ${num('Pedidos de rota', int(v(t, 'perfil_google.rotas')), d.bmh ? 'Asa Sul ' + int(v(t, 'perfil_google_asa_sul.rotas')) + ' · Taguatinga ' + int(v(t, 'perfil_google_taguatinga.rotas')) : 'quem pediu o caminho até a clínica', delta(v(t, 'perfil_google.rotas'), v(T.anterior || {}, 'perfil_google.rotas'), false, int))}
+      ${num('Cliques no site', int(v(t, 'perfil_google.cliques_site')), d.bmh ? 'Asa Sul ' + int(v(t, 'perfil_google_asa_sul.cliques_site')) + ' · Taguatinga ' + int(v(t, 'perfil_google_taguatinga.cliques_site')) : 'quem foi do perfil para o site', delta(v(t, 'perfil_google.cliques_site'), v(T.anterior || {}, 'perfil_google.cliques_site'), false, int))}
       ${num('Exibições', int(v(t, 'perfil_google.exibicoes_busca') + v(t, 'perfil_google.exibicoes_mapa')), 'vezes que o perfil apareceu (busca e mapa)', delta(v(t, 'perfil_google.exibicoes_busca') + v(t, 'perfil_google.exibicoes_mapa'), v(T.anterior || {}, 'perfil_google.exibicoes_busca') + v(T.anterior || {}, 'perfil_google.exibicoes_mapa'), false, int))}
     </div></section>
 
@@ -546,7 +546,7 @@ function desenharOrganico() {
       <li>Busca no Google: Search Console (cliques, exibições e posição média ponderada pelas exibições). Chega com 2 a 3 dias de atraso.</li>
       <li>Instagram: alcance, visitas ao perfil, cliques no link da bio e seguidores, pela API do Instagram. O alcance é a soma dos dias: a mesma pessoa pode contar em dias diferentes.</li>
       <li>Site: visitas do Analytics por canal (busca orgânica, redes sociais, IA, outros sites e direto).</li>
-      <li>Medido desde ${T.medido_desde ? br(T.medido_desde) : '—'}. Perfil do Google: API do Perfil da Empresa, desde 04/04/2025 (toque em ligar não é ligação atendida; o botão Agendar do perfil abre o WhatsApp e conta como origem \"google / perfil\").</li>
+      <li>Medido desde ${T.medido_desde ? br(T.medido_desde) : '—'}. Perfil do Google: API do Perfil da Empresa, desde ${d.bmh ? (T.perfil_desde ? br(T.perfil_desde) : '—') + ', as duas unidades somadas' : '04/04/2025'} (toque em ligar não é ligação atendida; o botão Agendar do perfil abre o WhatsApp e conta como origem \"google / perfil\").</li>
     </ul></details>
   </div>`;
   lista('camp', agrupa(org, conv, a => a.p + '|' + a.camp, a => ({ p: a.p, nome: a.camp })), false);

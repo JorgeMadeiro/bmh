@@ -42,27 +42,35 @@ const gr = {}; for (const x of await busca(`SELECT ad_group.name, metrics.cost_m
   const g = (gr[x.adGroup.name] ||= { g: 0, cli: 0, ct: 0 }); g.g += n(x.metrics.costMicros) / 1e6; g.cli += n(x.metrics.clicks); g.ct += n(x.metrics.conversions); }
 const valor = gr['Valor e convênio'] || { g: 0, ct: 0 };
 // ---------- orgânico: a página de perguntas foi trocada em 08/10/2026; vigiar posição e cliques ----------
-// linha de base (Search Console, 90 dias até 06/10/2026, por semana): "hiperbárica" posição 10,3 (1,5 clique/semana);
-// "câmara hiperbárica" 10,9 (0,5); /perguntas-frequentes/ 20,6 cliques e 5.775 exibições; página inicial 24,7 cliques.
-const BASE = { hiperbarica: 10.3, 'camara hiperbarica': 10.9, faq: { c: 20.6, i: 5775 }, home: { c: 24.7, i: 659 } };
-const semAc = (x) => String(x).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+// Linha de base corrigida em 15/10/2026 (pedido do Jorge: "não quero nunca alarme falso"): média das 3 semanas logo antes
+// da troca (15/09 a 05/10, Search Console). A base antiga era a média de 90 dias, puxada por julho e agosto, e disparou
+// alarme falso em 15/10 (exibições da página de perguntas "caíram" de 5.775, número que não existia nas semanas recentes).
+// Exibição sozinha nunca alarma (varia com a semana e com a página que o Google escolhe mostrar). Só alarma queda real:
+//  - posição de "hiperbárica" ou "câmara hiperbárica" 3 ou mais pontos pior que a base, nesta semana E na anterior; ou
+//  - cliques do site inteiro abaixo de 70% da base, nesta semana E na anterior.
+const BASE = { hiperbarica: 9.2, 'camara hiperbarica': 10.7, site: { c: 45.3, i: 4504 }, faq: { c: 15.7, i: 3803 }, home: { c: 21.3, i: 596 } };
+const semAc = (x) => String(x).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 const fimG = hoje.minus({ days: 3 }), semana = (d) => (d > fimG.minus({ days: 7 }).toISODate() ? 'atual' : 'antes');
 const org = { atual: {}, antes: {} };
 for (const r of ($('Search Console · buscas').first().json || {}).rows || []) { const k = semAc(r.keys[1]); const a = (org[semana(r.keys[0])][k] ||= { c: 0, i: 0, p: 0 }); a.c += r.clicks; a.i += r.impressions; a.p += r.position * r.impressions; }
-const pg = { atual: {}, antes: {} };
-for (const r of ($('Search Console · páginas').first().json || {}).rows || []) { const u = r.keys[1].replace(/^https?:\/\/(www\.)?hiperbaricabrasilia\.com\.br/, '') || '/'; const k = u.startsWith('/perguntas-frequentes') ? 'faq' : u === '/' ? 'home' : null; if (!k) continue;
-  const a = (pg[semana(r.keys[0])][k] ||= { c: 0, i: 0 }); a.c += r.clicks; a.i += r.impressions; }
+const pg = { atual: { site: { c: 0, i: 0 } }, antes: { site: { c: 0, i: 0 } } };
+for (const r of ($('Search Console · páginas').first().json || {}).rows || []) { const u = r.keys[1].replace(/^https?:\/\/(www\.)?hiperbaricabrasilia\.com\.br/, '') || '/'; const s = semana(r.keys[0]);
+  pg[s].site.c += r.clicks; pg[s].site.i += r.impressions;
+  const k = u.startsWith('/perguntas-frequentes') ? 'faq' : u === '/' ? 'home' : null; if (!k) continue;
+  const a = (pg[s][k] ||= { c: 0, i: 0 }); a.c += r.clicks; a.i += r.impressions; }
 const pos = (s, k) => (org[s][k] && org[s][k].i ? org[s][k].p / org[s][k].i : null), num1 = (v) => (v == null ? '—' : v.toFixed(1).replace('.', ','));
 const orgLinhas = [`🔎 Google orgânico (semana de ${dm(fimG.minus({ days: 6 }).toISODate())} a ${dm(fimG.toISODate())}; o Search Console atrasa 3 dias)`];
-let orgAlerta = false;
+const motivos = [];
 for (const [k, nome] of [['camara hiperbarica', 'câmara hiperbárica'], ['hiperbarica', 'hiperbárica']]) {
-  const p = pos('atual', k); if (p != null && p > BASE[k] + 3) orgAlerta = true;
-  orgLinhas.push(`• "${nome}": posição ${num1(p)} (semana antes ${num1(pos('antes', k))}; antes da troca ${num1(BASE[k])}) · ${Math.round(org.atual[k]?.c || 0)} ${Math.round(org.atual[k]?.c || 0) === 1 ? 'clique' : 'cliques'}`); }
-const fq = pg.atual.faq || { c: 0, i: 0 }, hm = pg.atual.home || { c: 0, i: 0 };
-if (fq.i < BASE.faq.i * 0.6) orgAlerta = true;
-orgLinhas.push(`• Perguntas frequentes: ${fq.c} cliques, ${fq.i.toLocaleString('pt-BR')} exibições (antes da troca: ~${Math.round(BASE.faq.c)} e ~${BASE.faq.i.toLocaleString('pt-BR')} por semana)`);
-orgLinhas.push(`• Página inicial: ${hm.c} cliques, ${hm.i.toLocaleString('pt-BR')} exibições (antes: ~${Math.round(BASE.home.c)} e ~${BASE.home.i} por semana)`);
-orgLinhas.push(orgAlerta ? '⚠️ Queda no orgânico depois da troca da página de perguntas: vale olhar com o Claude.' : '✅ Orgânico estável depois da troca da página de perguntas.');
+  const p = pos('atual', k), pa = pos('antes', k);
+  if (p != null && pa != null && p >= BASE[k] + 3 && pa >= BASE[k] + 3) motivos.push(`"${nome}" caiu 3 ou mais posições há duas semanas`);
+  orgLinhas.push(`• "${nome}": posição ${num1(p)} (semana antes ${num1(pa)}; base ${num1(BASE[k])}; menor é melhor) · ${Math.round(org.atual[k]?.c || 0)} ${Math.round(org.atual[k]?.c || 0) === 1 ? 'clique' : 'cliques'}`); }
+const st = pg.atual.site, sa = pg.antes.site, fq = pg.atual.faq || { c: 0, i: 0 }, hm = pg.atual.home || { c: 0, i: 0 };
+if (st.c < BASE.site.c * 0.7 && sa.c < BASE.site.c * 0.7) motivos.push('cliques do site abaixo de 70% da base há duas semanas');
+orgLinhas.push(`• Site inteiro: ${st.c} cliques, ${st.i.toLocaleString('pt-BR')} exibições (base: ~${Math.round(BASE.site.c)} e ~${BASE.site.i.toLocaleString('pt-BR')} por semana)`);
+orgLinhas.push(`• Perguntas frequentes: ${fq.c} cliques, ${fq.i.toLocaleString('pt-BR')} exibições (base: ~${Math.round(BASE.faq.c)} e ~${BASE.faq.i.toLocaleString('pt-BR')})`);
+orgLinhas.push(`• Página inicial: ${hm.c} cliques, ${hm.i.toLocaleString('pt-BR')} exibições (base: ~${Math.round(BASE.home.c)} e ~${BASE.home.i})`);
+orgLinhas.push(motivos.length ? '⚠️ Queda real no orgânico (' + motivos.join('; ') + '): vale olhar com o Claude.' : '✅ Orgânico dentro do normal (sem queda de posição nem de cliques do site).');
 
 const ok = (b) => (b ? '✅' : '❌'), final = hoje.toISODate() >= FIM_MEDICAO, primeira = dias <= 8;
 const t = [];

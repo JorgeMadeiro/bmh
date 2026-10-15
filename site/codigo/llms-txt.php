@@ -24,7 +24,7 @@ function bmh_llms_txt() {
 - Horário: todos os dias, inclusive sábado e domingo, das 7h às 19h, nas duas unidades.
 - Telefone e WhatsApp: (61) 3346-6005. E-mail: contato@hiperbaricabrasilia.com.br.
 - Unidade Asa Sul: SGAS 613, Conjunto E, Bloco A, 1º subsolo, Complexo Médico Hospitalar, L2 Sul, Brasília/DF, CEP 70200-730. Câmaras monoplace e multiplace.
-- Unidade Taguatinga: Prédio Prime Excelência Médica, Torre D, Setor C Norte, Taguatinga/DF.
+- Unidade Taguatinga: Prédio Prime Excelência Médica, Torre D, Lojas 2 a 5, Setor C Norte, Taguatinga/DF, CEP 72115-700.
 - Convênios: 50 planos atendidos. Lista: https://hiperbaricabrasilia.com.br/convenios/
 - Direção médica: Dr. Jorge Madeiro, diretor médico (CRM-DF 31687, RQE 26863). Responsáveis técnicos: Dr. Hélio Ivan, Asa Sul (CRM-DF 8164, RQE 26705); Dr. Alberto Jorge, Taguatinga (CRM-DF 7248, RQE 14575).
 
@@ -45,6 +45,8 @@ function bmh_llms_txt() {
 - Unidade Asa Sul: https://hiperbaricabrasilia.com.br/hiperbarica-asa-sul/
 - Unidade Taguatinga: https://hiperbaricabrasilia.com.br/hiperbarica-taguatinga/
 - Convênios: https://hiperbaricabrasilia.com.br/convenios/
+- Feridas que não cicatrizam e pé diabético: https://hiperbaricabrasilia.com.br/feridas-que-nao-cicatrizam/
+- Equipe médica (direção médica, CRM e RQE): https://hiperbaricabrasilia.com.br/equipe-medica/
 
 ## Como agendar
 

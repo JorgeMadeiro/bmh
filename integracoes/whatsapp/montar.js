@@ -21,6 +21,9 @@ const evo = async (rota, corpo) => { const r = await fetch(`${EVO}/${rota}/${INS
 const ler = (n) => fs.readFileSync(path.join(__dirname, n), 'utf8');
 
 const COLUNAS = { chave: 's', momento: 's', dia: 's', telefone: 's', numero_oculto: 's', direcao: 's', aparelho: 's', tipo: 's', texto: 's', transcrito: 's', respondendo: 's', apagar_em: 's' };
+// origem do contato pela mensagem pronta (15/10/2026): tabela à parte porque a API do n8n não acrescenta coluna em tabela existente.
+// Sem telefone nem texto: a chave liga com BMH_whatsapp_mensagens enquanto a conversa existir.
+const COLUNAS_ORIGEM = { chave: 's', dia: 's', momento: 's', origem: 's' };
 
 async function tabelas() {
   IDS.tabelas = IDS.tabelas || {};
@@ -32,6 +35,7 @@ async function tabelas() {
     IDS.tabelas[nome] = r.id; console.log('tabela criada:', nome); return r.id;
   };
   await garante('BMH_whatsapp_mensagens', Object.keys(COLUNAS));
+  await garante('BMH_whatsapp_origens', Object.keys(COLUNAS_ORIGEM));
   salva();
 }
 
@@ -76,13 +80,20 @@ function fluxo() {
       operation: 'upsert', dataTableId: tabela('BMH_whatsapp_mensagens'), filters: { conditions: [{ keyName: 'chave', keyValue: '={{ $json.chave }}' }] },
       columns: { mappingMode: 'defineBelow', value: Object.fromEntries(Object.keys(COLUNAS).map((k) => [k, `={{ $json.${k} }}`])), matchingColumns: [],
         schema: Object.keys(COLUNAS).map((k) => ({ id: k, displayName: k, required: false, defaultMatch: false, display: true, type: 'string', readOnly: false, removed: false })) }, options: {} }),
-    nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · WhatsApp · observa conversas\nInstância "BMH Recepção" (61 3346-6005) na Evolution da clínica, só leitura: nunca envia. Grava em BMH_whatsapp_mensagens a mensagem do paciente e a resposta da equipe, com o telefone (para cruzar com o iGut), sem grupos, com CPF apagado do texto. Áudio é transcrito (OpenAI). Apagar após apagar_em (6 meses). Decisão do Jorge em 09/10/2026. Não guarda execução (tem conversa de paciente).', width: 620, height: 220 }, { _lin: 2 }),
+    eOrigem: no('Veio de mensagem pronta?', 'n8n-nodes-base.if', 2.2, { conditions: { options: { caseSensitive: true, leftValue: '', typeValidation: 'loose', version: 2 }, combinator: 'and',
+      conditions: [{ id: crypto.randomUUID(), leftValue: '={{ $json.origem }}', rightValue: '', operator: { type: 'string', operation: 'notEmpty', singleValue: true } }] }, options: {} }, { _lin: 1 }),
+    gravaOrigem: no('Grava a origem', 'n8n-nodes-base.dataTable', 1.1, {
+      operation: 'upsert', dataTableId: tabela('BMH_whatsapp_origens'), filters: { conditions: [{ keyName: 'chave', keyValue: '={{ $json.chave }}' }] },
+      columns: { mappingMode: 'defineBelow', value: Object.fromEntries(Object.keys(COLUNAS_ORIGEM).map((k) => [k, `={{ $json.${k} }}`])), matchingColumns: [],
+        schema: Object.keys(COLUNAS_ORIGEM).map((k) => ({ id: k, displayName: k, required: false, defaultMatch: false, display: true, type: 'string', readOnly: false, removed: false })) }, options: {} }, { _lin: 1 }),
+    nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · WhatsApp · observa conversas\nInstância "BMH Recepção" (61 3346-6005) na Evolution da clínica, só leitura: nunca envia. Grava em BMH_whatsapp_mensagens a mensagem do paciente e a resposta da equipe, com o telefone (para cruzar com o iGut), sem grupos, com CPF apagado do texto. Áudio é transcrito (OpenAI). Apagar após apagar_em (6 meses). Decisão do Jorge em 09/10/2026. Não guarda execução (tem conversa de paciente).\nOrigem (15/10/2026): a primeira frase do paciente que bate com uma mensagem pronta (link da bio do Dr. Jorge, anúncio do Google, botões do site) vai para BMH_whatsapp_origens (chave, dia, origem; sem telefone nem texto). As frases estão em monta-linha.js.', width: 620, height: 220 }, { _lin: 2 }),
   };
   const cx = {};
   const liga = (de, para, saida = 0) => { cx[de.name] = cx[de.name] || { main: [] }; while (cx[de.name].main.length <= saida) cx[de.name].main.push([]); cx[de.name].main[saida].push({ node: para.name, type: 'main', index: 0 }); };
   liga(n.recebe, n.prepara); liga(n.prepara, n.eAudio);
   liga(n.eAudio, n.midia, 0); liga(n.eAudio, n.monta, 1);
   liga(n.midia, n.arquivo); liga(n.arquivo, n.transcreve); liga(n.transcreve, n.monta); liga(n.monta, n.grava);
+  liga(n.monta, n.eOrigem); liga(n.eOrigem, n.gravaOrigem);
   return { name: 'BMH · WhatsApp · observa conversas', nodes: Object.values(n), connections: cx,
     settings: { executionOrder: 'v1', timezone: 'America/Sao_Paulo', saveDataSuccessExecution: 'none', saveDataErrorExecution: 'none', ...(IDS.fluxos?.alerta ? { errorWorkflow: IDS.fluxos.alerta } : {}) } };
 }
@@ -112,5 +123,5 @@ async function configuraEvolution() {
 
 (async () => {
   if (!process.argv.includes('so-evolution')) { await tabelas(); await credenciais(); await publicaFluxo(); }
-  await configuraEvolution();
+  if (!process.argv.includes('so-fluxo')) await configuraEvolution();   // so-fluxo: atualiza tabela e fluxo sem tocar na Evolution
 })().catch((e) => { console.error('ERRO', e.message); process.exit(1); });

@@ -1,0 +1,100 @@
+{
+ "quando": "2026-10-15T14:13:29.719Z",
+ "valer": true,
+ "passos": [
+  {
+   "servico": "customerConversionGoals",
+   "n": 1,
+   "res": [
+    "customers/5066798424/customerConversionGoals/CONTACT~CALL_FROM_ADS"
+   ]
+  },
+  {
+   "servico": "sharedSets",
+   "n": 1,
+   "res": [
+    "customers/5066798424/sharedSets/12275364443"
+   ]
+  },
+  {
+   "servico": "sharedCriteria",
+   "n": 30,
+   "res": [
+    "customers/5066798424/sharedCriteria/12275364443~33899793",
+    "customers/5066798424/sharedCriteria/12275364443~33899783",
+    "customers/5066798424/sharedCriteria/12275364443~49916371",
+    "customers/5066798424/sharedCriteria/12275364443~23209020",
+    "customers/5066798424/sharedCriteria/12275364443~945056382",
+    "customers/5066798424/sharedCriteria/12275364443~506233681",
+    "customers/5066798424/sharedCriteria/12275364443~99473419",
+    "customers/5066798424/sharedCriteria/12275364443~141784977",
+    "customers/5066798424/sharedCriteria/12275364443~156291551",
+    "customers/5066798424/sharedCriteria/12275364443~138438944",
+    "customers/5066798424/sharedCriteria/12275364443~114405135",
+    "customers/5066798424/sharedCriteria/12275364443~148141639",
+    "customers/5066798424/sharedCriteria/12275364443~318170404476",
+    "customers/5066798424/sharedCriteria/12275364443~313424067079",
+    "customers/5066798424/sharedCriteria/12275364443~119353843",
+    "customers/5066798424/sharedCriteria/12275364443~378249552",
+    "customers/5066798424/sharedCriteria/12275364443~70728491",
+    "customers/5066798424/sharedCriteria/12275364443~139666749",
+    "customers/5066798424/sharedCriteria/12275364443~378249582",
+    "customers/5066798424/sharedCriteria/12275364443~446897102",
+    "customers/5066798424/sharedCriteria/12275364443~1244972495",
+    "customers/5066798424/sharedCriteria/12275364443~300426011685",
+    "customers/5066798424/sharedCriteria/12275364443~1191409778",
+    "customers/5066798424/sharedCriteria/12275364443~402336070005",
+    "customers/5066798424/sharedCriteria/12275364443~796212858",
+    "customers/5066798424/sharedCriteria/12275364443~640664796",
+    "customers/5066798424/sharedCriteria/12275364443~117064649",
+    "customers/5066798424/sharedCriteria/12275364443~261002178",
+    "customers/5066798424/sharedCriteria/12275364443~139897883",
+    "customers/5066798424/sharedCriteria/12275364443~261004608"
+   ]
+  },
+  {
+   "servico": "campaignSharedSets",
+   "n": 3,
+   "res": [
+    "customers/5066798424/campaignSharedSets/20776450309~12275364443",
+    "customers/5066798424/campaignSharedSets/20833761565~12275364443",
+    "customers/5066798424/campaignSharedSets/24333599216~12275364443"
+   ]
+  },
+  {
+   "servico": "assets",
+   "n": 7,
+   "res": [
+    "customers/5066798424/assets/430324527879",
+    "customers/5066798424/assets/430139531213",
+    "customers/5066798424/assets/430239482491",
+    "customers/5066798424/assets/430139345015",
+    "customers/5066798424/assets/430139433512",
+    "customers/5066798424/assets/430239482497",
+    "customers/5066798424/assets/430324557462"
+   ]
+  },
+  {
+   "servico": "customerAssets",
+   "n": 7,
+   "res": [
+    "customers/5066798424/customerAssets/430324527879~SITELINK",
+    "customers/5066798424/customerAssets/430139531213~SITELINK",
+    "customers/5066798424/customerAssets/430239482491~SITELINK",
+    "customers/5066798424/customerAssets/430139345015~SITELINK",
+    "customers/5066798424/customerAssets/430139433512~SITELINK",
+    "customers/5066798424/customerAssets/430239482497~CALL",
+    "customers/5066798424/customerAssets/430324557462~STRUCTURED_SNIPPET"
+   ]
+  },
+  {
+   "servico": "customerAssets",
+   "n": 3,
+   "res": [
+    "customers/5066798424/customerAssets/114991216183~SITELINK",
+    "customers/5066798424/customerAssets/115015809936~SITELINK",
+    "customers/5066798424/customerAssets/114984686606~STRUCTURED_SNIPPET"
+   ]
+  }
+ ]
+}

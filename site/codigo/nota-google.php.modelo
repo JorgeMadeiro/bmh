@@ -1,0 +1,39 @@
+/**
+ * BMH · nota do Google (14/10/2026). Mostra a nota e o número de avaliações de cada unidade, como estão no Perfil da
+ * Empresa no Google. Quem busca é o n8n (fluxo "BMH · Perfil do Google · nota para o site"); aqui o WordPress pergunta
+ * no máximo 2 vezes por dia, pelo agendador dele, e guarda a resposta. A página só lê o que está guardado (não espera
+ * o n8n), e se o n8n falhar fica o último número bom; sem nenhum guardado, vale o "padrao" escrito na página.
+ * Uso: [bmh_nota_google unidade="asa-sul|taguatinga|todas" campo="nota|total" padrao="4,8"]
+ * Guardado no plugin Code Snippets. Para desfazer: desligar este código no painel (a página volta ao "padrao").
+ */
+function bmh_nota_google_atualiza() {
+	$r = wp_remote_get( '__URL__', array( 'timeout' => 30 ) );
+	if ( is_wp_error( $r ) || 200 !== (int) wp_remote_retrieve_response_code( $r ) ) {
+		return;
+	}
+	$d = json_decode( wp_remote_retrieve_body( $r ), true );
+	if ( empty( $d['asa_sul']['total'] ) || empty( $d['taguatinga']['total'] ) ) {
+		return;
+	}
+	update_option( 'bmh_nota_google', $d, false );
+}
+add_action( 'bmh_nota_google_evento', 'bmh_nota_google_atualiza' );
+add_action( 'init', function () {
+	if ( ! wp_next_scheduled( 'bmh_nota_google_evento' ) ) {
+		wp_schedule_event( time() + 30, 'twicedaily', 'bmh_nota_google_evento' );
+	}
+} );
+add_shortcode( 'bmh_nota_google', function ( $a ) {
+	$a = shortcode_atts( array( 'unidade' => 'todas', 'campo' => 'nota', 'padrao' => '' ), $a );
+	$d = get_option( 'bmh_nota_google' );
+	if ( ! is_array( $d ) || empty( $d['asa_sul'] ) || empty( $d['taguatinga'] ) ) {
+		return esc_html( $a['padrao'] );
+	}
+	$u = str_replace( '-', '_', $a['unidade'] );
+	if ( 'total' === $a['campo'] ) {
+		$v = 'todas' === $u ? (int) $d['asa_sul']['total'] + (int) $d['taguatinga']['total'] : (int) ( $d[ $u ]['total'] ?? 0 );
+		return $v ? esc_html( number_format( $v, 0, ',', '.' ) ) : esc_html( $a['padrao'] );
+	}
+	$n = (float) ( $d[ $u ]['nota'] ?? 0 );
+	return $n ? esc_html( number_format( $n, 1, ',', '' ) ) : esc_html( $a['padrao'] );
+} );

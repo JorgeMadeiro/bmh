@@ -1,7 +1,11 @@
+<!-- wa-da-pagina: duvida -->
 <!-- BMH · perguntas frequentes (fonte), 08/10/2026, no mesmo endereço da página antiga do Elementor (23).
      Respostas aprovadas pelo Jorge em saidas/site-novo/perguntas-frequentes-para-o-jorge.md; fontes em
      marketing/conteudo/bmh-pagina-perguntas-frequentes-2026-10-08/fontes.md. Gerada a partir de uma lista só, para o
-     texto da página e o dos dados estruturados serem idênticos. -->
+     texto da página e o dos dados estruturados serem idênticos.
+     15/10/2026 (rascunho local): linha "Revisado por", seção de referências visível, endereço de Taguatinga com
+     Lojas 2 a 5. Referências conferidas em marketing/conteudo/bmh-pagina-unidades-e-referencias-2026-10-15/fontes.md.
+     Versão anterior: site/paginas/fontes/antes-2026-10-15/. -->
 <link rel="preload" as="font" type="font/woff2" href="https://fonts.gstatic.com/s/librefranklin/v20/jizDREVItHgc8qDIbSTKq4XkRiUf2zcZiVbJ.woff2" crossorigin>
 <style>
 /* Letra declarada aqui, sem a folha do Google Fonts que travava a primeira tela. Se o Google mudar a versão (v20),
@@ -42,6 +46,12 @@ body{background:#fff}
 .bmh-link:after{content:" \2192";color:var(--oxyt)}
 /* ---------- cabeçalho ---------- */
 .bmh-head{background:#fff;border-bottom:1px solid var(--line);position:relative;z-index:5}
+/* mês temático: só vale com a classe no <html> (script do cabeçalho); linha no topo, laço ao lado do nome e etiquetas das
+   seções claras na cor do mês. Botões e cores de marca não mudam. */
+.bmh-laco{display:none}
+.bmh-mes-tematico .bmh-head::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:linear-gradient(90deg,var(--bmh-mes-claro),var(--bmh-mes) 50%,var(--bmh-mes-claro))}
+.bmh-mes-tematico .bmh-laco{display:inline-flex;align-self:center;margin-left:2px}
+.bmh-mes-tematico .bmh .bmh-sec .bmh-eye{color:var(--bmh-mes-etiqueta)}
 .bmh-head .bmh-w{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:62px}
 .bmh-logo{display:flex;align-items:center;gap:10px;color:var(--navy)}
 .bmh-logo img{width:64px;height:34px;object-fit:contain}
@@ -154,6 +164,8 @@ body{background:#fff}
 .bmh-foot__g{display:grid;gap:16px}
 .bmh-foot__g>div{min-width:0;overflow-wrap:anywhere;line-height:1.6}
 .bmh .bmh-foot__legal{margin-top:20px;padding-top:14px;border-top:1px solid #1B2C55;font-size:13px}
+.bmh .bmh-foot__links{margin-top:22px;font-size:14px;line-height:1.9}
+.bmh .bmh-foot__links a{color:inherit;text-decoration:underline;text-underline-offset:3px}
 /* barra fixa: aparece depois que o botão do topo sai da tela */
 .bmh-fix{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;gap:10px;padding:10px 16px 14px;background:#fff;border-top:1px solid var(--line);box-shadow:0 -6px 18px rgba(0,20,63,.10);transform:translateY(110%);transition:transform .25s}
 .bmh-fix.bmh-fix--on{transform:none}
@@ -212,7 +224,7 @@ body{background:#fff}
 }
 @media (min-width:1180px){
   .bmh-menu{display:none}
-  .bmh-nav{display:flex;flex-wrap:nowrap;align-items:center;gap:22px;white-space:nowrap}
+  .bmh-nav{display:flex;flex-wrap:nowrap;align-items:center;gap:20px;white-space:nowrap}
   .bmh-nav a{color:var(--ink);font-weight:600;font-size:15px}
   .bmh-nav a.bmh-btn{min-height:46px;padding:0 20px;color:#fff}
 }
@@ -256,14 +268,23 @@ body{background:#fff}
   .bmh-duas{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:64px;align-items:start}
 }
 </style>
-<style>.bmh .bmh-faq__g{font-size:22px;margin:40px 0 0!important}.bmh .bmh-faq__g:first-child{margin-top:0!important}@media (min-width:860px){.bmh .bmh-faq__g{font-size:28px;margin-top:56px!important}}</style>
+<style>.bmh .bmh-faq__g{font-size:22px;margin:40px 0 0!important}.bmh .bmh-faq__g:first-child{margin-top:0!important}@media (min-width:860px){.bmh .bmh-faq__g{font-size:28px;margin-top:56px!important}}
+.bmh .bmh-revisado{font-size:14px;color:#9FB2D3;margin-top:6px}.bmh .bmh-revisado a{color:#fff}
+.bmh .bmh-refs{margin:14px 0 0;padding-left:22px;color:var(--txt);font-size:15px;overflow-wrap:anywhere}.bmh .bmh-refs li{margin-top:12px}.bmh .bmh-refs small{display:block;color:var(--light);font-size:14px;margin-top:2px}</style>
 
 <div class="bmh">
+<!-- Mês temático (15/10/2026, Jorge: "pode fazer de todos os meses já"): só cor, sem texto novo. No dia 1º de cada mês liga
+     a classe bmh-mes-tematico e as cores da campanha do mês (hora de Brasília). Mudar campanha ou cor = mudar esta tabela
+     (molde _molde/cabecalho.html e home-v2.html) e reenviar as páginas. Contraste das etiquetas conferido (mínimo 5,2). -->
+<script>(function(){try{var T={1:['#9E9E9E','#E0E0E0','#616161'],2:['#6A1B9A','#CE93D8','#6A1B9A'],3:['#8E44AD','#D7BDE2','#7D3C98'],4:['#29B6F6','#B3E5FC','#01579B'],
+5:['#F9A825','#FFE082','#8A5A00'],6:['#E53935','#EF9A9A','#B71C1C'],7:['#F9A825','#FFE082','#8A5A00'],8:['#C9A227','#F1DE9B','#735A0A'],9:['#F9A825','#FFE082','#8A5A00'],
+10:['#E91E63','#F48FB1','#C2185B'],11:['#1E88E5','#90CAF9','#1565C0'],12:['#C62828','#EF9A9A','#B71C1C']};var m=new Date(Date.now()-3*3600*1000).getUTCMonth()+1,c=T[m];if(!c)return;
+var r=document.documentElement;r.classList.add('bmh-mes-tematico');r.style.setProperty('--bmh-mes',c[0]);r.style.setProperty('--bmh-mes-claro',c[1]);r.style.setProperty('--bmh-mes-etiqueta',c[2])}catch(e){}})();</script>
 <header class="bmh-head"><div class="bmh-w">
-<a class="bmh-logo" href="/"><img src="{{img:bmh-logo.png}}" alt="BMH" width="300" height="159"><span>Brasília Medicina Hiperbárica<small>desde 2004</small></span></a>
+<a class="bmh-logo" href="/"><img src="{{img:bmh-logo.png}}" alt="BMH" width="300" height="159"><span>Brasília Medicina Hiperbárica<small>desde 2004</small></span><span class="bmh-laco" aria-hidden="true"><svg viewBox="0 0 24 36" width="16" height="24" focusable="false"><path fill="var(--bmh-mes,#E91E63)" d="M12 2c-3.3 0-5.5 2.6-5.5 5.6 0 2.3 1.2 4.6 2.8 7.1L3 30l4.2 1.8 4.8-10.6 4.8 10.6L21 30l-6.3-15.3c1.6-2.5 2.8-4.8 2.8-7.1C17.5 4.6 15.3 2 12 2zm0 3.2c1.4 0 2.3 1.1 2.3 2.5 0 1.3-.9 3-2.3 5.2-1.4-2.2-2.3-3.9-2.3-5.2 0-1.4.9-2.5 2.3-2.5z"/></svg></span></a>
 <nav class="bmh-nav" aria-label="Principal">
 <a href="/pos-operatorio-cirurgia-plastica/">Pós-operatório</a>
-<a href="/#como-funciona">Como funciona</a>
+<a href="/feridas-que-nao-cicatrizam/">Feridas</a>
 <a href="/hiperbarica-asa-sul/">Asa Sul</a>
 <a href="/hiperbarica-taguatinga/">Taguatinga</a>
 <a href="/convenios/">Convênios</a>
@@ -273,23 +294,26 @@ body{background:#fff}
 <details class="bmh-menu"><summary aria-label="Menu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></summary>
 <nav aria-label="Menu do celular">
 <a href="/pos-operatorio-cirurgia-plastica/">Pós-operatório de cirurgia plástica</a>
-<a href="/#como-funciona">Como funciona</a>
 <a href="/hiperbarica-asa-sul/">Unidade Asa Sul</a>
 <a href="/hiperbarica-taguatinga/">Unidade Taguatinga</a>
 <a href="/convenios/">Convênios</a>
+<a href="/feridas-que-nao-cicatrizam/">Feridas e pé diabético</a>
+<a href="/equipe-medica/">Equipe médica</a>
 <a href="/perguntas-frequentes/">Perguntas frequentes</a>
 <a class="bmh-btn bmh-btn--navy bmh-whatsapp" href="{{wa:geral}}">{{svg:wa}}Agendar pelo WhatsApp</a>
 </nav></details>
 </div></header>
 
+
 <section class="bmh-hero bmh-hero--int"><div class="bmh-w">
 <p class="bmh-trilha"><a href="/">Início</a> › Perguntas frequentes</p>
 <h1>Perguntas frequentes sobre a câmara hiperbárica</h1>
-<p class="bmh-hero__sub">Quantas sessões, quanto tempo dura, se dói, se o convênio cobre. Respostas revisadas pela direção médica da BMH.</p>
+<p class="bmh-hero__sub">Quantas sessões, quanto tempo dura, se dói, se o convênio cobre. Respostas da direção médica da BMH, com as referências no fim da página.</p>
 <div class="bmh-hero__ctas">
 <a class="bmh-btn bmh-btn--oxy bmh-whatsapp" href="{{wa:duvida}}">{{svg:wa}}Perguntar pelo WhatsApp</a>
 </div>
 <p class="bmh-hero__hora">A recepção responde todos os dias, das 7h às 19h.</p>
+<p class="bmh-revisado">Revisado por Dr. Jorge Madeiro, CRM-DF 31687, RQE 26863, em 15/10/2026. <a href="#referencias">Ver as referências</a></p>
 </div></section>
 
 <section id="perguntas" class="bmh-sec"><div class="bmh-w">
@@ -320,9 +344,25 @@ body{background:#fff}
 <details><summary>Precisa de pedido médico?</summary><p>O tratamento sempre começa com uma avaliação médica na BMH. Para usar o convênio, o plano pede o pedido do seu médico. Se você ainda não tem pedido, fale com a recepção: ela explica o caminho.</p></details>
 <details><summary>O convênio cobre a câmara hiperbárica?</summary><p>A BMH atende <a href="/convenios/">50 convênios</a>. Em geral, o plano pede o pedido médico com relatório e uma autorização antes de começar. A recepção confere a cobertura do seu plano pelo WhatsApp e ajuda com a autorização.</p></details>
 <details><summary>Quanto custa a sessão?</summary><p>O valor depende do motivo do tratamento e do convênio. A recepção informa pelo WhatsApp.</p></details>
-<details><summary>Onde fica e qual o horário?</summary><p>São duas unidades, a <a href="/hiperbarica-asa-sul/">Asa Sul</a> (Complexo Médico Hospitalar da L2 Sul) e <a href="/hiperbarica-taguatinga/">Taguatinga</a> (Prédio Prime Excelência Médica, Setor C Norte). As duas abrem todos os dias, das 7h às 19h. Telefone e WhatsApp: (61) 3346-6005.</p></details>
+<details><summary>Onde fica e qual o horário?</summary><p>São duas unidades, a <a href="/hiperbarica-asa-sul/">Asa Sul</a> (Complexo Médico Hospitalar da L2 Sul) e <a href="/hiperbarica-taguatinga/">Taguatinga</a> (Prédio Prime Excelência Médica, Torre D, Lojas 2 a 5, Setor C Norte). As duas abrem todos os dias, das 7h às 19h. Telefone e WhatsApp: (61) 3346-6005.</p></details>
 </div>
 <p class="bmh-mais"><a class="bmh-link bmh-whatsapp" href="{{wa:duvida}}">Não achou a sua pergunta? Fale com a recepção</a></p>
+</div></section>
+
+<section id="referencias" class="bmh-sec bmh-mist"><div class="bmh-w bmh-texto">
+<h2>Revisão médica e referências</h2>
+<p>Revisado por Dr. Jorge Madeiro, CRM-DF 31687, RQE 26863, diretor médico da BMH, em 15/10/2026.</p>
+<p>As respostas seguem as indicações reconhecidas pelo Conselho Federal de Medicina e as referências abaixo. Elas explicam o tratamento, mas não substituem a avaliação médica: cada caso é avaliado antes de começar.</p>
+<ol class="bmh-refs">
+<li>Conselho Federal de Medicina. Resolução CFM nº 1.457, de 15 de setembro de 1995 (oxigenoterapia hiperbárica). Diário Oficial da União, 19/10/1995. <a href="https://sbmh.com.br/indicacoes/indicacoes-de-oxigenoterapia-hiperbarica-pelo-conselho-federal-de-medicina/" target="_blank" rel="noopener">Texto reproduzido pela SBMH</a><small>Usada em: o que é, para que serve, os dois tipos de câmara.</small></li>
+<li>Undersea and Hyperbaric Medical Society (UHMS). Hyperbaric Medicine Indications Manual, 15ª edição. Huang ET, editor. Best Publishing Company.<small>Usada em: para que serve.</small></li>
+<li>Mathieu D e colaboradores. Tenth European Consensus Conference on Hyperbaric Medicine: recommendations for accepted and non-accepted clinical indications and practice of hyperbaric oxygen treatment. Diving and Hyperbaric Medicine, 2017. <a href="https://doi.org/10.28920/dhm47.1.24-32" target="_blank" rel="noopener">doi:10.28920/dhm47.1.24-32</a><small>Usada em: para que serve.</small></li>
+<li>Thom SR. Hyperbaric oxygen: its mechanisms and efficacy. Plastic and Reconstructive Surgery, 2011. <a href="https://doi.org/10.1097/PRS.0b013e3181fbe2bf" target="_blank" rel="noopener">doi:10.1097/PRS.0b013e3181fbe2bf</a><small>Usada em: como funciona.</small></li>
+<li>Francis A, Baynosa RC. Hyperbaric oxygen therapy for the compromised graft or flap. Advances in Wound Care, 2017. <a href="https://doi.org/10.1089/wound.2016.0707" target="_blank" rel="noopener">doi:10.1089/wound.2016.0707</a><small>Usada em: como funciona.</small></li>
+<li>Hadanny A e colaboradores. The safety of hyperbaric oxygen treatment: retrospective analysis in 2,334 patients. Undersea and Hyperbaric Medicine, 2016. <a href="https://pubmed.ncbi.nlm.nih.gov/27265988/" target="_blank" rel="noopener">PubMed 27265988</a><small>Usada em: dói e o ouvido; o que levar (diabetes).</small></li>
+<li>Heyboer M e colaboradores. Hyperbaric oxygen therapy: side effects defined and quantified. Advances in Wound Care, 2017. <a href="https://doi.org/10.1089/wound.2016.0718" target="_blank" rel="noopener">doi:10.1089/wound.2016.0718</a><small>Usada em: dói e o ouvido.</small></li>
+</ol>
+<p>Duração da sessão, número de sessões, frequência, roupa, curativo, cinta e dreno seguem a rotina da BMH, definida pela direção médica.</p>
 </div></section>
 
 <div id="cirurgioes" class="bmh-cir"><div class="bmh-w">
@@ -335,7 +375,7 @@ body{background:#fff}
 <h2>Agende a sua avaliação</h2>
 <p>Na Asa Sul ou em Taguatinga, todos os dias, das 7h às 19h.</p>
 </div>
-<a class="bmh-btn bmh-btn--oxy bmh-whatsapp" href="{{wa:geral}}">{{svg:wa}}Agendar pelo WhatsApp</a>
+<a class="bmh-btn bmh-btn--oxy bmh-whatsapp" href="{{wa:duvida}}">{{svg:wa}}Agendar pelo WhatsApp</a>
 </div></section>
 
 <footer class="bmh-foot"><div class="bmh-w">
@@ -343,14 +383,15 @@ body{background:#fff}
 <div class="bmh-foot__g">
 <div><strong>Brasília Medicina Hiperbárica</strong><br>Em Brasília desde 2004<br>CNPJ 07.091.027/0001-86</div>
 <div><strong>Asa Sul</strong><br>SGAS 613, Conj. E, Bloco A, 1º subsolo<br>L2 Sul · CEP 70200-730</div>
-<div><strong>Taguatinga</strong><br>Prime Excelência Médica, Torre D<br>Setor C Norte</div>
+<div><strong>Taguatinga</strong><br>Prime Excelência Médica, Torre D, Lojas 2 a 5<br>Setor C Norte · CEP 72115-700</div>
 <div><strong>Contato</strong><br><a class="bmh-telefone" href="tel:+556133466005">(61) 3346-6005</a><br><a href="mailto:contato@hiperbaricabrasilia.com.br">contato@hiperbaricabrasilia.com.br</a><br><a href="https://www.instagram.com/hiperbaricabrasilia/" target="_blank" rel="noopener me">Instagram @hiperbaricabrasilia</a></div>
 </div>
+<p class="bmh-foot__links"><a href="/pos-operatorio-cirurgia-plastica/">Pós-operatório</a> · <a href="/feridas-que-nao-cicatrizam/">Feridas e pé diabético</a> · <a href="/convenios/">Convênios</a> · <a href="/equipe-medica/">Equipe médica</a> · <a href="/perguntas-frequentes/">Perguntas frequentes</a> · <a href="/hiperbarica-asa-sul/">Unidade Asa Sul</a> · <a href="/hiperbarica-taguatinga/">Unidade Taguatinga</a></p>
 <p class="bmh-foot__legal">Responsáveis técnicos: Asa Sul, Dr. Hélio Ivan, CRM-DF 8164, RQE 26705 · Taguatinga, Dr. Alberto Jorge, CRM-DF 7248, RQE 14575 · Diretor médico: Dr. Jorge Madeiro, CRM-DF 31687, RQE 26863 · <a href="/politica-de-privacidade/">Política de privacidade</a></p>
 </div></footer>
 
 <div class="bmh-fix" id="bmh-fix">
-<a class="bmh-btn bmh-btn--navy bmh-whatsapp" href="{{wa:geral}}">{{svg:wa}}Agendar pelo WhatsApp</a>
+<a class="bmh-btn bmh-btn--navy bmh-whatsapp" href="{{wa:duvida}}">{{svg:wa}}Agendar pelo WhatsApp</a>
 <a class="bmh-tel bmh-telefone" href="tel:+556133466005" aria-label="Ligar para a BMH">{{svg:tel}}</a>
 </div>
 
@@ -366,4 +407,4 @@ body{background:#fff}
 })();
 </script>
 
-<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "FAQPage", "@id": "https://hiperbaricabrasilia.com.br/perguntas-frequentes/#pagina", "url": "https://hiperbaricabrasilia.com.br/perguntas-frequentes/", "inLanguage": "pt-BR", "lastReviewed": "2026-10-08", "reviewedBy": {"@type": "Physician", "name": "Dr. Jorge Madeiro", "identifier": "CRM-DF 31687"}, "publisher": {"@id": "https://hiperbaricabrasilia.com.br/#organizacao"}, "mainEntity": [{"@type": "Question", "name": "O que é a oxigenoterapia hiperbárica e como funciona?", "acceptedAnswer": {"@type": "Answer", "text": "Na oxigenoterapia hiperbárica, você respira oxigênio a 100% dentro de uma câmara com pressão maior que a do ar. Com a pressão, muito mais oxigênio se dissolve no sangue e chega aos tecidos que estão recebendo pouco sangue, como a pele de um retalho no pós-operatório ou uma ferida que não fecha. Esse oxigênio extra ajuda as células da cicatrização e a formação de novos vasos. Na BMH, a pressão usada equivale a pelo menos 10 metros de profundidade no mar."}}, {"@type": "Question", "name": "Para que serve? Quando é indicada?", "acceptedAnswer": {"@type": "Answer", "text": "A BMH segue as indicações reconhecidas pelo Conselho Federal de Medicina (Resolução 1.457/1995): pós-operatório com retalho ou enxerto comprometido; feridas que não cicatrizam e pé diabético; lesões causadas por radioterapia; infecções graves de pele e músculo; infecção crônica dos ossos (osteomielite); e acidente de mergulho (doença descompressiva). Cada caso passa por avaliação médica."}}, {"@type": "Question", "name": "A câmara hiperbárica é tratamento estético?", "acceptedAnswer": {"@type": "Answer", "text": "Não. Ela entra quando há uma indicação médica, como um retalho ou enxerto comprometido no pós-operatório, e não substitui o cuidado do cirurgião. A resposta varia de pessoa para pessoa, e o médico acompanha a evolução."}}, {"@type": "Question", "name": "Quantas sessões de câmara hiperbárica são necessárias?", "acceptedAnswer": {"@type": "Answer", "text": "O número de sessões depende do motivo do tratamento. Ele é definido pelo médico na avaliação e, no pós-operatório, combinado com o seu cirurgião. Em geral, são de 10 a 30 sessões no pós-operatório de cirurgia plástica e de 30 a 60 em feridas que não cicatrizam. O médico reavalia a evolução e pode ajustar esse número."}}, {"@type": "Question", "name": "Quanto tempo dura uma sessão?", "acceptedAnswer": {"@type": "Answer", "text": "Cada sessão dura cerca de 1h30, contando o tempo de pressurizar e de voltar à pressão normal."}}, {"@type": "Question", "name": "Com que frequência? Precisa ser todo dia?", "acceptedAnswer": {"@type": "Answer", "text": "Em geral, uma sessão por dia, em dias seguidos. O médico define o ritmo na avaliação. Em alguns casos agudos, podem ser duas sessões no mesmo dia."}}, {"@type": "Question", "name": "Dói? E o ouvido?", "acceptedAnswer": {"@type": "Answer", "text": "Não dói. Enquanto a pressão sobe, você sente o ouvido como na descida de um avião. A equipe ensina a aliviar engolindo ou bocejando, e a subida pode ser feita mais devagar, ou pausada, se incomodar. O incômodo no ouvido é o efeito mais comum, e mesmo ele é raro: num estudo com 2.334 pacientes, aconteceu em cerca de 1 a cada 2.500 sessões."}}, {"@type": "Question", "name": "Tenho claustrofobia. Posso fazer?", "acceptedAnswer": {"@type": "Answer", "text": "Na maioria dos casos, sim. A BMH tem dois tipos de câmara. Na monoplace, você fica deitado, sozinho, numa câmara de acrílico transparente, falando com a equipe pelo interfone o tempo todo. Na multiplace, uma sala maior, você fica sentado, com outras pessoas e um profissional da equipe. Conte na avaliação: o médico indica a melhor câmara para você."}}, {"@type": "Question", "name": "O que levar e como ir vestido?", "acceptedAnswer": {"@type": "Answer", "text": "A BMH fornece a roupa de algodão para a sessão. Por segurança, nada que possa pegar fogo ou fazer faísca entra na câmara: celular, relógio, isqueiro e aparelhos eletrônicos, além de cremes, maquiagem, perfume e gel de cabelo. Coma algo leve antes. Se você tem diabetes, avise a equipe."}}, {"@type": "Question", "name": "Posso fazer a sessão com curativo, cinta ou dreno?", "acceptedAnswer": {"@type": "Answer", "text": "Sim. Não precisa trocar o curativo antes da sessão, e a cinta e o dreno podem ficar. Traga as orientações do seu cirurgião."}}, {"@type": "Question", "name": "Preciso ficar internado? Posso ir sozinho e dirigir depois?", "acceptedAnswer": {"@type": "Answer", "text": "Não precisa de internação: você faz a sessão e volta para casa. A maioria das pessoas pode ir sozinha e dirigir depois. O médico avisa se o seu caso pedir companhia."}}, {"@type": "Question", "name": "Quais são as contraindicações?", "acceptedAnswer": {"@type": "Answer", "text": "A principal contraindicação é o pneumotórax não tratado, que é ar entre o pulmão e a parede do tórax. Alguns remédios, como certos quimioterápicos, também pedem cuidado. Resfriado, sinusite, febre, asma descontrolada e gravidez fazem o médico avaliar com mais atenção, e às vezes adiar a sessão. Por isso toda pessoa passa pela avaliação médica antes de começar."}}, {"@type": "Question", "name": "Tem médico durante a sessão?", "acceptedAnswer": {"@type": "Answer", "text": "Sim. Na BMH, um médico está na unidade em todas as sessões, do início ao fim. Ele avalia você antes de começar, acompanha a sessão e responde na hora a qualquer intercorrência."}}, {"@type": "Question", "name": "Precisa de pedido médico?", "acceptedAnswer": {"@type": "Answer", "text": "O tratamento sempre começa com uma avaliação médica na BMH. Para usar o convênio, o plano pede o pedido do seu médico. Se você ainda não tem pedido, fale com a recepção: ela explica o caminho."}}, {"@type": "Question", "name": "O convênio cobre a câmara hiperbárica?", "acceptedAnswer": {"@type": "Answer", "text": "A BMH atende 50 convênios. Em geral, o plano pede o pedido médico com relatório e uma autorização antes de começar. A recepção confere a cobertura do seu plano pelo WhatsApp e ajuda com a autorização."}}, {"@type": "Question", "name": "Quanto custa a sessão?", "acceptedAnswer": {"@type": "Answer", "text": "O valor depende do motivo do tratamento e do convênio. A recepção informa pelo WhatsApp."}}, {"@type": "Question", "name": "Onde fica e qual o horário?", "acceptedAnswer": {"@type": "Answer", "text": "São duas unidades, a Asa Sul (Complexo Médico Hospitalar da L2 Sul) e Taguatinga (Prédio Prime Excelência Médica, Setor C Norte). As duas abrem todos os dias, das 7h às 19h. Telefone e WhatsApp: (61) 3346-6005."}}]}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Início", "item": "https://hiperbaricabrasilia.com.br/"}, {"@type": "ListItem", "position": 2, "name": "Perguntas frequentes", "item": "https://hiperbaricabrasilia.com.br/perguntas-frequentes/"}]}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "FAQPage", "@id": "https://hiperbaricabrasilia.com.br/perguntas-frequentes/#pagina", "url": "https://hiperbaricabrasilia.com.br/perguntas-frequentes/", "inLanguage": "pt-BR", "lastReviewed":"2026-10-15", "reviewedBy": {"@type": "Physician", "name": "Dr. Jorge Madeiro", "identifier": ["CRM-DF 31687", "RQE 26863"]}, "publisher": {"@id": "https://hiperbaricabrasilia.com.br/#organizacao"}, "mainEntity": [{"@type": "Question", "name": "O que é a oxigenoterapia hiperbárica e como funciona?", "acceptedAnswer": {"@type": "Answer", "text": "Na oxigenoterapia hiperbárica, você respira oxigênio a 100% dentro de uma câmara com pressão maior que a do ar. Com a pressão, muito mais oxigênio se dissolve no sangue e chega aos tecidos que estão recebendo pouco sangue, como a pele de um retalho no pós-operatório ou uma ferida que não fecha. Esse oxigênio extra ajuda as células da cicatrização e a formação de novos vasos. Na BMH, a pressão usada equivale a pelo menos 10 metros de profundidade no mar."}}, {"@type": "Question", "name": "Para que serve? Quando é indicada?", "acceptedAnswer": {"@type": "Answer", "text": "A BMH segue as indicações reconhecidas pelo Conselho Federal de Medicina (Resolução 1.457/1995): pós-operatório com retalho ou enxerto comprometido; feridas que não cicatrizam e pé diabético; lesões causadas por radioterapia; infecções graves de pele e músculo; infecção crônica dos ossos (osteomielite); e acidente de mergulho (doença descompressiva). Cada caso passa por avaliação médica."}}, {"@type": "Question", "name": "A câmara hiperbárica é tratamento estético?", "acceptedAnswer": {"@type": "Answer", "text": "Não. Ela entra quando há uma indicação médica, como um retalho ou enxerto comprometido no pós-operatório, e não substitui o cuidado do cirurgião. A resposta varia de pessoa para pessoa, e o médico acompanha a evolução."}}, {"@type": "Question", "name": "Quantas sessões de câmara hiperbárica são necessárias?", "acceptedAnswer": {"@type": "Answer", "text": "O número de sessões depende do motivo do tratamento. Ele é definido pelo médico na avaliação e, no pós-operatório, combinado com o seu cirurgião. Em geral, são de 10 a 30 sessões no pós-operatório de cirurgia plástica e de 30 a 60 em feridas que não cicatrizam. O médico reavalia a evolução e pode ajustar esse número."}}, {"@type": "Question", "name": "Quanto tempo dura uma sessão?", "acceptedAnswer": {"@type": "Answer", "text": "Cada sessão dura cerca de 1h30, contando o tempo de pressurizar e de voltar à pressão normal."}}, {"@type": "Question", "name": "Com que frequência? Precisa ser todo dia?", "acceptedAnswer": {"@type": "Answer", "text": "Em geral, uma sessão por dia, em dias seguidos. O médico define o ritmo na avaliação. Em alguns casos agudos, podem ser duas sessões no mesmo dia."}}, {"@type": "Question", "name": "Dói? E o ouvido?", "acceptedAnswer": {"@type": "Answer", "text": "Não dói. Enquanto a pressão sobe, você sente o ouvido como na descida de um avião. A equipe ensina a aliviar engolindo ou bocejando, e a subida pode ser feita mais devagar, ou pausada, se incomodar. O incômodo no ouvido é o efeito mais comum, e mesmo ele é raro: num estudo com 2.334 pacientes, aconteceu em cerca de 1 a cada 2.500 sessões."}}, {"@type": "Question", "name": "Tenho claustrofobia. Posso fazer?", "acceptedAnswer": {"@type": "Answer", "text": "Na maioria dos casos, sim. A BMH tem dois tipos de câmara. Na monoplace, você fica deitado, sozinho, numa câmara de acrílico transparente, falando com a equipe pelo interfone o tempo todo. Na multiplace, uma sala maior, você fica sentado, com outras pessoas e um profissional da equipe. Conte na avaliação: o médico indica a melhor câmara para você."}}, {"@type": "Question", "name": "O que levar e como ir vestido?", "acceptedAnswer": {"@type": "Answer", "text": "A BMH fornece a roupa de algodão para a sessão. Por segurança, nada que possa pegar fogo ou fazer faísca entra na câmara: celular, relógio, isqueiro e aparelhos eletrônicos, além de cremes, maquiagem, perfume e gel de cabelo. Coma algo leve antes. Se você tem diabetes, avise a equipe."}}, {"@type": "Question", "name": "Posso fazer a sessão com curativo, cinta ou dreno?", "acceptedAnswer": {"@type": "Answer", "text": "Sim. Não precisa trocar o curativo antes da sessão, e a cinta e o dreno podem ficar. Traga as orientações do seu cirurgião."}}, {"@type": "Question", "name": "Preciso ficar internado? Posso ir sozinho e dirigir depois?", "acceptedAnswer": {"@type": "Answer", "text": "Não precisa de internação: você faz a sessão e volta para casa. A maioria das pessoas pode ir sozinha e dirigir depois. O médico avisa se o seu caso pedir companhia."}}, {"@type": "Question", "name": "Quais são as contraindicações?", "acceptedAnswer": {"@type": "Answer", "text": "A principal contraindicação é o pneumotórax não tratado, que é ar entre o pulmão e a parede do tórax. Alguns remédios, como certos quimioterápicos, também pedem cuidado. Resfriado, sinusite, febre, asma descontrolada e gravidez fazem o médico avaliar com mais atenção, e às vezes adiar a sessão. Por isso toda pessoa passa pela avaliação médica antes de começar."}}, {"@type": "Question", "name": "Tem médico durante a sessão?", "acceptedAnswer": {"@type": "Answer", "text": "Sim. Na BMH, um médico está na unidade em todas as sessões, do início ao fim. Ele avalia você antes de começar, acompanha a sessão e responde na hora a qualquer intercorrência."}}, {"@type": "Question", "name": "Precisa de pedido médico?", "acceptedAnswer": {"@type": "Answer", "text": "O tratamento sempre começa com uma avaliação médica na BMH. Para usar o convênio, o plano pede o pedido do seu médico. Se você ainda não tem pedido, fale com a recepção: ela explica o caminho."}}, {"@type": "Question", "name": "O convênio cobre a câmara hiperbárica?", "acceptedAnswer": {"@type": "Answer", "text": "A BMH atende 50 convênios. Em geral, o plano pede o pedido médico com relatório e uma autorização antes de começar. A recepção confere a cobertura do seu plano pelo WhatsApp e ajuda com a autorização."}}, {"@type": "Question", "name": "Quanto custa a sessão?", "acceptedAnswer": {"@type": "Answer", "text": "O valor depende do motivo do tratamento e do convênio. A recepção informa pelo WhatsApp."}}, {"@type": "Question", "name": "Onde fica e qual o horário?", "acceptedAnswer": {"@type": "Answer", "text": "São duas unidades, a Asa Sul (Complexo Médico Hospitalar da L2 Sul) e Taguatinga (Prédio Prime Excelência Médica, Torre D, Lojas 2 a 5, Setor C Norte). As duas abrem todos os dias, das 7h às 19h. Telefone e WhatsApp: (61) 3346-6005."}}], "citation": ["Conselho Federal de Medicina. Resolução CFM nº 1.457, de 15 de setembro de 1995.", "Undersea and Hyperbaric Medical Society. Hyperbaric Medicine Indications Manual, 15th edition. Huang ET, editor. Best Publishing Company.", "Mathieu D et al. Tenth European Consensus Conference on Hyperbaric Medicine. Diving Hyperb Med. 2017. doi:10.28920/dhm47.1.24-32", "Thom SR. Hyperbaric oxygen: its mechanisms and efficacy. Plast Reconstr Surg. 2011. doi:10.1097/PRS.0b013e3181fbe2bf", "Francis A, Baynosa RC. Hyperbaric Oxygen Therapy for the Compromised Graft or Flap. Adv Wound Care. 2017. doi:10.1089/wound.2016.0707", "Hadanny A et al. The safety of hyperbaric oxygen treatment: retrospective analysis in 2,334 patients. Undersea Hyperb Med. 2016. PMID 27265988", "Heyboer M et al. Hyperbaric Oxygen Therapy: Side Effects Defined and Quantified. Adv Wound Care. 2017. doi:10.1089/wound.2016.0718"]}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Início", "item": "https://hiperbaricabrasilia.com.br/"}, {"@type": "ListItem", "position": 2, "name": "Perguntas frequentes", "item": "https://hiperbaricabrasilia.com.br/perguntas-frequentes/"}]}]}</script>

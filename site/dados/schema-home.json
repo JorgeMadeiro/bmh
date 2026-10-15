@@ -43,11 +43,11 @@
   {
    "@type": "MedicalClinic",
    "@id": "https://hiperbaricabrasilia.com.br/#asa-sul",
-   "name": "BMH Brasília Medicina Hiperbárica · Asa Sul",
+   "name": "Brasília Medicina Hiperbárica | BMH Asa Sul",
    "parentOrganization": {
     "@id": "https://hiperbaricabrasilia.com.br/#organizacao"
    },
-   "url": "https://hiperbaricabrasilia.com.br/",
+   "url": "https://hiperbaricabrasilia.com.br/hiperbarica-asa-sul/",
    "image": "{{img:bmh-fachada-asa-sul.jpg}}",
    "telephone": "+55-61-3346-6005",
    "address": {
@@ -84,24 +84,33 @@
     ],
     "description": "Respirar oxigênio a 100% dentro de uma câmara com pressão maior que a do ar. Sessões de cerca de 1h30, com médico presente na unidade em todas as sessões."
    },
-   "medicalSpecialty": "Medicina hiperbárica"
+   "medicalSpecialty": "Medicina hiperbárica",
+   "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": -15.83452,
+    "longitude": -47.9122
+   },
+   "sameAs": [
+    "https://maps.google.com/maps?cid=16188707182465812117"
+   ]
   },
   {
    "@type": "MedicalClinic",
    "@id": "https://hiperbaricabrasilia.com.br/#taguatinga",
-   "name": "BMH Brasília Medicina Hiperbárica · Taguatinga",
+   "name": "Brasília Medicina Hiperbárica | BMH Taguatinga",
    "parentOrganization": {
     "@id": "https://hiperbaricabrasilia.com.br/#organizacao"
    },
-   "url": "https://hiperbaricabrasilia.com.br/",
+   "url": "https://hiperbaricabrasilia.com.br/hiperbarica-taguatinga/",
    "image": "{{img:bmh-fachada-taguatinga.jpg}}",
    "telephone": "+55-61-3346-6005",
    "address": {
     "@type": "PostalAddress",
-    "streetAddress": "Prédio Prime Excelência Médica, Torre D, Setor C Norte",
+    "streetAddress": "Prédio Prime Excelência Médica, Torre D, Lojas 2 a 5, Setor C Norte",
     "addressLocality": "Taguatinga, Brasília",
     "addressRegion": "DF",
-    "addressCountry": "BR"
+    "addressCountry": "BR",
+    "postalCode": "72115-700"
    },
    "openingHoursSpecification": [
     {
@@ -129,7 +138,15 @@
     ],
     "description": "Respirar oxigênio a 100% dentro de uma câmara com pressão maior que a do ar. Sessões de cerca de 1h30, com médico presente na unidade em todas as sessões."
    },
-   "medicalSpecialty": "Medicina hiperbárica"
+   "medicalSpecialty": "Medicina hiperbárica",
+   "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": -15.82222,
+    "longitude": -48.06614
+   },
+   "sameAs": [
+    "https://maps.google.com/maps?cid=14287440431353597253"
+   ]
   },
   {
    "@type": "Physician",

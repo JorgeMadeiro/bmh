@@ -1,0 +1,21 @@
+<!-- BMH · /drjorge/ (15/10/2026, bastão da Nexo): destino do link "Hiperbárica (BMH)" da bio do Instagram do Dr. Jorge.
+     Abre o WhatsApp da BMH com a frase pronta, que é o marcador de origem ("Vim pelo Instagram do Dr. Jorge"). Página curta
+     porque o Instagram estraga link de WhatsApp com texto (codifica o % de novo). Fora do Google (noindex) e do mapa do site.
+     Espera 1,5 s para o Analytics registrar a visita (o link da bio leva UTM). O botão fica para quem o navegador barrar. -->
+<style>
+.bmh-dj{font-family:'Libre Franklin',system-ui,-apple-system,'Segoe UI',sans-serif;max-width:420px;margin:0 auto;padding:48px 20px;text-align:center;color:#142033}
+.bmh-dj img{width:120px;height:auto;margin:0 auto 20px;display:block}
+.bmh-dj h1{font-size:22px;line-height:1.25;color:#002375;margin:0 0 10px}
+.bmh-dj p{font-size:16px;line-height:1.5;margin:0 0 22px;color:#2B3850}
+.bmh-dj a.bmh-dj__btn{display:inline-flex;align-items:center;gap:10px;min-height:52px;padding:0 26px;border-radius:999px;background:#34A9CF;color:#00143F;font-weight:700;text-decoration:none;font-size:17px}
+.bmh-dj a.bmh-dj__btn svg{width:22px;height:22px}
+.bmh-dj small{display:block;margin-top:18px;color:#4A5568;font-size:13px}
+</style>
+<div class="bmh-dj">
+<img src="{{img:bmh-logo.png}}" alt="BMH Brasília Medicina Hiperbárica" width="300" height="159">
+<h1>Abrindo o WhatsApp da BMH</h1>
+<p>Câmara hiperbárica com médico em todas as sessões, na Asa Sul e em Taguatinga.</p>
+<a class="bmh-dj__btn" id="bmh-dj-wa" href="{{wa:drjorge}}">{{svg:wa}}Abrir o WhatsApp</a>
+<small>Se não abrir sozinho, toque no botão. Todos os dias, das 7h às 19h.</small>
+</div>
+<script>setTimeout(function(){var a=document.getElementById('bmh-dj-wa');if(a){location.replace(a.href);}},1500);</script>

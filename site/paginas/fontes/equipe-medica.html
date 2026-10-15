@@ -1,0 +1,129 @@
+<!-- wa-da-pagina: geral -->
+<!-- BMH · página da equipe médica (fonte), RASCUNHO de 15/10/2026. Monta com scripts/montar-pagina.js.
+     Endereço sugerido: /equipe-medica/. Intenção: autoridade. Ação principal: agendar pelo WhatsApp (chave geral);
+     secundária: médico que encaminha (chave cirurgiao).
+     Fontes de cada frase e revisão em sete passadas: marketing/conteudo/bmh-pagina-equipe-medica-2026-10-15/.
+     Regras: nunca sugerir que o paciente é atendido por um diretor (dizer "médico em todas as sessões");
+     CRM e RQE só com o número; UHMS só nesta página (formação concluída, Jorge 15/10/2026); descrições dos três diretores no mesmo padrão. -->
+{{molde:estilo}}
+<style>
+/* ---------- página da equipe médica (15/10/2026) ---------- */
+.bmh .bmh-hero__hora a{color:#fff!important;font-weight:700}
+.bmh-dirs{list-style:none;margin:24px 0 0;padding:0;display:grid;gap:14px}
+.bmh-dirs>li{background:#fff;border:1px solid var(--line);border-radius:8px;padding:20px}
+.bmh-dirs__topo{display:flex;gap:14px;align-items:center}
+.bmh-dirs img{width:88px;height:88px;border-radius:50%;object-fit:cover;flex:none}
+.bmh-dirs h3{font-size:21px;line-height:1.2}
+.bmh .bmh-dirs__cargo{font-size:15px;font-weight:700;color:var(--oxyt);margin-top:4px;line-height:1.3}
+.bmh .bmh-dirs__reg{font-size:14px;color:var(--muted);margin-top:4px}
+.bmh-dirs ul{margin:16px 0 0;padding-left:20px;color:var(--txt);font-size:16px}
+.bmh-dirs ul li{margin-top:6px}
+.bmh .bmh-nota{font-size:15px;color:var(--muted);margin-top:20px;max-width:760px}
+.bmh-fatos a{font-weight:700}
+@media (min-width:860px){
+  .bmh-dirs{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:36px}
+  .bmh-dirs>li{padding:26px}
+  .bmh-dirs img{width:104px;height:104px}
+  .bmh-dirs ul{font-size:17px}
+}
+</style>
+
+<div class="bmh">
+{{molde:cabecalho}}
+
+<section class="bmh-hero bmh-hero--int"><div class="bmh-w">
+<p class="bmh-trilha"><a href="/">Início</a> › Equipe médica</p>
+<h1>Equipe médica da BMH</h1>
+<p class="bmh-hero__sub">Médico em todas as sessões de oxigenoterapia hiperbárica, na Asa Sul e em Taguatinga. Os protocolos são definidos pela direção médica, formada por três médicos com pós-graduação em medicina hiperbárica.</p>
+<div class="bmh-hero__ctas">
+<a class="bmh-btn bmh-btn--oxy bmh-whatsapp" href="{{wa:geral}}">{{svg:wa}}Agendar pelo WhatsApp</a>
+<a class="bmh-link bmh-whatsapp" href="{{wa:cirurgiao}}">Sou médico e quero encaminhar um paciente</a>
+</div>
+<p class="bmh-hero__hora">Todos os dias, das 7h às 19h. Telefone e WhatsApp: <a class="bmh-telefone" href="tel:+556133466005">(61) 3346-6005</a>.</p>
+</div></section>
+
+<section id="equipe" class="bmh-sec"><div class="bmh-w bmh-duas">
+<div class="bmh-texto">
+<h2>Médico em todas as sessões</h2>
+<p>Em todas as sessões, um médico da equipe da BMH está na unidade, do início ao fim. Ele avalia você antes de começar, acompanha a sessão e responde na hora a qualquer imprevisto.</p>
+<p>Se você sentir qualquer desconforto durante a sessão, quem responde é um médico, ali mesmo, na unidade.</p>
+<p>Os médicos da equipe seguem os mesmos protocolos nas duas unidades, em qualquer dia e horário. Quem define esses protocolos é a direção médica.</p>
+</div>
+<figure class="bmh-fig">
+<img src="{{img:bmh-equipe-medica-sala-monoplace-1200.webp}}" srcset="{{img:bmh-equipe-medica-sala-monoplace-800.webp}} 800w, {{img:bmh-equipe-medica-sala-monoplace-1200.webp}} 1200w" sizes="(min-width:860px) 480px, 100vw" alt="Sete médicos da equipe da BMH, de jaleco branco, lado a lado na sala das câmaras monoplace da unidade Asa Sul" width="1200" height="800" loading="lazy">
+<figcaption>Parte da equipe médica da BMH na sala das câmaras monoplace, na Asa Sul (2025).</figcaption>
+</figure>
+</div></section>
+
+<section id="direcao" class="bmh-sec bmh-mist"><div class="bmh-w">
+<div class="bmh-texto">
+<h2>Direção médica</h2>
+<p>A direção médica responde pelos protocolos da BMH: quem tem indicação para a oxigenoterapia hiperbárica, como cada sessão é conduzida e como a equipe age diante de um imprevisto.</p>
+</div>
+<ul class="bmh-dirs">
+<li>
+<div class="bmh-dirs__topo">
+<img src="{{img:bmh-dr-jorge-madeiro.jpg}}" alt="Retrato do Dr. Jorge Madeiro, diretor médico da BMH" width="240" height="240" loading="lazy">
+<div><h3>Dr. Jorge Madeiro</h3><p class="bmh-dirs__cargo">Diretor médico</p><p class="bmh-dirs__reg">CRM-DF 31687 · RQE 26863</p></div>
+</div>
+<ul>
+<li>Pós-graduação em medicina hiperbárica.</li>
+<li>Integra a direção médica, que responde pelos protocolos da BMH.</li>
+</ul>
+</li>
+<li>
+<div class="bmh-dirs__topo">
+<img src="{{img:bmh-dr-helio-ivan.jpg}}" alt="Retrato do Dr. Hélio Ivan, responsável técnico da unidade Asa Sul da BMH" width="240" height="240" loading="lazy">
+<div><h3>Dr. Hélio Ivan</h3><p class="bmh-dirs__cargo">Responsável técnico · unidade Asa Sul</p><p class="bmh-dirs__reg">CRM-DF 8164 · RQE 26705</p></div>
+</div>
+<ul>
+<li>Pós-graduação em medicina hiperbárica.</li>
+<li>Integra a direção médica, que responde pelos protocolos da BMH.</li>
+</ul>
+</li>
+<li>
+<div class="bmh-dirs__topo">
+<img src="{{img:bmh-dr-alberto-jorge.jpg}}" alt="Retrato do Dr. Alberto Jorge, responsável técnico da unidade Taguatinga da BMH" width="240" height="240" loading="lazy">
+<div><h3>Dr. Alberto Jorge</h3><p class="bmh-dirs__cargo">Responsável técnico · unidade Taguatinga</p><p class="bmh-dirs__reg">CRM-DF 7248 · RQE 14575</p></div>
+</div>
+<ul>
+<li>Pós-graduação em medicina hiperbárica.</li>
+<li>Integra a direção médica, que responde pelos protocolos da BMH.</li>
+</ul>
+</li>
+</ul>
+<p class="bmh-nota">Os três diretores têm pós-graduação em medicina hiperbárica no Brasil. O Dr. Jorge Madeiro fez a dele pela Santa Casa e também concluiu nos Estados Unidos a formação <i>The UHMS Program for Advanced Training in Hyperbaric Medicine</i>. Ele integra a diretoria da Sociedade Brasileira de Medicina Marítima e Hiperbárica, chapa 2026/27.</p>
+<p class="bmh-nota">Cada unidade tem um responsável técnico: o médico que responde por ela perante o Conselho Regional de Medicina do Distrito Federal. CRM é o número de registro no conselho; RQE, o Registro de Qualificação de Especialista.</p>
+</div></section>
+
+<section id="clinica" class="bmh-sec"><div class="bmh-w bmh-texto">
+<h2>Desde 2004 em Brasília</h2>
+<p>A BMH foi a primeira clínica particular de oxigenoterapia hiperbárica de Brasília e atende desde 2004. Hoje são duas unidades, abertas todos os dias, inclusive sábado e domingo, das 7h às 19h.</p>
+<ul class="bmh-fatos">
+<li><b>Asa Sul</b><span>SGAS 613, Conjunto E, Bloco A, 1º subsolo, Complexo Médico Hospitalar, L2 Sul, CEP 70200-730. <a href="/hiperbarica-asa-sul/">Ver a unidade Asa Sul</a></span></li>
+<li><b>Taguatinga</b><span>Prédio Prime Excelência Médica, Torre D, Lojas 2 a 5, Setor C Norte, Taguatinga, CEP 72115-700. <a href="/hiperbarica-taguatinga/">Ver a unidade Taguatinga</a></span></li>
+<li><b>Convênios</b><span>50 convênios atendidos. <a href="/convenios/">Ver a lista</a></span></li>
+</ul>
+</div></section>
+
+<section id="perguntas" class="bmh-sec bmh-mist"><div class="bmh-w">
+<div class="bmh-texto"><h2>Perguntas sobre a equipe</h2></div>
+<div class="bmh-faq">
+<details><summary>Quem acompanha a minha sessão?</summary><p>Um médico da equipe da BMH, que fica na unidade do início ao fim da sessão. Todos os médicos da equipe seguem os protocolos definidos pela direção médica.</p></details>
+<details><summary>Tem médico durante a sessão inteira?</summary><p>Sim. Em todas as sessões, nas duas unidades, um médico está presente do começo ao fim, e não só na avaliação.</p></details>
+<details><summary>Como confiro o registro dos médicos?</summary><p>Pelo número do CRM, na busca de médicos do site do Conselho Federal de Medicina. Os números da direção médica estão nesta página e no rodapé do site.</p></details>
+<details><summary>Qual unidade fica mais perto de mim?</summary><p>A Asa Sul fica no Complexo Médico Hospitalar da L2 Sul. A unidade Taguatinga é a mais perto de quem mora em Taguatinga, Ceilândia, Samambaia, Águas Claras e Vicente Pires. As duas têm médico em todas as sessões.</p></details>
+</div>
+<p class="bmh-nota">A recepção responde pelo WhatsApp, confere o seu convênio e marca a avaliação na unidade que você preferir.</p>
+<a class="bmh-btn bmh-btn--navy bmh-whatsapp" href="{{wa:geral}}" style="margin-top:20px">{{svg:wa}}Agendar pelo WhatsApp</a>
+</div></section>
+
+{{molde:fim}}
+
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [
+{"@type": "MedicalOrganization", "@id": "https://hiperbaricabrasilia.com.br/#organizacao", "name": "Brasília Medicina Hiperbárica", "alternateName": "BMH", "url": "https://hiperbaricabrasilia.com.br/", "logo": "{{img:bmh-logo.png}}", "foundingDate": "2004-11", "telephone": "+55-61-3346-6005", "medicalSpecialty": "Medicina hiperbárica", "member": [{"@id": "https://hiperbaricabrasilia.com.br/equipe-medica/#jorge-madeiro"}, {"@id": "https://hiperbaricabrasilia.com.br/equipe-medica/#helio-ivan"}, {"@id": "https://hiperbaricabrasilia.com.br/equipe-medica/#alberto-jorge"}]},
+{"@type": "Physician", "@id": "https://hiperbaricabrasilia.com.br/equipe-medica/#jorge-madeiro", "name": "Dr. Jorge Madeiro", "description": "Diretor médico da BMH Brasília Medicina Hiperbárica. Pós-graduação em medicina hiperbárica. Integra a direção médica, que responde pelos protocolos da BMH.", "url": "https://hiperbaricabrasilia.com.br/equipe-medica/", "image": "{{img:bmh-dr-jorge-madeiro.jpg}}", "identifier": [{"@type": "PropertyValue", "propertyID": "CRM-DF", "value": "31687"}, {"@type": "PropertyValue", "propertyID": "RQE", "value": "26863"}], "knowsAbout": ["Medicina hiperbárica", "Oxigenoterapia hiperbárica"], "memberOf": [{"@id": "https://hiperbaricabrasilia.com.br/#organizacao"}, {"@type": "MedicalOrganization", "name": "Sociedade Brasileira de Medicina Marítima e Hiperbárica"}]},
+{"@type": "Physician", "@id": "https://hiperbaricabrasilia.com.br/equipe-medica/#helio-ivan", "name": "Dr. Hélio Ivan", "description": "Responsável técnico da unidade Asa Sul da BMH Brasília Medicina Hiperbárica. Pós-graduação em medicina hiperbárica. Integra a direção médica, que responde pelos protocolos da BMH.", "url": "https://hiperbaricabrasilia.com.br/equipe-medica/", "image": "{{img:bmh-dr-helio-ivan.jpg}}", "identifier": [{"@type": "PropertyValue", "propertyID": "CRM-DF", "value": "8164"}, {"@type": "PropertyValue", "propertyID": "RQE", "value": "26705"}], "knowsAbout": ["Medicina hiperbárica", "Oxigenoterapia hiperbárica"], "memberOf": {"@id": "https://hiperbaricabrasilia.com.br/#organizacao"}},
+{"@type": "Physician", "@id": "https://hiperbaricabrasilia.com.br/equipe-medica/#alberto-jorge", "name": "Dr. Alberto Jorge", "description": "Responsável técnico da unidade Taguatinga da BMH Brasília Medicina Hiperbárica. Pós-graduação em medicina hiperbárica. Integra a direção médica, que responde pelos protocolos da BMH.", "url": "https://hiperbaricabrasilia.com.br/equipe-medica/", "image": "{{img:bmh-dr-alberto-jorge.jpg}}", "identifier": [{"@type": "PropertyValue", "propertyID": "CRM-DF", "value": "7248"}, {"@type": "PropertyValue", "propertyID": "RQE", "value": "14575"}], "knowsAbout": ["Medicina hiperbárica", "Oxigenoterapia hiperbárica"], "memberOf": {"@id": "https://hiperbaricabrasilia.com.br/#organizacao"}},
+{"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Início", "item": "https://hiperbaricabrasilia.com.br/"}, {"@type": "ListItem", "position": 2, "name": "Equipe médica", "item": "https://hiperbaricabrasilia.com.br/equipe-medica/"}]}
+]}</script>

@@ -96,3 +96,20 @@ Origens = cliques no WhatsApp do site (um por clique, Analytics), pago com a cam
 5. Login do painel: `bash scripts/guardar-chave.sh PAINEL_BMH_USUARIO PAINEL_BMH_SENHA`.
 
 Depois disso o Claude cria as credenciais do Google no usuário da BMH, o fluxo da página e a leitura diária do iGut.
+
+## Padrão dos fluxos e vigia (15/10/2026, T6 e S3 do bastão da Pessoal, aprovados pelo Jorge)
+
+- **Notas:** toda nota de cabeçalho dos fluxos do montador começa com **Traz / Envia / Limites**.
+- **Limite de 1 h por execução** (`executionTimeout: 3600` no `ajustes()`): execução travada vira erro e o "BMH · Alerta
+  de falha" avisa.
+- **Vigia de parados:** "BMH · Vigia · fluxos parados" (`6wNDORbM8I1jGEyU`), das 7h às 22h aos 23 min. Cada fluxo agendado
+  (mapa `VIGIA` no montador) ganhou os nós "Vigia · marca que rodou" e "Vigia · grava", que anotam o início em
+  `BMH_vigia` (`0kBTGpt8EjCjmR9t`). Prazos com folga: diário 26 h, avaliações 11 h, semanal 170 h, mensal 745 h. Um aviso
+  por problema. Testado em 15/10 com uma linha de teste (avisou uma vez, não repetiu; linha apagada).
+- **Google orgânico da semana:** "BMH · Google orgânico · semana" (`WiOZe3DeyyANNhdr`), segunda às 7h07: cliques,
+  exibições e posição da semana (que termina 3 dias antes) contra a anterior, as buscas mais clicadas, mudanças de
+  posição com volume e UMA ação de 10 minutos (página nova publicada antes da semana e sem exibição; senão busca LOCAL
+  com pouco clique; senão "nada urgente"). Genéricas do Brasil inteiro ficam fora da ação (auditoria, achado A10).
+  Teste: `/webhook/bmh-google-organico-semana?teste=1`.
+- Cópias dos fluxos antes dessas mudanças: `dados/n8n-copias/20261015-antes-vigia/`.
+

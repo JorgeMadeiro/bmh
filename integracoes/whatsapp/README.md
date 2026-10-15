@@ -19,3 +19,12 @@ Um mês olhando como a recepção atende hoje (61 3346-6005) antes de desenhar o
   execução. Rodar à mão: o caminho do "Rodar agora" está na nota do fluxo. Linha de teste só com `apagar_em` vencido ou do
   dia seguinte (a limpeza tira).
 - Regras de dado e credenciais: `~/.claude/skills/seguranca-credenciais/SKILL.md`.
+- **Origem do contato (15/10/2026):** o "Monta a linha" reconhece o começo da mensagem pronta e o fluxo grava em
+  `BMH_whatsapp_origens` (`chave`, `dia`, `momento`, `origem`; sem telefone nem texto). Origens: `instagram_dr_jorge`
+  (link "Hiperbárica (BMH)" da bio do Dr. Jorge, página `/drjorge/`, id 1419), `anuncio_google` (link do anúncio) e
+  `site` (botões do site). Tabela à parte porque a API do n8n não acrescenta coluna em tabela que já existe. Mudar uma
+  mensagem pronta (em `scripts/wp-pagina-html.js` ou no anúncio) pede ajustar `ORIGENS` em `monta-linha.js`.
+  Atualizar só o fluxo, sem mexer na Evolution: `node --env-file=.env integracoes/whatsapp/montar.js so-fluxo`.
+  Em 15/10/2026 a instância "BMH Recepção" estava desconectada (`state: close`) e a tabela de mensagens vazia: a contagem
+  pelo WhatsApp começa quando o aparelho for reconectado; até lá, quem conta é o Analytics (visitas a `/drjorge/` com
+  `utm_source=instagram&utm_medium=bio&utm_campaign=dr-jorge`).

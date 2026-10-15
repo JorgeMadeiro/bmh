@@ -545,3 +545,33 @@ e levar os fatos de valor duradouro para `_memoria/empresa.md` (com o ok dele).
   desde set/2023, corte de confiança nov/2024 para faturamento e faltas. Mensal agora curto, com link. Ver `integracoes/grupos/README.md`.
 - **09/10/2026, painel da diretoria liberado:** mensagem curta de setembro com link e login enviada ao grupo da diretoria
   (autorizado pelo Jorge, depois dos testes). Próximo envio automático: 01/11 às 8h.
+
+- **Nota do Google na home (14/10/2026, "pode" do Jorge):** faixa de provas ganhou o 4º item ("4,8 e 4,9 no Google, em
+  262 avaliações") e cada cartão de unidade mostra "★ nota no Google · N avaliações" com link para o perfil. Números
+  automáticos (snippet 8 "BMH · nota do Google" + fluxo n8n, 2x por dia; ver `integracoes/perfil-google/README.md`).
+  Conferido no ar no celular (390 px) e no computador, sem rolagem lateral. Os perfis do Google agora apontam para a
+  página de cada unidade, com UTM.
+
+- **Pacote do site publicado (15/10/2026, "pode publicar!" do Jorge).** Novas: `/convenios/` (nativa, id 1400, no lugar da
+  do Elementor, que foi para a lixeira), `/feridas-que-nao-cicatrizam/` (1394, 11 referências conferidas) e
+  `/equipe-medica/` (1397, três diretores no mesmo padrão). Reescritas: unidades Asa Sul (1369) e Taguatinga (1365), com
+  1.000+ palavras, e "Revisado por Dr. Jorge Madeiro em 15/10/2026" com referências em perguntas frequentes (1360) e
+  pós-operatório (1359). Fontes: `site/paginas/fontes/` (versões anteriores em `antes-2026-10-15/`), cópias do que estava
+  no ar em `dados/copias-paginas-20261015/`. Saíram até o Jorge responder: estacionamento, número de câmaras de
+  Taguatinga, frase do Rol da ANS e o item "diretriz da SBMH". Conferido no ar (celular 390 px): Tag Manager, Clarity,
+  Analytics da BMH (page_view; clique no WhatsApp gera `clique_whatsapp` e a conversão do Google Ads), mensagem de
+  WhatsApp de cada assunto, sem rolagem lateral, sem marca. Bing avisado das 8 páginas, mapa do site reenviado ao Google,
+  `llms.txt` com as páginas novas. Também em 15/10: redirecionamentos guardam gclid e UTM (e nunca vão para o cache do
+  LiteSpeed), `/lp/` redireciona para a home, rascunhos antigos na lixeira, rota `POST /wp-json/bmh/v1/limpar-cache`.
+  Pendentes: links internos para as páginas novas (menu e rodapé do molde), ajuste do menu a 1366 px e WhatsApp do fim
+  da página e da barra fixa com a mensagem do assunto (propostas ao Jorge).
+
+- **Mês temático no site (15/10/2026, bastão da Nexo; Jorge: "pode fazer de todos os meses já").** Só cor, sem texto: linha
+  de 4 px no topo, laço ao lado do nome e etiquetas das seções claras na cor da campanha do mês. Os 12 meses: Janeiro
+  Branco, Fevereiro Roxo, Março Lilás, Abril Azul, Maio Amarelo, Junho Vermelho, Julho Amarelo, Agosto Dourado, Setembro
+  Amarelo, Outubro Rosa, Novembro Azul, Dezembro Vermelho. Tabela no script do topo de `site/paginas/_molde/cabecalho.html`
+  e de `site/paginas/home-v2.html` (mudar nos dois e reenviar as 8 páginas). Contraste das etiquetas conferido (mínimo
+  5,2). Conferido no ar: outubro rosa; janeiro e maio simulados no navegador; as 8 páginas sem rolagem lateral e com Tag
+  Manager, Clarity e Analytics. Atrito: um comando abriu o cabeçalho do molde para escrever antes de ler e o apagou; foi
+  recuperado das páginas montadas antes de qualquer envio (lição: ler primeiro, gravar depois, nunca na mesma expressão).
+
