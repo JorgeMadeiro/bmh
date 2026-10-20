@@ -40,6 +40,11 @@
   set/2023, mês a mês (tudo de uma vez estoura a memória do n8n). Manual: `?so=financeiro&mes=AAAA-MM` ou
   `?so=operacao&desde=…&ate=…` (até 40 dias).
 - **Regra:** Produzido = Faturado + A faturar; Faturado = Recebido + A receber + Glosado; particular = faturado e recebido.
+- **Operação por convênio (20/10/2026):** a carga grava também `BMH_operacao_conv` (dia, unidade, convênio: agendadas,
+  atendidas, faltas, cobradas, avaliações; `operacao-conv-monta.js`, convênio da agenda do iGut com o nome igual ao do
+  financeiro). Histórico desde set/2023 (21.263 linhas); a soma por convênio bate com o total em todos os 1.757 dias ×
+  unidade. Com convênio no filtro, a Operação mostra só dele; Dias e lugares são da clínica, e a Ocupação vira a parte da
+  ocupação que veio desse convênio.
 - **Valor bruto, sempre (decisão do Jorge, 20/10/2026):** não descontar retenção de imposto (`retencao_em_reais`: R$ 2.600
   em 242 sessões em 26 meses) nem estorno (`total_estorno`: 3 sessões, R$ 1.419). Não é pendência de conferência.
 - **Auditoria de 20/10/2026 (iGut × tabelas, set/24 a out/26):** produção, sessões, recebido, a receber, a faturar e glosado
