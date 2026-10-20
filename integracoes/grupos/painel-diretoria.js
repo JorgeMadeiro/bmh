@@ -20,7 +20,9 @@ const atualizado = [...fin, ...op].map((r) => r.atualizado_em || '').sort().pop(
 const X = det.filter((r) => +r.valor > 0.5).map((r) => [r.mes, r.unidade, r.convenio, r.situacao, r.lote, +r.sessoes || 0, Math.round(+r.valor), r.dias || '']);
 // prazo de recebimento: [mes, unidade, convênio, valor pago, dias × valor]
 const PZ = prz.filter((r) => +r.valor_pago > 0).map((r) => [r.mes, r.unidade, r.convenio, Math.round(+r.valor_pago), +r.dias_x_valor || 0]);
-const DADOS = { F, O, X, PZ, hoje: hoje.toISODate(), atualizado: atualizado ? DateTime.fromISO(atualizado).setZone('America/Sao_Paulo').toFormat("dd/LL 'às' HH:mm") : '—' };
+// atFin: só o financeiro, que é gravado no fim da carga (a operação grava em segundos): o botão Atualizar espera por ele
+const atFin = fin.map((r) => r.atualizado_em || '').sort().pop() || '';
+const DADOS = { F, O, X, PZ, hoje: hoje.toISODate(), atFin, atualizado: atualizado ? DateTime.fromISO(atualizado).setZone('America/Sao_Paulo').toFormat("dd/LL 'às' HH:mm") : '—' };
 const json = JSON.stringify(DADOS).replace(/</g, '\\u003c');
 
 const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -29,7 +31,7 @@ const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><met
 <style>
 :root{--marinho:#002375;--fundo-escuro:#00143F;--oxigenio:#34A9CF;--azul-texto:#1A6E93;--tinta:#142033;--sec:#4A5568;--fio:#DCE5EE;--nevoa:#EEF5FA;--bom:#1E7B4F;--ruim:#B4372E}
 *{box-sizing:border-box}body{margin:0;background:#fff;color:var(--tinta);font:15px/1.45 'Libre Franklin',system-ui,sans-serif}
-header{background:var(--fundo-escuro);color:#fff;padding:12px 16px}header h1{margin:0;font-size:18px;font-weight:800}header p{margin:4px 0 0;color:#C9D6E6;font-size:13px}
+header{background:var(--fundo-escuro);color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}#atualizar{flex:none;min-height:40px;padding:0 14px;border:1px solid #C9D6E6;border-radius:999px;background:transparent;color:#fff;font:700 13px 'Libre Franklin',system-ui,sans-serif;cursor:pointer}#atualizar:disabled{opacity:.6;cursor:default}header h1{margin:0;font-size:18px;font-weight:800}header p{margin:4px 0 0;color:#C9D6E6;font-size:13px}
 main{max-width:980px;margin:0 auto;padding:0 16px 32px}
 .filtros{border-bottom:1px solid var(--fio);padding:10px 0;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .seg{display:flex;border:1px solid var(--fio);border-radius:999px;overflow:hidden}.seg button{border:0;background:#fff;color:var(--tinta);font:600 13px 'Libre Franklin',sans-serif;padding:7px 10px;min-height:36px}
@@ -50,14 +52,14 @@ th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:
 #det .conv{display:flex;justify-content:space-between;font-weight:800;margin:14px 0 4px;padding-top:10px;border-top:1px solid var(--fio)}#det .lin{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:5px 0}#det .lin span:first-child{color:var(--sec)}#det .lin span:last-child{font-weight:700;white-space:nowrap}
 footer{color:var(--sec);font-size:12px;margin-top:24px;border-top:1px solid var(--fio);padding-top:12px}
 </style></head><body>
-<header><h1>BMH · Diretoria</h1><p id="atu"></p></header>
+<header><div><h1>BMH · Diretoria</h1><p id="atu"></p></div><button id="atualizar" type="button">Atualizar agora</button></header>
 <main>
 <div class="filtros"><div class="seg" id="uni"><button data-u="" class="on">Todas</button><button data-u="Asa Sul">Asa Sul</button><button data-u="Taguatinga">Taguatinga</button></div><select id="conv"></select><div class="periodo">De <select id="de"></select> até <select id="ate"></select></div></div>
 <h2>Financeiro da produção</h2><p class="s">R$ mil · * mês em andamento · toque num valor em azul para ver por lote</p><div class="tab"><table id="tFin"></table></div>
 <h2>A receber há mais de 90 dias</h2><ul class="lista" id="l90"></ul>
 <h2>A faturar atrasado</h2><ul class="lista" id="lFat"></ul>
 <h2>Prazo de recebimento</h2><p class="s">Dias, em média, da sessão até o convênio pagar (no período)</p><ul class="lista" id="lPrazo"></ul>
-<h2>Operação</h2><p class="s">* mês em andamento, até ontem · Var.: sessões contra o mês anterior · Dias: dias com atendimento</p><div class="tab"><table id="tOp"></table></div>
+<h2>Operação</h2><p class="s">* mês em andamento, até ontem · Var. ano: sessões contra o mesmo mês do ano anterior · Var. mês: contra o mês anterior · Dias: dias com atendimento</p><div class="tab"><table id="tOp"></table></div>
 <div id="det"><div class="caixa"><button class="fechar" aria-label="Fechar">×</button><h3 id="dTit"></h3><p class="sub" id="dSub"></p><div id="dCorpo"></div></div></div>
 <footer>Números do iGut, gravados toda noite. Produzido = faturado + a faturar; faturado = recebido + a receber + glosado; % recebido sem a glosa. Particular conta como recebido (cartão, D+1). Prazo: média ponderada pelo valor, só do que já foi pago (o que segue em aberto não entra). A receber: convênio não pagou ou falta baixa no iGut. Falta = faltou, desmarcou ou desistiu. "—": ainda não registrado no iGut (lote, pagamento e faltas desde nov/2024; avaliações desde mar/2024).</footer>
 </main>
@@ -75,6 +77,20 @@ const el = (t, txt, cls) => { const e = document.createElement(t); if (txt != nu
 let U = '', C = '', DE = '', ATE = '', PEND = false;
 const noPeriodo = m => (!DE || m >= DE) && (!ATE || m <= ATE);
 document.getElementById('atu').textContent = 'Atualizado em ' + D.atualizado;
+// botão "Atualizar agora" (Jorge, 20/10/2026): abre ?atualizar=1 no próprio painel (navegação sempre leva o login; consulta
+// pela página nem sempre), o n8n pede a carga completa (13 meses + ontem e hoje, uns 6 min) e volta com ?pedido=<hora do
+// servidor>. Enquanto o financeiro gravado for mais velho que o pedido, a página se recarrega a cada 45 s.
+(() => {
+  const b = document.getElementById('atualizar'), atu = document.getElementById('atu');
+  b.onclick = () => { b.disabled = true; b.textContent = 'Pedindo…'; location.href = location.pathname + '?atualizar=1'; };
+  const pedido = +new URLSearchParams(location.search).get('pedido') || 0; if (!pedido) return;
+  const limpa = () => history.replaceState(null, '', location.pathname);
+  if (Date.parse(D.atFin) >= pedido) { limpa(); atu.textContent = 'Atualizado em ' + D.atualizado + ' · pronto'; return; }
+  if (Date.now() - pedido > 15 * 60000) { limpa(); atu.textContent = 'A atualização não terminou a tempo. Atualizado em ' + D.atualizado; return; }
+  b.disabled = true; b.textContent = 'Atualizando…';
+  atu.textContent = 'Atualizando com o iGut (uns 6 minutos). Pode fechar: os números ficam prontos sozinhos.';
+  setTimeout(() => location.reload(), 45000);
+})();
 const convs = [...new Set(D.F.map(r => r[2]))].sort((a, b) => a === 'PARTICULAR' ? -1 : b === 'PARTICULAR' ? 1 : a.localeCompare(b, 'pt-BR'));
 const sel = document.getElementById('conv'); sel.append(new Option('Todos os convênios', '')); convs.forEach(c => sel.append(new Option(c, c)));
 const mesAtual = D.hoje.slice(0,7), d0 = new Date(D.hoje + 'T12:00:00'); const anterior = m => { const [a, b] = m.split('-').map(Number); return b === 1 ? (a-1) + '-12' : a + '-' + String(b-1).padStart(2, '0'); };
@@ -170,13 +186,15 @@ function desenha() {
   if (tv) { const li = el('li'); li.append(el('span', 'Média geral'), el('span', Math.round(td / tv) + ' dias')); ulp.append(li); }
   // operação
   const to = document.getElementById('tOp'); to.replaceChildren();
-  // detalhe que antes ficava nos quadros do início (20/10/2026): variação contra o mês anterior (só mês fechado: mês parcial
-  // contra mês cheio seria alarme falso), dias com atendimento, sessões por dia (essa compara o mês parcial) e faltas cobradas
-  const co = el('tr'); ['Mês','Sessões','Var.','Dias','Por dia','Ocupação','Faltas','Cobradas','Avaliações'].forEach(t => co.append(el('th', t))); to.append(co);
+  // detalhe que antes ficava nos quadros do início (20/10/2026): variação contra o ano e o mês anteriores (só mês fechado: mês
+  // parcial contra mês cheio seria alarme falso), dias com atendimento, sessões por dia (essa compara o mês parcial) e faltas cobradas
+  // Var. ano (pedido do Jorge, 20/10/2026): o mesmo mês do ano anterior, porque a BMH tem sazonalidade; a do mês fica ao lado
+  const varia = (a, b, m) => { if (m >= mesAtual || !b) return el('td', '—'); const v = Math.round(100 * (a - b) / b); return el('td', (v > 0 ? '+' : '') + v + '%', v > 0 ? 'd up' : v < 0 ? 'd down' : ''); };
+  const anoAntes = m => (+m.slice(0, 4) - 1) + m.slice(4);
+  const co = el('tr'); ['Mês','Sessões','Var. ano','Var. mês','Dias','Por dia','Ocupação','Faltas','Cobradas','Avaliações'].forEach(t => co.append(el('th', t))); to.append(co);
   for (const m of [...new Set(D.O.map(r => r[0]))].sort().reverse()) { const r = opr(m); if (!r.ag || !noPeriodo(m)) continue; const tr = el('tr');
-    const ant = opr(anterior(m)), v = m < mesAtual && ant.at ? Math.round(100 * (r.at - ant.at) / ant.at) : null;
-    [nomeMes(m) + (m === mesAtual ? '*' : ''), r.at.toLocaleString('pt-BR'), null, String(r.dias), r.dias ? Math.round(r.at / r.dias).toLocaleString('pt-BR') : '—', pct(r.at, r.lu), m >= CONTROLE ? pct(r.fa, r.ag) : '—', m >= CONTROLE ? r.co.toLocaleString('pt-BR') : '—', m >= AVALIACOES ? r.af.toLocaleString('pt-BR') : '—']
-      .forEach((x, i) => tr.append(i === 2 ? el('td', v === null ? '—' : (v > 0 ? '+' : '') + v + '%', v > 0 ? 'd up' : v < 0 ? 'd down' : '') : el('td', x))); to.append(tr); }
+    [nomeMes(m) + (m === mesAtual ? '*' : ''), r.at.toLocaleString('pt-BR'), varia(r.at, opr(anoAntes(m)).at, m), varia(r.at, opr(anterior(m)).at, m), String(r.dias), r.dias ? Math.round(r.at / r.dias).toLocaleString('pt-BR') : '—', pct(r.at, r.lu), m >= CONTROLE ? pct(r.fa, r.ag) : '—', m >= CONTROLE ? r.co.toLocaleString('pt-BR') : '—', m >= AVALIACOES ? r.af.toLocaleString('pt-BR') : '—']
+      .forEach(x => tr.append(typeof x === 'string' ? el('td', x) : x)); to.append(tr); }
 }
 document.querySelectorAll('#uni button').forEach(b => b.onclick = () => { document.querySelectorAll('#uni button').forEach(x => x.classList.remove('on')); b.classList.add('on'); U = b.dataset.u; desenha(); });
 sel.onchange = () => { C = sel.value; desenha(); };
