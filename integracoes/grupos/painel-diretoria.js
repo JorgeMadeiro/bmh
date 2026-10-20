@@ -197,9 +197,10 @@ function desenha() {
   const pz = {}; let tv = 0, td = 0;
   for (const x of D.PZ) { if ((U && x[1] !== U) || (C && x[2] !== C) || !noPeriodo(x[0])) continue; const a = (pz[x[2]] ||= [0, 0]); a[0] += x[3]; a[1] += x[4]; tv += x[3]; td += x[4]; }
   const ulp = document.getElementById('lPrazo'); ulp.replaceChildren();
-  const itp = Object.entries(pz).filter(([, a]) => a[0] >= 1000).sort((a, b) => b[1][1] / b[1][0] - a[1][1] / a[1][0]);
+  // todos os convênios com pagamento no período (20/10/2026: antes só os 10 primeiros, com R$ 1.000 pagos ou mais)
+  const itp = Object.entries(pz).filter(([, a]) => a[0] >= 1).sort((a, b) => b[1][1] / b[1][0] - a[1][1] / a[1][0]);
   if (!itp.length) ulp.append(el('li', 'Sem pagamento de convênio no período.', 'vazio'));
-  itp.slice(0, 10).forEach(([c, a]) => { const li = el('li'); li.append(el('span', c), el('span', Math.round(a[1] / a[0]) + ' dias')); ulp.append(li); });
+  itp.forEach(([c, a]) => { const li = el('li'); li.append(el('span', c), el('span', Math.round(a[1] / a[0]) + ' dias')); ulp.append(li); });
   if (tv) { const li = el('li'); li.append(el('span', 'Média geral'), el('span', Math.round(td / tv) + ' dias')); ulp.append(li); }
   // operação
   const to = document.getElementById('tOp'); to.replaceChildren();
