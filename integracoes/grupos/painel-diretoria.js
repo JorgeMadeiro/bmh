@@ -92,8 +92,8 @@ const SIT_LISTA = { l90: 'a_receber', lFat: 'a_faturar' };
 const NOME_SIT = { a_faturar: 'A faturar', recebido: 'Recebido', a_receber: 'A receber', glosado: 'Glosado' };
 let corteMesG = '';
 const celula = (v, sit, meses, rot) => { const td = el('td', v); if (sit && v !== '—' && v !== '<1' || (sit && v === '<1')) { td.className = 'cl'; td.onclick = () => abre(sit, meses, '', rot); } return td; };
-// dias "3,4,5,9" → "3–5, 9"
-const faixas = s => { const d = String(s || '').split(',').map(Number).filter(Boolean); const o = []; for (let i = 0; i < d.length; i++) { let j = i; while (j + 1 < d.length && d[j + 1] === d[j] + 1) j++; o.push(j > i + 1 ? d[i] + '–' + d[j] : j === i + 1 ? d[i] + ', ' + d[j] : String(d[i])); i = j; } return o.join(', '); };
+// dias "3,4,5,9" do mês 2025-09 → "03/09/25 a 05/09/25, 09/09/25" (data completa: pedido do Jorge, 20/10/2026)
+const datas = (s, mes) => { const fim = '/' + String(mes).slice(5, 7) + '/' + String(mes).slice(2, 4), dd = n => String(n).padStart(2, '0') + fim; const d = [...new Set(String(s || '').split(',').map(Number).filter(Boolean))].sort((a, b) => a - b); const o = []; for (let i = 0; i < d.length; i++) { let j = i; while (j + 1 < d.length && d[j + 1] === d[j] + 1) j++; o.push(j > i + 1 ? dd(d[i]) + ' a ' + dd(d[j]) : j === i + 1 ? dd(d[i]) + ', ' + dd(d[j]) : dd(d[i])); i = j; } return o.join(', '); };
 let ultimo = null;
 function abre(sit, meses, conv, rot) {
   ultimo = [sit, meses, conv, rot];
@@ -111,7 +111,7 @@ function abre(sit, meses, conv, rot) {
     const h = el('div', null, 'conv'); h.append(el('span', c), el('span', brl(xs.reduce((s, x) => s + x[6], 0)))); corpo.append(h);
     xs.sort((a, b) => a[0] < b[0] ? 1 : a[0] > b[0] ? -1 : b[6] - a[6]).forEach(x => {
       const l = el('div', null, 'lin');
-      const desc = (x[4] !== '-' ? 'Lote ' + x[4] + ' · ' : '') + nomeMes(x[0]) + ' · ' + x[1] + ' · ' + x[5] + (x[5] === 1 ? ' sessão' : ' sessões') + (x[7] ? ' · dias ' + faixas(x[7]) : '');
+      const desc = (x[4] !== '-' ? 'Lote ' + x[4] + ' · ' : '') + nomeMes(x[0]) + ' · ' + x[1] + ' · ' + x[5] + (x[5] === 1 ? ' sessão' : ' sessões') + (x[7] ? ' · ' + datas(x[7], x[0]) : '');
       const esq = el('span', desc);
       {   // 3º nível: pacientes do lote (ou do particular do mês), na própria janela, lidos da tabela gravada
         const a = el('span', ' · pacientes ›', 'cl'); a.onclick = () => pacientes({ mes: x[0], unidade: x[1], convenio: /^PARTICULAR/.test(x[2]) ? 'PARTICULAR' : x[2], situacao: x[3], lote: x[4] }); esq.append(a);
@@ -131,7 +131,7 @@ function pacientes(par) {
     .then(d => {
       document.getElementById('dTit').textContent = d.titulo; document.getElementById('dSub').textContent = d.sub;
       if (!d.pacientes.length) { corpo.append(el('p', 'Nenhum paciente nessa situação (pode ter mudado desde a última atualização do painel).', 'sub')); return; }
-      d.pacientes.forEach(p => { const l = el('div', null, 'lin'); const e = el('span'); e.append(el('b', p.nome)); e.append(document.createElement('br'), document.createTextNode(p.sessoes + (p.sessoes === 1 ? ' sessão' : ' sessões') + ' · dias ' + p.dias + (p.medicos ? ' · ' + p.medicos : ''))); l.append(e, el('span', 'R$ ' + p.valor.toLocaleString('pt-BR'))); corpo.append(l); });
+      d.pacientes.forEach(p => { const l = el('div', null, 'lin'); const e = el('span'); e.append(el('b', p.nome)); e.append(document.createElement('br'), document.createTextNode(p.sessoes + (p.sessoes === 1 ? ' sessão' : ' sessões') + ' · ' + p.dias + (p.medicos ? ' · ' + p.medicos : ''))); l.append(e, el('span', 'R$ ' + p.valor.toLocaleString('pt-BR'))); corpo.append(l); });
       corpo.append(el('p', 'Dado de paciente: não encaminhar fora da equipe responsável.', 'sub'));
     })
     .catch(e => {
@@ -154,9 +154,8 @@ function desenha() {
     card(cm, op0.at.toLocaleString('pt-BR'), 'sessões', delta(op0.at, op1.at));
     card(cm, pct(op0.at, op0.lu), 'ocupação', null);
     card(cm, pct(op0.fa, op0.ag), 'faltas' + (op0.co ? ' (' + op0.co + (op0.co === 1 ? ' cobrada)' : ' cobradas)') : ''), null);
-    card(cm, op0.af.toLocaleString('pt-BR'), 'avaliações', delta(op0.af, op1.af));
   } else card(cm, f0.s.toLocaleString('pt-BR'), 'sessões desse convênio', delta(f0.s, f1.s));
-  card(cm, brl(f0.p), 'produzido', delta(f0.p, f1.p));
+  // avaliações e produzido do mês fechado saíram do início (Jorge, 20/10/2026): já estão nas tabelas de operação e financeiro
   card(cm, pct(f0.r, f0.p - f0.g), 'recebido (' + brl(f0.r) + ')', null);
   document.getElementById('tAtual').textContent = mesLongo(mesAtual).replace(/^./, c => c.toUpperCase()) + ' (parcial)';
   const ca = document.getElementById('cAtual'); ca.replaceChildren(); const opA = opr(mesAtual), fA = fin(mesAtual);
