@@ -160,7 +160,7 @@ function desenha() {
   document.getElementById('tAtual').textContent = mesLongo(mesAtual).replace(/^./, c => c.toUpperCase()) + ' (parcial)';
   const ca = document.getElementById('cAtual'); ca.replaceChildren(); const opA = opr(mesAtual), fA = fin(mesAtual);
   if (!C) { card(ca, opA.at.toLocaleString('pt-BR'), 'sessões em ' + opA.dias + ' dias'); card(ca, pct(opA.at, opA.lu), 'ocupação'); card(ca, pct(opA.fa, opA.ag), 'faltas'); }
-  card(ca, brl(fA.p), 'produzido');
+  if (C) card(ca, brl(fA.p), 'produzido');   // sem filtro de convênio, o produzido do mês atual saiu do início (Jorge, 20/10/2026): está na tabela do financeiro
   // tabela do financeiro
   const tf = document.getElementById('tFin'); tf.replaceChildren();
   const cab = el('tr'); ['Mês','Produzido','Faturado','A faturar','Recebido','%','A receber','Glosado'].forEach(t => cab.append(el('th', t))); tf.append(cab);
