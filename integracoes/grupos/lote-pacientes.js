@@ -19,7 +19,8 @@ for (const r of linhasTab) {
   p.sessoes += n(r.sessoes); p.valor += n(r.valor); p.dias.push(...String(r.dias || '').split(',').map(Number).filter(Boolean));
   String(r.medicos || '').split(', ').filter(Boolean).forEach((m) => p.medicos.add(m));
 }
-const atualizado = linhasTab.map((r) => r.atualizado_em || '').sort().pop();
+// "dados de": última gravação da tabela inteira (desde 20/10/2026 só grava o que mudou, então a linha do lote pode ser antiga)
+const atualizado = $('Pacientes do lote (tabela)').all().map((i) => (i.json && i.json.atualizado_em) || '').sort().pop();
 const ps = Object.values(pac).sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
 const total = ps.reduce((s, p) => s + p.valor, 0), sessoes = ps.reduce((s, p) => s + p.sessoes, 0);
 const titulo = `${NOME_SIT[q.situacao] || ''} · ${q.lote && q.lote !== '-' ? 'Lote ' + q.lote + ' · ' : ''}${q.convenio === 'PARTICULAR' ? 'Particular (cartão)' : q.convenio || ''}`;

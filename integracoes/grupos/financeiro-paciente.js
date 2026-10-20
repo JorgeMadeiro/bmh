@@ -34,8 +34,13 @@ meses.forEach((mes, k) => {
 });
 const novos = Object.values(out).map((r) => ({ ...r, valor: Math.round(r.valor * 100) / 100, dias: [...r.dias].sort((a, b) => a - b).join(','), medicos: [...r.medicos].join(', ') }));
 const chaves = new Set(novos.map((r) => r.chave));
+const salvos = {}; try { for (const i of $('Pacientes (tabela)').all()) if (i.json && i.json.chave) salvos[i.json.chave] = i.json; } catch (e) {}
 let zerados = []; try {
-  zerados = $('Pacientes (tabela)').all().map((i) => i.json).filter((r) => r && r.chave && refeitos.has(r.mes) && !chaves.has(r.chave) && (n(r.valor) || n(r.sessoes)))
+  zerados = Object.values(salvos).filter((r) => refeitos.has(r.mes) && !chaves.has(r.chave) && (n(r.valor) || n(r.sessoes)))
     .map((r) => ({ chave: r.chave, mes: r.mes, unidade: r.unidade, convenio: r.convenio, situacao: r.situacao, lote: r.lote, paciente_id: r.paciente_id, paciente: r.paciente, sessoes: 0, valor: 0, dias: '', medicos: '', atualizado_em: agora }));
 } catch (e) {}
-return [...novos, ...zerados].map((json) => ({ json }));
+// só o que mudou (20/10/2026): conferir é na memória (menos de 1 s para as ~7.600 linhas); gravar é linha a linha (uns 5 min
+// para todas). Linha igual à gravada não volta a ser gravada, e a hora de cada linha passa a ser a da última mudança.
+const igual = (a, b) => !!b && ['mes', 'unidade', 'convenio', 'situacao', 'lote', 'paciente_id', 'paciente', 'dias', 'medicos'].every((k) => String(a[k] ?? '') === String(b[k] ?? ''))
+  && n(a.sessoes) === n(b.sessoes) && Math.abs(n(a.valor) - n(b.valor)) < 0.005;
+return [...novos, ...zerados].filter((r) => !igual(r, salvos[r.chave])).map((json) => ({ json }));

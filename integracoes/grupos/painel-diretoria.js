@@ -20,13 +20,15 @@ const atualizado = [...fin, ...op].map((r) => r.atualizado_em || '').sort().pop(
 const X = det.filter((r) => +r.valor > 0.5).map((r) => [r.mes, r.unidade, r.convenio, r.situacao, r.lote, +r.sessoes || 0, Math.round(+r.valor), r.dias || '']);
 // prazo de recebimento: [mes, unidade, convênio, valor pago, dias × valor]
 const PZ = prz.filter((r) => +r.valor_pago > 0).map((r) => [r.mes, r.unidade, r.convenio, Math.round(+r.valor_pago), +r.dias_x_valor || 0]);
-// atOp: a operação (ontem e hoje) é a última parte gravada na carga (o financeiro sai em ~1 min, os pacientes por lote
-// levam uns 5): o botão Atualizar só diz "pronto" quando ela for mais nova que o pedido (medido em 20/10/2026)
+// atOp: a operação (ontem e hoje) é a última parte gravada na carga (o financeiro sai em ~1 min; os pacientes por lote, desde
+// 20/10/2026, só gravam o que mudou): o botão Atualizar só diz "pronto" quando ela for mais nova que o pedido (medido em 20/10/2026)
 const atOp = op.map((r) => r.atualizado_em || '').sort().pop() || '';
 // etapas da carga, na ordem em que gravam: financeiro (~1 min), lotes, prazos, pacientes (a parte longa) e operação (fim)
 const ultima = (t) => t.map((r) => r.atualizado_em || '').sort().pop() || '';
 const ET = { fin: ultima(fin), det: ultima(det), prazo: ultima(prz) };
-const DADOS = { F, O, X, PZ, hoje: hoje.toISODate(), atOp, ET, atualizado: atualizado ? DateTime.fromISO(atualizado).setZone('America/Sao_Paulo').toFormat("dd/LL 'às' HH:mm") : '—' };
+// último pedido do botão, de qualquer pessoa (trava para todos, 20/10/2026)
+const pedido = Number((linhas('Pedido (tabela)').find((r) => r.chave === 'ultimo') || {}).pedido) || 0;
+const DADOS = { F, O, X, PZ, hoje: hoje.toISODate(), atOp, ET, pedido, atualizado: atualizado ? DateTime.fromISO(atualizado).setZone('America/Sao_Paulo').toFormat("dd/LL 'às' HH:mm") : '—' };
 const json = JSON.stringify(DADOS).replace(/</g, '\\u003c');
 
 const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -82,23 +84,28 @@ let U = '', C = '', DE = '', ATE = '', PEND = false;
 const noPeriodo = m => (!DE || m >= DE) && (!ATE || m <= ATE);
 document.getElementById('atu').textContent = 'Atualizado em ' + D.atualizado;
 // botão "Atualizar agora" (Jorge, 20/10/2026): abre ?atualizar=1 no próprio painel (navegação sempre leva o login; consulta
-// pela página nem sempre), o n8n pede a carga completa (13 meses + ontem e hoje, uns 8 min) e volta com ?pedido=<hora do
-// servidor>. Enquanto a operação gravada (última parte da carga) for mais velha que o pedido, recarrega a cada 45 s;
+// pela página nem sempre), o n8n pede a carga completa (13 meses + ontem e hoje, uns 2,5 min) e volta com ?pedido=<hora do
+// servidor>. Enquanto a operação gravada (última parte da carga) for mais velha que o pedido, recarrega a cada 20 s;
 // cada recarga já mostra o que chegou (o financeiro chega em ~1 min).
 (() => {
   const b = document.getElementById('atualizar'), atu = document.getElementById('atu');
   b.onclick = () => { b.disabled = true; b.textContent = 'Pedindo…'; location.href = location.pathname + '?atualizar=1'; };
-  const pedido = +new URLSearchParams(location.search).get('pedido') || 0; if (!pedido) return;
+  // trava para todos: a carga pedida por qualquer pessoa há menos de 15 min, cuja última etapa ainda não gravou, aparece
+  // em andamento para quem abrir o painel (e o n8n também recusa um segundo pedido nesse intervalo)
+  const daUrl = +new URLSearchParams(location.search).get('pedido') || 0;
+  const andando = D.pedido && !(Date.parse(D.atOp) >= D.pedido) && Date.now() - D.pedido < 15 * 60000;
+  const pedido = andando ? D.pedido : daUrl; if (!pedido) return;
+  if (andando && daUrl !== pedido) history.replaceState(null, '', location.pathname + '?pedido=' + pedido);   // para mostrar o "pronto" no fim
   const limpa = () => history.replaceState(null, '', location.pathname);
   if (Date.parse(D.atOp) >= pedido) { limpa(); atu.textContent = 'Atualizado em ' + D.atualizado + ' · pronto'; return; }
   if (Date.now() - pedido > 15 * 60000) { limpa(); atu.textContent = 'A atualização não terminou a tempo. Atualizado em ' + D.atualizado; return; }
-  // andamento no próprio botão, travado até o fim (pedido do Jorge, 20/10/2026): o tempo passado contra os ~8 min medidos,
+  // andamento no próprio botão, travado até o fim (pedido do Jorge, 20/10/2026): o tempo passado contra os ~2,5 min medidos (20/10/2026: financeiro 55 s, lotes 2 min, prazos e o resto 2,5 min),
   // nunca abaixo da etapa que já gravou e nunca 100% antes do fim (o 100% é o "pronto")
-  const feito = k => Date.parse(D.ET[k]) >= pedido, piso = feito('prazo') ? 35 : feito('det') ? 25 : feito('fin') ? 15 : 0;
-  const pinta = () => { const p = Math.max(piso, Math.min(95, Math.round((Date.now() - pedido) / 4800))); b.style.setProperty('--p', p + '%'); b.textContent = 'Atualizando ' + p + '%'; };
+  const feito = k => Date.parse(D.ET[k]) >= pedido, piso = feito('prazo') ? 90 : feito('det') ? 80 : feito('fin') ? 35 : 0;
+  const pinta = () => { const p = Math.max(piso, Math.min(95, Math.round((Date.now() - pedido) / 1500))); b.style.setProperty('--p', p + '%'); b.textContent = 'Atualizando ' + p + '%'; };
   b.disabled = true; pinta(); setInterval(pinta, 1000);
-  atu.textContent = feito('fin') ? 'Financeiro já atualizado; faltam lotes, pacientes e sessões. Pode fechar a página.' : 'Buscando no iGut (uns 8 minutos). Pode fechar a página.';
-  setTimeout(() => location.reload(), 45000);
+  atu.textContent = feito('fin') ? 'Financeiro já atualizado; faltam lotes, pacientes e sessões. Pode fechar a página.' : 'Buscando no iGut (uns 2 a 3 minutos). Pode fechar a página.';
+  setTimeout(() => location.reload(), 20000);
 })();
 const convs = [...new Set(D.F.map(r => r[2]))].sort((a, b) => a === 'PARTICULAR' ? -1 : b === 'PARTICULAR' ? 1 : a.localeCompare(b, 'pt-BR'));
 const sel = document.getElementById('conv'); sel.append(new Option('Todos os convênios', '')); convs.forEach(c => sel.append(new Option(c, c)));

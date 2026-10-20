@@ -45,6 +45,7 @@ const COLUNAS = {
   BMH_financeiro_mes: { chave: 's', mes: 's', unidade: 's', convenio: 's', sessoes: 'n', produzido: 'n', faturado: 'n', a_faturar: 'n', recebido: 'n', a_receber: 'n', glosado: 'n', atualizado_em: 's' },
   BMH_financeiro_detalhe: { chave: 's', mes: 's', unidade: 's', convenio: 's', situacao: 's', lote: 's', sessoes: 'n', valor: 'n', glosa: 'n', dias: 's', atualizado_em: 's' },
   BMH_financeiro_paciente: { chave: 's', mes: 's', unidade: 's', convenio: 's', situacao: 's', lote: 's', paciente_id: 's', paciente: 's', sessoes: 'n', valor: 'n', dias: 's', medicos: 's', atualizado_em: 's' },
+  BMH_diretoria_pedido: { chave: 's', pedido: 's' },   // hora (ms) do último toque em "Atualizar agora" (trava para todos, 20/10/2026)
   BMH_prazo_recebimento: { chave: 's', mes: 's', unidade: 's', convenio: 's', valor_pago: 'n', dias_x_valor: 'n', sessoes_pagas: 'n', atualizado_em: 's' },
   BMH_operacao_dia: { chave: 's', dia: 's', unidade: 's', agendadas: 'n', atendidas: 'n', faltas: 'n', cobradas: 'n', lugares: 'n', avaliacoes_agendadas: 'n', avaliacoes_feitas: 'n', atualizado_em: 's' },
   BMH_radar_paginas: { chave: 's', nome: 's', hash: 's', texto: 's', visto_em: 's' },
@@ -381,13 +382,24 @@ function fluxoPainelDiretoria() {
   const n = {
     pag: no('Painel da diretoria', 'n8n-nodes-base.webhook', 2, { path: 'bmh-diretoria', authentication: 'basicAuth', responseMode: 'responseNode', options: {} }, { webhookId: crypto.randomUUID(), credentials: cred('httpBasicAuth', 'BMH · Painel da diretoria (login)') }),
     ehAtualiza: se('É o botão Atualizar?', "={{ !!($json.query || {}).atualizar }}"),   // ?atualizar=1: pede a carga completa (20/10/2026)
+    // trava para todos (20/10/2026): com uma carga pedida há menos de 15 min e ainda sem a última etapa gravada, não pede outra
+    ultPed: le('Último pedido', 'BMH_diretoria_pedido'), opPed: le('Operação (pedido)', 'BMH_operacao_dia'),
+    decide: no('Decide o pedido', 'n8n-nodes-base.code', 2, { jsCode: [
+      "const agora = $now.toMillis();",
+      "let ult = 0; try { ult = Number(($('Último pedido').all().map((i) => i.json).find((r) => r && r.chave === 'ultimo') || {}).pedido) || 0; } catch (e) {}",
+      "let atOp = 0; try { for (const i of $('Operação (pedido)').all()) atOp = Math.max(atOp, Date.parse((i.json || {}).atualizado_em || '') || 0); } catch (e) {}",
+      "const andando = ult > 0 && agora - ult < 15 * 60000 && atOp < ult;",
+      "return [{ json: { chave: 'ultimo', pedido: String(andando ? ult : agora), disparar: !andando } }];"].join('\n') }, { executeOnce: true }),
+    dispara: se('Dispara?', '={{ $json.disparar }}'),
+    gravaPed: grava('Grava o pedido', 'BMH_diretoria_pedido'),
     pede: no('Pede a atualização', 'n8n-nodes-base.httpRequest', 4.2, { method: 'GET', url: process.env.N8N_URL.replace(/\/$/, '') + '/webhook/' + botaoDiretoria(), options: { timeout: 30000 } }, { retryOnFail: true, maxTries: 3, waitBetweenTries: 5000 }),
     // volta para o painel com a hora do pedido (do servidor): a página se recarrega até o financeiro gravado ser mais novo
-    respondePedido: no('Volta para o painel', 'n8n-nodes-base.respondToWebhook', 1.1, { respondWith: 'text', responseBody: "={{ '<!doctype html><meta charset=\"utf-8\"><meta name=\"robots\" content=\"noindex\"><script>location.replace(\"bmh-diretoria?pedido=' + $now.toMillis() + '\")</script>' }}",
+    respondePedido: no('Volta para o painel', 'n8n-nodes-base.respondToWebhook', 1.1, { respondWith: 'text', responseBody: "={{ '<!doctype html><meta charset=\"utf-8\"><meta name=\"robots\" content=\"noindex\"><script>location.replace(\"bmh-diretoria?pedido=' + $('Decide o pedido').first().json.pedido + '\")</script>' }}",
       options: { responseHeaders: { entries: [{ name: 'Content-Type', value: 'text/html; charset=utf-8' }, { name: 'Cache-Control', value: 'no-store' }] } } }),
     ehLista: se('É lista de pacientes?', "={{ !!($json.query || {}).situacao }}"),   // JSON (?formato=json) ou página dentro da janela (?embutido=1)
     // página
     fin: le('Financeiro (tabela)', 'BMH_financeiro_mes'), op: le('Operação (tabela)', 'BMH_operacao_dia'), det: le('Detalhes (tabela)', 'BMH_financeiro_detalhe'), prazo: le('Prazo (tabela)', 'BMH_prazo_recebimento'),
+    pedTab: le('Pedido (tabela)', 'BMH_diretoria_pedido'),
     monta: codigo('Monta a página', '../../grupos/painel-diretoria.js', { executeOnce: true }),
     entrega: no('Entrega a página', 'n8n-nodes-base.respondToWebhook', 1.1, { respondWith: 'text', responseBody: '={{ $json.html }}', options: { responseHeaders: { entries: [{ name: 'Content-Type', value: 'text/html; charset=utf-8' }, { name: 'Cache-Control', value: 'no-store' }, { name: 'X-Robots-Tag', value: 'noindex' }] } } }),
     // pacientes do lote (3º nível): lê a tabela gravada às 23h40 (abre na hora; funciona com o iGut fora do ar)
@@ -397,10 +409,12 @@ function fluxoPainelDiretoria() {
     nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Diretoria (painel)\n**Traz:** tabelas da diretoria\n**Envia:** o painel da diretoria, com login\n**Limites:** só lê; execução não guardada\n\nUm painel só, login da diretoria (credencial \"BMH · Painel da diretoria (login)\"; cópia no .env em PAINEL_DIRETORIA_*). Página: lê BMH_financeiro_mes, BMH_operacao_dia e BMH_financeiro_detalhe (gravadas às 23h40). ?formato=json&situacao=...: pacientes de um lote, lidos de BMH_financeiro_paciente (gravada às 23h40; nomes guardados por decisão do Jorge); o n8n não guarda a execução.', width: 560, height: 200 }),
   };
   const cx = {}; liga(cx, n.pag.name, n.ehAtualiza.name);
-  cx[n.ehAtualiza.name] = { main: [[{ node: n.pede.name, type: 'main', index: 0 }], [{ node: n.ehLista.name, type: 'main', index: 0 }]] };
-  liga(cx, n.pede.name, n.respondePedido.name);
+  cx[n.ehAtualiza.name] = { main: [[{ node: n.ultPed.name, type: 'main', index: 0 }], [{ node: n.ehLista.name, type: 'main', index: 0 }]] };
+  liga(cx, n.ultPed.name, n.opPed.name); liga(cx, n.opPed.name, n.decide.name); liga(cx, n.decide.name, n.dispara.name);
+  cx[n.dispara.name] = { main: [[{ node: n.gravaPed.name, type: 'main', index: 0 }], [{ node: n.respondePedido.name, type: 'main', index: 0 }]] };
+  liga(cx, n.gravaPed.name, n.pede.name); liga(cx, n.pede.name, n.respondePedido.name);
   cx[n.ehLista.name] = { main: [[{ node: n.pacTab.name, type: 'main', index: 0 }], [{ node: n.fin.name, type: 'main', index: 0 }]] };
-  for (const [a, b] of [[n.fin, n.op], [n.op, n.det], [n.det, n.prazo], [n.prazo, n.monta], [n.monta, n.entrega], [n.pacTab, n.lista], [n.lista, n.entregaLista]]) liga(cx, a.name, b.name);
+  for (const [a, b] of [[n.fin, n.op], [n.op, n.det], [n.det, n.prazo], [n.prazo, n.pedTab], [n.pedTab, n.monta], [n.monta, n.entrega], [n.pacTab, n.lista], [n.lista, n.entregaLista]]) liga(cx, a.name, b.name);
   return { name: 'BMH · Diretoria (painel)', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none', saveDataErrorExecution: 'none' }) };   // tem nome de paciente: não guarda execução
 }
 
