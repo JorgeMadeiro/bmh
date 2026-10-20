@@ -44,9 +44,11 @@ const num = (t) => { t = String(t).trim(); if (t === '—' || t === '') return n
     await p.selectOption('#de', '2026-10'); f((await p.$eval('#ate', (s) => s.value)) === '2026-10', '"De" depois de "Até" não ajustou');
     // números do mês fechado
     await p.selectOption('#de', '2025-10'); await p.selectOption('#ate', '2026-10');
-    const cards = await p.$$eval('#cMes .card b', (b) => b.map((x) => x.textContent));
-    console.log('cartões (todas):', cards.join(' | '));
-    for (const u of ['Asa Sul', 'Taguatinga']) { await p.click(`#uni button:has-text("${u}")`); console.log(`cartões (${u}):`, (await p.$$eval('#cMes .card b', (b) => b.map((x) => x.textContent))).join(' | ')); }
+    // os quadros do início saíram em 20/10/2026: o resumo do mês fica na Operação (2 primeiras linhas: mês atual e o fechado)
+    f(!(await p.$('#cMes')) && !(await p.$('#cAtual')), 'os quadros do início voltaram');
+    const linhasOp = () => p.$$eval('#tOp tr', (trs) => trs.slice(0, 3).map((tr) => [...tr.children].map((td) => td.textContent).join(' | ')));
+    console.log('operação (todas):', (await linhasOp()).join('  //  '));
+    for (const u of ['Asa Sul', 'Taguatinga']) { await p.click(`#uni button:has-text("${u}")`); console.log(`operação (${u}):`, (await linhasOp()).slice(1).join('  //  ')); }
     console.log('atenção (Todas):', (await (await p.click('#uni button:has-text("Todas")'), p.locator('#l90').innerText())).replace(/\n/g, ' '));
     f(!erros.length, `erros JS: ${erros}`);
     console.log('combinações testadas:', combos, '| convênios:', convs.length - 1);

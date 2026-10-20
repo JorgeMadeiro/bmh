@@ -35,8 +35,6 @@ main{max-width:980px;margin:0 auto;padding:0 16px 32px}
 .seg{display:flex;border:1px solid var(--fio);border-radius:999px;overflow:hidden}.seg button{border:0;background:#fff;color:var(--tinta);font:600 13px 'Libre Franklin',sans-serif;padding:7px 10px;min-height:36px}
 .seg button.on{background:var(--marinho);color:#fff}select{font:600 13px 'Libre Franklin',sans-serif;border:1px solid var(--fio);border-radius:999px;padding:7px 10px;min-height:36px;background:#fff;color:var(--tinta);max-width:100%}#conv{flex:1;min-width:0}
 h2{font-size:16px;font-weight:800;margin:20px 0 2px}h2+p.s{margin:0 0 10px;color:var(--sec);font-size:13px}
-.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}@media(min-width:720px){.cards{grid-template-columns:repeat(3,1fr)}}
-.card{border:1px solid var(--fio);border-radius:6px;padding:8px 10px}.card b{display:block;font-size:20px;font-weight:800}.card span{font-size:12px;color:var(--sec)}
 .d{font-size:12px;font-weight:700}.d.up{color:var(--bom)}.d.down{color:var(--ruim)}
 .tab{overflow-x:auto;border:1px solid var(--fio);border-radius:6px}table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
 th,td{padding:8px 10px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--fio)}th{background:var(--nevoa);font-weight:700;font-size:12px}
@@ -55,13 +53,11 @@ footer{color:var(--sec);font-size:12px;margin-top:24px;border-top:1px solid var(
 <header><h1>BMH · Diretoria</h1><p id="atu"></p></header>
 <main>
 <div class="filtros"><div class="seg" id="uni"><button data-u="" class="on">Todas</button><button data-u="Asa Sul">Asa Sul</button><button data-u="Taguatinga">Taguatinga</button></div><select id="conv"></select><div class="periodo">De <select id="de"></select> até <select id="ate"></select></div></div>
-<h2 id="tMes"></h2><p class="s" id="sMes"></p><div class="cards" id="cMes"></div>
-<h2 id="tAtual"></h2><p class="s">Até ontem.</p><div class="cards" id="cAtual"></div>
 <h2>Financeiro da produção</h2><p class="s">R$ mil · * mês em andamento · toque num valor em azul para ver por lote</p><div class="tab"><table id="tFin"></table></div>
 <h2>Para cobrar</h2><p class="s">A receber há mais de 90 dias</p><ul class="lista" id="l90"></ul>
 <p class="s" style="margin-top:12px">A faturar atrasado</p><ul class="lista" id="lFat"></ul>
 <h2>Prazo de recebimento</h2><p class="s">Dias, em média, da sessão até o convênio pagar (no período)</p><ul class="lista" id="lPrazo"></ul>
-<h2>Operação</h2><div class="tab"><table id="tOp"></table></div>
+<h2>Operação</h2><p class="s">* mês em andamento, até ontem · Var.: sessões contra o mês anterior · Dias: dias com atendimento</p><div class="tab"><table id="tOp"></table></div>
 <div id="det"><div class="caixa"><button class="fechar" aria-label="Fechar">×</button><h3 id="dTit"></h3><p class="sub" id="dSub"></p><div id="dCorpo"></div></div></div>
 <footer>Números do iGut, gravados toda noite. Produzido = faturado + a faturar; faturado = recebido + a receber + glosado; % recebido sem a glosa. Particular conta como recebido (cartão, D+1). Prazo: média ponderada pelo valor, só do que já foi pago (o que segue em aberto não entra). A receber: convênio não pagou ou falta baixa no iGut. Falta = faltou, desmarcou ou desistiu. "—": ainda não registrado no iGut (lote, pagamento e faltas desde nov/2024; avaliações desde mar/2024).</footer>
 </main>
@@ -82,11 +78,9 @@ document.getElementById('atu').textContent = 'Atualizado em ' + D.atualizado;
 const convs = [...new Set(D.F.map(r => r[2]))].sort((a, b) => a === 'PARTICULAR' ? -1 : b === 'PARTICULAR' ? 1 : a.localeCompare(b, 'pt-BR'));
 const sel = document.getElementById('conv'); sel.append(new Option('Todos os convênios', '')); convs.forEach(c => sel.append(new Option(c, c)));
 const mesAtual = D.hoje.slice(0,7), d0 = new Date(D.hoje + 'T12:00:00'); const anterior = m => { const [a, b] = m.split('-').map(Number); return b === 1 ? (a-1) + '-12' : a + '-' + String(b-1).padStart(2, '0'); };
-const mesFechado = anterior(mesAtual), mesAntes = anterior(mesFechado);
+const mesFechado = anterior(mesAtual);
 const fin = m => { const r = { s:0,p:0,f:0,af:0,r:0,ar:0,g:0 }; for (const x of D.F) { if (x[0] !== m || (U && x[1] !== U) || (C && x[2] !== C)) continue; r.s+=x[3]; r.p+=x[4]; r.f+=x[5]; r.af+=x[6]; r.r+=x[7]; r.ar+=x[8]; r.g+=x[9]; } return r; };
 const opr = m => { const r = { ag:0,at:0,fa:0,co:0,lu:0,aa:0,af:0,dias:0 }; for (const x of D.O) { if (x[0] !== m || (U && x[1] !== U)) continue; r.ag+=x[2]; r.at+=x[3]; r.fa+=x[4]; r.co+=x[5]; r.lu+=x[6]; r.aa+=x[7]; r.af+=x[8]; r.dias=Math.max(r.dias, x[9]); } return r; };
-const delta = (a, b, inverso) => { if (!b) return null; const v = Math.round(100*(a-b)/b); const s = el('span', (v > 0 ? '+' : '') + v + '% vs ' + nomeMes(mesAntes).slice(0, 3), 'd ' + ((inverso ? -v : v) > 0 ? 'up' : (inverso ? -v : v) < 0 ? 'down' : '')); return s; };
-const card = (alvo, valor, rot, dl) => { const c = el('div', null, 'card'); c.append(el('b', valor), el('span', rot)); if (dl) { c.append(document.createElement('br'), dl); } alvo.append(c); };
 const SIT_COL = [null, null, null, 'a_faturar', 'recebido', null, 'a_receber', 'glosado'];
 const SIT_LISTA = { l90: 'a_receber', lFat: 'a_faturar' };
 const NOME_SIT = { a_faturar: 'A faturar', recebido: 'Recebido', a_receber: 'A receber', glosado: 'Glosado' };
@@ -146,21 +140,7 @@ function pacientes(par) {
 const fecha = () => { document.getElementById('det').classList.remove('on'); document.body.style.overflow = ''; };
 document.querySelector('#det .fechar').onclick = fecha; document.getElementById('det').onclick = e => { if (e.target.id === 'det') fecha(); }; document.addEventListener('keydown', e => { if (e.key === 'Escape') fecha(); });
 function desenha() {
-  const op0 = opr(mesFechado), op1 = opr(mesAntes), f0 = fin(mesFechado), f1 = fin(mesAntes);
-  document.getElementById('tMes').textContent = mesLongo(mesFechado).replace(/^./, c => c.toUpperCase());
-  document.getElementById('sMes').textContent = (U || 'As duas unidades') + (C ? ' · ' + C : '');
-  const cm = document.getElementById('cMes'); cm.replaceChildren();
-  if (!C) {
-    card(cm, op0.at.toLocaleString('pt-BR'), 'sessões', delta(op0.at, op1.at));
-    card(cm, pct(op0.at, op0.lu), 'ocupação', null);
-    card(cm, pct(op0.fa, op0.ag), 'faltas' + (op0.co ? ' (' + op0.co + (op0.co === 1 ? ' cobrada)' : ' cobradas)') : ''), null);
-  } else card(cm, f0.s.toLocaleString('pt-BR'), 'sessões desse convênio', delta(f0.s, f1.s));
-  // avaliações e produzido do mês fechado saíram do início (Jorge, 20/10/2026): já estão nas tabelas de operação e financeiro
-  card(cm, pct(f0.r, f0.p - f0.g), 'recebido (' + brl(f0.r) + ')', null);
-  document.getElementById('tAtual').textContent = mesLongo(mesAtual).replace(/^./, c => c.toUpperCase()) + ' (parcial)';
-  const ca = document.getElementById('cAtual'); ca.replaceChildren(); const opA = opr(mesAtual), fA = fin(mesAtual);
-  if (!C) { card(ca, opA.at.toLocaleString('pt-BR'), 'sessões em ' + opA.dias + ' dias'); card(ca, pct(opA.at, opA.lu), 'ocupação'); card(ca, pct(opA.fa, opA.ag), 'faltas'); }
-  if (C) card(ca, brl(fA.p), 'produzido');   // sem filtro de convênio, o produzido do mês atual saiu do início (Jorge, 20/10/2026): está na tabela do financeiro
+  // os quadros do início saíram (Jorge, 20/10/2026): o resumo de cada mês fica na tabela de Operação e no Financeiro
   // tabela do financeiro
   const tf = document.getElementById('tFin'); tf.replaceChildren();
   const cab = el('tr'); ['Mês','Produzido','Faturado','A faturar','Recebido','%','A receber','Glosado'].forEach(t => cab.append(el('th', t))); tf.append(cab);
@@ -190,9 +170,13 @@ function desenha() {
   if (tv) { const li = el('li'); li.append(el('span', 'Média geral'), el('span', Math.round(td / tv) + ' dias')); ulp.append(li); }
   // operação
   const to = document.getElementById('tOp'); to.replaceChildren();
-  const co = el('tr'); ['Mês','Sessões','Ocupação','Faltas','Avaliações'].forEach(t => co.append(el('th', t))); to.append(co);
+  // detalhe que antes ficava nos quadros do início (20/10/2026): variação contra o mês anterior (só mês fechado: mês parcial
+  // contra mês cheio seria alarme falso), dias com atendimento, sessões por dia (essa compara o mês parcial) e faltas cobradas
+  const co = el('tr'); ['Mês','Sessões','Var.','Dias','Por dia','Ocupação','Faltas','Cobradas','Avaliações'].forEach(t => co.append(el('th', t))); to.append(co);
   for (const m of [...new Set(D.O.map(r => r[0]))].sort().reverse()) { const r = opr(m); if (!r.ag || !noPeriodo(m)) continue; const tr = el('tr');
-    [nomeMes(m) + (m === mesAtual ? '*' : ''), r.at.toLocaleString('pt-BR'), pct(r.at, r.lu), m >= CONTROLE ? pct(r.fa, r.ag) : '—', m >= AVALIACOES ? r.af.toLocaleString('pt-BR') : '—'].forEach(v => tr.append(el('td', v))); to.append(tr); }
+    const ant = opr(anterior(m)), v = m < mesAtual && ant.at ? Math.round(100 * (r.at - ant.at) / ant.at) : null;
+    [nomeMes(m) + (m === mesAtual ? '*' : ''), r.at.toLocaleString('pt-BR'), null, String(r.dias), r.dias ? Math.round(r.at / r.dias).toLocaleString('pt-BR') : '—', pct(r.at, r.lu), m >= CONTROLE ? pct(r.fa, r.ag) : '—', m >= CONTROLE ? r.co.toLocaleString('pt-BR') : '—', m >= AVALIACOES ? r.af.toLocaleString('pt-BR') : '—']
+      .forEach((x, i) => tr.append(i === 2 ? el('td', v === null ? '—' : (v > 0 ? '+' : '') + v + '%', v > 0 ? 'd up' : v < 0 ? 'd down' : '') : el('td', x))); to.append(tr); }
 }
 document.querySelectorAll('#uni button').forEach(b => b.onclick = () => { document.querySelectorAll('#uni button').forEach(x => x.classList.remove('on')); b.classList.add('on'); U = b.dataset.u; desenha(); });
 sel.onchange = () => { C = sel.value; desenha(); };
