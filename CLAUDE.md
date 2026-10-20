@@ -205,8 +205,14 @@ até o plano ficar claro) e `prospeccao` (lista de empresas com contato público
 - Alerta: `BMH · Alerta de falha` (`7u3CuyjESsHmCtMW`), **ativo** (estava desligado e nunca tinha avisado nada), grava em
   `BMH_falhas` e manda no Telegram do Jorge com máscara de dado pessoal. 27 chamadas HTTP em 11 fluxos com nova tentativa.
 - Novo: `BMH · WhatsApp · apaga conversas vencidas` (`sm7uaiRPM5G5gAhO`, todo dia 4h37, registro em `BMH_limpeza_registro`).
-- Novo e **desligado**: `BMH · Instagram · fila de publicação` (`r6Rib8PXJ0zlSo4z`, tabela `BMH_fila_publicacao`); falta o
-  token da Meta da BMH e o id da conta do Instagram.
+- Novo e **desligado**: `BMH · Instagram · fila de publicação` (`r6Rib8PXJ0zlSo4z`, tabela `BMH_fila_publicacao`). Desde
+  20/10/2026 tem o id do Instagram e a credencial `BMH · Meta Instagram (token)` (`HXdesRATFOJkYxhK`, tipo `httpQueryAuth`)
+  nos 7 nós da Graph; continua desligado até o Jorge dizer "publica".
+- **IDs da Meta da BMH (20/10/2026, não são segredo):** usuário do sistema "Claude BMH" no app "BMH Integrações"
+  (app `1104609048722893`); portfólio `3231205376979050` (BMH - Brasília Medicina Hiperbárica); conta de anúncios
+  `act_327952129944258` (CA - Brasília Medicina Hiperbárica); página do Facebook `622093514556929`; Instagram
+  @hiperbaricabrasilia `17841408031661983`. O token fica no `.env` (`META_ADS_TOKEN`) e no n8n (credencial acima);
+  nunca no CLAUDE.md nem escrito em nó de fluxo.
 - Cópias de antes de cada alteração em `dados/n8n-copias/` (fora do git; trazem segredos dos nós).
 - "Produção Diaria e Mensal BMH" e "BMH · Diretoria · produção do mês" mandam pela instância **Madeiro** (número pessoal):
   pela regra de 12/10, migrar para o número de automação quando ele existir.
