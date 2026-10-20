@@ -20,9 +20,13 @@ const atualizado = [...fin, ...op].map((r) => r.atualizado_em || '').sort().pop(
 const X = det.filter((r) => +r.valor > 0.5).map((r) => [r.mes, r.unidade, r.convenio, r.situacao, r.lote, +r.sessoes || 0, Math.round(+r.valor), r.dias || '']);
 // prazo de recebimento: [mes, unidade, convênio, valor pago, dias × valor]
 const PZ = prz.filter((r) => +r.valor_pago > 0).map((r) => [r.mes, r.unidade, r.convenio, Math.round(+r.valor_pago), +r.dias_x_valor || 0]);
-// atFin: só o financeiro, que é gravado no fim da carga (a operação grava em segundos): o botão Atualizar espera por ele
-const atFin = fin.map((r) => r.atualizado_em || '').sort().pop() || '';
-const DADOS = { F, O, X, PZ, hoje: hoje.toISODate(), atFin, atualizado: atualizado ? DateTime.fromISO(atualizado).setZone('America/Sao_Paulo').toFormat("dd/LL 'às' HH:mm") : '—' };
+// atOp: a operação (ontem e hoje) é a última parte gravada na carga (o financeiro sai em ~1 min, os pacientes por lote
+// levam uns 5): o botão Atualizar só diz "pronto" quando ela for mais nova que o pedido (medido em 20/10/2026)
+const atOp = op.map((r) => r.atualizado_em || '').sort().pop() || '';
+// etapas da carga, na ordem em que gravam: financeiro (~1 min), lotes, prazos, pacientes (a parte longa) e operação (fim)
+const ultima = (t) => t.map((r) => r.atualizado_em || '').sort().pop() || '';
+const ET = { fin: ultima(fin), det: ultima(det), prazo: ultima(prz) };
+const DADOS = { F, O, X, PZ, hoje: hoje.toISODate(), atOp, ET, atualizado: atualizado ? DateTime.fromISO(atualizado).setZone('America/Sao_Paulo').toFormat("dd/LL 'às' HH:mm") : '—' };
 const json = JSON.stringify(DADOS).replace(/</g, '\\u003c');
 
 const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -31,7 +35,7 @@ const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><met
 <style>
 :root{--marinho:#002375;--fundo-escuro:#00143F;--oxigenio:#34A9CF;--azul-texto:#1A6E93;--tinta:#142033;--sec:#4A5568;--fio:#DCE5EE;--nevoa:#EEF5FA;--bom:#1E7B4F;--ruim:#B4372E}
 *{box-sizing:border-box}body{margin:0;background:#fff;color:var(--tinta);font:15px/1.45 'Libre Franklin',system-ui,sans-serif}
-header{background:var(--fundo-escuro);color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}#atualizar{flex:none;min-height:40px;padding:0 14px;border:1px solid #C9D6E6;border-radius:999px;background:transparent;color:#fff;font:700 13px 'Libre Franklin',system-ui,sans-serif;cursor:pointer}#atualizar:disabled{opacity:.6;cursor:default}header h1{margin:0;font-size:18px;font-weight:800}header p{margin:4px 0 0;color:#C9D6E6;font-size:13px}
+header{background:var(--fundo-escuro);color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}#atualizar{flex:none;min-height:40px;padding:0 14px;border:1px solid #C9D6E6;border-radius:999px;background:linear-gradient(to right,rgba(52,169,207,.6) var(--p,0%),transparent var(--p,0%));font-variant-numeric:tabular-nums;color:#fff;font:700 13px 'Libre Franklin',system-ui,sans-serif;cursor:pointer}#atualizar:disabled{cursor:default}header h1{margin:0;font-size:18px;font-weight:800}header p{margin:4px 0 0;color:#C9D6E6;font-size:13px}
 main{max-width:980px;margin:0 auto;padding:0 16px 32px}
 .filtros{border-bottom:1px solid var(--fio);padding:10px 0;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .seg{display:flex;border:1px solid var(--fio);border-radius:999px;overflow:hidden}.seg button{border:0;background:#fff;color:var(--tinta);font:600 13px 'Libre Franklin',sans-serif;padding:7px 10px;min-height:36px}
@@ -78,17 +82,22 @@ let U = '', C = '', DE = '', ATE = '', PEND = false;
 const noPeriodo = m => (!DE || m >= DE) && (!ATE || m <= ATE);
 document.getElementById('atu').textContent = 'Atualizado em ' + D.atualizado;
 // botão "Atualizar agora" (Jorge, 20/10/2026): abre ?atualizar=1 no próprio painel (navegação sempre leva o login; consulta
-// pela página nem sempre), o n8n pede a carga completa (13 meses + ontem e hoje, uns 6 min) e volta com ?pedido=<hora do
-// servidor>. Enquanto o financeiro gravado for mais velho que o pedido, a página se recarrega a cada 45 s.
+// pela página nem sempre), o n8n pede a carga completa (13 meses + ontem e hoje, uns 8 min) e volta com ?pedido=<hora do
+// servidor>. Enquanto a operação gravada (última parte da carga) for mais velha que o pedido, recarrega a cada 45 s;
+// cada recarga já mostra o que chegou (o financeiro chega em ~1 min).
 (() => {
   const b = document.getElementById('atualizar'), atu = document.getElementById('atu');
   b.onclick = () => { b.disabled = true; b.textContent = 'Pedindo…'; location.href = location.pathname + '?atualizar=1'; };
   const pedido = +new URLSearchParams(location.search).get('pedido') || 0; if (!pedido) return;
   const limpa = () => history.replaceState(null, '', location.pathname);
-  if (Date.parse(D.atFin) >= pedido) { limpa(); atu.textContent = 'Atualizado em ' + D.atualizado + ' · pronto'; return; }
+  if (Date.parse(D.atOp) >= pedido) { limpa(); atu.textContent = 'Atualizado em ' + D.atualizado + ' · pronto'; return; }
   if (Date.now() - pedido > 15 * 60000) { limpa(); atu.textContent = 'A atualização não terminou a tempo. Atualizado em ' + D.atualizado; return; }
-  b.disabled = true; b.textContent = 'Atualizando…';
-  atu.textContent = 'Atualizando com o iGut (uns 6 minutos). Pode fechar: os números ficam prontos sozinhos.';
+  // andamento no próprio botão, travado até o fim (pedido do Jorge, 20/10/2026): o tempo passado contra os ~8 min medidos,
+  // nunca abaixo da etapa que já gravou e nunca 100% antes do fim (o 100% é o "pronto")
+  const feito = k => Date.parse(D.ET[k]) >= pedido, piso = feito('prazo') ? 35 : feito('det') ? 25 : feito('fin') ? 15 : 0;
+  const pinta = () => { const p = Math.max(piso, Math.min(95, Math.round((Date.now() - pedido) / 4800))); b.style.setProperty('--p', p + '%'); b.textContent = 'Atualizando ' + p + '%'; };
+  b.disabled = true; pinta(); setInterval(pinta, 1000);
+  atu.textContent = feito('fin') ? 'Financeiro já atualizado; faltam lotes, pacientes e sessões. Pode fechar a página.' : 'Buscando no iGut (uns 8 minutos). Pode fechar a página.';
   setTimeout(() => location.reload(), 45000);
 })();
 const convs = [...new Set(D.F.map(r => r[2]))].sort((a, b) => a === 'PARTICULAR' ? -1 : b === 'PARTICULAR' ? 1 : a.localeCompare(b, 'pt-BR'));
