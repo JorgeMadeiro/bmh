@@ -186,12 +186,13 @@ function desenha() {
   const mesesPer = [...ult12]; const tt = el('tr', null, 'tot'); ['Período', mil(tot.p), mil(tot.f), mil(tot.af), mil(tot.r), pct(tot.r, tot.p - tot.g), mil(tot.ar), mil(tot.g)].forEach((v, i) => tt.append(celula(v, SIT_COL[i], mesesPer, 'período'))); tf.append(tt, ...linhasMes);
   // atenção: a receber há mais de 90 dias e a faturar atrasado, por convênio
   const corte = new Date(d0); corte.setDate(corte.getDate() - 90); const corteMes = corte.toISOString().slice(0, 7); corteMesG = corteMes;
-  const soma = (filtro, idx) => { const m = {}; for (const x of D.F) { if ((U && x[1] !== U) || (C && x[2] !== C) || !noPeriodo(x[0]) || !filtro(x[0]) || !x[idx]) continue; m[x[2]] = (m[x[2]] || 0) + x[idx]; } return Object.entries(m).filter(([, v]) => v >= 500).sort((a, b) => b[1] - a[1]); };
+  const soma = (filtro, idx, minimo = 500) => { const m = {}; for (const x of D.F) { if ((U && x[1] !== U) || (C && x[2] !== C) || !noPeriodo(x[0]) || !filtro(x[0]) || !x[idx]) continue; m[x[2]] = (m[x[2]] || 0) + x[idx]; } return Object.entries(m).filter(([, v]) => v >= minimo).sort((a, b) => b[1] - a[1]); };
   const lista = (id, itens, vazio) => { const ul = document.getElementById(id); ul.replaceChildren(); if (!itens.length) { ul.append(el('li', vazio, 'vazio')); return; }
-    itens.slice(0, 8).forEach(([c, v]) => { const li = el('li', null, 'cl'); li.append(el('span', c), el('span', brl(v))); li.onclick = () => abre(SIT_LISTA[id], [...new Set(D.F.map(r => r[0]))].filter(m => m >= CONTROLE && noPeriodo(m) && (id === 'l90' ? m < corteMesG : m < mesFechado)), c, id === 'l90' ? 'há mais de 90 dias' : 'atrasado'); ul.append(li); });
+    itens.slice(0, id === 'lFat' ? itens.length : 8).forEach(([c, v]) => { const li = el('li', null, 'cl'); li.append(el('span', c), el('span', brl(v))); li.onclick = () => abre(SIT_LISTA[id], [...new Set(D.F.map(r => r[0]))].filter(m => m >= CONTROLE && noPeriodo(m) && (id === 'l90' ? m < corteMesG : m < mesFechado)), c, id === 'l90' ? 'há mais de 90 dias' : 'atrasado'); ul.append(li); });
     if (itens.length > 1) { const t = itens.reduce((s, [, v]) => s + v, 0); const li = el('li'); li.append(el('span', 'Total'), el('span', brl(t))); ul.append(li); } };
   lista('l90', soma(m => m >= CONTROLE && m < corteMes, 8), 'Nada a receber há mais de 90 dias.');
-  lista('lFat', soma(m => m >= CONTROLE && m < mesFechado, 6), 'Nada atrasado para faturar.');
+  // a faturar atrasado sem o corte de R$ 500 e com todos os convênios (Jorge, 20/10/2026): R$ 1 só para não listar centavos
+  lista('lFat', soma(m => m >= CONTROLE && m < mesFechado, 6, 1), 'Nada atrasado para faturar.');
   // prazo de recebimento por convênio (média ponderada pelo valor pago)
   const pz = {}; let tv = 0, td = 0;
   for (const x of D.PZ) { if ((U && x[1] !== U) || (C && x[2] !== C) || !noPeriodo(x[0])) continue; const a = (pz[x[2]] ||= [0, 0]); a[0] += x[3]; a[1] += x[4]; tv += x[3]; td += x[4]; }
