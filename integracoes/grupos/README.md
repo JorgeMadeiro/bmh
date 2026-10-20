@@ -40,6 +40,14 @@
   set/2023, mês a mês (tudo de uma vez estoura a memória do n8n). Manual: `?so=financeiro&mes=AAAA-MM` ou
   `?so=operacao&desde=…&ate=…` (até 40 dias).
 - **Regra:** Produzido = Faturado + A faturar; Faturado = Recebido + A receber + Glosado; particular = faturado e recebido.
+- **Valor bruto, sempre (decisão do Jorge, 20/10/2026):** não descontar retenção de imposto (`retencao_em_reais`: R$ 2.600
+  em 242 sessões em 26 meses) nem estorno (`total_estorno`: 3 sessões, R$ 1.419). Não é pendência de conferência.
+- **Auditoria de 20/10/2026 (iGut × tabelas, set/24 a out/26):** produção, sessões, recebido, a receber, a faturar e glosado
+  com diferença zero, nas duas unidades; nenhuma sessão fora por unidade; as 5 agendas (111, 112, 113, 120, 121) lidas.
+  Corrigido no mesmo dia: meses com mais de 13 meses que ainda têm pendência passam a ser refeitos em toda atualização
+  (R$ 58.640 a receber de 2025 ficavam parados); prazo de recebimento e as duas listas de cobrança sem corte e com todos os
+  convênios. Para saber: "sessões" do financeiro inclui consultas, retornos e avaliações sem custo (a operação conta só
+  câmara); falta cobrada ("Faltou" no BI) entra na produção.
 - **Corte de confiança:** o iGut só registra lote e pagamento de forma completa **desde nov/2024** (antes, "a faturar" e "a
   receber" inflados) e faltas também desde nov/2024; avaliações desde mar/2024. O painel mostra "—" antes disso e o bloco
   Atenção só olha de nov/2024 em diante (a receber > 90 dias: R$ 526 mil, GEAP R$ 221 mil e ASSEFAZ R$ 202 mil; a faturar
