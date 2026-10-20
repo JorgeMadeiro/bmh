@@ -188,7 +188,7 @@ function desenha() {
   // tabela do financeiro
   const tf = document.getElementById('tFin'); tf.replaceChildren();
   const cab = el('tr'); ['Mês','Produzido','Faturado','A faturar','Recebido','%','A receber','Glosado'].forEach(t => cab.append(el('th', t))); tf.append(cab);
-  const meses = [...new Set(D.F.map(r => r[0]))].sort().reverse(); const tot = { p:0,f:0,af:0,r:0,ar:0,g:0 };
+  const meses = [...new Set(D.F.map(r => r[0]))].sort().reverse(); const tot = { p:0,pOk:0,f:0,af:0,r:0,ar:0,g:0 };
   const ult12 = new Set(meses.filter(m => noPeriodo(m)));   // total = todos os meses do período escolhido, com o mês em andamento (Jorge, 20/10/2026)
   const linhasMes = [];
   for (const m of meses) { const r = fin(m); if (!r.p || !noPeriodo(m)) continue;
@@ -196,8 +196,8 @@ function desenha() {
     const ok = m >= CONTROLE; [nomeMes(m) + (m === mesAtual ? '*' : ''), mil(r.p), ok ? mil(r.f) : '—', ok ? mil(r.af) : '—', ok ? mil(r.r) : '—', ok ? pct(r.r, r.p - r.g) : '—', ok ? mil(r.ar) : '—', ok ? mil(r.g) : '—'].forEach((v, i) => tr.append(celula(v, ok ? SIT_COL[i] : null, [m], nomeMes(m)))); linhasMes.push(tr);
     // antes de nov/2024 (CONTROLE) só o produzido aparece; o resto mostra "—" e não pode entrar no total (corrigido em
     // 20/10/2026: o período set/24 a set/25 somava R$ 240 mil de "a receber" de set e out/24 que a tela não mostrava)
-    if (ult12.has(m)) { tot.p+=r.p; if (ok) { tot.f+=r.f; tot.af+=r.af; tot.r+=r.r; tot.ar+=r.ar; tot.g+=r.g; } } }
-  const mesesPer = [...ult12]; const tt = el('tr', null, 'tot'); ['Período', mil(tot.p), mil(tot.f), mil(tot.af), mil(tot.r), pct(tot.r, tot.p - tot.g), mil(tot.ar), mil(tot.g)].forEach((v, i) => tt.append(celula(v, SIT_COL[i], mesesPer, 'período'))); tf.append(tt, ...linhasMes);
+    if (ult12.has(m)) { tot.p+=r.p; if (ok) { tot.pOk+=r.p; tot.f+=r.f; tot.af+=r.af; tot.r+=r.r; tot.ar+=r.ar; tot.g+=r.g; } } }
+  const mesesPer = [...ult12]; const tt = el('tr', null, 'tot'); ['Período', mil(tot.p), mil(tot.f), mil(tot.af), mil(tot.r), pct(tot.r, tot.pOk - tot.g), mil(tot.ar), mil(tot.g)].forEach((v, i) => tt.append(celula(v, SIT_COL[i], mesesPer, 'período'))); tf.append(tt, ...linhasMes);
   // atenção: a receber há mais de 90 dias e a faturar atrasado, por convênio
   const corte = new Date(d0); corte.setDate(corte.getDate() - 90); const corteMes = corte.toISOString().slice(0, 7); corteMesG = corteMes;
   const soma = (filtro, idx, minimo = 1) => { const m = {}; for (const x of D.F) { if ((U && x[1] !== U) || (C && x[2] !== C) || !noPeriodo(x[0]) || !filtro(x[0]) || !x[idx]) continue; m[x[2]] = (m[x[2]] || 0) + x[idx]; } return Object.entries(m).filter(([, v]) => v >= minimo).sort((a, b) => b[1] - a[1]); };

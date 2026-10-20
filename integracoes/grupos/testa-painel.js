@@ -44,7 +44,10 @@ const num = (t) => { t = String(t).trim(); if (t === '—' || t === '') return n
     await p.selectOption('#de', (await p.$eval('#de option', (o) => o.value))); await p.selectOption('#ate', '2025-09');
     { const rows = await tabela(); const tot = rows[0], meses = rows.slice(1);
       for (const col of [1, 2, 3, 4, 6, 7]) { const soma = meses.reduce((s, r) => s + (num(r[col]) || 0), 0), t = num(tot[col]) || 0;
-        f(Math.abs(soma - t) <= Math.max(3, meses.length * 0.6), `período desde o início: coluna ${col} total ${t} ≠ soma ${soma.toFixed(0)}`); } }
+        f(Math.abs(soma - t) <= Math.max(3, meses.length * 0.6), `período desde o início: coluna ${col} total ${t} ≠ soma ${soma.toFixed(0)}`); }
+      // % do total: recebido ÷ (produzido dos meses que mostram faturado − glosa), como em cada linha
+      const pOk = meses.filter((r) => num(r[2]) !== null).reduce((s, r) => s + (num(r[1]) || 0), 0), esperado = Math.round(100 * (num(tot[4]) || 0) / (pOk - (num(tot[7]) || 0)));
+      f(Math.abs(esperado - Number(String(tot[5]).replace('%', ''))) <= 1, `período desde o início: % ${tot[5]} ≠ ${esperado}%`); }
     // de depois de até se ajusta sozinho
     await p.selectOption('#de', '2026-10'); f((await p.$eval('#ate', (s) => s.value)) === '2026-10', '"De" depois de "Até" não ajustou');
     // números do mês fechado
