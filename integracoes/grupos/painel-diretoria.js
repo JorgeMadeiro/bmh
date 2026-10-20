@@ -137,7 +137,8 @@ function abre(sit, meses, conv, rot) {
   ultimo = [sit, meses, conv, rot];
   const ms = new Set(meses), alvoConv = conv || C;
   // o particular não tem lote: entra no "recebido" como uma linha por mês e unidade (cartão, D+1)
-  const part = sit !== 'recebido' ? [] : D.F.filter(x => x[2] === 'PARTICULAR' && x[7] > 0.5).map(x => [x[0], x[1], 'PARTICULAR (cartão)', 'recebido', '-', x[3], Math.round(x[7]), '']);
+  const part = sit !== 'recebido' ? [] : D.F.filter(x => x[2] === 'PARTICULAR' && x[7] > 0.5 && x[0] >= CONTROLE)   // antes de nov/2024 não há lista de pacientes (nem entra no total)
+    .map(x => [x[0], x[1], 'PARTICULAR (cartão)', 'recebido', '-', x[3], Math.round(x[7]), '']);
   const linhas = [...D.X, ...part].filter(x => x[3] === sit && ms.has(x[0]) && (!U || x[1] === U) && (!alvoConv || x[2] === alvoConv || (alvoConv === 'PARTICULAR' && x[2] === 'PARTICULAR (cartão)')));
   const porConv = {}; for (const x of linhas) (porConv[x[2]] ||= []).push(x);
   const total = linhas.reduce((s, x) => s + x[6], 0), sessoes = linhas.reduce((s, x) => s + x[5], 0);
