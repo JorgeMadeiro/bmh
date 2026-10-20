@@ -54,8 +54,8 @@ footer{color:var(--sec);font-size:12px;margin-top:24px;border-top:1px solid var(
 <main>
 <div class="filtros"><div class="seg" id="uni"><button data-u="" class="on">Todas</button><button data-u="Asa Sul">Asa Sul</button><button data-u="Taguatinga">Taguatinga</button></div><select id="conv"></select><div class="periodo">De <select id="de"></select> até <select id="ate"></select></div></div>
 <h2>Financeiro da produção</h2><p class="s">R$ mil · * mês em andamento · toque num valor em azul para ver por lote</p><div class="tab"><table id="tFin"></table></div>
-<h2>Para cobrar</h2><p class="s">A receber há mais de 90 dias</p><ul class="lista" id="l90"></ul>
-<p class="s" style="margin-top:12px">A faturar atrasado</p><ul class="lista" id="lFat"></ul>
+<h2>A receber há mais de 90 dias</h2><ul class="lista" id="l90"></ul>
+<h2>A faturar atrasado</h2><ul class="lista" id="lFat"></ul>
 <h2>Prazo de recebimento</h2><p class="s">Dias, em média, da sessão até o convênio pagar (no período)</p><ul class="lista" id="lPrazo"></ul>
 <h2>Operação</h2><p class="s">* mês em andamento, até ontem · Var.: sessões contra o mês anterior · Dias: dias com atendimento</p><div class="tab"><table id="tOp"></table></div>
 <div id="det"><div class="caixa"><button class="fechar" aria-label="Fechar">×</button><h3 id="dTit"></h3><p class="sub" id="dSub"></p><div id="dCorpo"></div></div></div>
@@ -69,7 +69,7 @@ const CONTROLE = '2024-11', AVALIACOES = '2024-03';
 const MES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
 const nomeMes = m => MES[+m.slice(5,7)-1] + '/' + m.slice(2,4), mesLongo = m => ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'][+m.slice(5,7)-1] + ' de ' + m.slice(0,4);
 const mil = v => { const x = v/1000; return Math.abs(x) < 0.5 ? (v ? '<1' : '—') : Math.round(x).toLocaleString('pt-BR'); };
-const brl = v => 'R$ ' + (v >= 1e6 ? (v/1e6).toFixed(2).replace('.', ',') + ' mi' : v >= 1000 ? Math.round(v/1000).toLocaleString('pt-BR') + ' mil' : Math.round(v).toLocaleString('pt-BR'));
+const brl = v => 'R$ ' + Math.round(v).toLocaleString('pt-BR');   // valor exato, sem "mil" (Jorge, 20/10/2026); a tabela do financeiro segue em R$ mil
 const pct = (a, b) => b ? Math.round(100*a/b) + '%' : '—';
 const el = (t, txt, cls) => { const e = document.createElement(t); if (txt != null) e.textContent = txt; if (cls) e.className = cls; return e; };
 let U = '', C = '', DE = '', ATE = '', PEND = false;
@@ -145,7 +145,7 @@ function desenha() {
   const tf = document.getElementById('tFin'); tf.replaceChildren();
   const cab = el('tr'); ['Mês','Produzido','Faturado','A faturar','Recebido','%','A receber','Glosado'].forEach(t => cab.append(el('th', t))); tf.append(cab);
   const meses = [...new Set(D.F.map(r => r[0]))].sort().reverse(); const tot = { p:0,f:0,af:0,r:0,ar:0,g:0 };
-  const ult12 = new Set(meses.filter(m => m < mesAtual && noPeriodo(m)));   // total = meses fechados do período escolhido
+  const ult12 = new Set(meses.filter(m => noPeriodo(m)));   // total = todos os meses do período escolhido, com o mês em andamento (Jorge, 20/10/2026)
   const linhasMes = [];
   for (const m of meses) { const r = fin(m); if (!r.p || !noPeriodo(m)) continue;
     const tr = el('tr');

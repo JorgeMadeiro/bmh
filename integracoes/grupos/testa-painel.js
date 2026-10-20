@@ -20,9 +20,9 @@ const num = (t) => { t = String(t).trim(); if (t === '—' || t === '') return n
         for (const pend of [false]) {
           combos++;
           const rows = await tabela(); const tot = rows[0], meses = rows.slice(1);
-          // total do período = soma das linhas fechadas exibidas (sem o mês corrente *); com "só pendentes" o total continua do período todo
+          // total do período = soma de todas as linhas exibidas, com o mês corrente * (desde 20/10/2026); com "só pendentes" o total continua do período todo
           if (!pend) for (const col of [1, 2, 3, 4, 6, 7]) {
-            const soma = meses.filter((r) => !r[0].endsWith('*')).reduce((s, r) => s + (num(r[col]) || 0), 0), t = num(tot[col]) || 0;
+            const soma = meses.reduce((s, r) => s + (num(r[col]) || 0), 0), t = num(tot[col]) || 0;
             f(Math.abs(soma - t) <= Math.max(3, meses.length * 0.6), `${u}/${c || 'todos'}: coluna ${col} total ${t} ≠ soma ${soma.toFixed(0)}`);
           }
           for (const r of meses) {
