@@ -403,7 +403,7 @@ function fluxoPainelDiretoria() {
     monta: codigo('Monta a página', '../../grupos/painel-diretoria.js', { executeOnce: true }),
     entrega: no('Entrega a página', 'n8n-nodes-base.respondToWebhook', 1.1, { respondWith: 'text', responseBody: '={{ $json.html }}', options: { responseHeaders: { entries: [{ name: 'Content-Type', value: 'text/html; charset=utf-8' }, { name: 'Cache-Control', value: 'no-store' }, { name: 'X-Robots-Tag', value: 'noindex' }] } } }),
     // pacientes do lote (3º nível): lê a tabela gravada às 23h40 (abre na hora; funciona com o iGut fora do ar)
-    pacTab: le('Pacientes do lote (tabela)', 'BMH_financeiro_paciente'),
+    pacTab: le('Pacientes do lote (tabela)', 'BMH_financeiro_paciente'), fimLista: le('Fim da última atualização', 'BMH_operacao_dia'),
     lista: codigo('Lista os pacientes', '../../grupos/lote-pacientes.js'),
     entregaLista: no('Entrega a lista', 'n8n-nodes-base.respondToWebhook', 1.1, { respondWith: 'text', responseBody: '={{ $json.corpo }}', options: { responseHeaders: { entries: [{ name: 'Content-Type', value: '={{ $json.tipo }}' }, { name: 'Cache-Control', value: 'no-store' }, { name: 'X-Robots-Tag', value: 'noindex' }] } } }),
     nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Diretoria (painel)\n**Traz:** tabelas da diretoria\n**Envia:** o painel da diretoria, com login\n**Limites:** só lê; execução não guardada\n\nUm painel só, login da diretoria (credencial \"BMH · Painel da diretoria (login)\"; cópia no .env em PAINEL_DIRETORIA_*). Página: lê BMH_financeiro_mes, BMH_operacao_dia e BMH_financeiro_detalhe (gravadas às 23h40). ?formato=json&situacao=...: pacientes de um lote, lidos de BMH_financeiro_paciente (gravada às 23h40; nomes guardados por decisão do Jorge); o n8n não guarda a execução.', width: 560, height: 200 }),
@@ -414,7 +414,7 @@ function fluxoPainelDiretoria() {
   cx[n.dispara.name] = { main: [[{ node: n.gravaPed.name, type: 'main', index: 0 }], [{ node: n.respondePedido.name, type: 'main', index: 0 }]] };
   liga(cx, n.gravaPed.name, n.pede.name); liga(cx, n.pede.name, n.respondePedido.name);
   cx[n.ehLista.name] = { main: [[{ node: n.pacTab.name, type: 'main', index: 0 }], [{ node: n.fin.name, type: 'main', index: 0 }]] };
-  for (const [a, b] of [[n.fin, n.op], [n.op, n.det], [n.det, n.prazo], [n.prazo, n.pedTab], [n.pedTab, n.monta], [n.monta, n.entrega], [n.pacTab, n.lista], [n.lista, n.entregaLista]]) liga(cx, a.name, b.name);
+  for (const [a, b] of [[n.fin, n.op], [n.op, n.det], [n.det, n.prazo], [n.prazo, n.pedTab], [n.pedTab, n.monta], [n.monta, n.entrega], [n.pacTab, n.fimLista], [n.fimLista, n.lista], [n.lista, n.entregaLista]]) liga(cx, a.name, b.name);
   return { name: 'BMH · Diretoria (painel)', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none', saveDataErrorExecution: 'none' }) };   // tem nome de paciente: não guarda execução
 }
 
