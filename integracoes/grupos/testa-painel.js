@@ -40,6 +40,11 @@ const num = (t) => { t = String(t).trim(); if (t === '—' || t === '') return n
     const r1 = await tabela(); f(r1.length === 2 && r1[1][0] === 'set/26', `período set/26 mostrou ${r1.length - 1} meses`);
     f(r1[0][1] === r1[1][1], `período set/26: total ${r1[0][1]} ≠ linha ${r1[1][1]}`);
     const op = await p.$$eval('#tOp tr', (trs) => trs.slice(1).map((tr) => tr.children[0].textContent)); f(op.length === 1 && op[0] === 'set/26', `operação no período mostrou ${op}`);
+    // período que começa antes de nov/2024 (20/10/2026): o total soma só o que as linhas mostram (meses com "—" não entram)
+    await p.selectOption('#de', (await p.$eval('#de option', (o) => o.value))); await p.selectOption('#ate', '2025-09');
+    { const rows = await tabela(); const tot = rows[0], meses = rows.slice(1);
+      for (const col of [1, 2, 3, 4, 6, 7]) { const soma = meses.reduce((s, r) => s + (num(r[col]) || 0), 0), t = num(tot[col]) || 0;
+        f(Math.abs(soma - t) <= Math.max(3, meses.length * 0.6), `período desde o início: coluna ${col} total ${t} ≠ soma ${soma.toFixed(0)}`); } }
     // de depois de até se ajusta sozinho
     await p.selectOption('#de', '2026-10'); f((await p.$eval('#ate', (s) => s.value)) === '2026-10', '"De" depois de "Até" não ajustou');
     // números do mês fechado

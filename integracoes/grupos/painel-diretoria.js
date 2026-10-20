@@ -194,7 +194,9 @@ function desenha() {
   for (const m of meses) { const r = fin(m); if (!r.p || !noPeriodo(m)) continue;
     const tr = el('tr');
     const ok = m >= CONTROLE; [nomeMes(m) + (m === mesAtual ? '*' : ''), mil(r.p), ok ? mil(r.f) : '—', ok ? mil(r.af) : '—', ok ? mil(r.r) : '—', ok ? pct(r.r, r.p - r.g) : '—', ok ? mil(r.ar) : '—', ok ? mil(r.g) : '—'].forEach((v, i) => tr.append(celula(v, ok ? SIT_COL[i] : null, [m], nomeMes(m)))); linhasMes.push(tr);
-    if (ult12.has(m)) { tot.p+=r.p; tot.f+=r.f; tot.af+=r.af; tot.r+=r.r; tot.ar+=r.ar; tot.g+=r.g; } }
+    // antes de nov/2024 (CONTROLE) só o produzido aparece; o resto mostra "—" e não pode entrar no total (corrigido em
+    // 20/10/2026: o período set/24 a set/25 somava R$ 240 mil de "a receber" de set e out/24 que a tela não mostrava)
+    if (ult12.has(m)) { tot.p+=r.p; if (ok) { tot.f+=r.f; tot.af+=r.af; tot.r+=r.r; tot.ar+=r.ar; tot.g+=r.g; } } }
   const mesesPer = [...ult12]; const tt = el('tr', null, 'tot'); ['Período', mil(tot.p), mil(tot.f), mil(tot.af), mil(tot.r), pct(tot.r, tot.p - tot.g), mil(tot.ar), mil(tot.g)].forEach((v, i) => tt.append(celula(v, SIT_COL[i], mesesPer, 'período'))); tf.append(tt, ...linhasMes);
   // atenção: a receber há mais de 90 dias e a faturar atrasado, por convênio
   const corte = new Date(d0); corte.setDate(corte.getDate() - 90); const corteMes = corte.toISOString().slice(0, 7); corteMesG = corteMes;
