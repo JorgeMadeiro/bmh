@@ -39,7 +39,8 @@ function decideMeta(E) {
 
   // erro de qualquer leitura: avisa e não decide em cima de dado faltando
   const erros = Object.entries(E.erros || {});
-  for (const [no, msg] of erros) add({ regra: 'meta_erro_api', acao: 'avisar', alvo: no, detalhe: `não consegui ler "${no}" na Meta: ${String(msg).slice(0, 200)}` });
+  for (const [no, msg] of erros) add({ regra: 'meta_erro_api', acao: 'avisar', alvo: no,
+    detalhe: `não consegui ler "${no}" na Meta: ${String(msg).replace(/(access_token|token)=[^&\s"']+/gi, '$1=[removido]').slice(0, 200)}` });
   if (erros.length) return out;
 
   const conta = E.conta || {};
@@ -162,7 +163,13 @@ function montaMensagem(Q, acoes) {
   let t = (Q.teste ? '🧪 TESTE: nada foi gravado\n' : '') + '🛡️ Guardião Meta BMH · ' + dm(Q.hoje) + ' (homologação, simulação)\n';
   if (avisos.length) t += '\n' + avisos.map(a => '• ' + a.detalhe).join('\n') + '\n';
   if (propostas.length) t += '\nO que eu proporia (nada foi mudado):\n' + propostas.map(a => '• ' + (a.acao === 'pausar' ? `pausar "${a.alvo}": ` : `orçamento de "${a.alvo}": `) + a.detalhe).join('\n') + '\n';
-  return [{ texto: t.length > 4000 ? t.slice(0, 3990) + '\n(...)' : t }];
+  // Limpeza antes do Telegram (21/10/2026, depois da 1ª execução recusada): tira caractere de controle e emoji partido,
+  // esconde token que venha num erro da Meta, nunca manda vazio e corta em linha inteira antes de 3.500 caracteres.
+  t = t.replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, '')
+    .replace(/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g, '')
+    .replace(/(access_token|token)=[^&\s"']+/gi, '$1=[removido]').trim();
+  if (t.length > 3500) t = t.slice(0, t.lastIndexOf('\n', 3500) > 0 ? t.lastIndexOf('\n', 3500) : 3500) + '\n(...)';
+  return [{ texto: t || 'Guardião Meta BMH: mensagem vazia (ver a execução no n8n).' }];
 }
 // FIM-DA-FUNCAO (o montador corta daqui para baixo ao embutir no n8n)
 if (typeof module !== 'undefined') module.exports = { decideMeta, montaEntrada, montaMensagem };

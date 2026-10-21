@@ -78,11 +78,23 @@ x = x0
 monta = no('Monta a mensagem', 'n8n-nodes-base.code', 2, {'jsCode': (
     '// Copiado de scripts/n8n/bmh-meta-guardiao-decide.js pelo monta-guardiao-meta.py (só montaMensagem é usada aqui).\n' + regras +
     "\nreturn montaMensagem($('Quando').first().json, $input.all().map(i => i.json)).map(json => ({ json }));\n")})
-telegram = no('Telegram · aviso', 'n8n-nodes-base.telegram', 1.2, {'chatId': '8708228589', 'text': '={{ $json.texto }}',
-              'additionalFields': {'appendAttribution': False}}, credentials=CRED_TELEGRAM)
+# Envio como o do "BMH · Alerta de falha" (que funciona): HTML com &, < e > escapados e 3 tentativas. Se o Telegram recusar
+# mesmo assim, a saída de erro vai ao nó seguinte, que falha com a resposta do Telegram e o tamanho do texto: o alerta de
+# falha grava isso na BMH_falhas (21/10/2026: a 1ª execução, 609075, só registrou "Bad request").
+telegram = no('Telegram · aviso', 'n8n-nodes-base.telegram', 1.2, {'chatId': '8708228589',
+              'text': "={{ String($json.texto || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') }}",
+              'additionalFields': {'appendAttribution': False, 'parse_mode': 'HTML'}}, credentials=CRED_TELEGRAM,
+              retryOnFail=True, maxTries=3, waitBetweenTries=5000, onError='continueErrorOutput')
+explica = no('Explica a recusa do Telegram', 'n8n-nodes-base.code', 2, {'jsCode': (
+    "// Só roda quando o Telegram recusou a mensagem. Falha de propósito com a resposta dele e o tamanho do texto, para o\n"
+    "// \"BMH · Alerta de falha\" gravar o motivo na BMH_falhas (o texto em si não vai: pode ter nome de anúncio).\n"
+    "const e = $input.first().json;\n"
+    "const t = String($('Monta a mensagem').first().json.texto || '');\n"
+    "const motivo = JSON.stringify(e.error || e).replace(/(access_token|token|bot)[0-9]*[=:][^&\\s\"']+/gi, '$1=[removido]').slice(0, 400);\n"
+    "throw new Error('Telegram recusou: ' + motivo + ' | texto com ' + t.length + ' caracteres e ' + t.split('\\n').length + ' linhas');\n")})
 for n in nos:
     if n['name'] in (prepara, registra): n['position'][1] = -220
-    if n['name'] in (monta, telegram): n['position'][1] = 220
+    if n['name'] in (monta, telegram, explica): n['position'][1] = 220
 nota = no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, {'width': 1100, 'height': 420, 'content': (
     "## BMH · Meta · guardião diário (homologação)\n"
     "**Traz:** a conta de anúncios do Meta da BMH (`act_327952129944258`): limite de gastos, saldo pré-pago, campanhas, conjuntos, anúncios, "
@@ -101,12 +113,15 @@ nota = no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, {'width': 1100, 'h
 nos[-1]['position'] = [0, -520]
 
 ligacoes = {}
-def liga(a, b):
-    ligacoes.setdefault(a, {'main': [[]]})['main'][0].append({'node': b, 'type': 'main', 'index': 0})
+def liga(a, b, saida=0):
+    m = ligacoes.setdefault(a, {'main': []})['main']
+    while len(m) <= saida: m.append([])
+    m[saida].append({'node': b, 'type': 'main', 'index': 0})
 for a, b in zip(seq, seq[1:]): liga(a, b)
 liga(manual, 'Quando')
 liga(decide, prepara); liga(decide, monta)
 liga(prepara, registra); liga(monta, telegram)
+liga(telegram, explica, saida=1)   # saída 1 = erro (onError continueErrorOutput)
 
 fluxo = {'name': 'BMH · Meta · guardião diário (homologação)', 'nodes': nos, 'connections': ligacoes,
          'settings': {'executionOrder': 'v1', 'timezone': 'America/Sao_Paulo', 'saveDataSuccessExecution': 'all',
