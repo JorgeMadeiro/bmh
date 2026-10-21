@@ -6,7 +6,7 @@
  *   node scripts/n8n/testa-numeros-meta.js [--desde AAAA-MM-DD] [--cfg chave=valor ...]
  */
 global.verbaDaConta = require('./bmh-meta-guardiao-decide.js').verbaDaConta;   // no n8n, o texto das duas fica no mesmo nó
-const { linhasDoDia, blocoMeta } = require('./bmh-meta-numeros.js');
+const { linhasDoDia, blocoMeta, juntaDias } = require('./bmh-meta-numeros.js');
 const L = require('./bmh-meta-numeros-leituras.json');
 const COFRE = (process.env.COFRE_URL || 'http://cofre:8080').replace(/\/+$/, '') + '/meta-bmh/';
 
@@ -15,15 +15,17 @@ const cfg = {}; for (let i = 0; i < args.length; i++) if (args[i] === '--cfg') {
 const hoje = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date());
 const d = new Date(hoje + 'T12:00:00Z'), menos = n => { const x = new Date(d); x.setUTCDate(x.getUTCDate() - n); return x.toISOString().slice(0, 10); };
 const Q = { hoje, ontem: menos(1), desde: arg('desde') || menos(3), agora: new Date().toISOString(), conta: L.conta };
-const troca = s => s.replace(/\{(\w+)\}/g, (_, k) => Q[k]);
+const troca = (s, extra = {}) => s.replace(/\{(\w+)\}/g, (_, k) => ({ ...Q, ...extra })[k]);
+const diasDoPeriodo = () => { const out = []; for (let x = new Date(Q.desde + 'T12:00:00Z'); x.toISOString().slice(0, 10) <= Q.ontem; x.setUTCDate(x.getUTCDate() + 1)) out.push(x.toISOString().slice(0, 10)); return out; };
 
 (async () => {
   const lidas = {};
-  for (const l of L.leituras) {
-    const q = new URLSearchParams(Object.fromEntries(Object.entries(l.consulta).map(([k, v]) => [k, troca(v)])));
-    const r = await fetch(`${COFRE}${L.versao}/${troca(l.caminho)}?${q}`); const j = await r.json().catch(() => ({}));
-    lidas[l.chave] = r.ok ? j : { error: { message: r.status + ' ' + JSON.stringify(j).slice(0, 200) } };
-  }
+  const le = async (l, extra) => {
+    const q = new URLSearchParams(Object.fromEntries(Object.entries(l.consulta).map(([k, v]) => [k, troca(v, extra)])));
+    const r = await fetch(`${COFRE}${L.versao}/${troca(l.caminho, extra)}?${q}`); const j = await r.json().catch(() => ({}));
+    return r.ok ? j : { error: { message: r.status + ' ' + JSON.stringify(j).slice(0, 200) } };
+  };
+  for (const l of L.leituras) lidas[l.chave] = l.porDia ? juntaDias(await Promise.all(diasDoPeriodo().map(dia => le(l, { dia })))) : await le(l, {});
   const linhas = linhasDoDia(Q, lidas);
   const dias = [...new Set(linhas.filter(r => r.tipo === 'anuncio').map(r => r.dia))].sort();
   console.log(`período ${Q.desde} a ${Q.ontem}: ${linhas.length - 1} linhas de anúncio em ${dias.length} dias + 1 foto da conta`);

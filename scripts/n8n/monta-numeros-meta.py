@@ -43,17 +43,29 @@ seq.append(no('Quando', 'n8n-nodes-base.code', 2, {'jsCode': (
     "let desde = hoje.minus({ days: 3 }).toISODate();\n"
     "if (/^\\d{4}-\\d{2}-\\d{2}$/.test(q.desde || '') && q.desde >= hoje.minus({ days: 31 }).toISODate() && q.desde < hoje.toISODate()) desde = q.desde;\n"
     f"return [{{ json: {{ hoje: hoje.toISODate(), ontem: hoje.minus({{ days: 1 }}).toISODate(), desde, agora: $now.toISO(), teste: !!q.teste, conta: '{L['conta']}' }} }}];\n")}))
-nomes = {}
+seq.append(no('Dias', 'n8n-nodes-base.code', 2, {'jsCode': (
+    "// Um item por dia do período: a leitura por anúncio é feita um dia por vez (21/10/2026: pedida com vários dias de uma vez,\n"
+    "// a Meta devolveu gasto e exibições zerados em parte dos anúncios).\n"
+    "const Q = $('Quando').first().json, out = [];\n"
+    "for (let d = DateTime.fromISO(Q.desde); d.toISODate() <= Q.ontem; d = d.plus({ days: 1 })) out.push({ json: { dia: d.toISODate() } });\n"
+    "return out;\n")}))
+# {dia} vem do item de cada dia ($json); o resto, do Quando
+exprDia = lambda s: '={{ `' + re.sub(r'\{(\w+)\}', lambda m: '${$json.dia}' if m.group(1) == 'dia' else "${$('Quando').first().json." + m.group(1) + '}', s) + '` }}' if re.search(r'\{\w+\}', s) else s
+nomes, porDia = {}, []
 for l in L['leituras']:
     nomes[l['chave']] = l['no']
+    if l.get('porDia'): porDia.append(l['chave'])
+    e = exprDia if l.get('porDia') else expr
+    extra = dict(credentials=CRED_META, retryOnFail=True, maxTries=3, waitBetweenTries=5000)
+    if not l.get('porDia'): extra['executeOnce'] = True   # a leitura por dia roda uma vez para cada item do nó Dias
     seq.append(no(l['no'], 'n8n-nodes-base.httpRequest', 4.2, {
-        'url': expr(f"https://graph.facebook.com/{L['versao']}/{l['caminho']}"), 'authentication': 'genericCredentialType', 'genericAuthType': 'httpQueryAuth',
-        'sendQuery': True, 'queryParameters': {'parameters': [{'name': k, 'value': expr(v)} for k, v in l['consulta'].items()]}, 'options': {'timeout': 60000}},
-        credentials=CRED_META, executeOnce=True, retryOnFail=True, maxTries=3, waitBetweenTries=5000))
+        'url': e(f"https://graph.facebook.com/{L['versao']}/{l['caminho']}"), 'authentication': 'genericCredentialType', 'genericAuthType': 'httpQueryAuth',
+        'sendQuery': True, 'queryParameters': {'parameters': [{'name': k, 'value': e(v)} for k, v in l['consulta'].items()]}, 'options': {'timeout': 60000}},
+        **extra))
 seq.append(no('Monta as linhas', 'n8n-nodes-base.code', 2, {'jsCode': AVISO_FONTE + VERBA + NUMEROS +
     "\nconst Q = $('Quando').first().json;\n"
-    f"const NOS = {json.dumps(nomes, ensure_ascii=False)};\n"
-    "const lidas = Object.fromEntries(Object.entries(NOS).map(([k, n]) => [k, $(n).first().json]));\n"
+    f"const NOS = {json.dumps(nomes, ensure_ascii=False)}, POR_DIA = {json.dumps(porDia)};\n"
+    "const lidas = Object.fromEntries(Object.entries(NOS).map(([k, n]) => [k, POR_DIA.includes(k) ? juntaDias($(n).all().map(i => i.json)) : $(n).first().json]));\n"
     "return linhasDoDia(Q, lidas).map(json => ({ json }));\n"}))
 seq.append(no('Só fora do teste', 'n8n-nodes-base.code', 2, {'jsCode':
     "// ?teste=1: as linhas ficam na execução para conferir, e nada é gravado.\nif ($('Quando').first().json.teste) return [];\nreturn $input.all();\n"}))

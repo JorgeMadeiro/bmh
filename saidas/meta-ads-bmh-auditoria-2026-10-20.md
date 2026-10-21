@@ -319,6 +319,24 @@ Para criar:
 5. Rodar o resumo de homologação pelo Manual e comparar com o das 8h. Aprovado, a mesma mudança vai para o resumo de produção
    pelo Mac, porque a rota da Central só edita fluxo de homologação.
 
+Resultado: fluxos `0FskpyELgh7nBqF0` (números) e `UUYRg6GlEOlupbnW` (resumo de homologação), tabela `JMvvyiF8uT6iqgQL`. A carga
+de 1º a 19/10 (execução 609345, na noite de 20/10) bateu centavo a centavo com a Meta (R$ 492,63).
+
+**Falha da 1ª rodada sozinha (21/10, 6h05, execução 611682):**
+- **O que aconteceu:** a rodada saiu "sucesso", mas gravou 18, 19 e 20/10 com gasto, exibições e alcance zerados em parte dos
+  anúncios. Os cliques ficaram certos. A tabela foi a R$ 444,36 de 1º a 19/10, e o dia 20 ficou em R$ 0 (a Meta dá R$ 21,78).
+- **A causa:** a Meta, pedida por anúncio com vários dias de uma vez (`time_increment=1`), passou a devolver dado incompleto e sem
+  alcance, inclusive no intervalo de 1º a 20/10, que na véspera tinha vindo certo. Pedida um dia por vez, vem certa. O total da
+  conta por dia e as leituras agregadas do guardião (3 e 7 dias por conjunto) vêm certos.
+- **A correção:**
+  - leitura por anúncio **um dia por vez**;
+  - **trava antes de gravar**: a soma dos anúncios de cada dia tem de bater com o gasto da conta no dia (até R$ 0,50 ou 2%). Se
+    não bater, o fluxo termina em erro, passa pelo alerta de falha, e nada é gravado.
+- **Como foi provado:** a trava, alimentada com a resposta quebrada das 6h05, recusou ("18/10: R$ 14,33 por anúncio contra
+  R$ 26,47 da conta"). Com a leitura por dia, os 20 dias de outubro passam e batem.
+- **Lição:** número gravado sem conferir contra um total independente pode estar errado em silêncio; toda gravação de números
+  confere a soma contra a conta antes de gravar.
+
 ## 5. Problemas
 
 - risco: **a conta para por volta de 28/10** se nada mudar (limite e saldo acabam juntos). Precisa do P1 ou de limite e Pix

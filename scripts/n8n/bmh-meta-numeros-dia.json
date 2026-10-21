@@ -50,12 +50,25 @@
    }
   },
   {
+   "id": "fb85be83-374f-5e9c-a928-eaaced3ce904",
+   "name": "Dias",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    480,
+    0
+   ],
+   "parameters": {
+    "jsCode": "// Um item por dia do período: a leitura por anúncio é feita um dia por vez (21/10/2026: pedida com vários dias de uma vez,\n// a Meta devolveu gasto e exibições zerados em parte dos anúncios).\nconst Q = $('Quando').first().json, out = [];\nfor (let d = DateTime.fromISO(Q.desde); d.toISODate() <= Q.ontem; d = d.plus({ days: 1 })) out.push({ json: { dia: d.toISODate() } });\nreturn out;\n"
+   }
+  },
+  {
    "id": "46506632-d429-5534-96a7-0d34071097af",
    "name": "Meta · anúncios por dia",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
    "position": [
-    480,
+    720,
     0
    ],
    "parameters": {
@@ -70,12 +83,8 @@
        "value": "ad"
       },
       {
-       "name": "time_increment",
-       "value": "1"
-      },
-      {
        "name": "time_range",
-       "value": "={{ `{\"since\":\"${$('Quando').first().json.desde}\",\"until\":\"${$('Quando').first().json.ontem}\"}` }}"
+       "value": "={{ `{\"since\":\"${$json.dia}\",\"until\":\"${$json.dia}\"}` }}"
       },
       {
        "name": "fields",
@@ -97,10 +106,58 @@
      "name": "BMH · Meta Instagram (token)"
     }
    },
-   "executeOnce": true,
    "retryOnFail": true,
    "maxTries": 3,
    "waitBetweenTries": 5000
+  },
+  {
+   "id": "65da1cdb-4e01-5b20-9929-542eb49ce943",
+   "name": "Meta · conta por dia",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    960,
+    0
+   ],
+   "parameters": {
+    "url": "={{ `https://graph.facebook.com/v26.0/${$('Quando').first().json.conta}/insights` }}",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpQueryAuth",
+    "sendQuery": true,
+    "queryParameters": {
+     "parameters": [
+      {
+       "name": "time_increment",
+       "value": "1"
+      },
+      {
+       "name": "time_range",
+       "value": "={{ `{\"since\":\"${$('Quando').first().json.desde}\",\"until\":\"${$('Quando').first().json.ontem}\"}` }}"
+      },
+      {
+       "name": "fields",
+       "value": "date_start,spend"
+      },
+      {
+       "name": "limit",
+       "value": "60"
+      }
+     ]
+    },
+    "options": {
+     "timeout": 60000
+    }
+   },
+   "credentials": {
+    "httpQueryAuth": {
+     "id": "HXdesRATFOJkYxhK",
+     "name": "BMH · Meta Instagram (token)"
+    }
+   },
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000,
+   "executeOnce": true
   },
   {
    "id": "2110ea30-e9e1-505a-a851-a2d7309ff377",
@@ -108,7 +165,7 @@
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
    "position": [
-    720,
+    1200,
     0
    ],
    "parameters": {
@@ -134,10 +191,10 @@
      "name": "BMH · Meta Instagram (token)"
     }
    },
-   "executeOnce": true,
    "retryOnFail": true,
    "maxTries": 3,
-   "waitBetweenTries": 5000
+   "waitBetweenTries": 5000,
+   "executeOnce": true
   },
   {
    "id": "9742361c-3a02-514a-aae4-2db066719ab1",
@@ -145,7 +202,7 @@
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
    "position": [
-    960,
+    1440,
     0
    ],
    "parameters": {
@@ -175,10 +232,10 @@
      "name": "BMH · Meta Instagram (token)"
     }
    },
-   "executeOnce": true,
    "retryOnFail": true,
    "maxTries": 3,
-   "waitBetweenTries": 5000
+   "waitBetweenTries": 5000,
+   "executeOnce": true
   },
   {
    "id": "30487ff0-a2f9-5c55-8ed0-04dc43db99be",
@@ -186,7 +243,7 @@
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
    "position": [
-    1200,
+    1680,
     0
    ],
    "parameters": {
@@ -216,10 +273,10 @@
      "name": "BMH · Meta Instagram (token)"
     }
    },
-   "executeOnce": true,
    "retryOnFail": true,
    "maxTries": 3,
-   "waitBetweenTries": 5000
+   "waitBetweenTries": 5000,
+   "executeOnce": true
   },
   {
    "id": "6ec627e2-2244-5930-8d27-434be2b85805",
@@ -227,7 +284,7 @@
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
    "position": [
-    1440,
+    1920,
     0
    ],
    "parameters": {
@@ -265,10 +322,10 @@
      "name": "BMH · Meta Instagram (token)"
     }
    },
-   "executeOnce": true,
    "retryOnFail": true,
    "maxTries": 3,
-   "waitBetweenTries": 5000
+   "waitBetweenTries": 5000,
+   "executeOnce": true
   },
   {
    "id": "226d507b-483c-5933-bcdb-15cd1e81ba5c",
@@ -276,11 +333,11 @@
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
    "position": [
-    1680,
+    2160,
     0
    ],
    "parameters": {
-    "jsCode": "// Copiado de scripts/n8n/bmh-meta-numeros.js e bmh-meta-guardiao-decide.js (BMH_Claude_VSL) pelo monta-numeros-meta.py: editar lá.\n// Verba da conta: o que sobra = menor entre o restante do limite de gastos e o saldo livre (conta pré-paga). Ritmo = soma\n// dos orçamentos diários ligados (reage na hora a uma pausa ou corte; a média de 7 dias levaria uma semana e daria alarme\n// falso); sem orçamento diário (verba total), a média de 7 dias. Usada pelo guardião e pelos \"números do dia\".\nfunction verbaDaConta(E) {\n  const num = v => Number(v) || 0;\n  const lista = r => (r && Array.isArray(r.data)) ? r.data : [];\n  const maisDias = (d, n) => { const x = new Date(d + 'T12:00:00Z'); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); };\n  // valor em texto da Meta (\"R$211.10\" ou \"R$ 1.211,10\"): o último separador é o decimal\n  const valor = s => { const m = String(s || '').match(/R\\$\\s?([\\d.,]+)/); if (!m) return null; const t = m[1]; const i = Math.max(t.lastIndexOf('.'), t.lastIndexOf(','));\n    return i > -1 && t.length - i - 1 === 2 ? Number(t.slice(0, i).replace(/[.,]/g, '') + '.' + t.slice(i + 1)) : Number(t.replace(/[.,]/g, '')); };\n  const conta = E.conta || {};\n  const campanhas = lista(E.campanhas), conjuntos = lista(E.conjuntos);\n  const campAtiva = new Set(campanhas.filter(c => c.effective_status === 'ACTIVE').map(c => c.id));\n  const orc = [];\n  for (const c of campanhas) if (c.effective_status === 'ACTIVE' && num(c.daily_budget)) orc.push({ tipo: 'campanha', id: c.id, nome: c.name, valor: num(c.daily_budget) / 100 });\n  for (const c of conjuntos) if (c.effective_status === 'ACTIVE' && campAtiva.has(c.campaign_id) && num(c.daily_budget)) orc.push({ tipo: 'conjunto', id: c.id, nome: c.name, valor: num(c.daily_budget) / 100 });\n  const B = orc.reduce((s, o) => s + o.valor, 0);\n  const ritmo = B > 0 ? B : lista(E.dias7).reduce((s, d) => s + num(d.spend), 0) / 7;\n  const limite = conta.spend_cap && num(conta.spend_cap) > 0 ? (num(conta.spend_cap) - num(conta.amount_spent)) / 100 : null;\n  const saldoBruto = conta.is_prepay_account ? valor((conta.funding_source_details || {}).display_string) : null;\n  const saldo = saldoBruto === null ? null : saldoBruto - num(conta.balance) / 100;\n  const candidatos = [limite, saldo].filter(v => v !== null && !Number.isNaN(v));\n  if (!candidatos.length) return { orc, B, ritmo, limite, saldo, verba: null, quem: '', dias: null, acaba: '' };\n  const verba = Math.min(...candidatos);\n  const dias = ritmo > 0 ? verba / ritmo : null;\n  return { orc, B, ritmo, limite, saldo, verba, quem: verba === limite ? 'limite de gastos da conta' : 'saldo pré-pago',\n    dias, acaba: dias === null ? '' : maisDias(E.hoje, Math.floor(dias)) };\n}\n// Números do Meta Ads da BMH (21/10/2026): o que a \"BMH · Meta · números do dia\" grava na BMH_meta_anuncios_dia e o bloco do\n// Meta no resumo das 8h, lido dessa tabela (lição da Nexo: painel, resumo e guardião leem a mesma fonte e nunca discordam).\n// A verba da conta vem de verbaDaConta (bmh-meta-guardiao-decide.js), a mesma conta do guardião. Fonte: este arquivo; os\n// montadores embutem o texto nos nós do n8n e o testa-numeros-meta.js roda com os dados de verdade pelo cofre.\n//\n// Tabela BMH_meta_anuncios_dia: uma linha por anúncio por dia (tipo \"anuncio\", chave dia|ad_id) e uma foto da conta por dia\n// (tipo \"conta\", chave dia|conta). Só números e nomes de campanha e anúncio: nada de lead, conversa ou paciente.\nconst COLUNAS_META_DIA = {\n  chave: 'string', dia: 'string', tipo: 'string', campanha_id: 'string', campanha: 'string', conjunto_id: 'string',\n  conjunto: 'string', ad_id: 'string', anuncio: 'string', gasto: 'number', impressoes: 'number', alcance: 'number',\n  cliques_link: 'number', conversas: 'number', verba_restante: 'number', orcamento_ligado: 'number', ritmo: 'number',\n  dias_restantes: 'number', acaba_em: 'string', fonte_verba: 'string', atualizado_em: 'string',\n};\n\n// Q: hoje, agora (ISO); lidas: chave da leitura → resposta da Graph (anuncios, conta, campanhas, conjuntos, dias7).\nfunction linhasDoDia(Q, lidas) {\n  const CONV = 'onsite_conversion.messaging_conversation_started_7d';\n  const num = v => Number(v) || 0, r2 = v => Math.round(num(v) * 100) / 100;\n  const lista = r => (r && Array.isArray(r.data)) ? r.data : [];\n  for (const [k, r] of Object.entries(lidas)) if (!r || r.error) throw new Error(`não consegui ler \"${k}\" na Meta: ` +\n    String(r && r.error ? (r.error.message || JSON.stringify(r.error)) : 'sem resposta').replace(/(access_token|token)=[^&\\s\"']+/gi, '$1=[removido]').slice(0, 250));\n  // mais de uma página: não grava pela metade (o período do ?desde= ficou grande demais)\n  if (lidas.anuncios.paging && lidas.anuncios.paging.next) throw new Error('a Meta devolveu mais de 500 linhas: use um ?desde= mais curto');\n  const vazio = { campanha_id: '', campanha: '', conjunto_id: '', conjunto: '', ad_id: '', anuncio: '', gasto: 0, impressoes: 0, alcance: 0,\n    cliques_link: 0, conversas: 0, verba_restante: 0, orcamento_ligado: 0, ritmo: 0, dias_restantes: 0, acaba_em: '', fonte_verba: '' };\n  const linhas = lista(lidas.anuncios).map(x => {\n    const a = Object.fromEntries((x.actions || []).map(y => [y.action_type, num(y.value)]));\n    return { ...vazio, chave: x.date_start + '|' + x.ad_id, dia: x.date_start, tipo: 'anuncio', campanha_id: String(x.campaign_id || ''),\n      campanha: x.campaign_name || '', conjunto_id: String(x.adset_id || ''), conjunto: x.adset_name || '', ad_id: String(x.ad_id || ''),\n      anuncio: x.ad_name || '', gasto: r2(x.spend), impressoes: num(x.impressions), alcance: num(x.reach),\n      cliques_link: num(x.inline_link_clicks), conversas: a[CONV] || 0, atualizado_em: Q.agora };\n  });\n  const V = verbaDaConta({ ...lidas, hoje: Q.hoje });\n  linhas.push({ ...vazio, chave: Q.hoje + '|conta', dia: Q.hoje, tipo: 'conta', verba_restante: V.verba === null ? 0 : r2(V.verba),\n    orcamento_ligado: r2(V.B), ritmo: r2(V.ritmo), dias_restantes: V.dias === null ? 0 : Math.round(V.dias * 10) / 10,\n    acaba_em: V.acaba || '', fonte_verba: V.quem || '', atualizado_em: Q.agora });\n  return linhas;\n}\n\n// Bloco do Meta no resumo das 8h. rows: linhas da BMH_meta_anuncios_dia; D: O (ontem), M0 (1º do mês de ontem), hoje,\n// diaOntem, diasMes. Devolve as linhas de ontem, as do mês e os avisos de dado atrasado.\nfunction blocoMeta(rows, cfg, D) {\n  const num = v => Number(v) || 0;\n  const brl = v => 'R$ ' + Math.round(num(v)).toLocaleString('pt-BR'), int = v => Math.round(num(v)).toLocaleString('pt-BR');\n  const dm = d => d.slice(8, 10) + '/' + d.slice(5, 7);\n  const soma = (rs, f) => rs.reduce((s, r) => s + num(r[f]), 0);\n  const cada = (g, c) => c >= 0.5 ? ` (${brl(g / c)} cada)` : '';\n  const ads = rows.filter(r => r.tipo === 'anuncio');\n  const aO = ads.filter(r => r.dia === D.O), aM = ads.filter(r => r.dia >= D.M0 && r.dia <= D.O);\n  const gO = soma(aO, 'gasto'), cvO = soma(aO, 'conversas'), clO = soma(aO, 'cliques_link'), gM = soma(aM, 'gasto'), cvM = soma(aM, 'conversas');\n  const conta = rows.filter(r => r.tipo === 'conta').sort((a, b) => (a.dia < b.dia ? -1 : 1)).pop();\n  const deHoje = conta && conta.dia === D.hoje;\n  const teto = num(cfg['meta_teto_mes_' + D.M0.slice(0, 7)] || cfg.meta_teto_mes);\n  const noArAte = cfg.meta_no_ar_ate || '2026-10-31';\n  const restantes = D.diasMes - D.diaOntem;\n  const out = { ontem: [], mes: [], atraso: [] };\n  out.ontem.push('📘 Meta Ads: ' + brl(gO) + ' · ' + (cvO >= 0.5 ? int(cvO) + (Math.round(cvO) === 1 ? ' conversa' : ' conversas') + cada(gO, cvO) : 'nenhuma conversa') +\n    ' · ' + int(clO) + (Math.round(clO) === 1 ? ' clique' : ' cliques') + ' no link');\n  const B = deHoje ? num(conta.orcamento_ligado) : null, proj = B === null ? null : gM + B * restantes;\n  out.mes.push('• Meta: ' + brl(gM) + (teto ? ' de ' + brl(teto) : '') + (proj === null ? '' : ' · com ' + brl(B) + '/dia, fecha em ' + brl(proj)) +\n    (teto && proj !== null && proj > teto * 1.02 ? ' ⚠️ acima do teto' : ''));\n  out.mes.push('• Conversas do Meta: ' + int(cvM) + cada(gM, cvM));\n  if (deHoje && num(conta.verba_restante) > 0) out.mes.push('• Verba da conta Meta: ' + brl(conta.verba_restante) +\n    (num(conta.dias_restantes) ? ', dura ~' + num(conta.dias_restantes).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' dias' + (conta.acaba_em ? ' (até ' + dm(conta.acaba_em) + ')' : '') : '') +\n    (conta.acaba_em && conta.acaba_em < noArAte && D.hoje <= noArAte ? ' ⚠️ antes de ' + dm(noArAte) : ''));\n  if (!deHoje) out.atraso.push('⚠️ A gravação do Meta das 6h05 não rodou hoje: os números do Meta podem estar incompletos.');\n  return out;\n}\n\nconst Q = $('Quando').first().json;\nconst NOS = {\"anuncios\": \"Meta · anúncios por dia\", \"conta\": \"Meta · conta\", \"campanhas\": \"Meta · campanhas\", \"conjuntos\": \"Meta · conjuntos\", \"dias7\": \"Meta · 7 dias da conta\"};\nconst lidas = Object.fromEntries(Object.entries(NOS).map(([k, n]) => [k, $(n).first().json]));\nreturn linhasDoDia(Q, lidas).map(json => ({ json }));\n"
+    "jsCode": "// Copiado de scripts/n8n/bmh-meta-numeros.js e bmh-meta-guardiao-decide.js (BMH_Claude_VSL) pelo monta-numeros-meta.py: editar lá.\n// Verba da conta: o que sobra = menor entre o restante do limite de gastos e o saldo livre (conta pré-paga). Ritmo = soma\n// dos orçamentos diários ligados (reage na hora a uma pausa ou corte; a média de 7 dias levaria uma semana e daria alarme\n// falso); sem orçamento diário (verba total), a média de 7 dias. Usada pelo guardião e pelos \"números do dia\".\nfunction verbaDaConta(E) {\n  const num = v => Number(v) || 0;\n  const lista = r => (r && Array.isArray(r.data)) ? r.data : [];\n  const maisDias = (d, n) => { const x = new Date(d + 'T12:00:00Z'); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); };\n  // valor em texto da Meta (\"R$211.10\" ou \"R$ 1.211,10\"): o último separador é o decimal\n  const valor = s => { const m = String(s || '').match(/R\\$\\s?([\\d.,]+)/); if (!m) return null; const t = m[1]; const i = Math.max(t.lastIndexOf('.'), t.lastIndexOf(','));\n    return i > -1 && t.length - i - 1 === 2 ? Number(t.slice(0, i).replace(/[.,]/g, '') + '.' + t.slice(i + 1)) : Number(t.replace(/[.,]/g, '')); };\n  const conta = E.conta || {};\n  const campanhas = lista(E.campanhas), conjuntos = lista(E.conjuntos);\n  const campAtiva = new Set(campanhas.filter(c => c.effective_status === 'ACTIVE').map(c => c.id));\n  const orc = [];\n  for (const c of campanhas) if (c.effective_status === 'ACTIVE' && num(c.daily_budget)) orc.push({ tipo: 'campanha', id: c.id, nome: c.name, valor: num(c.daily_budget) / 100 });\n  for (const c of conjuntos) if (c.effective_status === 'ACTIVE' && campAtiva.has(c.campaign_id) && num(c.daily_budget)) orc.push({ tipo: 'conjunto', id: c.id, nome: c.name, valor: num(c.daily_budget) / 100 });\n  const B = orc.reduce((s, o) => s + o.valor, 0);\n  const ritmo = B > 0 ? B : lista(E.dias7).reduce((s, d) => s + num(d.spend), 0) / 7;\n  const limite = conta.spend_cap && num(conta.spend_cap) > 0 ? (num(conta.spend_cap) - num(conta.amount_spent)) / 100 : null;\n  const saldoBruto = conta.is_prepay_account ? valor((conta.funding_source_details || {}).display_string) : null;\n  const saldo = saldoBruto === null ? null : saldoBruto - num(conta.balance) / 100;\n  const candidatos = [limite, saldo].filter(v => v !== null && !Number.isNaN(v));\n  if (!candidatos.length) return { orc, B, ritmo, limite, saldo, verba: null, quem: '', dias: null, acaba: '' };\n  const verba = Math.min(...candidatos);\n  const dias = ritmo > 0 ? verba / ritmo : null;\n  return { orc, B, ritmo, limite, saldo, verba, quem: verba === limite ? 'limite de gastos da conta' : 'saldo pré-pago',\n    dias, acaba: dias === null ? '' : maisDias(E.hoje, Math.floor(dias)) };\n}\n// Números do Meta Ads da BMH (21/10/2026): o que a \"BMH · Meta · números do dia\" grava na BMH_meta_anuncios_dia e o bloco do\n// Meta no resumo das 8h, lido dessa tabela (lição da Nexo: painel, resumo e guardião leem a mesma fonte e nunca discordam).\n// A verba da conta vem de verbaDaConta (bmh-meta-guardiao-decide.js), a mesma conta do guardião. Fonte: este arquivo; os\n// montadores embutem o texto nos nós do n8n e o testa-numeros-meta.js roda com os dados de verdade pelo cofre.\n//\n// Tabela BMH_meta_anuncios_dia: uma linha por anúncio por dia (tipo \"anuncio\", chave dia|ad_id) e uma foto da conta por dia\n// (tipo \"conta\", chave dia|conta). Só números e nomes de campanha e anúncio: nada de lead, conversa ou paciente.\nconst COLUNAS_META_DIA = {\n  chave: 'string', dia: 'string', tipo: 'string', campanha_id: 'string', campanha: 'string', conjunto_id: 'string',\n  conjunto: 'string', ad_id: 'string', anuncio: 'string', gasto: 'number', impressoes: 'number', alcance: 'number',\n  cliques_link: 'number', conversas: 'number', verba_restante: 'number', orcamento_ligado: 'number', ritmo: 'number',\n  dias_restantes: 'number', acaba_em: 'string', fonte_verba: 'string', atualizado_em: 'string',\n};\n\n// Q: hoje, agora (ISO); lidas: chave da leitura → resposta da Graph (anuncios, conta, campanhas, conjuntos, dias7).\nfunction linhasDoDia(Q, lidas) {\n  const CONV = 'onsite_conversion.messaging_conversation_started_7d';\n  const num = v => Number(v) || 0, r2 = v => Math.round(num(v) * 100) / 100;\n  const lista = r => (r && Array.isArray(r.data)) ? r.data : [];\n  for (const [k, r] of Object.entries(lidas)) if (!r || r.error) throw new Error(`não consegui ler \"${k}\" na Meta: ` +\n    String(r && r.error ? (r.error.message || JSON.stringify(r.error)) : 'sem resposta').replace(/(access_token|token)=[^&\\s\"']+/gi, '$1=[removido]').slice(0, 250));\n  // mais de uma página num dia: não grava pela metade\n  if (lidas.anuncios.paging && lidas.anuncios.paging.next) throw new Error('a Meta devolveu mais de 500 anúncios num dia: falta paginar');\n  const vazio = { campanha_id: '', campanha: '', conjunto_id: '', conjunto: '', ad_id: '', anuncio: '', gasto: 0, impressoes: 0, alcance: 0,\n    cliques_link: 0, conversas: 0, verba_restante: 0, orcamento_ligado: 0, ritmo: 0, dias_restantes: 0, acaba_em: '', fonte_verba: '' };\n  const linhas = lista(lidas.anuncios).map(x => {\n    const a = Object.fromEntries((x.actions || []).map(y => [y.action_type, num(y.value)]));\n    return { ...vazio, chave: x.date_start + '|' + x.ad_id, dia: x.date_start, tipo: 'anuncio', campanha_id: String(x.campaign_id || ''),\n      campanha: x.campaign_name || '', conjunto_id: String(x.adset_id || ''), conjunto: x.adset_name || '', ad_id: String(x.ad_id || ''),\n      anuncio: x.ad_name || '', gasto: r2(x.spend), impressoes: num(x.impressions), alcance: num(x.reach),\n      cliques_link: num(x.inline_link_clicks), conversas: a[CONV] || 0, atualizado_em: Q.agora };\n  });\n  // Trava (21/10/2026): a soma dos anúncios de cada dia tem de bater com o gasto da conta no dia (diferença até R$ 0,50 ou 2%).\n  // Não bateu: a Meta devolveu dado incompleto, e nada é gravado (o fluxo termina em erro e passa pelo alerta de falha).\n  const contaDia = Object.fromEntries(lista(lidas.contaDia).map(x => [x.date_start, num(x.spend)]));\n  const somaDia = {};\n  for (const l of linhas) somaDia[l.dia] = (somaDia[l.dia] || 0) + l.gasto;\n  for (const dia of [...new Set([...Object.keys(contaDia), ...Object.keys(somaDia)])].sort()) {\n    const a = r2(somaDia[dia] || 0), c = r2(contaDia[dia] || 0);\n    if (Math.abs(a - c) > Math.max(0.5, c * 0.02))\n      throw new Error(`o gasto por anúncio de ${dia} (R$ ${a.toFixed(2)}) não bate com o da conta (R$ ${c.toFixed(2)}): a Meta devolveu dado incompleto e nada foi gravado`);\n  }\n  const V = verbaDaConta({ ...lidas, hoje: Q.hoje });\n  linhas.push({ ...vazio, chave: Q.hoje + '|conta', dia: Q.hoje, tipo: 'conta', verba_restante: V.verba === null ? 0 : r2(V.verba),\n    orcamento_ligado: r2(V.B), ritmo: r2(V.ritmo), dias_restantes: V.dias === null ? 0 : Math.round(V.dias * 10) / 10,\n    acaba_em: V.acaba || '', fonte_verba: V.quem || '', atualizado_em: Q.agora });\n  return linhas;\n}\n\n// Junta as respostas de uma leitura feita um dia por vez (uma resposta por dia) numa só, no formato da Graph.\nfunction juntaDias(respostas) {\n  const erro = respostas.find(r => !r || r.error);\n  if (erro) return erro || { error: { message: 'sem resposta' } };\n  return { data: respostas.flatMap(r => r.data || []), paging: respostas.some(r => r.paging && r.paging.next) ? { next: true } : null };\n}\n\n// Bloco do Meta no resumo das 8h. rows: linhas da BMH_meta_anuncios_dia; D: O (ontem), M0 (1º do mês de ontem), hoje,\n// diaOntem, diasMes. Devolve as linhas de ontem, as do mês e os avisos de dado atrasado.\nfunction blocoMeta(rows, cfg, D) {\n  const num = v => Number(v) || 0;\n  const brl = v => 'R$ ' + Math.round(num(v)).toLocaleString('pt-BR'), int = v => Math.round(num(v)).toLocaleString('pt-BR');\n  const dm = d => d.slice(8, 10) + '/' + d.slice(5, 7);\n  const soma = (rs, f) => rs.reduce((s, r) => s + num(r[f]), 0);\n  const cada = (g, c) => c >= 0.5 ? ` (${brl(g / c)} cada)` : '';\n  const ads = rows.filter(r => r.tipo === 'anuncio');\n  const aO = ads.filter(r => r.dia === D.O), aM = ads.filter(r => r.dia >= D.M0 && r.dia <= D.O);\n  const gO = soma(aO, 'gasto'), cvO = soma(aO, 'conversas'), clO = soma(aO, 'cliques_link'), gM = soma(aM, 'gasto'), cvM = soma(aM, 'conversas');\n  const conta = rows.filter(r => r.tipo === 'conta').sort((a, b) => (a.dia < b.dia ? -1 : 1)).pop();\n  const deHoje = conta && conta.dia === D.hoje;\n  const teto = num(cfg['meta_teto_mes_' + D.M0.slice(0, 7)] || cfg.meta_teto_mes);\n  const noArAte = cfg.meta_no_ar_ate || '2026-10-31';\n  const restantes = D.diasMes - D.diaOntem;\n  const out = { ontem: [], mes: [], atraso: [] };\n  out.ontem.push('📘 Meta Ads: ' + brl(gO) + ' · ' + (cvO >= 0.5 ? int(cvO) + (Math.round(cvO) === 1 ? ' conversa' : ' conversas') + cada(gO, cvO) : 'nenhuma conversa') +\n    ' · ' + int(clO) + (Math.round(clO) === 1 ? ' clique' : ' cliques') + ' no link');\n  const B = deHoje ? num(conta.orcamento_ligado) : null, proj = B === null ? null : gM + B * restantes;\n  out.mes.push('• Meta: ' + brl(gM) + (teto ? ' de ' + brl(teto) : '') + (proj === null ? '' : ' · com ' + brl(B) + '/dia, fecha em ' + brl(proj)) +\n    (teto && proj !== null && proj > teto * 1.02 ? ' ⚠️ acima do teto' : ''));\n  out.mes.push('• Conversas do Meta: ' + int(cvM) + cada(gM, cvM));\n  if (deHoje && num(conta.verba_restante) > 0) out.mes.push('• Verba da conta Meta: ' + brl(conta.verba_restante) +\n    (num(conta.dias_restantes) ? ', dura ~' + num(conta.dias_restantes).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' dias' + (conta.acaba_em ? ' (até ' + dm(conta.acaba_em) + ')' : '') : '') +\n    (conta.acaba_em && conta.acaba_em < noArAte && D.hoje <= noArAte ? ' ⚠️ antes de ' + dm(noArAte) : ''));\n  if (!deHoje) out.atraso.push('⚠️ A gravação do Meta das 6h05 não rodou hoje: os números do Meta podem estar incompletos.');\n  return out;\n}\n\nconst Q = $('Quando').first().json;\nconst NOS = {\"anuncios\": \"Meta · anúncios por dia\", \"contaDia\": \"Meta · conta por dia\", \"conta\": \"Meta · conta\", \"campanhas\": \"Meta · campanhas\", \"conjuntos\": \"Meta · conjuntos\", \"dias7\": \"Meta · 7 dias da conta\"}, POR_DIA = [\"anuncios\"];\nconst lidas = Object.fromEntries(Object.entries(NOS).map(([k, n]) => [k, POR_DIA.includes(k) ? juntaDias($(n).all().map(i => i.json)) : $(n).first().json]));\nreturn linhasDoDia(Q, lidas).map(json => ({ json }));\n"
    }
   },
   {
@@ -289,7 +346,7 @@
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
    "position": [
-    1920,
+    2400,
     0
    ],
    "parameters": {
@@ -302,7 +359,7 @@
    "type": "n8n-nodes-base.dataTable",
    "typeVersion": 1.1,
    "position": [
-    2160,
+    2640,
     0
    ],
    "parameters": {
@@ -595,6 +652,17 @@
    "main": [
     [
      {
+      "node": "Dias",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Dias": {
+   "main": [
+    [
+     {
       "node": "Meta · anúncios por dia",
       "type": "main",
       "index": 0
@@ -603,6 +671,17 @@
    ]
   },
   "Meta · anúncios por dia": {
+   "main": [
+    [
+     {
+      "node": "Meta · conta por dia",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Meta · conta por dia": {
    "main": [
     [
      {

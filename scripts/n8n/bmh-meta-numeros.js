@@ -19,8 +19,8 @@ function linhasDoDia(Q, lidas) {
   const lista = r => (r && Array.isArray(r.data)) ? r.data : [];
   for (const [k, r] of Object.entries(lidas)) if (!r || r.error) throw new Error(`não consegui ler "${k}" na Meta: ` +
     String(r && r.error ? (r.error.message || JSON.stringify(r.error)) : 'sem resposta').replace(/(access_token|token)=[^&\s"']+/gi, '$1=[removido]').slice(0, 250));
-  // mais de uma página: não grava pela metade (o período do ?desde= ficou grande demais)
-  if (lidas.anuncios.paging && lidas.anuncios.paging.next) throw new Error('a Meta devolveu mais de 500 linhas: use um ?desde= mais curto');
+  // mais de uma página num dia: não grava pela metade
+  if (lidas.anuncios.paging && lidas.anuncios.paging.next) throw new Error('a Meta devolveu mais de 500 anúncios num dia: falta paginar');
   const vazio = { campanha_id: '', campanha: '', conjunto_id: '', conjunto: '', ad_id: '', anuncio: '', gasto: 0, impressoes: 0, alcance: 0,
     cliques_link: 0, conversas: 0, verba_restante: 0, orcamento_ligado: 0, ritmo: 0, dias_restantes: 0, acaba_em: '', fonte_verba: '' };
   const linhas = lista(lidas.anuncios).map(x => {
@@ -30,11 +30,28 @@ function linhasDoDia(Q, lidas) {
       anuncio: x.ad_name || '', gasto: r2(x.spend), impressoes: num(x.impressions), alcance: num(x.reach),
       cliques_link: num(x.inline_link_clicks), conversas: a[CONV] || 0, atualizado_em: Q.agora };
   });
+  // Trava (21/10/2026): a soma dos anúncios de cada dia tem de bater com o gasto da conta no dia (diferença até R$ 0,50 ou 2%).
+  // Não bateu: a Meta devolveu dado incompleto, e nada é gravado (o fluxo termina em erro e passa pelo alerta de falha).
+  const contaDia = Object.fromEntries(lista(lidas.contaDia).map(x => [x.date_start, num(x.spend)]));
+  const somaDia = {};
+  for (const l of linhas) somaDia[l.dia] = (somaDia[l.dia] || 0) + l.gasto;
+  for (const dia of [...new Set([...Object.keys(contaDia), ...Object.keys(somaDia)])].sort()) {
+    const a = r2(somaDia[dia] || 0), c = r2(contaDia[dia] || 0);
+    if (Math.abs(a - c) > Math.max(0.5, c * 0.02))
+      throw new Error(`o gasto por anúncio de ${dia} (R$ ${a.toFixed(2)}) não bate com o da conta (R$ ${c.toFixed(2)}): a Meta devolveu dado incompleto e nada foi gravado`);
+  }
   const V = verbaDaConta({ ...lidas, hoje: Q.hoje });
   linhas.push({ ...vazio, chave: Q.hoje + '|conta', dia: Q.hoje, tipo: 'conta', verba_restante: V.verba === null ? 0 : r2(V.verba),
     orcamento_ligado: r2(V.B), ritmo: r2(V.ritmo), dias_restantes: V.dias === null ? 0 : Math.round(V.dias * 10) / 10,
     acaba_em: V.acaba || '', fonte_verba: V.quem || '', atualizado_em: Q.agora });
   return linhas;
+}
+
+// Junta as respostas de uma leitura feita um dia por vez (uma resposta por dia) numa só, no formato da Graph.
+function juntaDias(respostas) {
+  const erro = respostas.find(r => !r || r.error);
+  if (erro) return erro || { error: { message: 'sem resposta' } };
+  return { data: respostas.flatMap(r => r.data || []), paging: respostas.some(r => r.paging && r.paging.next) ? { next: true } : null };
 }
 
 // Bloco do Meta no resumo das 8h. rows: linhas da BMH_meta_anuncios_dia; D: O (ontem), M0 (1º do mês de ontem), hoje,
@@ -67,4 +84,4 @@ function blocoMeta(rows, cfg, D) {
   return out;
 }
 // FIM-DA-FUNCAO (o montador corta daqui para baixo ao embutir no n8n)
-if (typeof module !== 'undefined') module.exports = { linhasDoDia, blocoMeta, COLUNAS_META_DIA };
+if (typeof module !== 'undefined') module.exports = { linhasDoDia, blocoMeta, juntaDias, COLUNAS_META_DIA };
