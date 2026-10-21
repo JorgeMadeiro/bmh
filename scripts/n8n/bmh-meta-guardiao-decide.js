@@ -29,9 +29,6 @@ function decideMeta(E) {
   const maisDias = (d, n) => { const x = new Date(d + 'T12:00:00Z'); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); };
   const lista = r => (r && Array.isArray(r.data)) ? r.data : [];
   const acoesDe = a => Object.fromEntries((a || []).map(x => [x.action_type, num(x.value)]));
-  // valor em texto da Meta ("R$211.10" ou "R$ 1.211,10"): o último separador é o decimal
-  const valor = s => { const m = String(s || '').match(/R\$\s?([\d.,]+)/); if (!m) return null; const t = m[1]; const i = Math.max(t.lastIndexOf('.'), t.lastIndexOf(','));
-    return i > -1 && t.length - i - 1 === 2 ? Number(t.slice(0, i).replace(/[.,]/g, '') + '.' + t.slice(i + 1)) : Number(t.replace(/[.,]/g, '')); };
 
   const out = [];
   const add = a => out.push({ hoje: E.hoje, teste: !!E.teste, plataforma: 'meta', tipo: '', alvo_id: '', alvo: '', valor_antes: '', valor_novo: '',
@@ -52,25 +49,9 @@ function decideMeta(E) {
   if (num(conta.account_status) !== 1)
     add({ regra: 'meta_conta_fora', acao: 'avisar', alvo: 'conta', detalhe: `a conta de anúncios não está ativa (status ${conta.account_status}${conta.disable_reason ? ', motivo ' + conta.disable_reason : ''}). Nada roda até resolver.` });
 
-  // orçamentos diários ligados (campanha com orçamento próprio ou conjunto)
-  const orc = [];
-  for (const c of campanhas) if (c.effective_status === 'ACTIVE' && num(c.daily_budget)) orc.push({ tipo: 'campanha', id: c.id, nome: c.name, valor: num(c.daily_budget) / 100 });
-  for (const c of ativos) if (campAtiva.has(c.campaign_id) && num(c.daily_budget)) orc.push({ tipo: 'conjunto', id: c.id, nome: c.name, valor: num(c.daily_budget) / 100 });
-  const B = orc.reduce((s, o) => s + o.valor, 0);
-
-  // (2) verba da conta e continuidade: o que sobra = menor entre o restante do limite de gastos e o saldo livre (pré-paga).
-  // Ritmo = soma dos orçamentos ligados (reage na hora a uma pausa ou corte; a média de 7 dias levaria uma semana e daria
-  // alarme falso); sem orçamento diário (verba total), usa a média de 7 dias.
-  const ritmo = B > 0 ? B : lista(E.dias7).reduce((s, d) => s + num(d.spend), 0) / 7;
-  const limite = conta.spend_cap && num(conta.spend_cap) > 0 ? (num(conta.spend_cap) - num(conta.amount_spent)) / 100 : null;
-  const saldoBruto = conta.is_prepay_account ? valor((conta.funding_source_details || {}).display_string) : null;
-  const saldo = saldoBruto === null ? null : saldoBruto - num(conta.balance) / 100;
-  const candidatos = [limite, saldo].filter(v => v !== null && !Number.isNaN(v));
-  if (candidatos.length && ritmo > 0) {
-    const verba = Math.min(...candidatos);
-    const quem = verba === limite ? 'limite de gastos da conta' : 'saldo pré-pago';
-    const dias = verba / ritmo;
-    const acaba = maisDias(E.hoje, Math.floor(dias));
+  // (2) verba da conta e continuidade (a conta mora em verbaDaConta, a mesma dos "números do dia")
+  const { orc, B, ritmo, limite, verba, quem, dias, acaba } = verbaDaConta(E);
+  if (verba !== null && ritmo > 0) {
     const antesDoPrazo = NO_AR_ATE && acaba < NO_AR_ATE;
     if (dias < DIAS_AVISO || antesDoPrazo) {
       let txt = `a verba da conta (${quem}) tem ${brl(verba)}: com ${brl(ritmo)}/dia ${B > 0 ? 'de orçamento ligado' : '(média de 7 dias)'} dura ${dias.toLocaleString('pt-BR', { maximumFractionDigits: 1 })} dias e acaba por volta de ${dm(acaba)}.`;
@@ -147,6 +128,34 @@ function decideMeta(E) {
   const visto = new Set((E.registro || []).filter(r => r.plataforma === 'meta' && r.data >= desde && r.data < E.hoje).map(r => r.regra + '|' + r.alvo_id));
   return out.filter(a => !(REPETE_EM_7.has(a.regra) && visto.has(a.regra + '|' + a.alvo_id)));
 }
+// Verba da conta: o que sobra = menor entre o restante do limite de gastos e o saldo livre (conta pré-paga). Ritmo = soma
+// dos orçamentos diários ligados (reage na hora a uma pausa ou corte; a média de 7 dias levaria uma semana e daria alarme
+// falso); sem orçamento diário (verba total), a média de 7 dias. Usada pelo guardião e pelos "números do dia".
+function verbaDaConta(E) {
+  const num = v => Number(v) || 0;
+  const lista = r => (r && Array.isArray(r.data)) ? r.data : [];
+  const maisDias = (d, n) => { const x = new Date(d + 'T12:00:00Z'); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); };
+  // valor em texto da Meta ("R$211.10" ou "R$ 1.211,10"): o último separador é o decimal
+  const valor = s => { const m = String(s || '').match(/R\$\s?([\d.,]+)/); if (!m) return null; const t = m[1]; const i = Math.max(t.lastIndexOf('.'), t.lastIndexOf(','));
+    return i > -1 && t.length - i - 1 === 2 ? Number(t.slice(0, i).replace(/[.,]/g, '') + '.' + t.slice(i + 1)) : Number(t.replace(/[.,]/g, '')); };
+  const conta = E.conta || {};
+  const campanhas = lista(E.campanhas), conjuntos = lista(E.conjuntos);
+  const campAtiva = new Set(campanhas.filter(c => c.effective_status === 'ACTIVE').map(c => c.id));
+  const orc = [];
+  for (const c of campanhas) if (c.effective_status === 'ACTIVE' && num(c.daily_budget)) orc.push({ tipo: 'campanha', id: c.id, nome: c.name, valor: num(c.daily_budget) / 100 });
+  for (const c of conjuntos) if (c.effective_status === 'ACTIVE' && campAtiva.has(c.campaign_id) && num(c.daily_budget)) orc.push({ tipo: 'conjunto', id: c.id, nome: c.name, valor: num(c.daily_budget) / 100 });
+  const B = orc.reduce((s, o) => s + o.valor, 0);
+  const ritmo = B > 0 ? B : lista(E.dias7).reduce((s, d) => s + num(d.spend), 0) / 7;
+  const limite = conta.spend_cap && num(conta.spend_cap) > 0 ? (num(conta.spend_cap) - num(conta.amount_spent)) / 100 : null;
+  const saldoBruto = conta.is_prepay_account ? valor((conta.funding_source_details || {}).display_string) : null;
+  const saldo = saldoBruto === null ? null : saldoBruto - num(conta.balance) / 100;
+  const candidatos = [limite, saldo].filter(v => v !== null && !Number.isNaN(v));
+  if (!candidatos.length) return { orc, B, ritmo, limite, saldo, verba: null, quem: '', dias: null, acaba: '' };
+  const verba = Math.min(...candidatos);
+  const dias = ritmo > 0 ? verba / ritmo : null;
+  return { orc, B, ritmo, limite, saldo, verba, quem: verba === limite ? 'limite de gastos da conta' : 'saldo pré-pago',
+    dias, acaba: dias === null ? '' : maisDias(E.hoje, Math.floor(dias)) };
+}
 // Monta a entrada E a partir das respostas cruas das leituras (bmh-meta-guardiao-leituras.json), igual no n8n e no teste.
 // lidas: chave da leitura → resposta da Graph (ou { error } quando o nó falhou).
 function montaEntrada(Q, cfg, lidas, registro, nomes) {
@@ -181,4 +190,4 @@ function montaMensagem(Q, acoes) {
   return [{ texto: t || 'Guardião Meta BMH: mensagem vazia (ver a execução no n8n).' }];
 }
 // FIM-DA-FUNCAO (o montador corta daqui para baixo ao embutir no n8n)
-if (typeof module !== 'undefined') module.exports = { decideMeta, montaEntrada, montaMensagem, falhaDeLeitura };
+if (typeof module !== 'undefined') module.exports = { decideMeta, montaEntrada, montaMensagem, falhaDeLeitura, verbaDaConta };

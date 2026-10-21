@@ -275,12 +275,56 @@ Hoje o risco é zero (desligada e vazia), e ela fica para depois de a credencial
 3. Passou se a mensagem não tiver "não consegui ler" e a execução ficar verde.
 4. Para a fila, depois: o modo simulação (status `teste` e `?simular=1`), que cria a mídia no Instagram sem publicar.
 
+Resultado (21/10, pela Central): credencial regravada pelo Mac, execução 609174 em 7 s, e a mensagem recebida pelo Jorge foi a
+esperada (só o aviso do anúncio com erro). O guardião fica ligado, às 7h35.
+
+### 4.3 Números do dia e bloco do Meta no resumo das 8h (21/10/2026, prontos para homologação)
+
+| Arquivo | O que é |
+|---|---|
+| `scripts/n8n/bmh-meta-numeros.js` | `linhasDoDia` (o que se grava) e `blocoMeta` (o que sai no resumo); colunas da tabela em `COLUNAS_META_DIA` |
+| `scripts/n8n/bmh-meta-numeros-leituras.json` | as 5 leituras da Graph (só GET) |
+| `scripts/n8n/testa-numeros-meta.js` | roda com os dados de hoje pelo cofre, sem gravar, e mostra o bloco do resumo |
+| `scripts/n8n/monta-numeros-meta.py` | monta os dois fluxos; recebe o id da tabela; lê o resumo de produção pelo cofre e para se ele tiver mudado |
+| `scripts/n8n/bmh-meta-numeros-dia.json` | "BMH · Meta · números do dia (homologação)", 12 nós, 6h05 |
+| `scripts/n8n/bmh-resumo-manha-homologacao.json` | cópia do resumo das 8h com o bloco do Meta, só com o Manual |
+
+- **A verba da conta mora num lugar só** (`verbaDaConta`), usada pelo guardião e pelos números: os dois nunca discordam. Mudar
+  a função não mudou nada no guardião: os 10 cenários deram o mesmo de antes.
+- **A tabela nova `BMH_meta_anuncios_dia`** (a criar no n8n) tem 21 colunas:
+  - texto: `chave`, `dia`, `tipo`, `campanha_id`, `campanha`, `conjunto_id`, `conjunto`, `ad_id`, `anuncio`, `acaba_em`, `fonte_verba`,
+    `atualizado_em`;
+  - número: `gasto`, `impressoes`, `alcance`, `cliques_link`, `conversas`, `verba_restante`, `orcamento_ligado`, `ritmo`,
+    `dias_restantes`.
+- **O que grava:** uma linha por anúncio por dia e uma foto da conta por dia. Às 6h05 regrava os 3 últimos dias, porque a Meta
+  ajusta conversa atrasada. Leitura com erro para o fluxo, e nada é gravado pela metade.
+- **No resumo:**
+  - na parte de ontem, "📘 Meta Ads: gasto · conversas · cliques no link";
+  - na parte do mês, o gasto contra o teto (`meta_teto_mes`) com projeção, as conversas do mês e a verba da conta, com a data em
+    que acaba e ⚠️ se for antes de 31/10;
+  - se a gravação das 6h05 não rodou, um aviso de atraso;
+  - proposta do guardião do Meta não conta como "esperando o seu Aplicar", porque não tem botão.
+- **Conferido:**
+  - as 5 leituras com as expressões avaliadas responderam 200;
+  - o nó "Monta as linhas", tirado do JSON e rodado com os dados de hoje, deu 27 linhas, com as 21 colunas certas;
+  - o resumo de homologação, rodado como sairia amanhã às 8h, saiu com o bloco no lugar;
+  - a soma por anúncio de 1º a 19/10 (R$ 492,63) bate com a conta inteira. **Correção da auditoria:** os R$ 508,05 de outubro
+    incluíam o gasto parcial de 20/10.
+
+Para criar:
+1. O Mac cria a tabela `BMH_meta_anuncios_dia` com as 21 colunas acima (não há rota para criar tabela).
+2. Com o id dela, rodar `python3 scripts/n8n/monta-numeros-meta.py <id>`.
+3. A Central cria os dois fluxos em homologação. Para ler a tabela daqui, o id entra na rota `n8n-tabelas`, com ok do Jorge.
+4. Carregar o mês: Manual dos números com `?desde=2026-10-01`. Depois roda sozinho às 6h05.
+5. Rodar o resumo de homologação pelo Manual e comparar com o das 8h. Aprovado, a mesma mudança vai para o resumo de produção
+   pelo Mac, porque a rota da Central só edita fluxo de homologação.
+
 ## 5. Problemas
 
 - risco: **a conta para por volta de 28/10** se nada mudar (limite e saldo acabam juntos). Precisa do P1 ou de limite e Pix
   antes de 25/10. O guardião ainda não existe; até lá, o aviso é este relatório.
 - não feito: nenhum fluxo, tabela ou chave criados; P1 a P6 só propostos.
-- não feito: os JSON de "números do dia" e da cópia do resumo das 8h (o do guardião está pronto, seção 4.1).
+- não feito: a tabela `BMH_meta_anuncios_dia`, os dois fluxos da seção 4.3 no n8n e a troca no resumo de produção.
 - desconhecido: o guardião nunca rodou dentro do n8n (só o código dele, tirado do JSON, com os dados de verdade). A criação e o
   primeiro `?teste=1` são a prova que falta.
 - risco: a regra dos 7 dias depende do registro; enquanto `guardiao_meta_grava = nao`, frequência e anúncio com problema avisam

@@ -1,0 +1,346 @@
+{
+ "name": "BMH · Telegram · resumo da manhã (homologação)",
+ "nodes": [
+  {
+   "id": "0bc3b96a-091a-4dae-b82f-fe0032b381ba",
+   "name": "Manual",
+   "type": "n8n-nodes-base.webhook",
+   "typeVersion": 2,
+   "position": [
+    520,
+    0
+   ],
+   "parameters": {
+    "path": "bmh-resumo-manha-homolog-5d03a8e2b1",
+    "options": {}
+   },
+   "webhookId": "bdcb1f17-16ad-5ca5-bb94-0cd89c8b26c5"
+  },
+  {
+   "id": "bb48a15c-5155-4d7f-b1a4-26466c006c10",
+   "name": "Config",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    780,
+    0
+   ],
+   "parameters": {
+    "operation": "get",
+    "dataTableId": {
+     "__rl": true,
+     "value": "V4NRHS9mc1kvigix",
+     "mode": "id",
+     "cachedResultName": "BMH_config"
+    },
+    "returnAll": true
+   },
+   "alwaysOutputData": true,
+   "executeOnce": true
+  },
+  {
+   "id": "0de97734-47e2-458a-9530-8a8b5e0bcfaa",
+   "name": "Anúncios (tabela)",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    1040,
+    0
+   ],
+   "parameters": {
+    "operation": "get",
+    "dataTableId": {
+     "__rl": true,
+     "value": "1TSLyd68TBzYajYq",
+     "mode": "id",
+     "cachedResultName": "BMH_google_anuncios_dia"
+    },
+    "returnAll": true
+   },
+   "alwaysOutputData": true,
+   "executeOnce": true
+  },
+  {
+   "id": "3d5a848e-dddf-48c8-8fb3-23a294f14e34",
+   "name": "Site · cliques (tabela)",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    1300,
+    0
+   ],
+   "parameters": {
+    "operation": "get",
+    "dataTableId": {
+     "__rl": true,
+     "value": "RzSGWyyyutU0N9V9",
+     "mode": "id",
+     "cachedResultName": "BMH_site_cliques_dia"
+    },
+    "returnAll": true
+   },
+   "alwaysOutputData": true,
+   "executeOnce": true
+  },
+  {
+   "id": "149a960a-25f2-4e14-9860-57c3b228afd5",
+   "name": "iGut (tabela)",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    1560,
+    0
+   ],
+   "parameters": {
+    "operation": "get",
+    "dataTableId": {
+     "__rl": true,
+     "value": "KOrlT3JXdspKlBSo",
+     "mode": "id",
+     "cachedResultName": "BMH_igut_dia"
+    },
+    "returnAll": true
+   },
+   "alwaysOutputData": true,
+   "executeOnce": true
+  },
+  {
+   "id": "a7435ff5-7493-45c4-bc03-e8b5561f3bad",
+   "name": "Guardião (tabela)",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    1820,
+    0
+   ],
+   "parameters": {
+    "operation": "get",
+    "dataTableId": {
+     "__rl": true,
+     "value": "E1ewiB9pcohZpSfw",
+     "mode": "id",
+     "cachedResultName": "BMH_guardiao_registro"
+    },
+    "returnAll": true
+   },
+   "alwaysOutputData": true,
+   "executeOnce": true
+  },
+  {
+   "id": "f1433353-2846-41c4-95ec-4e0ceed42144",
+   "name": "Google · renova o acesso",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    2080,
+    0
+   ],
+   "parameters": {
+    "method": "POST",
+    "url": "https://oauth2.googleapis.com/token",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpCustomAuth",
+    "sendBody": true,
+    "contentType": "json",
+    "specifyBody": "json",
+    "jsonBody": "{}",
+    "options": {}
+   },
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000,
+   "credentials": {
+    "httpCustomAuth": {
+     "id": "Qewvtjz9JokCUvNy",
+     "name": "BMH · Google Ads (renovação do acesso)"
+    }
+   },
+   "executeOnce": true,
+   "onError": "continueRegularOutput",
+   "alwaysOutputData": true
+  },
+  {
+   "id": "6905e4a9-b806-46c5-b81e-8943d2ac2dcf",
+   "name": "Monta o resumo",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    0,
+    0
+   ],
+   "parameters": {
+    "jsCode": "// Resumo da manhã da BMH no Telegram (8h): ontem e o mês até ontem, com os mesmos números do painel (anúncios gravados às\n// 6h10, iGut às 3h20, cliques no WhatsApp do Analytics). Só números, sem dado de paciente.\nconst linhas = n => $(n).all().map(i => i.json).filter(r => r && r.chave);\nconst cfg = Object.fromEntries(linhas('Config').map(r => [r.chave, r.valor]));\nconst ads = linhas('Anúncios (tabela)'), site = linhas('Site · cliques (tabela)'), igut = linhas('iGut (tabela)'), guard = linhas('Guardião (tabela)');\nconst num = v => Number(v) || 0, entre = (d, a, b) => d >= a && d <= b;\nconst brl = v => 'R$ ' + Math.round(num(v)).toLocaleString('pt-BR'), int = v => Math.round(num(v)).toLocaleString('pt-BR');\nconst pct = (a, b) => b ? (a >= b ? '+' : '') + Math.round((a / b - 1) * 100) + '%' : '';\nconst hoje = $now.setZone('America/Sao_Paulo').startOf('day'), ontem = hoje.minus({ days: 1 }).setLocale('pt-BR');\nconst O = ontem.toISODate(), M0 = ontem.startOf('month').toISODate();\nconst ant = ontem.minus({ months: 1 }), A0 = ant.startOf('month').toISODate(), A1 = ant.set({ day: Math.min(ontem.day, ant.daysInMonth) }).toISODate();\nconst mesNome = d => d.setLocale('pt-BR').toFormat('LLLL');\nconst soma = (rs, f) => rs.reduce((s, r) => s + num(r[f]), 0);\n// anúncios\nconst adsO = ads.filter(r => r.dia === O), adsM = ads.filter(r => entre(r.dia, M0, O));\nconst gO = soma(adsO, 'gasto'), cO = soma(adsO, 'contatos') + soma(adsO, 'ligacoes'), gM = soma(adsM, 'gasto'), cM = soma(adsM, 'contatos') + soma(adsM, 'ligacoes');\n// projeção igual à do guardião: gasto até ontem + orçamento diário de hoje × dias que faltam (com hoje)\nconst teto = num(cfg['teto_mes_' + M0.slice(0, 7)] || cfg.teto_mes), restantes = ontem.daysInMonth - ontem.day;\nlet B = null;\ntry {\n  const tok = $('Google · renova o acesso').first().json.access_token;\n  const r = await this.helpers.httpRequest({ method: 'POST', url: 'https://googleads.googleapis.com/v25/customers/5066798424/googleAds:search', headers: { Authorization: 'Bearer ' + tok },\n    body: { query: \"SELECT campaign_budget.resource_name, campaign_budget.amount_micros FROM campaign WHERE campaign.status = 'ENABLED' AND campaign.experiment_type = 'BASE'\" }, json: true, timeout: 60000 });\n  const orc = {}; for (const x of r.results || []) orc[x.campaignBudget.resourceName] = Number(x.campaignBudget.amountMicros) / 1e6;\n  B = Object.values(orc).reduce((s, v) => s + v, 0);\n} catch (e) {}\nconst proj = B === null ? gM / ontem.day * ontem.daysInMonth : gM + B * (restantes || 0);\nconst cada = (g, c) => c >= 0.5 ? ` (${brl(g / c)} cada)` : '';\n// WhatsApp pelo site\nconst wO = site.filter(r => r.dia === O && r.tipo === 'whatsapp'), PAGO = c => /Paid|Cross-network/.test(c || '');\nconst wTot = soma(wO, 'cliques'), wAds = soma(wO.filter(r => PAGO(r.canal)), 'cliques');\n// iGut\nconst igO = igut.filter(r => r.dia === O), igM = igut.filter(r => entre(r.dia, M0, O)), igA = igut.filter(r => entre(r.dia, A0, A1));\nconst porUn = igO.map(r => r.unidade + ' ' + int(r.atendimentos)).join(' · ');\nconst sM = soma(igM, 'atendimentos'), vM = soma(igM, 'valor'), sA = soma(igA, 'atendimentos'), vA = soma(igA, 'valor');\n// guardião de hoje\nconst gHoje = guard.filter(r => r.data === hoje.toISODate());\nconst pendentes = gHoje.filter(r => r.acao !== 'avisar' && r.resultado === 'simulado' && r.plataforma !== 'meta').length;\n// avisos de dado atrasado\nconst atraso = [];\nconst ultima = ads.map(r => r.atualizado_em || '').sort().pop() || '';\nif (ultima.slice(0, 10) < hoje.toISODate()) atraso.push('⚠️ A gravação dos anúncios das 6h10 não rodou hoje: os números do Google Ads podem estar incompletos.');\nif (!igO.length) atraso.push('⚠️ O iGut de ontem ainda não chegou (a busca é às 3h20).');\n// Meta (21/10/2026): bloco lido da BMH_meta_anuncios_dia\n// Copiado de scripts/n8n/bmh-meta-numeros.js e bmh-meta-guardiao-decide.js (BMH_Claude_VSL) pelo monta-numeros-meta.py: editar lá.\n// Números do Meta Ads da BMH (21/10/2026): o que a \"BMH · Meta · números do dia\" grava na BMH_meta_anuncios_dia e o bloco do\n// Meta no resumo das 8h, lido dessa tabela (lição da Nexo: painel, resumo e guardião leem a mesma fonte e nunca discordam).\n// A verba da conta vem de verbaDaConta (bmh-meta-guardiao-decide.js), a mesma conta do guardião. Fonte: este arquivo; os\n// montadores embutem o texto nos nós do n8n e o testa-numeros-meta.js roda com os dados de verdade pelo cofre.\n//\n// Tabela BMH_meta_anuncios_dia: uma linha por anúncio por dia (tipo \"anuncio\", chave dia|ad_id) e uma foto da conta por dia\n// (tipo \"conta\", chave dia|conta). Só números e nomes de campanha e anúncio: nada de lead, conversa ou paciente.\nconst COLUNAS_META_DIA = {\n  chave: 'string', dia: 'string', tipo: 'string', campanha_id: 'string', campanha: 'string', conjunto_id: 'string',\n  conjunto: 'string', ad_id: 'string', anuncio: 'string', gasto: 'number', impressoes: 'number', alcance: 'number',\n  cliques_link: 'number', conversas: 'number', verba_restante: 'number', orcamento_ligado: 'number', ritmo: 'number',\n  dias_restantes: 'number', acaba_em: 'string', fonte_verba: 'string', atualizado_em: 'string',\n};\n\n// Q: hoje, agora (ISO); lidas: chave da leitura → resposta da Graph (anuncios, conta, campanhas, conjuntos, dias7).\nfunction linhasDoDia(Q, lidas) {\n  const CONV = 'onsite_conversion.messaging_conversation_started_7d';\n  const num = v => Number(v) || 0, r2 = v => Math.round(num(v) * 100) / 100;\n  const lista = r => (r && Array.isArray(r.data)) ? r.data : [];\n  for (const [k, r] of Object.entries(lidas)) if (!r || r.error) throw new Error(`não consegui ler \"${k}\" na Meta: ` +\n    String(r && r.error ? (r.error.message || JSON.stringify(r.error)) : 'sem resposta').replace(/(access_token|token)=[^&\\s\"']+/gi, '$1=[removido]').slice(0, 250));\n  // mais de uma página: não grava pela metade (o período do ?desde= ficou grande demais)\n  if (lidas.anuncios.paging && lidas.anuncios.paging.next) throw new Error('a Meta devolveu mais de 500 linhas: use um ?desde= mais curto');\n  const vazio = { campanha_id: '', campanha: '', conjunto_id: '', conjunto: '', ad_id: '', anuncio: '', gasto: 0, impressoes: 0, alcance: 0,\n    cliques_link: 0, conversas: 0, verba_restante: 0, orcamento_ligado: 0, ritmo: 0, dias_restantes: 0, acaba_em: '', fonte_verba: '' };\n  const linhas = lista(lidas.anuncios).map(x => {\n    const a = Object.fromEntries((x.actions || []).map(y => [y.action_type, num(y.value)]));\n    return { ...vazio, chave: x.date_start + '|' + x.ad_id, dia: x.date_start, tipo: 'anuncio', campanha_id: String(x.campaign_id || ''),\n      campanha: x.campaign_name || '', conjunto_id: String(x.adset_id || ''), conjunto: x.adset_name || '', ad_id: String(x.ad_id || ''),\n      anuncio: x.ad_name || '', gasto: r2(x.spend), impressoes: num(x.impressions), alcance: num(x.reach),\n      cliques_link: num(x.inline_link_clicks), conversas: a[CONV] || 0, atualizado_em: Q.agora };\n  });\n  const V = verbaDaConta({ ...lidas, hoje: Q.hoje });\n  linhas.push({ ...vazio, chave: Q.hoje + '|conta', dia: Q.hoje, tipo: 'conta', verba_restante: V.verba === null ? 0 : r2(V.verba),\n    orcamento_ligado: r2(V.B), ritmo: r2(V.ritmo), dias_restantes: V.dias === null ? 0 : Math.round(V.dias * 10) / 10,\n    acaba_em: V.acaba || '', fonte_verba: V.quem || '', atualizado_em: Q.agora });\n  return linhas;\n}\n\n// Bloco do Meta no resumo das 8h. rows: linhas da BMH_meta_anuncios_dia; D: O (ontem), M0 (1º do mês de ontem), hoje,\n// diaOntem, diasMes. Devolve as linhas de ontem, as do mês e os avisos de dado atrasado.\nfunction blocoMeta(rows, cfg, D) {\n  const num = v => Number(v) || 0;\n  const brl = v => 'R$ ' + Math.round(num(v)).toLocaleString('pt-BR'), int = v => Math.round(num(v)).toLocaleString('pt-BR');\n  const dm = d => d.slice(8, 10) + '/' + d.slice(5, 7);\n  const soma = (rs, f) => rs.reduce((s, r) => s + num(r[f]), 0);\n  const cada = (g, c) => c >= 0.5 ? ` (${brl(g / c)} cada)` : '';\n  const ads = rows.filter(r => r.tipo === 'anuncio');\n  const aO = ads.filter(r => r.dia === D.O), aM = ads.filter(r => r.dia >= D.M0 && r.dia <= D.O);\n  const gO = soma(aO, 'gasto'), cvO = soma(aO, 'conversas'), clO = soma(aO, 'cliques_link'), gM = soma(aM, 'gasto'), cvM = soma(aM, 'conversas');\n  const conta = rows.filter(r => r.tipo === 'conta').sort((a, b) => (a.dia < b.dia ? -1 : 1)).pop();\n  const deHoje = conta && conta.dia === D.hoje;\n  const teto = num(cfg['meta_teto_mes_' + D.M0.slice(0, 7)] || cfg.meta_teto_mes);\n  const noArAte = cfg.meta_no_ar_ate || '2026-10-31';\n  const restantes = D.diasMes - D.diaOntem;\n  const out = { ontem: [], mes: [], atraso: [] };\n  out.ontem.push('📘 Meta Ads: ' + brl(gO) + ' · ' + (cvO >= 0.5 ? int(cvO) + (Math.round(cvO) === 1 ? ' conversa' : ' conversas') + cada(gO, cvO) : 'nenhuma conversa') +\n    ' · ' + int(clO) + (Math.round(clO) === 1 ? ' clique' : ' cliques') + ' no link');\n  const B = deHoje ? num(conta.orcamento_ligado) : null, proj = B === null ? null : gM + B * restantes;\n  out.mes.push('• Meta: ' + brl(gM) + (teto ? ' de ' + brl(teto) : '') + (proj === null ? '' : ' · com ' + brl(B) + '/dia, fecha em ' + brl(proj)) +\n    (teto && proj !== null && proj > teto * 1.02 ? ' ⚠️ acima do teto' : ''));\n  out.mes.push('• Conversas do Meta: ' + int(cvM) + cada(gM, cvM));\n  if (deHoje && num(conta.verba_restante) > 0) out.mes.push('• Verba da conta Meta: ' + brl(conta.verba_restante) +\n    (num(conta.dias_restantes) ? ', dura ~' + num(conta.dias_restantes).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' dias' + (conta.acaba_em ? ' (até ' + dm(conta.acaba_em) + ')' : '') : '') +\n    (conta.acaba_em && conta.acaba_em < noArAte && D.hoje <= noArAte ? ' ⚠️ antes de ' + dm(noArAte) : ''));\n  if (!deHoje) out.atraso.push('⚠️ A gravação do Meta das 6h05 não rodou hoje: os números do Meta podem estar incompletos.');\n  return out;\n}\nconst META = blocoMeta(linhas('Meta (tabela)'), cfg, { O, M0, hoje: hoje.toISODate(), diaOntem: ontem.day, diasMes: ontem.daysInMonth });\nconst t = [];\nt.push('🧪 (homologação) ☀️ BMH · resumo de ontem, ' + ontem.toFormat('cccc, dd/LL'));\nt.push('');\nt.push('📣 Google Ads: ' + brl(gO) + ' · ' + (cO >= 0.5 ? int(cO) + (Math.round(cO) === 1 ? ' contato' : ' contatos') + cada(gO, cO) : 'nenhum contato'));\nt.push(...META.ontem);\nt.push('💬 WhatsApp pelo site: ' + int(wTot) + (wTot === 1 ? ' clique' : ' cliques') + (wTot ? ` (${int(wAds)} de anúncio, ${int(wTot - wAds)} de busca e outros)` : ''));\nif (igO.length) t.push('🏥 iGut: ' + int(soma(igO, 'atendimentos')) + ' sessões (' + porUn + ') · ' + brl(soma(igO, 'valor')) + ' produzidos');\nt.push('');\nt.push('📅 ' + mesNome(ontem).replace(/^./, c => c.toUpperCase()) + ' até ontem (' + ontem.day + ' de ' + ontem.daysInMonth + ' dias)');\nconst ritmo = B === null ? ' · no ritmo, fecha em ' : ' · com ' + brl(B) + '/dia, fecha em ';\nt.push('• Anúncios: ' + brl(gM) + (teto ? ' de ' + brl(teto) : '') + ritmo + brl(proj) + (teto && proj > teto * 1.02 ? ' ⚠️ acima do teto' : ''));\nt.push('• Contatos do Google Ads: ' + int(cM) + cada(gM, cM));\nt.push(...META.mes);\nif (igM.length) t.push('• iGut: ' + int(sM) + ' sessões · ' + brl(vM) + ' produzidos');\nif (igA.length) t.push('• Mesmo período de ' + mesNome(ant) + ': ' + int(sA) + ' sessões (' + pct(sM, sA) + ') · ' + brl(vA) + ' (' + pct(vM, vA) + ')');\nt.push('');\nt.push('🛡️ Guardião: ' + (pendentes ? pendentes + (pendentes === 1 ? ' proposta esperando' : ' propostas esperando') + ' o seu Aplicar ou Ignorar (mensagens acima).' : gHoje.length ? 'só avisos hoje (mensagem acima).' : 'nada a corrigir hoje.'));\natraso.push(...META.atraso);\nif (atraso.length) { t.push(''); t.push(...atraso); }\nt.push('');\nt.push('Painel: https://automacao.cannlink.com.br/webhook/bmh-painel');\nreturn [{ json: { texto: t.join('\\n') } }];\n"
+   }
+  },
+  {
+   "id": "11205a3a-d842-4f01-867e-78f45c081ab9",
+   "name": "Envia no Telegram",
+   "type": "n8n-nodes-base.telegram",
+   "typeVersion": 1.2,
+   "position": [
+    2340,
+    0
+   ],
+   "parameters": {
+    "chatId": "8708228589",
+    "text": "={{ $json.texto }}",
+    "additionalFields": {
+     "appendAttribution": false
+    }
+   },
+   "credentials": {
+    "telegramApi": {
+     "id": "SgQHWuJOuMWeVbPi",
+     "name": "BMH · Telegram (robô BMH alertas)"
+    }
+   },
+   "webhookId": "03bc9bba-24b2-4a35-ad0c-d464aae0ea91"
+  },
+  {
+   "id": "240f25f5-a323-4702-96f8-a35335839427",
+   "name": "Sobre este fluxo",
+   "type": "n8n-nodes-base.stickyNote",
+   "typeVersion": 1,
+   "position": [
+    2600,
+    0
+   ],
+   "parameters": {
+    "content": "## BMH · Telegram · resumo da manhã (homologação)\n**Traz:** as mesmas tabelas do resumo de produção (`QGDceUjADbnNINb3`) e a `BMH_meta_anuncios_dia`.\n**Envia:** o resumo no Telegram, marcado 🧪 (homologação), com o bloco do Meta: ontem (gasto, conversas, cliques), o mês com projeção e teto (`meta_teto_mes`), a verba da conta e o aviso se a gravação das 6h05 não rodou.\n**Limites:** só pelo Manual (sem horário, para não duplicar o das 8h); proposta do guardião do Meta não conta como \"esperando o seu Aplicar\" (não tem botão).\n\nManual: `/webhook/bmh-resumo-manha-homolog-5d03a8e2b1`. Montado por `BMH_Claude_VSL/scripts/n8n/monta-numeros-meta.py` a partir do resumo de produção; quando aprovado, a mesma mudança vai para o de produção.",
+    "width": 560,
+    "height": 200
+   }
+  },
+  {
+   "id": "fd4fb890-a8bb-569c-b44f-0e3f14eee999",
+   "name": "Meta (tabela)",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    1940,
+    220
+   ],
+   "parameters": {
+    "operation": "get",
+    "dataTableId": {
+     "__rl": true,
+     "value": "CRIAR_A_TABELA",
+     "mode": "id",
+     "cachedResultName": "BMH_meta_anuncios_dia"
+    },
+    "returnAll": true
+   },
+   "alwaysOutputData": true,
+   "executeOnce": true
+  }
+ ],
+ "connections": {
+  "Manual": {
+   "main": [
+    [
+     {
+      "node": "Config",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Config": {
+   "main": [
+    [
+     {
+      "node": "Anúncios (tabela)",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Anúncios (tabela)": {
+   "main": [
+    [
+     {
+      "node": "Site · cliques (tabela)",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Site · cliques (tabela)": {
+   "main": [
+    [
+     {
+      "node": "iGut (tabela)",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "iGut (tabela)": {
+   "main": [
+    [
+     {
+      "node": "Guardião (tabela)",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Guardião (tabela)": {
+   "main": [
+    [
+     {
+      "node": "Meta (tabela)",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Google · renova o acesso": {
+   "main": [
+    [
+     {
+      "node": "Monta o resumo",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Monta o resumo": {
+   "main": [
+    [
+     {
+      "node": "Envia no Telegram",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Meta (tabela)": {
+   "main": [
+    [
+     {
+      "node": "Google · renova o acesso",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  }
+ },
+ "settings": {
+  "executionOrder": "v1",
+  "timezone": "America/Sao_Paulo",
+  "saveDataErrorExecution": "all",
+  "errorWorkflow": "7u3CuyjESsHmCtMW",
+  "saveDataSuccessExecution": "all",
+  "executionTimeout": 3600
+ }
+}
