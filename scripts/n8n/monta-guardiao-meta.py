@@ -92,9 +92,18 @@ explica = no('Explica a recusa do Telegram', 'n8n-nodes-base.code', 2, {'jsCode'
     "const t = String($('Monta a mensagem').first().json.texto || '');\n"
     "const motivo = JSON.stringify(e.error || e).replace(/(access_token|token|bot)[0-9]*[=:][^&\\s\"']+/gi, '$1=[removido]').slice(0, 400);\n"
     "throw new Error('Telegram recusou: ' + motivo + ' | texto com ' + t.length + ' caracteres e ' + t.split('\\n').length + ' linhas');\n")})
+x -= 240
+nos[-1]['position'] = [x, 440]
+x += 240
+para = no('Leitura falhou? Para em erro', 'n8n-nodes-base.code', 2, {'jsCode': (
+    '// Depois de avisar no Telegram: com metade ou mais das leituras com erro, o fluxo termina em ERRO (alerta de falha e\n'
+    '// BMH_falhas). Regra em falhaDeLeitura, copiada de scripts/n8n/bmh-meta-guardiao-decide.js pelo montador.\n' + regras +
+    f"\nconst motivo = falhaDeLeitura($('Decide').all().map(i => i.json), {len(L['leituras'])});\n"
+    "if (motivo) throw new Error(motivo);\n"
+    "return [{ json: { leituras: 'ok' } }];\n")})
 for n in nos:
     if n['name'] in (prepara, registra): n['position'][1] = -220
-    if n['name'] in (monta, telegram, explica): n['position'][1] = 220
+    if n['name'] in (monta, telegram, para): n['position'][1] = 220
 nota = no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, {'width': 1100, 'height': 420, 'content': (
     "## BMH · Meta · guardião diário (homologação)\n"
     "**Traz:** a conta de anúncios do Meta da BMH (`act_327952129944258`): limite de gastos, saldo pré-pago, campanhas, conjuntos, anúncios, "
@@ -121,6 +130,7 @@ for a, b in zip(seq, seq[1:]): liga(a, b)
 liga(manual, 'Quando')
 liga(decide, prepara); liga(decide, monta)
 liga(prepara, registra); liga(monta, telegram)
+liga(telegram, para, saida=0)      # mandou: confere se a leitura falhou e, se sim, para em erro
 liga(telegram, explica, saida=1)   # saída 1 = erro (onError continueErrorOutput)
 
 fluxo = {'name': 'BMH · Meta · guardião diário (homologação)', 'nodes': nos, 'connections': ligacoes,

@@ -245,6 +245,36 @@ Para a Central criar:
 
 O bloco do Meta no resumo das 8h, a tabela `BMH_meta_anuncios_dia` e o "números do dia" ficam para a próxima etapa.
 
+### 4.2 Primeiros testes no n8n (20 e 21/10/2026)
+
+O fluxo é o `K4UckCbHkrqr8sc6`, ligado pela Central com o "pode" do Jorge.
+
+| Execução | Resultado | O que era |
+|---|---|---|
+| 609075 | erro no Telegram ("Bad request") | as 10 leituras falharam na credencial do n8n; o texto era o dos erros. A causa exata da recusa não ficou provada |
+| 609116 | "sucesso" em 1 min 46 s | **as 10 leituras falharam de novo** ("403 (#200) Provide valid app ID") e o erro virou aviso; os 100 s são 10 leituras × 3 tentativas × 5 s |
+
+**Lição (a regra que ficou):** execução verde não prova leitura; confira o conteúdo da mensagem. O Gerente BMH disse ao Jorge que
+"nenhuma leitura falhou de vez" deduzindo o texto, sem vê-lo, e estava errado. O token do `.env` funciona pelo cofre; a
+credencial `BMH · Meta Instagram (token)` do n8n está com o nome ou o valor errados.
+
+Correções no fluxo:
+- a mensagem é limpa antes de ir (controle, emoji partido, token escondido, nunca vazia, até 3.500 caracteres);
+- o Telegram vai em HTML escapado, com 3 tentativas;
+- a recusa do Telegram é gravada com o motivo;
+- **com metade ou mais das leituras falhando, o fluxo termina em erro** depois de avisar (nó "Leitura falhou? Para em erro"):
+  passa pelo `BMH · Alerta de falha` e fica na `BMH_falhas`.
+
+**Fila do Instagram** (`r6Rib8PXJ0zlSo4z`): usa a mesma credencial nos 7 nós da Meta. Com ela errada, nenhum post sai. O erro
+"(#200)" não é de conexão, então o nó "Decide: tenta de novo?" marca `falhou` e avisa no Telegram: falha alto, não em silêncio.
+Hoje o risco é zero (desligada e vazia), e ela fica para depois de a credencial passar.
+
+**Como testar a credencial sem publicar nada:**
+1. Na credencial, `Name` = `access_token` e `Value` = o token puro, sem "Bearer", aspas ou espaço.
+2. Rodar o guardião com `?teste=1`. As 10 leituras são só GET, pela mesma credencial da fila.
+3. Passou se a mensagem não tiver "não consegui ler" e a execução ficar verde.
+4. Para a fila, depois: o modo simulação (status `teste` e `?simular=1`), que cria a mídia no Instagram sem publicar.
+
 ## 5. Problemas
 
 - risco: **a conta para por volta de 28/10** se nada mudar (limite e saldo acabam juntos). Precisa do P1 ou de limite e Pix

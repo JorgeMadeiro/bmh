@@ -155,6 +155,15 @@ function montaEntrada(Q, cfg, lidas, registro, nomes) {
   const mes = lidas.mes && Array.isArray(lidas.mes.data) && lidas.mes.data[0] ? lidas.mes.data[0].spend : 0;
   return { ...Q, cfg, ...lidas, mes, registro: registro || [], erros };
 }
+// Leitura quebrada não pode sair como "sucesso" (21/10/2026: a credencial do n8n falhou nas 10 leituras e a execução saiu
+// verde, porque o erro vira aviso). Metade ou mais das leituras com erro: devolve o motivo, e o nó seguinte ao Telegram faz o
+// fluxo terminar em erro (passa pelo "BMH · Alerta de falha" e fica na BMH_falhas). Menos que isso: só o aviso.
+function falhaDeLeitura(acoes, total) {
+  const erros = acoes.filter(a => a.regra === 'meta_erro_api');
+  if (!total || erros.length < total / 2) return '';
+  return `guardião Meta: ${erros.length} de ${total} leituras da Meta falharam (credencial "BMH · Meta Instagram (token)"?). Primeira: ` +
+    String(erros[0].detalhe).slice(0, 250);
+}
 // Uma mensagem só no Telegram (robô BMH alertas), sem botões: nesta versão nada se aplica, nem pelo toque.
 function montaMensagem(Q, acoes) {
   if (!acoes.length) return [];
@@ -172,4 +181,4 @@ function montaMensagem(Q, acoes) {
   return [{ texto: t || 'Guardião Meta BMH: mensagem vazia (ver a execução no n8n).' }];
 }
 // FIM-DA-FUNCAO (o montador corta daqui para baixo ao embutir no n8n)
-if (typeof module !== 'undefined') module.exports = { decideMeta, montaEntrada, montaMensagem };
+if (typeof module !== 'undefined') module.exports = { decideMeta, montaEntrada, montaMensagem, falhaDeLeitura };
