@@ -1,0 +1,151 @@
+{
+ "name": "BMH · Instagram · fila · muda status (homologação)",
+ "nodes": [
+  {
+   "id": "1cea0e58-45c5-4ce1-8f1c-d9c89cc55a5f",
+   "name": "Pedido da VPS",
+   "type": "n8n-nodes-base.webhook",
+   "typeVersion": 2,
+   "position": [
+    0,
+    304
+   ],
+   "parameters": {
+    "path": "bmh-fila-status-6f470f8c43",
+    "options": {},
+    "authentication": "headerAuth",
+    "httpMethod": "POST"
+   },
+   "webhookId": "e1efd7ea-9282-4c03-845e-05dc16cdae49"
+  },
+  {
+   "id": "6aa61c02-2e85-4b31-b136-82f39e8797db",
+   "name": "Pedido válido?",
+   "type": "n8n-nodes-base.if",
+   "typeVersion": 2.2,
+   "position": [
+    240,
+    304
+   ],
+   "parameters": {
+    "conditions": {
+     "options": {
+      "caseSensitive": true,
+      "leftValue": "",
+      "typeValidation": "strict",
+      "version": 2
+     },
+     "conditions": [
+      {
+       "id": "23b374a2-32aa-45c5-bd0a-da603bc7bc53",
+       "leftValue": "={{ ['cancelado', 'agendado'].includes($json.body?.status) && Number($json.body?.id) > 0 }}",
+       "rightValue": "",
+       "operator": {
+        "type": "boolean",
+        "operation": "true",
+        "singleValue": true
+       }
+      }
+     ],
+     "combinator": "and"
+    },
+    "options": {}
+   }
+  },
+  {
+   "id": "1c365560-fa6a-4ed3-9cc5-cc5f1b4adfb0",
+   "name": "Muda o status",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    480,
+    208
+   ],
+   "parameters": {
+    "operation": "update",
+    "dataTableId": {
+     "__rl": true,
+     "value": "RaABWuNztVAap9AV",
+     "mode": "id",
+     "cachedResultName": "BMH_fila_publicacao"
+    },
+    "columns": {
+     "mappingMode": "defineBelow",
+     "value": {
+      "status": "={{ $json.body.status }}"
+     },
+     "matchingColumns": [],
+     "schema": [
+      {
+       "id": "status",
+       "displayName": "status",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      }
+     ]
+    },
+    "filters": {
+     "conditions": [
+      {
+       "keyName": "id",
+       "keyValue": "={{ Number($json.body.id) }}"
+      },
+      {
+       "keyName": "status",
+       "keyValue": "={{ $json.body.status === 'agendado' ? 'cancelado' : 'agendado' }}"
+      }
+     ]
+    },
+    "options": {},
+    "matchType": "allConditions"
+   }
+  },
+  {
+   "id": "62700417-129a-48da-afae-70673e4aece8",
+   "name": "Sobre este fluxo",
+   "type": "n8n-nodes-base.stickyNote",
+   "typeVersion": 1,
+   "position": [
+    -16,
+    -224
+   ],
+   "parameters": {
+    "content": "## BMH · Instagram · fila · muda status\nPor onde a VPS cancela ou reativa um item da fila da BMH (a API pública do n8n não altera linha de tabela). Copiado de JORGE · Instagram · fila · muda status (yc3wmeMe8AjTkDOG) em 20/10/2026. Recebe `{id, status}` pelo cofre (rota `n8n-fila-bmh-status`), com o cabeçalho `X-Chave-Fila` (credencial *BMH · chave da fila (cofre)*, a criar; a mesma chave fica no docker secret `bmh_fila_chave` do cofre).\n\n**Traz:** id do item e status novo. **Envia:** o status novo na linha de `BMH_fila_publicacao`, só quando a troca é permitida.\n**Limites:** só aceita `cancelado` ou `agendado` com id maior que zero, e só troca `agendado` por `cancelado` ou o contrário; linha publicada, publicando, falhou, teste ou de simulação fica como está. A resposta é só o recibo do webhook (`publicar-instagram.js cancelar` relê a fila). Também dá para cancelar direto na tabela.",
+    "width": 1120,
+    "height": 358
+   }
+  }
+ ],
+ "connections": {
+  "Pedido da VPS": {
+   "main": [
+    [
+     {
+      "node": "Pedido válido?",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Pedido válido?": {
+   "main": [
+    [
+     {
+      "node": "Muda o status",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  }
+ },
+ "settings": {
+  "executionOrder": "v1",
+  "timezone": "America/Sao_Paulo"
+ }
+}

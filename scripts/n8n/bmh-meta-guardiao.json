@@ -1,0 +1,1031 @@
+{
+ "name": "BMH · Meta · guardião diário (homologação)",
+ "nodes": [
+  {
+   "id": "0cb6bc0c-6537-51d3-ba52-2fa0bed3f6b6",
+   "name": "Todo dia às 7h35",
+   "type": "n8n-nodes-base.scheduleTrigger",
+   "typeVersion": 1.2,
+   "position": [
+    0,
+    0
+   ],
+   "parameters": {
+    "rule": {
+     "interval": [
+      {
+       "field": "cronExpression",
+       "expression": "35 7 * * *"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "898e4c5b-684f-5939-98b3-262f1b13b012",
+   "name": "Manual",
+   "type": "n8n-nodes-base.webhook",
+   "typeVersion": 2,
+   "position": [
+    0,
+    200
+   ],
+   "parameters": {
+    "path": "bmh-meta-guardiao-3e8d1c5a07",
+    "options": {}
+   },
+   "webhookId": "6a68c684-84f4-5c4a-8e9d-00115cd9f06d"
+  },
+  {
+   "id": "14e308c3-8f08-5432-926d-6adca687b460",
+   "name": "Quando",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    240,
+    0
+   ],
+   "parameters": {
+    "jsCode": "// Datas do dia (Brasília). Chamada manual com ?teste=1: decide e manda a mensagem marcada como teste, sem gravar.\nconst hoje = $now.setZone('America/Sao_Paulo').startOf('day');\nlet teste = false; try { teste = $('Manual').isExecuted && !!($('Manual').first().json.query || {}).teste; } catch (e) {}\nreturn [{ json: { hoje: hoje.toISODate(), ontem: hoje.minus({ days: 1 }).toISODate(), dia: hoje.day, dias_mes: hoje.daysInMonth,\n  restantes: hoje.daysInMonth - hoje.day + 1, mes_desde: hoje.day > 1 ? hoje.startOf('month').toISODate() : hoje.minus({ days: 1 }).toISODate(),\n  teste, conta: 'act_327952129944258' } }];\n"
+   }
+  },
+  {
+   "id": "79ec080b-d465-5239-9d13-479a9f0c6d5e",
+   "name": "Config",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    480,
+    0
+   ],
+   "parameters": {
+    "operation": "get",
+    "dataTableId": {
+     "__rl": true,
+     "value": "V4NRHS9mc1kvigix",
+     "mode": "id",
+     "cachedResultName": "BMH_config"
+    },
+    "returnAll": true
+   },
+   "alwaysOutputData": true
+  },
+  {
+   "id": "4944ee04-d067-5310-82fc-6cef59e984bb",
+   "name": "Meta · conta",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    720,
+    0
+   ],
+   "parameters": {
+    "url": "={{ `https://graph.facebook.com/v26.0/${$('Quando').first().json.conta}` }}",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpQueryAuth",
+    "sendQuery": true,
+    "queryParameters": {
+     "parameters": [
+      {
+       "name": "fields",
+       "value": "account_status,disable_reason,spend_cap,amount_spent,balance,is_prepay_account,funding_source_details"
+      }
+     ]
+    },
+    "options": {
+     "timeout": 60000
+    }
+   },
+   "credentials": {
+    "httpQueryAuth": {
+     "id": "HXdesRATFOJkYxhK",
+     "name": "BMH · Meta Instagram (token)"
+    }
+   },
+   "executeOnce": true,
+   "alwaysOutputData": true,
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000,
+   "onError": "continueRegularOutput"
+  },
+  {
+   "id": "3df1ab54-5dc9-5a67-b9bb-687fbe6d17fc",
+   "name": "Meta · campanhas",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    960,
+    0
+   ],
+   "parameters": {
+    "url": "={{ `https://graph.facebook.com/v26.0/${$('Quando').first().json.conta}/campaigns` }}",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpQueryAuth",
+    "sendQuery": true,
+    "queryParameters": {
+     "parameters": [
+      {
+       "name": "fields",
+       "value": "id,name,effective_status,daily_budget"
+      },
+      {
+       "name": "limit",
+       "value": "200"
+      }
+     ]
+    },
+    "options": {
+     "timeout": 60000
+    }
+   },
+   "credentials": {
+    "httpQueryAuth": {
+     "id": "HXdesRATFOJkYxhK",
+     "name": "BMH · Meta Instagram (token)"
+    }
+   },
+   "executeOnce": true,
+   "alwaysOutputData": true,
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000,
+   "onError": "continueRegularOutput"
+  },
+  {
+   "id": "96165bcd-ce38-51ee-a2d6-f2a70bd38d07",
+   "name": "Meta · conjuntos",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    1200,
+    0
+   ],
+   "parameters": {
+    "url": "={{ `https://graph.facebook.com/v26.0/${$('Quando').first().json.conta}/adsets` }}",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpQueryAuth",
+    "sendQuery": true,
+    "queryParameters": {
+     "parameters": [
+      {
+       "name": "fields",
+       "value": "id,name,campaign_id,effective_status,daily_budget,optimization_goal,destination_type,created_time"
+      },
+      {
+       "name": "limit",
+       "value": "200"
+      }
+     ]
+    },
+    "options": {
+     "timeout": 60000
+    }
+   },
+   "credentials": {
+    "httpQueryAuth": {
+     "id": "HXdesRATFOJkYxhK",
+     "name": "BMH · Meta Instagram (token)"
+    }
+   },
+   "executeOnce": true,
+   "alwaysOutputData": true,
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000,
+   "onError": "continueRegularOutput"
+  },
+  {
+   "id": "a2b232c8-d68f-53e9-a6c5-81d4b672a756",
+   "name": "Meta · anúncios",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    1440,
+    0
+   ],
+   "parameters": {
+    "url": "={{ `https://graph.facebook.com/v26.0/${$('Quando').first().json.conta}/ads` }}",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpQueryAuth",
+    "sendQuery": true,
+    "queryParameters": {
+     "parameters": [
+      {
+       "name": "fields",
+       "value": "id,name,adset_id,effective_status"
+      },
+      {
+       "name": "limit",
+       "value": "500"
+      }
+     ]
+    },
+    "options": {
+     "timeout": 60000
+    }
+   },
+   "credentials": {
+    "httpQueryAuth": {
+     "id": "HXdesRATFOJkYxhK",
+     "name": "BMH · Meta Instagram (token)"
+    }
+   },
+   "executeOnce": true,
+   "alwaysOutputData": true,
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000,
+   "onError": "continueRegularOutput"
+  },
+  {
+   "id": "b42b2562-265a-51c2-ab6b-1914915af3aa",
+   "name": "Meta · ontem por conjunto",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    1680,
+    0
+   ],
+   "parameters": {
+    "url": "={{ `https://graph.facebook.com/v26.0/${$('Quando').first().json.conta}/insights` }}",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpQueryAuth",
+    "sendQuery": true,
+    "queryParameters": {
+     "parameters": [
+      {
+       "name": "level",
+       "value": "adset"
+      },
+      {
+       "name": "date_preset",
+       "value": "yesterday"
+      },
+      {
+       "name": "fields",
+       "value": "adset_id,adset_name,spend,impressions"
+      },
+      {
+       "name": "limit",
+       "value": "200"
+      }
+     ]
+    },
+    "options": {
+     "timeout": 60000
+    }
+   },
+   "credentials": {
+    "httpQueryAuth": {
+     "id": "HXdesRATFOJkYxhK",
+     "name": "BMH · Meta Instagram (token)"
+    }
+   },
+   "executeOnce": true,
+   "alwaysOutputData": true,
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000,
+   "onError": "continueRegularOutput"
+  },
+  {
+   "id": "27a05b96-2b75-5c2f-a69a-ccdc23f4ad88",
+   "name": "Meta · 3 dias por conjunto",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    1920,
+    0
+   ],
+   "parameters": {
+    "url": "={{ `https://graph.facebook.com/v26.0/${$('Quando').first().json.conta}/insights` }}",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpQueryAuth",
+    "sendQuery": true,
+    "queryParameters": {
+     "parameters": [
+      {
+       "name": "level",
+       "value": "adset"
+      },
+      {
+       "name": "date_preset",
+       "value": "last_3d"
+      },
+      {
+       "name": "fields",
+       "value": "adset_id,spend,actions"
+      },
+      {
+       "name": "limit",
+       "value": "200"
+      }
+     ]
+    },
+    "options": {
+     "timeout": 60000
+    }
+   },
+   "credentials": {
+    "httpQueryAuth": {
+     "id": "HXdesRATFOJkYxhK",
+     "name": "BMH · Meta Instagram (token)"
+    }
+   },
+   "executeOnce": true,
+   "alwaysOutputData": true,
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000,
+   "onError": "continueRegularOutput"
+  },
+  {
+   "id": "23ce23ce-f60a-5b13-90b4-f468378c96c8",
+   "name": "Meta · 7 dias por conjunto",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    2160,
+    0
+   ],
+   "parameters": {
+    "url": "={{ `https://graph.facebook.com/v26.0/${$('Quando').first().json.conta}/insights` }}",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpQueryAuth",
+    "sendQuery": true,
+    "queryParameters": {
+     "parameters": [
+      {
+       "name": "level",
+       "value": "adset"
+      },
+      {
+       "name": "date_preset",
+       "value": "last_7d"
+      },
+      {
+       "name": "fields",
+       "value": "adset_id,adset_name,spend,reach,frequency"
+      },
+      {
+       "name": "limit",
+       "value": "200"
+      }
+     ]
+    },
+    "options": {
+     "timeout": 60000
+    }
+   },
+   "credentials": {
+    "httpQueryAuth": {
+     "id": "HXdesRATFOJkYxhK",
+     "name": "BMH · Meta Instagram (token)"
+    }
+   },
+   "executeOnce": true,
+   "alwaysOutputData": true,
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000,
+   "onError": "continueRegularOutput"
+  },
+  {
+   "id": "3509fc81-b2ab-51a0-92d2-1d613569f624",
+   "name": "Meta · 7 dias da conta",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    2400,
+    0
+   ],
+   "parameters": {
+    "url": "={{ `https://graph.facebook.com/v26.0/${$('Quando').first().json.conta}/insights` }}",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpQueryAuth",
+    "sendQuery": true,
+    "queryParameters": {
+     "parameters": [
+      {
+       "name": "date_preset",
+       "value": "last_7d"
+      },
+      {
+       "name": "time_increment",
+       "value": "1"
+      },
+      {
+       "name": "fields",
+       "value": "date_start,spend"
+      },
+      {
+       "name": "limit",
+       "value": "10"
+      }
+     ]
+    },
+    "options": {
+     "timeout": 60000
+    }
+   },
+   "credentials": {
+    "httpQueryAuth": {
+     "id": "HXdesRATFOJkYxhK",
+     "name": "BMH · Meta Instagram (token)"
+    }
+   },
+   "executeOnce": true,
+   "alwaysOutputData": true,
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000,
+   "onError": "continueRegularOutput"
+  },
+  {
+   "id": "a5294027-54c2-5544-874b-a5aec2d40fa6",
+   "name": "Meta · mês até ontem",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    2640,
+    0
+   ],
+   "parameters": {
+    "url": "={{ `https://graph.facebook.com/v26.0/${$('Quando').first().json.conta}/insights` }}",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpQueryAuth",
+    "sendQuery": true,
+    "queryParameters": {
+     "parameters": [
+      {
+       "name": "time_range",
+       "value": "={{ `{\"since\":\"${$('Quando').first().json.mes_desde}\",\"until\":\"${$('Quando').first().json.ontem}\"}` }}"
+      },
+      {
+       "name": "fields",
+       "value": "spend"
+      }
+     ]
+    },
+    "options": {
+     "timeout": 60000
+    }
+   },
+   "credentials": {
+    "httpQueryAuth": {
+     "id": "HXdesRATFOJkYxhK",
+     "name": "BMH · Meta Instagram (token)"
+    }
+   },
+   "executeOnce": true,
+   "alwaysOutputData": true,
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000,
+   "onError": "continueRegularOutput"
+  },
+  {
+   "id": "9823f2b4-b48c-5845-ba37-d7bfed386645",
+   "name": "Meta · alterações de ontem",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    2880,
+    0
+   ],
+   "parameters": {
+    "url": "={{ `https://graph.facebook.com/v26.0/${$('Quando').first().json.conta}/activities` }}",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpQueryAuth",
+    "sendQuery": true,
+    "queryParameters": {
+     "parameters": [
+      {
+       "name": "since",
+       "value": "={{ `${$('Quando').first().json.ontem}` }}"
+      },
+      {
+       "name": "until",
+       "value": "={{ `${$('Quando').first().json.hoje}` }}"
+      },
+      {
+       "name": "fields",
+       "value": "event_time,event_type,translated_event_type,actor_name,object_name"
+      },
+      {
+       "name": "limit",
+       "value": "200"
+      }
+     ]
+    },
+    "options": {
+     "timeout": 60000
+    }
+   },
+   "credentials": {
+    "httpQueryAuth": {
+     "id": "HXdesRATFOJkYxhK",
+     "name": "BMH · Meta Instagram (token)"
+    }
+   },
+   "executeOnce": true,
+   "alwaysOutputData": true,
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000,
+   "onError": "continueRegularOutput"
+  },
+  {
+   "id": "cf504438-c450-5c89-9858-95ba4d942340",
+   "name": "Registro (tabela)",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    3120,
+    0
+   ],
+   "parameters": {
+    "operation": "get",
+    "dataTableId": {
+     "__rl": true,
+     "value": "E1ewiB9pcohZpSfw",
+     "mode": "id",
+     "cachedResultName": "BMH_guardiao_registro"
+    },
+    "returnAll": true
+   },
+   "executeOnce": true,
+   "alwaysOutputData": true
+  },
+  {
+   "id": "2ded67be-ea3d-5c83-8c87-0d897259639b",
+   "name": "Decide",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    3360,
+    0
+   ],
+   "parameters": {
+    "jsCode": "// Regras copiadas de scripts/n8n/bmh-meta-guardiao-decide.js (BMH_Claude_VSL) pelo monta-guardiao-meta.py: não editar aqui,\n// editar lá, testar com testa-guardiao-meta.js e montar de novo.\n// Guardião do Meta Ads da BMH (20/10/2026): as regras. Pelo método da Nexo (Central_Claude/frentes/metodo-meta-ads.md, seção 4)\n// mais a regra do Jorge de 20/10: a conta não para antes de `meta_no_ar_ate` e nenhuma proposta deixa a conta sem anúncio\n// rodando antes dessa data. Este arquivo é a fonte: o montador (monta-guardiao-meta.py) embute o mesmo texto no nó \"Decide\" do\n// fluxo e o testa-guardiao-meta.js roda com os dados de verdade pelo cofre. Mudou aqui, monta o fluxo de novo.\n//\n// Só decide: devolve uma linha por aviso ou proposta. Não aplica nada (nesta versão o guardião é só simulação; pausar ou mudar\n// verba sozinho é outra versão, com o \"pode\" do Jorge e depois de rodadas conferidas).\n//\n// Entrada E: hoje, ontem, dia, dias_mes, restantes (dias que faltam no mês, com hoje), teste, cfg (chave → valor da BMH_config),\n// conta, campanhas, conjuntos, anuncios (listas da Graph), ontemConj, tresConj, seteConj (insights por conjunto), dias7\n// (gasto da conta por dia, 7 dias), mes (gasto do mês até ontem), alteracoes (activities de ontem), registro (linhas da\n// BMH_guardiao_registro) e erros (nome do nó → mensagem).\nfunction decideMeta(E) {\n  const cfg = E.cfg || {};\n  const CONV = 'onsite_conversion.messaging_conversation_started_7d';\n  // padrão seguro: sem a chave na BMH_config, vale a data da regra do Jorge (20/10/2026); a chave só serve para mudar a data\n  const NO_AR_ATE = cfg.meta_no_ar_ate || '2026-10-31';\n  const DIAS_AVISO = Number(cfg.meta_dias_aviso || 5);          // 3 dias de folga (regra do Jorge) + 2 para o Pix cair\n  const FREQ_MAX = Number(cfg.meta_freq_max || 4);\n  const LIM_SEM_CONVERSA = Number(cfg.meta_limite_sem_conversa || 40);\n  const PISO = 6;                                               // menor orçamento diário que o guardião propõe\n  const TETO = Number(cfg['meta_teto_mes_' + E.hoje.slice(0, 7)] || cfg.meta_teto_mes || 0);\n  const DA_CASA = new Set(['Meta', ...String(cfg.meta_alteracoes_da_casa || 'Claude BMH').split(',').map(s => s.trim()).filter(Boolean)]);\n  const REPETE_EM_7 = new Set(['meta_frequencia', 'meta_anuncio_problema']);   // o resto aparece todo dia enquanto durar\n\n  const num = v => Number(v) || 0;\n  const brl = v => 'R$ ' + num(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });\n  const dm = d => d.slice(8, 10) + '/' + d.slice(5, 7);\n  const maisDias = (d, n) => { const x = new Date(d + 'T12:00:00Z'); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); };\n  const lista = r => (r && Array.isArray(r.data)) ? r.data : [];\n  const acoesDe = a => Object.fromEntries((a || []).map(x => [x.action_type, num(x.value)]));\n  // valor em texto da Meta (\"R$211.10\" ou \"R$ 1.211,10\"): o último separador é o decimal\n  const valor = s => { const m = String(s || '').match(/R\\$\\s?([\\d.,]+)/); if (!m) return null; const t = m[1]; const i = Math.max(t.lastIndexOf('.'), t.lastIndexOf(','));\n    return i > -1 && t.length - i - 1 === 2 ? Number(t.slice(0, i).replace(/[.,]/g, '') + '.' + t.slice(i + 1)) : Number(t.replace(/[.,]/g, '')); };\n\n  const out = [];\n  const add = a => out.push({ hoje: E.hoje, teste: !!E.teste, plataforma: 'meta', tipo: '', alvo_id: '', alvo: '', valor_antes: '', valor_novo: '',\n    detalhe: '', modo: 'simulacao', resultado: 'simulado', ...a });\n\n  // erro de qualquer leitura: avisa e não decide em cima de dado faltando\n  const erros = Object.entries(E.erros || {});\n  for (const [no, msg] of erros) add({ regra: 'meta_erro_api', acao: 'avisar', alvo: no, detalhe: `não consegui ler \"${no}\" na Meta: ${String(msg).slice(0, 200)}` });\n  if (erros.length) return out;\n\n  const conta = E.conta || {};\n  const campanhas = lista(E.campanhas), conjuntos = lista(E.conjuntos), anuncios = lista(E.anuncios);\n  const campAtiva = new Set(campanhas.filter(c => c.effective_status === 'ACTIVE').map(c => c.id));\n  const ativos = conjuntos.filter(c => c.effective_status === 'ACTIVE');\n\n  // (1) conta fora do ar\n  if (num(conta.account_status) !== 1)\n    add({ regra: 'meta_conta_fora', acao: 'avisar', alvo: 'conta', detalhe: `a conta de anúncios não está ativa (status ${conta.account_status}${conta.disable_reason ? ', motivo ' + conta.disable_reason : ''}). Nada roda até resolver.` });\n\n  // orçamentos diários ligados (campanha com orçamento próprio ou conjunto)\n  const orc = [];\n  for (const c of campanhas) if (c.effective_status === 'ACTIVE' && num(c.daily_budget)) orc.push({ tipo: 'campanha', id: c.id, nome: c.name, valor: num(c.daily_budget) / 100 });\n  for (const c of ativos) if (campAtiva.has(c.campaign_id) && num(c.daily_budget)) orc.push({ tipo: 'conjunto', id: c.id, nome: c.name, valor: num(c.daily_budget) / 100 });\n  const B = orc.reduce((s, o) => s + o.valor, 0);\n\n  // (2) verba da conta e continuidade: o que sobra = menor entre o restante do limite de gastos e o saldo livre (pré-paga).\n  // Ritmo = soma dos orçamentos ligados (reage na hora a uma pausa ou corte; a média de 7 dias levaria uma semana e daria\n  // alarme falso); sem orçamento diário (verba total), usa a média de 7 dias.\n  const ritmo = B > 0 ? B : lista(E.dias7).reduce((s, d) => s + num(d.spend), 0) / 7;\n  const limite = conta.spend_cap && num(conta.spend_cap) > 0 ? (num(conta.spend_cap) - num(conta.amount_spent)) / 100 : null;\n  const saldoBruto = conta.is_prepay_account ? valor((conta.funding_source_details || {}).display_string) : null;\n  const saldo = saldoBruto === null ? null : saldoBruto - num(conta.balance) / 100;\n  const candidatos = [limite, saldo].filter(v => v !== null && !Number.isNaN(v));\n  if (candidatos.length && ritmo > 0) {\n    const verba = Math.min(...candidatos);\n    const quem = verba === limite ? 'limite de gastos da conta' : 'saldo pré-pago';\n    const dias = verba / ritmo;\n    const acaba = maisDias(E.hoje, Math.floor(dias));\n    const antesDoPrazo = NO_AR_ATE && acaba < NO_AR_ATE;\n    if (dias < DIAS_AVISO || antesDoPrazo) {\n      let txt = `a verba da conta (${quem}) tem ${brl(verba)}: com ${brl(ritmo)}/dia ${B > 0 ? 'de orçamento ligado' : '(média de 7 dias)'} dura ${dias.toLocaleString('pt-BR', { maximumFractionDigits: 1 })} dias e acaba por volta de ${dm(acaba)}.`;\n      if (antesDoPrazo) {\n        const falta = Math.ceil(((Math.round((new Date(NO_AR_ATE) - new Date(E.hoje)) / 864e5) + 1) * ritmo - verba) / 10) * 10;\n        const pede = verba === limite ? `subir o limite em pelo menos ${brl(falta)} (e ter saldo para isso)` : `pôr Pix de pelo menos ${brl(falta)} além do imposto`;\n        txt += ` A conta precisa ficar no ar até ${dm(NO_AR_ATE)}: ${pede}, ou baixar o gasto diário. Só o Jorge sobe o limite e põe Pix.`;\n      } else txt += ` Só o Jorge ${verba === limite ? 'sobe o limite' : 'põe Pix (o Pix inclui imposto)'}.`;\n      add({ regra: 'meta_verba_conta', acao: 'avisar', alvo: 'conta', valor_antes: verba.toFixed(2), detalhe: txt });\n    }\n  }\n\n  // (3) gasto zero: conjunto ligado, de campanha ligada, criado antes de ontem, sem nenhuma exibição ontem\n  const impOntem = Object.fromEntries(lista(E.ontemConj).map(x => [x.adset_id, num(x.impressions)]));\n  for (const c of ativos) if (campAtiva.has(c.campaign_id) && String(c.created_time).slice(0, 10) < E.ontem && !impOntem[c.id])\n    add({ regra: 'meta_gasto_zero', tipo: 'conjunto', alvo_id: c.id, alvo: c.name, acao: 'avisar', detalhe: `o conjunto \"${c.name}\" está ligado e não teve nenhuma exibição ontem (saldo, limite, reprovação ou público).` });\n\n  // (4) frequência alta em 7 dias, só de conjunto que continua ligado (o pausado não pede criativo novo)\n  const ligados = new Set(ativos.filter(c => campAtiva.has(c.campaign_id)).map(c => c.id));\n  for (const x of lista(E.seteConj)) if (ligados.has(x.adset_id) && num(x.frequency) > FREQ_MAX)\n    add({ regra: 'meta_frequencia', tipo: 'conjunto', alvo_id: x.adset_id, alvo: x.adset_name, acao: 'avisar', valor_antes: num(x.frequency).toFixed(1),\n      detalhe: `\"${x.adset_name}\" mostrou o anúncio ${num(x.frequency).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} vezes para cada pessoa em 7 dias (${brl(x.spend)}): pede criativo novo ou pausa.` });\n\n  // (5) anúncio reprovado ou com problema, em conjunto ligado\n  const conjAtivo = new Set(ativos.map(c => c.id));\n  for (const a of anuncios) if (['DISAPPROVED', 'WITH_ISSUES'].includes(a.effective_status) && conjAtivo.has(a.adset_id))\n    add({ regra: 'meta_anuncio_problema', tipo: 'anuncio', alvo_id: a.id, alvo: a.name, acao: 'avisar',\n      detalhe: `o anúncio \"${a.name}\" está ${a.effective_status === 'DISAPPROVED' ? 'reprovado' : 'com problema'} na Meta e não roda.` });\n\n  // (6) alteração feita por quem não é da casa, ontem (cobrança e evento da própria Meta ficam de fora)\n  const porPessoa = {};\n  for (const h of lista(E.alteracoes)) if (!DA_CASA.has(h.actor_name)) (porPessoa[h.actor_name || '?'] ||= []).push(h.translated_event_type || h.event_type);\n  for (const [p, ev] of Object.entries(porPessoa))\n    add({ regra: 'meta_alteracao_terceiros', alvo: p, acao: 'avisar', detalhe: `${p} mexeu na conta ontem (${ev.length}): ${[...new Set(ev)].slice(0, 5).join(', ')}.` });\n\n  // (7) conjunto de mensagem com R$ 40 em 3 dias sem nenhuma conversa: proposta de pausa\n  const tres = Object.fromEntries(lista(E.tresConj).map(x => [x.adset_id, { gasto: num(x.spend), conv: acoesDe(x.actions)[CONV] || 0 }]));\n  const ehMensagem = c => c.optimization_goal === 'CONVERSATIONS' || /WHATSAPP|MESSENGER|MESSAGING|INSTAGRAM_DIRECT/.test(String(c.destination_type || ''));\n  for (const c of ativos) { const t = tres[c.id]; if (ehMensagem(c) && t && t.gasto >= LIM_SEM_CONVERSA && t.conv === 0)\n    add({ regra: 'meta_sem_conversa_3_dias', tipo: 'conjunto', alvo_id: c.id, alvo: c.name, acao: 'pausar', valor_antes: t.gasto.toFixed(2),\n      detalhe: `${brl(t.gasto)} em 3 dias sem nenhuma conversa iniciada.` }); }\n\n  // (8) teto do mês: gasto até ontem + orçamentos ligados × dias que faltam (com hoje)\n  if (TETO) {\n    const G = E.dia > 1 ? num(E.mes) : 0, proj = G + B * E.restantes;\n    if (G >= TETO) for (const o of orc)\n      add({ regra: 'meta_teto', tipo: o.tipo, alvo_id: o.id, alvo: o.nome, acao: 'pausar', valor_antes: G.toFixed(2), detalhe: `o mês já gastou ${brl(G)} no Meta; o teto é ${brl(TETO)}.` });\n    else if (B > 0 && proj > TETO * 1.02) {\n      const alvoTotal = Math.max(PISO * orc.length, (TETO - G) / E.restantes);\n      for (const o of orc) { const novo = Math.max(PISO, Math.floor(o.valor * alvoTotal / B * 100) / 100); if (novo >= o.valor) continue;\n        add({ regra: 'meta_teto', tipo: 'orcamento_' + o.tipo, alvo_id: o.id, alvo: o.nome, acao: 'orcamento', valor_antes: o.valor.toFixed(2), valor_novo: novo.toFixed(2),\n          detalhe: `com ${brl(B)}/dia o mês fecharia em ${brl(proj)}, acima do teto de ${brl(TETO)}: de ${brl(o.valor)} para ${brl(novo)}/dia.` }); }\n    }\n  }\n\n  // Trava de continuidade (Jorge, 20/10/2026): antes de `meta_no_ar_ate`, nenhuma proposta deixa a conta sem anúncio rodando.\n  // Se as pausas propostas desligariam o último conjunto ligado, viram aviso.\n  if (NO_AR_ATE && E.hoje <= NO_AR_ATE) {\n    const pausas = out.filter(a => a.acao === 'pausar');\n    const desliga = new Set();\n    for (const a of pausas) {\n      if (a.tipo === 'conjunto') desliga.add(a.alvo_id);\n      if (a.tipo === 'campanha') ativos.filter(c => c.campaign_id === a.alvo_id).forEach(c => desliga.add(c.id));\n    }\n    const sobram = ativos.filter(c => campAtiva.has(c.campaign_id) && !desliga.has(c.id)).length;\n    if (pausas.length && sobram === 0) for (const a of pausas) {\n      a.acao = 'avisar'; a.resultado = 'nao_proposto';\n      a.detalhe += ` Não proponho pausar: deixaria a conta sem anúncio antes de ${dm(NO_AR_ATE)} (regra do Jorge).`;\n    }\n  }\n\n  // Mesmo aviso sobre o mesmo alvo só volta depois de 7 dias (só para frequência e anúncio com problema)\n  const desde = maisDias(E.hoje, -7);\n  const visto = new Set((E.registro || []).filter(r => r.plataforma === 'meta' && r.data >= desde && r.data < E.hoje).map(r => r.regra + '|' + r.alvo_id));\n  return out.filter(a => !(REPETE_EM_7.has(a.regra) && visto.has(a.regra + '|' + a.alvo_id)));\n}\n// Monta a entrada E a partir das respostas cruas das leituras (bmh-meta-guardiao-leituras.json), igual no n8n e no teste.\n// lidas: chave da leitura → resposta da Graph (ou { error } quando o nó falhou).\nfunction montaEntrada(Q, cfg, lidas, registro, nomes) {\n  const erros = {};\n  for (const [k, r] of Object.entries(lidas)) if (!r || r.error) erros[(nomes && nomes[k]) || k] = r && r.error ? (r.error.message || JSON.stringify(r.error)) : 'sem resposta';\n  const mes = lidas.mes && Array.isArray(lidas.mes.data) && lidas.mes.data[0] ? lidas.mes.data[0].spend : 0;\n  return { ...Q, cfg, ...lidas, mes, registro: registro || [], erros };\n}\n// Uma mensagem só no Telegram (robô BMH alertas), sem botões: nesta versão nada se aplica, nem pelo toque.\nfunction montaMensagem(Q, acoes) {\n  if (!acoes.length) return [];\n  const dm = d => d.slice(8, 10) + '/' + d.slice(5, 7);\n  const avisos = acoes.filter(a => a.acao === 'avisar'), propostas = acoes.filter(a => a.acao !== 'avisar');\n  let t = (Q.teste ? '🧪 TESTE: nada foi gravado\\n' : '') + '🛡️ Guardião Meta BMH · ' + dm(Q.hoje) + ' (homologação, simulação)\\n';\n  if (avisos.length) t += '\\n' + avisos.map(a => '• ' + a.detalhe).join('\\n') + '\\n';\n  if (propostas.length) t += '\\nO que eu proporia (nada foi mudado):\\n' + propostas.map(a => '• ' + (a.acao === 'pausar' ? `pausar \"${a.alvo}\": ` : `orçamento de \"${a.alvo}\": `) + a.detalhe).join('\\n') + '\\n';\n  return [{ texto: t.length > 4000 ? t.slice(0, 3990) + '\\n(...)' : t }];\n}\n\nconst Q = $('Quando').first().json;\nconst cfg = Object.fromEntries($('Config').all().map(i => i.json).filter(r => r && r.chave).map(r => [r.chave, r.valor]));\nconst NOS = {\"conta\": \"Meta · conta\", \"campanhas\": \"Meta · campanhas\", \"conjuntos\": \"Meta · conjuntos\", \"anuncios\": \"Meta · anúncios\", \"ontemConj\": \"Meta · ontem por conjunto\", \"tresConj\": \"Meta · 3 dias por conjunto\", \"seteConj\": \"Meta · 7 dias por conjunto\", \"dias7\": \"Meta · 7 dias da conta\", \"mes\": \"Meta · mês até ontem\", \"alteracoes\": \"Meta · alterações de ontem\"};\nconst lidas = {};\nfor (const [k, n] of Object.entries(NOS)) { try { lidas[k] = $(n).first().json; } catch (e) { lidas[k] = { error: { message: String(e.message || e) } }; } }\nconst registro = $('Registro (tabela)').all().map(i => i.json).filter(r => r && r.chave);\nreturn decideMeta(montaEntrada(Q, cfg, lidas, registro, NOS)).map(json => ({ json }));\n"
+   }
+  },
+  {
+   "id": "9f32b9af-5eff-5aec-80c5-f350a70735a1",
+   "name": "Prepara o registro",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    3600,
+    -220
+   ],
+   "parameters": {
+    "jsCode": "// Grava em BMH_guardiao_registro só quando BMH_config guardiao_meta_grava = sim (em homologação não grava, para o painel e o\n// resumo das 8h não mostrarem decisão de teste) e nunca na chamada de teste.\nconst cfg = Object.fromEntries($('Config').all().map(i => i.json).filter(r => r && r.chave).map(r => [r.chave, r.valor]));\nif ($('Quando').first().json.teste || cfg.guardiao_meta_grava !== 'sim') return [];\nreturn $input.all().map(({ json: a }) => ({ json: { chave: [a.hoje, a.regra, a.alvo_id || a.alvo].join('|'), data: a.hoje, regra: a.regra,\n  plataforma: 'meta', tipo: a.tipo || '', alvo_id: String(a.alvo_id || ''), alvo: a.alvo || '', acao: a.acao, valor_antes: String(a.valor_antes || ''),\n  valor_novo: String(a.valor_novo || ''), modo: a.modo, resultado: a.resultado, detalhe: a.detalhe || '' } }));\n"
+   }
+  },
+  {
+   "id": "28e3eeed-388c-5bc7-b44c-08ca4cdca41e",
+   "name": "Registra",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    3840,
+    -220
+   ],
+   "parameters": {
+    "operation": "upsert",
+    "dataTableId": {
+     "__rl": true,
+     "value": "E1ewiB9pcohZpSfw",
+     "mode": "id",
+     "cachedResultName": "BMH_guardiao_registro"
+    },
+    "filters": {
+     "conditions": [
+      {
+       "keyName": "chave",
+       "keyValue": "={{ $json.chave }}"
+      }
+     ]
+    },
+    "columns": {
+     "mappingMode": "defineBelow",
+     "value": {
+      "chave": "={{ $json.chave }}",
+      "data": "={{ $json.data }}",
+      "regra": "={{ $json.regra }}",
+      "plataforma": "={{ $json.plataforma }}",
+      "tipo": "={{ $json.tipo }}",
+      "alvo_id": "={{ $json.alvo_id }}",
+      "alvo": "={{ $json.alvo }}",
+      "acao": "={{ $json.acao }}",
+      "valor_antes": "={{ $json.valor_antes }}",
+      "valor_novo": "={{ $json.valor_novo }}",
+      "modo": "={{ $json.modo }}",
+      "resultado": "={{ $json.resultado }}",
+      "detalhe": "={{ $json.detalhe }}"
+     },
+     "matchingColumns": [],
+     "schema": [
+      {
+       "id": "chave",
+       "displayName": "chave",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "data",
+       "displayName": "data",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "regra",
+       "displayName": "regra",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "plataforma",
+       "displayName": "plataforma",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "tipo",
+       "displayName": "tipo",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "alvo_id",
+       "displayName": "alvo_id",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "alvo",
+       "displayName": "alvo",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "acao",
+       "displayName": "acao",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "valor_antes",
+       "displayName": "valor_antes",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "valor_novo",
+       "displayName": "valor_novo",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "modo",
+       "displayName": "modo",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "resultado",
+       "displayName": "resultado",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "detalhe",
+       "displayName": "detalhe",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      }
+     ]
+    },
+    "options": {}
+   }
+  },
+  {
+   "id": "9f33a24a-c8b4-5b7d-8b62-2de966f6c3ed",
+   "name": "Monta a mensagem",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    3600,
+    220
+   ],
+   "parameters": {
+    "jsCode": "// Copiado de scripts/n8n/bmh-meta-guardiao-decide.js pelo monta-guardiao-meta.py (só montaMensagem é usada aqui).\n// Guardião do Meta Ads da BMH (20/10/2026): as regras. Pelo método da Nexo (Central_Claude/frentes/metodo-meta-ads.md, seção 4)\n// mais a regra do Jorge de 20/10: a conta não para antes de `meta_no_ar_ate` e nenhuma proposta deixa a conta sem anúncio\n// rodando antes dessa data. Este arquivo é a fonte: o montador (monta-guardiao-meta.py) embute o mesmo texto no nó \"Decide\" do\n// fluxo e o testa-guardiao-meta.js roda com os dados de verdade pelo cofre. Mudou aqui, monta o fluxo de novo.\n//\n// Só decide: devolve uma linha por aviso ou proposta. Não aplica nada (nesta versão o guardião é só simulação; pausar ou mudar\n// verba sozinho é outra versão, com o \"pode\" do Jorge e depois de rodadas conferidas).\n//\n// Entrada E: hoje, ontem, dia, dias_mes, restantes (dias que faltam no mês, com hoje), teste, cfg (chave → valor da BMH_config),\n// conta, campanhas, conjuntos, anuncios (listas da Graph), ontemConj, tresConj, seteConj (insights por conjunto), dias7\n// (gasto da conta por dia, 7 dias), mes (gasto do mês até ontem), alteracoes (activities de ontem), registro (linhas da\n// BMH_guardiao_registro) e erros (nome do nó → mensagem).\nfunction decideMeta(E) {\n  const cfg = E.cfg || {};\n  const CONV = 'onsite_conversion.messaging_conversation_started_7d';\n  // padrão seguro: sem a chave na BMH_config, vale a data da regra do Jorge (20/10/2026); a chave só serve para mudar a data\n  const NO_AR_ATE = cfg.meta_no_ar_ate || '2026-10-31';\n  const DIAS_AVISO = Number(cfg.meta_dias_aviso || 5);          // 3 dias de folga (regra do Jorge) + 2 para o Pix cair\n  const FREQ_MAX = Number(cfg.meta_freq_max || 4);\n  const LIM_SEM_CONVERSA = Number(cfg.meta_limite_sem_conversa || 40);\n  const PISO = 6;                                               // menor orçamento diário que o guardião propõe\n  const TETO = Number(cfg['meta_teto_mes_' + E.hoje.slice(0, 7)] || cfg.meta_teto_mes || 0);\n  const DA_CASA = new Set(['Meta', ...String(cfg.meta_alteracoes_da_casa || 'Claude BMH').split(',').map(s => s.trim()).filter(Boolean)]);\n  const REPETE_EM_7 = new Set(['meta_frequencia', 'meta_anuncio_problema']);   // o resto aparece todo dia enquanto durar\n\n  const num = v => Number(v) || 0;\n  const brl = v => 'R$ ' + num(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });\n  const dm = d => d.slice(8, 10) + '/' + d.slice(5, 7);\n  const maisDias = (d, n) => { const x = new Date(d + 'T12:00:00Z'); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); };\n  const lista = r => (r && Array.isArray(r.data)) ? r.data : [];\n  const acoesDe = a => Object.fromEntries((a || []).map(x => [x.action_type, num(x.value)]));\n  // valor em texto da Meta (\"R$211.10\" ou \"R$ 1.211,10\"): o último separador é o decimal\n  const valor = s => { const m = String(s || '').match(/R\\$\\s?([\\d.,]+)/); if (!m) return null; const t = m[1]; const i = Math.max(t.lastIndexOf('.'), t.lastIndexOf(','));\n    return i > -1 && t.length - i - 1 === 2 ? Number(t.slice(0, i).replace(/[.,]/g, '') + '.' + t.slice(i + 1)) : Number(t.replace(/[.,]/g, '')); };\n\n  const out = [];\n  const add = a => out.push({ hoje: E.hoje, teste: !!E.teste, plataforma: 'meta', tipo: '', alvo_id: '', alvo: '', valor_antes: '', valor_novo: '',\n    detalhe: '', modo: 'simulacao', resultado: 'simulado', ...a });\n\n  // erro de qualquer leitura: avisa e não decide em cima de dado faltando\n  const erros = Object.entries(E.erros || {});\n  for (const [no, msg] of erros) add({ regra: 'meta_erro_api', acao: 'avisar', alvo: no, detalhe: `não consegui ler \"${no}\" na Meta: ${String(msg).slice(0, 200)}` });\n  if (erros.length) return out;\n\n  const conta = E.conta || {};\n  const campanhas = lista(E.campanhas), conjuntos = lista(E.conjuntos), anuncios = lista(E.anuncios);\n  const campAtiva = new Set(campanhas.filter(c => c.effective_status === 'ACTIVE').map(c => c.id));\n  const ativos = conjuntos.filter(c => c.effective_status === 'ACTIVE');\n\n  // (1) conta fora do ar\n  if (num(conta.account_status) !== 1)\n    add({ regra: 'meta_conta_fora', acao: 'avisar', alvo: 'conta', detalhe: `a conta de anúncios não está ativa (status ${conta.account_status}${conta.disable_reason ? ', motivo ' + conta.disable_reason : ''}). Nada roda até resolver.` });\n\n  // orçamentos diários ligados (campanha com orçamento próprio ou conjunto)\n  const orc = [];\n  for (const c of campanhas) if (c.effective_status === 'ACTIVE' && num(c.daily_budget)) orc.push({ tipo: 'campanha', id: c.id, nome: c.name, valor: num(c.daily_budget) / 100 });\n  for (const c of ativos) if (campAtiva.has(c.campaign_id) && num(c.daily_budget)) orc.push({ tipo: 'conjunto', id: c.id, nome: c.name, valor: num(c.daily_budget) / 100 });\n  const B = orc.reduce((s, o) => s + o.valor, 0);\n\n  // (2) verba da conta e continuidade: o que sobra = menor entre o restante do limite de gastos e o saldo livre (pré-paga).\n  // Ritmo = soma dos orçamentos ligados (reage na hora a uma pausa ou corte; a média de 7 dias levaria uma semana e daria\n  // alarme falso); sem orçamento diário (verba total), usa a média de 7 dias.\n  const ritmo = B > 0 ? B : lista(E.dias7).reduce((s, d) => s + num(d.spend), 0) / 7;\n  const limite = conta.spend_cap && num(conta.spend_cap) > 0 ? (num(conta.spend_cap) - num(conta.amount_spent)) / 100 : null;\n  const saldoBruto = conta.is_prepay_account ? valor((conta.funding_source_details || {}).display_string) : null;\n  const saldo = saldoBruto === null ? null : saldoBruto - num(conta.balance) / 100;\n  const candidatos = [limite, saldo].filter(v => v !== null && !Number.isNaN(v));\n  if (candidatos.length && ritmo > 0) {\n    const verba = Math.min(...candidatos);\n    const quem = verba === limite ? 'limite de gastos da conta' : 'saldo pré-pago';\n    const dias = verba / ritmo;\n    const acaba = maisDias(E.hoje, Math.floor(dias));\n    const antesDoPrazo = NO_AR_ATE && acaba < NO_AR_ATE;\n    if (dias < DIAS_AVISO || antesDoPrazo) {\n      let txt = `a verba da conta (${quem}) tem ${brl(verba)}: com ${brl(ritmo)}/dia ${B > 0 ? 'de orçamento ligado' : '(média de 7 dias)'} dura ${dias.toLocaleString('pt-BR', { maximumFractionDigits: 1 })} dias e acaba por volta de ${dm(acaba)}.`;\n      if (antesDoPrazo) {\n        const falta = Math.ceil(((Math.round((new Date(NO_AR_ATE) - new Date(E.hoje)) / 864e5) + 1) * ritmo - verba) / 10) * 10;\n        const pede = verba === limite ? `subir o limite em pelo menos ${brl(falta)} (e ter saldo para isso)` : `pôr Pix de pelo menos ${brl(falta)} além do imposto`;\n        txt += ` A conta precisa ficar no ar até ${dm(NO_AR_ATE)}: ${pede}, ou baixar o gasto diário. Só o Jorge sobe o limite e põe Pix.`;\n      } else txt += ` Só o Jorge ${verba === limite ? 'sobe o limite' : 'põe Pix (o Pix inclui imposto)'}.`;\n      add({ regra: 'meta_verba_conta', acao: 'avisar', alvo: 'conta', valor_antes: verba.toFixed(2), detalhe: txt });\n    }\n  }\n\n  // (3) gasto zero: conjunto ligado, de campanha ligada, criado antes de ontem, sem nenhuma exibição ontem\n  const impOntem = Object.fromEntries(lista(E.ontemConj).map(x => [x.adset_id, num(x.impressions)]));\n  for (const c of ativos) if (campAtiva.has(c.campaign_id) && String(c.created_time).slice(0, 10) < E.ontem && !impOntem[c.id])\n    add({ regra: 'meta_gasto_zero', tipo: 'conjunto', alvo_id: c.id, alvo: c.name, acao: 'avisar', detalhe: `o conjunto \"${c.name}\" está ligado e não teve nenhuma exibição ontem (saldo, limite, reprovação ou público).` });\n\n  // (4) frequência alta em 7 dias, só de conjunto que continua ligado (o pausado não pede criativo novo)\n  const ligados = new Set(ativos.filter(c => campAtiva.has(c.campaign_id)).map(c => c.id));\n  for (const x of lista(E.seteConj)) if (ligados.has(x.adset_id) && num(x.frequency) > FREQ_MAX)\n    add({ regra: 'meta_frequencia', tipo: 'conjunto', alvo_id: x.adset_id, alvo: x.adset_name, acao: 'avisar', valor_antes: num(x.frequency).toFixed(1),\n      detalhe: `\"${x.adset_name}\" mostrou o anúncio ${num(x.frequency).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} vezes para cada pessoa em 7 dias (${brl(x.spend)}): pede criativo novo ou pausa.` });\n\n  // (5) anúncio reprovado ou com problema, em conjunto ligado\n  const conjAtivo = new Set(ativos.map(c => c.id));\n  for (const a of anuncios) if (['DISAPPROVED', 'WITH_ISSUES'].includes(a.effective_status) && conjAtivo.has(a.adset_id))\n    add({ regra: 'meta_anuncio_problema', tipo: 'anuncio', alvo_id: a.id, alvo: a.name, acao: 'avisar',\n      detalhe: `o anúncio \"${a.name}\" está ${a.effective_status === 'DISAPPROVED' ? 'reprovado' : 'com problema'} na Meta e não roda.` });\n\n  // (6) alteração feita por quem não é da casa, ontem (cobrança e evento da própria Meta ficam de fora)\n  const porPessoa = {};\n  for (const h of lista(E.alteracoes)) if (!DA_CASA.has(h.actor_name)) (porPessoa[h.actor_name || '?'] ||= []).push(h.translated_event_type || h.event_type);\n  for (const [p, ev] of Object.entries(porPessoa))\n    add({ regra: 'meta_alteracao_terceiros', alvo: p, acao: 'avisar', detalhe: `${p} mexeu na conta ontem (${ev.length}): ${[...new Set(ev)].slice(0, 5).join(', ')}.` });\n\n  // (7) conjunto de mensagem com R$ 40 em 3 dias sem nenhuma conversa: proposta de pausa\n  const tres = Object.fromEntries(lista(E.tresConj).map(x => [x.adset_id, { gasto: num(x.spend), conv: acoesDe(x.actions)[CONV] || 0 }]));\n  const ehMensagem = c => c.optimization_goal === 'CONVERSATIONS' || /WHATSAPP|MESSENGER|MESSAGING|INSTAGRAM_DIRECT/.test(String(c.destination_type || ''));\n  for (const c of ativos) { const t = tres[c.id]; if (ehMensagem(c) && t && t.gasto >= LIM_SEM_CONVERSA && t.conv === 0)\n    add({ regra: 'meta_sem_conversa_3_dias', tipo: 'conjunto', alvo_id: c.id, alvo: c.name, acao: 'pausar', valor_antes: t.gasto.toFixed(2),\n      detalhe: `${brl(t.gasto)} em 3 dias sem nenhuma conversa iniciada.` }); }\n\n  // (8) teto do mês: gasto até ontem + orçamentos ligados × dias que faltam (com hoje)\n  if (TETO) {\n    const G = E.dia > 1 ? num(E.mes) : 0, proj = G + B * E.restantes;\n    if (G >= TETO) for (const o of orc)\n      add({ regra: 'meta_teto', tipo: o.tipo, alvo_id: o.id, alvo: o.nome, acao: 'pausar', valor_antes: G.toFixed(2), detalhe: `o mês já gastou ${brl(G)} no Meta; o teto é ${brl(TETO)}.` });\n    else if (B > 0 && proj > TETO * 1.02) {\n      const alvoTotal = Math.max(PISO * orc.length, (TETO - G) / E.restantes);\n      for (const o of orc) { const novo = Math.max(PISO, Math.floor(o.valor * alvoTotal / B * 100) / 100); if (novo >= o.valor) continue;\n        add({ regra: 'meta_teto', tipo: 'orcamento_' + o.tipo, alvo_id: o.id, alvo: o.nome, acao: 'orcamento', valor_antes: o.valor.toFixed(2), valor_novo: novo.toFixed(2),\n          detalhe: `com ${brl(B)}/dia o mês fecharia em ${brl(proj)}, acima do teto de ${brl(TETO)}: de ${brl(o.valor)} para ${brl(novo)}/dia.` }); }\n    }\n  }\n\n  // Trava de continuidade (Jorge, 20/10/2026): antes de `meta_no_ar_ate`, nenhuma proposta deixa a conta sem anúncio rodando.\n  // Se as pausas propostas desligariam o último conjunto ligado, viram aviso.\n  if (NO_AR_ATE && E.hoje <= NO_AR_ATE) {\n    const pausas = out.filter(a => a.acao === 'pausar');\n    const desliga = new Set();\n    for (const a of pausas) {\n      if (a.tipo === 'conjunto') desliga.add(a.alvo_id);\n      if (a.tipo === 'campanha') ativos.filter(c => c.campaign_id === a.alvo_id).forEach(c => desliga.add(c.id));\n    }\n    const sobram = ativos.filter(c => campAtiva.has(c.campaign_id) && !desliga.has(c.id)).length;\n    if (pausas.length && sobram === 0) for (const a of pausas) {\n      a.acao = 'avisar'; a.resultado = 'nao_proposto';\n      a.detalhe += ` Não proponho pausar: deixaria a conta sem anúncio antes de ${dm(NO_AR_ATE)} (regra do Jorge).`;\n    }\n  }\n\n  // Mesmo aviso sobre o mesmo alvo só volta depois de 7 dias (só para frequência e anúncio com problema)\n  const desde = maisDias(E.hoje, -7);\n  const visto = new Set((E.registro || []).filter(r => r.plataforma === 'meta' && r.data >= desde && r.data < E.hoje).map(r => r.regra + '|' + r.alvo_id));\n  return out.filter(a => !(REPETE_EM_7.has(a.regra) && visto.has(a.regra + '|' + a.alvo_id)));\n}\n// Monta a entrada E a partir das respostas cruas das leituras (bmh-meta-guardiao-leituras.json), igual no n8n e no teste.\n// lidas: chave da leitura → resposta da Graph (ou { error } quando o nó falhou).\nfunction montaEntrada(Q, cfg, lidas, registro, nomes) {\n  const erros = {};\n  for (const [k, r] of Object.entries(lidas)) if (!r || r.error) erros[(nomes && nomes[k]) || k] = r && r.error ? (r.error.message || JSON.stringify(r.error)) : 'sem resposta';\n  const mes = lidas.mes && Array.isArray(lidas.mes.data) && lidas.mes.data[0] ? lidas.mes.data[0].spend : 0;\n  return { ...Q, cfg, ...lidas, mes, registro: registro || [], erros };\n}\n// Uma mensagem só no Telegram (robô BMH alertas), sem botões: nesta versão nada se aplica, nem pelo toque.\nfunction montaMensagem(Q, acoes) {\n  if (!acoes.length) return [];\n  const dm = d => d.slice(8, 10) + '/' + d.slice(5, 7);\n  const avisos = acoes.filter(a => a.acao === 'avisar'), propostas = acoes.filter(a => a.acao !== 'avisar');\n  let t = (Q.teste ? '🧪 TESTE: nada foi gravado\\n' : '') + '🛡️ Guardião Meta BMH · ' + dm(Q.hoje) + ' (homologação, simulação)\\n';\n  if (avisos.length) t += '\\n' + avisos.map(a => '• ' + a.detalhe).join('\\n') + '\\n';\n  if (propostas.length) t += '\\nO que eu proporia (nada foi mudado):\\n' + propostas.map(a => '• ' + (a.acao === 'pausar' ? `pausar \"${a.alvo}\": ` : `orçamento de \"${a.alvo}\": `) + a.detalhe).join('\\n') + '\\n';\n  return [{ texto: t.length > 4000 ? t.slice(0, 3990) + '\\n(...)' : t }];\n}\n\nreturn montaMensagem($('Quando').first().json, $input.all().map(i => i.json)).map(json => ({ json }));\n"
+   }
+  },
+  {
+   "id": "5d855191-422b-5359-b8bd-a78911ee81f1",
+   "name": "Telegram · aviso",
+   "type": "n8n-nodes-base.telegram",
+   "typeVersion": 1.2,
+   "position": [
+    3840,
+    220
+   ],
+   "parameters": {
+    "chatId": "8708228589",
+    "text": "={{ $json.texto }}",
+    "additionalFields": {
+     "appendAttribution": false
+    }
+   },
+   "credentials": {
+    "telegramApi": {
+     "id": "SgQHWuJOuMWeVbPi",
+     "name": "BMH · Telegram (robô BMH alertas)"
+    }
+   }
+  },
+  {
+   "id": "a37898a0-3ced-5e25-ada1-1cf9881df0ed",
+   "name": "Sobre este fluxo",
+   "type": "n8n-nodes-base.stickyNote",
+   "typeVersion": 1,
+   "position": [
+    0,
+    -520
+   ],
+   "parameters": {
+    "width": 1100,
+    "height": 420,
+    "content": "## BMH · Meta · guardião diário (homologação)\n**Traz:** a conta de anúncios do Meta da BMH (`act_327952129944258`): limite de gastos, saldo pré-pago, campanhas, conjuntos, anúncios, números de ontem, 3 e 7 dias, gasto do mês e alterações de ontem (credencial `BMH · Meta Instagram (token)`, só leitura).\n**Envia:** uma mensagem no robô BMH alertas com avisos e o que proporia; grava em `BMH_guardiao_registro` (plataforma meta) só com `guardiao_meta_grava = sim` na `BMH_config`.\n**Limites:** só simulação, não aplica nada e não tem botão; nenhuma pausa proposta deixa a conta sem anúncio antes de `meta_no_ar_ate` (regra do Jorge, 20/10/2026: a conta não para até 31/10); nunca sobe verba.\n\nRegras: verba da conta (o menor entre limite e saldo livre, pela média de 7 dias) com menos de `meta_dias_aviso` (5) dias ou acabando antes de `meta_no_ar_ate`; conta fora do ar; conjunto ligado sem exibição ontem; frequência acima de `meta_freq_max` (4) em 7 dias; anúncio reprovado ou com problema; alteração de quem não está em `meta_alteracoes_da_casa`; conjunto de mensagem com `meta_limite_sem_conversa` (R$ 40) em 3 dias sem conversa; teto `meta_teto_mes` (ou `meta_teto_mes_AAAA-MM`). Frequência e anúncio com problema só voltam depois de 7 dias.\n\nAs regras moram em `BMH_Claude_VSL/scripts/n8n/bmh-meta-guardiao-decide.js` e se testam com `testa-guardiao-meta.js` (dados de hoje, pelo cofre). Manual: `/webhook/bmh-meta-guardiao-3e8d1c5a07?teste=1`. Método: `Central_Claude/frentes/metodo-meta-ads.md`."
+   }
+  }
+ ],
+ "connections": {
+  "Todo dia às 7h35": {
+   "main": [
+    [
+     {
+      "node": "Quando",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Quando": {
+   "main": [
+    [
+     {
+      "node": "Config",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Config": {
+   "main": [
+    [
+     {
+      "node": "Meta · conta",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Meta · conta": {
+   "main": [
+    [
+     {
+      "node": "Meta · campanhas",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Meta · campanhas": {
+   "main": [
+    [
+     {
+      "node": "Meta · conjuntos",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Meta · conjuntos": {
+   "main": [
+    [
+     {
+      "node": "Meta · anúncios",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Meta · anúncios": {
+   "main": [
+    [
+     {
+      "node": "Meta · ontem por conjunto",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Meta · ontem por conjunto": {
+   "main": [
+    [
+     {
+      "node": "Meta · 3 dias por conjunto",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Meta · 3 dias por conjunto": {
+   "main": [
+    [
+     {
+      "node": "Meta · 7 dias por conjunto",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Meta · 7 dias por conjunto": {
+   "main": [
+    [
+     {
+      "node": "Meta · 7 dias da conta",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Meta · 7 dias da conta": {
+   "main": [
+    [
+     {
+      "node": "Meta · mês até ontem",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Meta · mês até ontem": {
+   "main": [
+    [
+     {
+      "node": "Meta · alterações de ontem",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Meta · alterações de ontem": {
+   "main": [
+    [
+     {
+      "node": "Registro (tabela)",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Registro (tabela)": {
+   "main": [
+    [
+     {
+      "node": "Decide",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Manual": {
+   "main": [
+    [
+     {
+      "node": "Quando",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Decide": {
+   "main": [
+    [
+     {
+      "node": "Prepara o registro",
+      "type": "main",
+      "index": 0
+     },
+     {
+      "node": "Monta a mensagem",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Prepara o registro": {
+   "main": [
+    [
+     {
+      "node": "Registra",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Monta a mensagem": {
+   "main": [
+    [
+     {
+      "node": "Telegram · aviso",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  }
+ },
+ "settings": {
+  "executionOrder": "v1",
+  "timezone": "America/Sao_Paulo",
+  "saveDataSuccessExecution": "all",
+  "saveDataErrorExecution": "all",
+  "errorWorkflow": "7u3CuyjESsHmCtMW",
+  "executionTimeout": 900
+ }
+}
