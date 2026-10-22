@@ -271,9 +271,30 @@ function desenha() {
       return [m, x[1], x[2], x[4], x[5], x[6], x[7], k[7] || 0, k[8] || 0]; }) : D.OK.filter(x => x[0] === m && (!U || x[1] === U)))
     .sort((a, b) => ORDEM.indexOf(a[2] + '|' + a[1]) - ORDEM.indexOf(b[2] + '|' + b[1]));
   const camDe = (m, x) => (cams(m).find(y => y[1] === x[1] && y[2] === x[2]) || [])[4] || 0;
-  document.getElementById('sOp').textContent += ' · toque na seta do mês para ver multiplace e monoplace';
+  document.getElementById('sOp').textContent += ' · toque na seta do mês para ver multiplace e monoplace · Período: soma dos meses mostrados (Var. ano só dos meses fechados)';
   const co = el('tr'); ['Mês','Sessões','Var. ano','Var. mês','Dias','Por dia','Ocupação','Faltas','Cobradas','Avaliações'].forEach(t => co.append(el('th', t))); to.append(co);
-  for (const m of [...new Set(D.O.map(r => r[0]))].sort().reverse()) { const r = opx(m); if (!(r.ag || r.aa) || !noPeriodo(m)) continue; const tr = el('tr');
+  // linha "Período" (22/10/2026), como no financeiro: soma dos meses mostrados, com o mês em andamento. Faltas e cobradas só dos
+  // meses com controle (nov/2024 em diante) e avaliações desde mar/2024, como nas linhas. Var. ano compara só os meses fechados
+  // com os mesmos meses do ano anterior, e só se todos tiverem base completa; Var. mês não se aplica ao período
+  const mesesOp = [...new Set(D.O.map(r => r[0]))].sort().reverse().filter(m => { const r = opx(m); return (r.ag || r.aa) && noPeriodo(m); });
+  const variaPer = (atual, base, inc) => { const mf = mesesOp.filter(m => m < mesAtual); if (!mf.length || mf.some(m => m === inc || anoAntes(m) === inc || !base(anoAntes(m)))) return el('td', '—');
+    const a = mf.reduce((t, m) => t + atual(m), 0), b = mf.reduce((t, m) => t + base(anoAntes(m)), 0), v = Math.round(100 * (a - b) / b); return el('td', (v > 0 ? '+' : '') + v + '%', v > 0 ? 'd up' : v < 0 ? 'd down' : ''); };
+  const linhaPer = (rot, cls, l, va) => { const tr = el('tr', null, cls); const ctl = l.ctl;
+    [rot, l.at.toLocaleString('pt-BR'), va, '—', String(l.dias), l.dias ? Math.round(l.at / l.dias).toLocaleString('pt-BR') : '—', pct(l.at, l.lu), ctl ? pct(l.fa, l.ag) : '—', ctl ? l.co.toLocaleString('pt-BR') : '—', l.aval ? l.af.toLocaleString('pt-BR') : '—']
+      .forEach(x => tr.append(typeof x === 'string' ? el('td', x) : x)); to.append(tr); return tr; };
+  if (mesesOp.length) {
+    const T = { at: 0, ag: 0, fa: 0, co: 0, lu: 0, dias: 0, af: 0, ctl: false, aval: false };
+    for (const m of mesesOp) { const r = opx(m); T.at += r.at; T.lu += r.lu; T.dias += r.dias; if (m >= CONTROLE) { T.ag += r.ag; T.fa += r.fa; T.co += r.co; T.ctl = true; } if (m >= AVALIACOES) { T.af += r.af; T.aval = true; } }
+    const trP = linhaPer('Período', 'tot', T, variaPer(m => opx(m).at, m => opx(m).at, mesIncompleto));
+    // câmaras do período: a seta abre a soma de cada câmara nos meses mostrados
+    const porCam = {}; for (const m of mesesOp) for (const x of cams(m)) { const k = x[1] + '|' + x[2];
+      const c = (porCam[k] ||= { x, at: 0, ag: 0, fa: 0, co: 0, lu: 0, dias: 0, ctl: false }); c.at += x[4]; c.lu += x[7]; c.dias += x[8]; if (m >= CONTROLE) { c.ag += x[3]; c.fa += x[5]; c.co += x[6]; c.ctl = true; } }
+    const cps = Object.values(porCam).sort((a, b) => ORDEM.indexOf(a.x[2] + '|' + a.x[1]) - ORDEM.indexOf(b.x[2] + '|' + b.x[1]));
+    if (cps.length) { const td = trP.firstChild; td.classList.add('abre'); if (abertos.has('periodo')) td.classList.add('aberto'); td.onclick = () => { abertos.has('periodo') ? abertos.delete('periodo') : abertos.add('periodo'); desenha(); };
+      if (abertos.has('periodo')) for (const c of cps) { const inc = incompleto(D.inicioK[c.x[1] + '|' + c.x[2]] || '');
+        linhaPer(c.x[2] + (U ? '' : ' · ' + c.x[1]), 'sub', { ...c, af: 0, aval: false }, variaPer(m => (cams(m).find(y => y[1] === c.x[1] && y[2] === c.x[2]) || [])[4] || 0, m => camDe(m, c.x), inc)); } }
+  }
+  for (const m of mesesOp) { const r = opx(m); const tr = el('tr');
     [nomeMes(m) + (m === mesAtual ? '*' : '') + (m === mesIncompleto ? ' (desde ' + inicio.slice(8, 10) + '/' + inicio.slice(5, 7) + ')' : ''), r.at.toLocaleString('pt-BR'), varia(r.at, opx(anoAntes(m)).at, m, anoAntes(m)), varia(r.at, opx(anterior(m)).at, m, anterior(m)), String(r.dias), r.dias ? Math.round(r.at / r.dias).toLocaleString('pt-BR') : '—', pct(r.at, r.lu), m >= CONTROLE ? pct(r.fa, r.ag) : '—', m >= CONTROLE ? r.co.toLocaleString('pt-BR') : '—', m >= AVALIACOES ? r.af.toLocaleString('pt-BR') : '—']
       .forEach(x => tr.append(typeof x === 'string' ? el('td', x) : x)); to.append(tr);
     const cs = cams(m);

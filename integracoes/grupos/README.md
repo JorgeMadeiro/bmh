@@ -55,6 +55,9 @@
   uma linha por câmara, com a ocupação de cada uma. Com convênio no filtro (22/10/2026), a seta abre as câmaras daquele
   convênio, por `BMH_operacao_camconv` (`operacao-camconv-monta.js`, dia × câmara × convênio; 2.888 dias × câmara e 21.303
   dias × convênio conferidos sem diferença); ocupação = parte da ocupação da câmara que veio do convênio.
+- **Linha "Período" na Operação (22/10/2026):** soma dos meses mostrados (com o mês em andamento), como no financeiro; faltas e
+  cobradas só de nov/2024 em diante e avaliações desde mar/2024; Var. ano compara só os meses fechados e só quando todos têm
+  base completa (senão "—"); Var. mês não se aplica. A seta do Período abre a soma de cada câmara.
 - **Mês de início incompleto:** o primeiro mês da clínica (set/23, desde 09/09), de cada unidade (Taguatinga, desde 27/01/2025)
   e de cada câmara aparece "(desde dd/mm)" e não entra em variação (Taguatinga jan/26 aparecia +2.468%).
 - **Valor bruto, sempre (decisão do Jorge, 20/10/2026):** não descontar retenção de imposto (`retencao_em_reais`: R$ 2.600

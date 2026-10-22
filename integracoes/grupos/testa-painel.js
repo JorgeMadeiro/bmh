@@ -39,7 +39,14 @@ const num = (t) => { t = String(t).trim(); if (t === '—' || t === '') return n
     await p.selectOption('#de', '2026-09'); await p.selectOption('#ate', '2026-09');
     const r1 = await tabela(); f(r1.length === 2 && r1[1][0] === 'set/26', `período set/26 mostrou ${r1.length - 1} meses`);
     f(r1[0][1] === r1[1][1], `período set/26: total ${r1[0][1]} ≠ linha ${r1[1][1]}`);
-    const op = await p.$$eval('#tOp tr', (trs) => trs.slice(1).map((tr) => tr.children[0].textContent)); f(op.length === 1 && op[0] === 'set/26', `operação no período mostrou ${op}`);
+    const op = await p.$$eval('#tOp tr', (trs) => trs.slice(1).map((tr) => tr.children[0].textContent).filter((t) => t !== 'Período')); f(op.length === 1 && op[0] === 'set/26', `operação no período mostrou ${op}`);
+    // linha Período da Operação (22/10/2026): sessões = soma dos meses; com 1 mês, igual à linha do mês
+    { const tp = await p.$$eval('#tOp tr', (trs) => trs.slice(1).map((tr) => [...tr.children].map((x) => x.textContent))); const per = tp.find((r) => r[0] === 'Período'), mes = tp.find((r) => r[0] === 'set/26');
+      f(per && mes && per[1] === mes[1] && per[6] === mes[6] && per[7] === mes[7], `operação: Período ${per} ≠ set/26 ${mes}`); }
+    // Operação, período longo: sessões do Período = soma das linhas dos meses
+    await p.selectOption('#de', '2025-10'); await p.selectOption('#ate', '2026-10');
+    { const tp = await p.$$eval('#tOp tr:not(.sub)', (trs) => trs.slice(1).map((tr) => [...tr.children].map((x) => x.textContent))); const per = tp.find((r) => r[0] === 'Período');
+      const soma = tp.filter((r) => r[0] !== 'Período').reduce((s, r) => s + num(r[1]), 0); f(per && num(per[1]) === soma, `operação: Período ${per && per[1]} ≠ soma dos meses ${soma}`); }
     // período que começa antes de nov/2024 (20/10/2026): o total soma só o que as linhas mostram (meses com "—" não entram)
     await p.selectOption('#de', (await p.$eval('#de option', (o) => o.value))); await p.selectOption('#ate', '2025-09');
     { const rows = await tabela(); const tot = rows[0], meses = rows.slice(1);
