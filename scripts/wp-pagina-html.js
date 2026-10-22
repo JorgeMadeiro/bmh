@@ -23,20 +23,9 @@ const path = require('path');
 
 const RAIZ = path.join(__dirname, '..');
 const NUMERO = '556133466005';
-const MENSAGENS = {
-  geral: 'Olá! Vim pelo site da BMH e gostaria de agendar uma avaliação.',
-  duvida: 'Olá! Vim pelo site da BMH e tenho uma dúvida.',
-  pos: 'Olá! Estou no pós-operatório de cirurgia plástica e quero saber sobre a câmara hiperbárica.',
-  ferida: 'Olá! Tenho uma ferida que não cicatriza e quero agendar uma avaliação.',
-  pedido: 'Olá! Tenho um pedido médico de oxigenoterapia hiperbárica e quero agendar.',
-  mergulho: 'Olá! Sou mergulhador e quero agendar uma avaliação.',
-  cirurgiao: 'Olá! Sou médico(a) e quero encaminhar um paciente para a BMH.',
-  asasul: 'Olá! Quero agendar na unidade Asa Sul.',
-  taguatinga: 'Olá! Quero agendar na unidade Taguatinga.',
-  convenio: 'Olá! Quero saber se a BMH atende o meu convênio.',
-  // link "Hiperbárica (BMH)" da bio do Instagram do Dr. Jorge (15/10/2026): a frase é o marcador de origem; não mudar o começo
-  drjorge: 'Olá! Vim pelo Instagram do Dr. Jorge e quero saber sobre a câmara hiperbárica.',
-};
+// mensagens prontas do WhatsApp: vêm da lista ÚNICA integracoes/origem/frases.json (22/10/2026), a mesma que o leitor de
+// origem do Kommo usa; mudar uma frase só lá (lição da Nexo: duas listas viram uma esquecida)
+const MENSAGENS = Object.fromEntries(require('../integracoes/origem/frases.json').frases.filter((f) => !f.mensagem.includes('{')).map((f) => [f.chave, f.mensagem]));
 const SVG = {
   wa: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.4A8.4 8.4 0 1 1 21 11.5z"/></svg>',
   tel: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>',

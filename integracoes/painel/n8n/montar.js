@@ -45,6 +45,7 @@ const COLUNAS = {
   BMH_financeiro_mes: { chave: 's', mes: 's', unidade: 's', convenio: 's', sessoes: 'n', produzido: 'n', faturado: 'n', a_faturar: 'n', recebido: 'n', a_receber: 'n', glosado: 'n', atualizado_em: 's' },
   BMH_financeiro_detalhe: { chave: 's', mes: 's', unidade: 's', convenio: 's', situacao: 's', lote: 's', sessoes: 'n', valor: 'n', glosa: 'n', dias: 's', atualizado_em: 's' },
   BMH_financeiro_paciente: { chave: 's', mes: 's', unidade: 's', convenio: 's', situacao: 's', lote: 's', paciente_id: 's', paciente: 's', sessoes: 'n', valor: 'n', dias: 's', medicos: 's', atualizado_em: 's' },
+  BMH_origem_leads: Object.fromEntries(['chave', 'lead_id', 'contato_id', 'frase', 'origem', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'cirurgiao_indicou', 'acao', 'modo', 'recebida_em'].map((k) => [k, 's'])),   // origem do lead pelo Kommo (22/10/2026)
   BMH_confirmacoes: Object.fromEntries(['chave', 'dia', 'paciente_id', 'unidade', 'hora', 'tipo', 'modo', 'status', 'criado_em'].map((k) => [k, 's'])),   // confirmação da véspera (22/10/2026)
   BMH_diretoria_chave: { chave: 's', token: 's', anterior: 's', dia: 's' },   // chave do dia da lista de pacientes (22/10/2026)
   BMH_diretoria_pedido: { chave: 's', pedido: 's' },   // hora (ms) do último toque em "Atualizar agora" (trava para todos, 20/10/2026)
@@ -544,6 +545,27 @@ function fluxoConfirmacao() {
   return { name: 'BMH · Agenda · confirmação da véspera', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none' }) };   // no modo real passa nome e celular
 }
 
+// ---------------- origem do lead pelo Kommo (22/10/2026): pronta antes da assinatura, em ensaio ----------------
+// Recebe o webhook de conta do Kommo (mensagem recebida), identifica a frase pronta pela lista ÚNICA
+// integracoes/origem/frases.json (injetada no código) e registra em BMH_origem_leads, sem texto da mensagem. No modo real
+// (chave origem_modo) também grava os campos no lead: o nó de PATCH no Kommo entra na virada, com a credencial
+// "BMH · Kommo (token)", lote de 5 por segundo (lição da Nexo: estourar o limite bloqueou a API por mais de 30 min).
+function fluxoOrigem() {
+  x = 0;
+  IDS.origem ||= {}; IDS.origem.kommo ||= 'bmh-kommo-mensagem-' + crypto.randomBytes(8).toString('hex');
+  const frases = JSON.stringify(JSON.parse(ler('../../origem/frases.json')).frases);
+  const n = {
+    recebe: no('Recebe do Kommo', 'n8n-nodes-base.webhook', 2, { httpMethod: 'POST', path: IDS.origem.kommo, responseMode: 'onReceived', options: {} }, { webhookId: crypto.randomUUID() }),
+    config: le('Config', 'BMH_config'),
+    le_: no('Lê a origem', 'n8n-nodes-base.code', 2, { jsCode: ler('../../origem/origem-kommo.js').replace('__FRASES__', frases) }, { executeOnce: true }),
+    registro: no('Monta o registro', 'n8n-nodes-base.code', 2, { jsCode: "// uma linha por mensagem com frase ou com lead, sem o texto (só a origem); a chave não repete a mesma mensagem\nreturn $input.all().filter((i) => i.json.lead_id || i.json.frase).map((i) => ({ json: { ...i.json, chave: [i.json.conversa_id || '-', i.json.lead_id || i.json.contato_id || '-', i.json.recebida_em || '-'].join('|'), lead_id: String(i.json.lead_id || ''), contato_id: String(i.json.contato_id || ''), recebida_em: i.json.recebida_em ? new Date(i.json.recebida_em * 1000).toISOString() : '' } }));" }),
+    grava: grava('Grava a origem', 'BMH_origem_leads'),
+    nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Kommo · origem do lead\n**Traz:** o webhook de conta do Kommo (mensagem recebida)\n**Envia:** hoje nada ao Kommo (ensaio); grava a origem em BMH_origem_leads\n**Limites:** sem o texto da mensagem; só lead (mensagem de contato é ignorada); frase pela lista única integracoes/origem/frases.json\n\nModo na chave `origem_modo` (ensaio | real). Na virada: registrar este endereço no webhook de conta do Kommo e acrescentar o PATCH no lead (credencial BMH · Kommo, 5 por segundo).', width: 620, height: 220 }),
+  };
+  const cx = {}; for (const [a, b] of [[n.recebe, n.config], [n.config, n.le_], [n.le_, n.registro], [n.registro, n.grava]]) liga(cx, a.name, b.name);
+  return { name: 'BMH · Kommo · origem do lead', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none' }) };
+}
+
 function fluxoSearchConsole() {
   x = 0;
   const GSC = 'https://www.googleapis.com/webmasters/v3/sites/https%3A%2F%2Fhiperbaricabrasilia.com.br%2F/searchAnalytics/query';
@@ -676,7 +698,7 @@ function fluxoAvaliacoes() {
   const tags = (await api('tags?limit=100', 'GET')).data || []; const tagBMH = tags.find((t) => t.name === 'BMH');
     const so = process.argv.slice(2);   // ex.: node montar.js pagina guardiao (só esses)
   // o alerta vem primeiro: os outros precisam do id dele (errorWorkflow)
-  const fluxos = { alerta: fluxoAlerta, grava: fluxoGrava, pagina: fluxoPagina, igut: fluxoIgut, guardiao: fluxoGuardiao, botoes: fluxoBotoes, resumo: fluxoResumo, medicao: fluxoMedicao, mensal: fluxoMensal, numeros: fluxoNumeros, diretoria: fluxoPainelDiretoria, plantoes: fluxoPlantoes, plantoesEmails: fluxoPlantoesEmails, avaliacoes: fluxoAvaliacoes, nota: fluxoNota, vigia: fluxoVigia, organico: fluxoSearchConsole, radar: fluxoRadar, confirmacao: fluxoConfirmacao };
+  const fluxos = { alerta: fluxoAlerta, grava: fluxoGrava, pagina: fluxoPagina, igut: fluxoIgut, guardiao: fluxoGuardiao, botoes: fluxoBotoes, resumo: fluxoResumo, medicao: fluxoMedicao, mensal: fluxoMensal, numeros: fluxoNumeros, diretoria: fluxoPainelDiretoria, plantoes: fluxoPlantoes, plantoesEmails: fluxoPlantoesEmails, avaliacoes: fluxoAvaliacoes, nota: fluxoNota, vigia: fluxoVigia, organico: fluxoSearchConsole, radar: fluxoRadar, confirmacao: fluxoConfirmacao, origem: fluxoOrigem };
   for (const [chave, monta] of Object.entries(fluxos).filter(([k]) => !so.length || so.includes(k))) {
     const f = comVigia(chave, monta());
     if (!/^BMH · /.test(f.name)) throw new Error('nome sem BMH');

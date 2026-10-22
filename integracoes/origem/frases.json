@@ -1,0 +1,143 @@
+{
+  "_sobre": "Lista ÚNICA das frases prontas do WhatsApp da BMH (22/10/2026; lição da Nexo/Skyfit: duas listas viram uma esquecida). Daqui saem os botões do site (scripts/wp-pagina-html.js), o leitor de origem do Kommo e o recebedor da Meta (montados pelo integracoes/painel/n8n/montar.js). Mudou uma frase: rodar de novo o montar.js e republicar as páginas que a usam. 'inicio' é o começo que identifica a frase (comparado sem acento, maiúscula e pontuação).",
+  "frases": [
+    {
+      "chave": "geral",
+      "mensagem": "Olá! Vim pelo site da BMH e gostaria de agendar uma avaliação.",
+      "inicio": "Olá! Vim pelo site da BMH",
+      "origem": "site",
+      "utm_source": "site",
+      "utm_medium": "whatsapp",
+      "utm_content": "site: geral"
+    },
+    {
+      "chave": "duvida",
+      "mensagem": "Olá! Vim pelo site da BMH e tenho uma dúvida.",
+      "inicio": "Olá! Vim pelo site da BMH e tenho",
+      "origem": "site",
+      "utm_source": "site",
+      "utm_medium": "whatsapp",
+      "utm_content": "site: dúvida"
+    },
+    {
+      "chave": "pos",
+      "mensagem": "Olá! Estou no pós-operatório de cirurgia plástica e quero saber sobre a câmara hiperbárica.",
+      "inicio": "Olá! Estou no pós-operatório de cirurgia plástica e quero saber",
+      "origem": "site",
+      "utm_source": "site",
+      "utm_medium": "whatsapp",
+      "utm_content": "site: pós-operatório"
+    },
+    {
+      "chave": "ferida",
+      "mensagem": "Olá! Tenho uma ferida que não cicatriza e quero agendar uma avaliação.",
+      "inicio": "Olá! Tenho uma ferida que não cicatriza",
+      "origem": "site",
+      "utm_source": "site",
+      "utm_medium": "whatsapp",
+      "utm_content": "site: ferida"
+    },
+    {
+      "chave": "pedido",
+      "mensagem": "Olá! Tenho um pedido médico de oxigenoterapia hiperbárica e quero agendar.",
+      "inicio": "Olá! Tenho um pedido médico de oxigenoterapia",
+      "origem": "site",
+      "utm_source": "site",
+      "utm_medium": "whatsapp",
+      "utm_content": "site: pedido médico"
+    },
+    {
+      "chave": "mergulho",
+      "mensagem": "Olá! Sou mergulhador e quero agendar uma avaliação.",
+      "inicio": "Olá! Sou mergulhador",
+      "origem": "site",
+      "utm_source": "site",
+      "utm_medium": "whatsapp",
+      "utm_content": "site: mergulho"
+    },
+    {
+      "chave": "cirurgiao",
+      "mensagem": "Olá! Sou médico(a) e quero encaminhar um paciente para a BMH.",
+      "inicio": "Olá! Sou médico(a) e quero encaminhar",
+      "origem": "site",
+      "utm_source": "site",
+      "utm_medium": "whatsapp",
+      "utm_content": "site: médico encaminhando"
+    },
+    {
+      "chave": "asasul",
+      "mensagem": "Olá! Quero agendar na unidade Asa Sul.",
+      "inicio": "Olá! Quero agendar na unidade Asa Sul",
+      "origem": "site",
+      "utm_source": "site",
+      "utm_medium": "whatsapp",
+      "utm_content": "site: Asa Sul"
+    },
+    {
+      "chave": "taguatinga",
+      "mensagem": "Olá! Quero agendar na unidade Taguatinga.",
+      "inicio": "Olá! Quero agendar na unidade Taguatinga",
+      "origem": "site",
+      "utm_source": "site",
+      "utm_medium": "whatsapp",
+      "utm_content": "site: Taguatinga"
+    },
+    {
+      "chave": "convenio",
+      "mensagem": "Olá! Quero saber se a BMH atende o meu convênio.",
+      "inicio": "Olá! Quero saber se a BMH atende o meu convênio",
+      "origem": "site",
+      "utm_source": "site",
+      "utm_medium": "whatsapp",
+      "utm_content": "site: convênio"
+    },
+    {
+      "chave": "anuncio_google",
+      "mensagem": "Ola! Vim pelo anuncio da BMH no Google e gostaria de agendar uma avaliacao.",
+      "inicio": "Olá! Vim pelo anúncio da BMH no Google",
+      "origem": "anúncio Google",
+      "utm_source": "google",
+      "utm_medium": "cpc",
+      "utm_content": "link do anúncio"
+    },
+    {
+      "chave": "drjorge",
+      "mensagem": "Olá! Vim pelo Instagram do Dr. Jorge e quero saber sobre a câmara hiperbárica.",
+      "inicio": "Olá! Vim pelo Instagram do Dr. Jorge",
+      "origem": "Instagram do Dr. Jorge",
+      "utm_source": "instagram",
+      "utm_medium": "bio",
+      "utm_campaign": "dr-jorge",
+      "utm_content": "bio do Dr. Jorge"
+    },
+    {
+      "chave": "instagram",
+      "mensagem": "Olá! Vim pelo Instagram da BMH e quero saber sobre a câmara hiperbárica.",
+      "inicio": "Olá! Vim pelo Instagram da BMH",
+      "origem": "Instagram da BMH",
+      "utm_source": "instagram",
+      "utm_medium": "bio",
+      "utm_campaign": "bmh",
+      "utm_content": "bio da BMH"
+    },
+    {
+      "chave": "perfil",
+      "mensagem": "Olá! Encontrei a BMH no Google e quero saber sobre a câmara hiperbárica.",
+      "inicio": "Olá! Encontrei a BMH no Google",
+      "origem": "Perfil do Google",
+      "utm_source": "google",
+      "utm_medium": "perfil",
+      "utm_content": "Perfil do Google"
+    },
+    {
+      "chave": "indicacao",
+      "mensagem": "Olá! Vim pela indicação do Dr(a). {nome} e quero agendar uma avaliação.",
+      "inicio": "Olá! Vim pela indicação",
+      "origem": "cirurgião",
+      "utm_source": "cirurgiao",
+      "utm_medium": "indicacao",
+      "utm_content": "QR do cirurgião",
+      "captura": "indica[cç][aã]o d[oa]s? (?:dr\\(a\\)\\.?|dra?\\.?|doutora?)?\\s*(.+?)\\s+e quero"
+    }
+  ]
+}

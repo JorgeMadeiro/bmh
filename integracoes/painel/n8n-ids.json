@@ -43,7 +43,8 @@
   "BMH_operacao_camara": "voOTrnCXntt8wSrr",
   "BMH_operacao_camconv": "TJpA7hXYffYUgwTO",
   "BMH_diretoria_chave": "p4kUGIgoOKLbRDb7",
-  "BMH_confirmacoes": "BxqVZtkFhkO6HGuG"
+  "BMH_confirmacoes": "BxqVZtkFhkO6HGuG",
+  "BMH_origem_leads": "W3vVI35KlBrgJmGl"
  },
  "fluxos": {
   "grava": "AeQIImClkXtRrWIf",
@@ -67,7 +68,8 @@
   "vigia": "6wNDORbM8I1jGEyU",
   "organico": "WiOZe3DeyyANNhdr",
   "radar": "mBwLYNgQIXDz2LYI",
-  "confirmacao": "j9fKHps4n9xGDGL8"
+  "confirmacao": "j9fKHps4n9xGDGL8",
+  "origem": "x5M8FWBTjTRAdZAl"
  },
  "whatsapp": {
   "caminho": "bmh-whatsapp-daeff8542cee5cef6c6a8832"
@@ -81,5 +83,8 @@
  },
  "agenda": {
   "confirmacao": "bmh-agenda-confirmacao-fd9ae869dd12"
+ },
+ "origem": {
+  "kommo": "bmh-kommo-mensagem-fdb2f5dad1d7ad81"
  }
 }
