@@ -168,8 +168,11 @@ function pacientes(par) {
   const corpo = document.getElementById('dCorpo'); corpo.replaceChildren();
   const volta = el('span', '‹ voltar', 'cl'); volta.onclick = () => abre(...ultimo); corpo.append(volta);
   document.getElementById('dTit').textContent = 'Pacientes'; document.getElementById('dSub').textContent = 'Consultando o iGut agora…';
-  fetch('bmh-diretoria?' + new URLSearchParams({ ...par, formato: 'json' }), { cache: 'no-store', credentials: 'same-origin' })   // mesmo endereço do painel: reaproveita o login
-    .then(r => { if (r.status === 401) throw new Error('login'); if (!r.ok) throw new Error('falha'); return r.json(); })
+  // falha momentânea (rede, servidor ocupado): tenta de novo sozinho 2 vezes; persistindo, vai pela segunda via (22/10/2026)
+  const tenta = n => fetch('bmh-diretoria?' + new URLSearchParams({ ...par, formato: 'json' }), { cache: 'no-store', credentials: 'same-origin' })   // mesmo endereço do painel: reaproveita o login
+    .then(r => { if (r.status === 401) throw new Error('login'); if (!r.ok) throw new Error('erro ' + r.status); return r.json(); })
+    .catch(e => { if (e.message === 'login' || n >= 2) throw e; return new Promise(ok => setTimeout(ok, 1500 * (n + 1))).then(() => tenta(n + 1)); });
+  tenta(0)
     .then(d => {
       document.getElementById('dTit').textContent = d.titulo; document.getElementById('dSub').textContent = d.sub;
       if (!d.pacientes.length) { corpo.append(el('p', 'Nenhum paciente nessa situação (pode ter mudado desde a última atualização do painel).', 'sub')); return; }
@@ -177,10 +180,12 @@ function pacientes(par) {
       corpo.append(el('p', 'Dado de paciente: não encaminhar fora da equipe responsável.', 'sub'));
     })
     .catch(e => {
-      if (e.message !== 'login') { document.getElementById('dSub').textContent = 'O iGut não respondeu. Tente de novo em instantes.'; return; }
+      // qualquer falha (login não reenviado, erro do servidor ou da rede, mesmo depois de 3 tentativas) vai pela segunda via
       // segunda via: alguns navegadores não reenviam o login numa consulta feita pela página; carregando como página
       // (dentro da janela), o navegador sempre reaproveita o login do painel
-      document.getElementById('dTit').textContent = 'Pacientes'; document.getElementById('dSub').textContent = '';
+      document.getElementById('dTit').textContent = 'Pacientes';
+      // sem ser o login, mostra o motivo (para achar a causa se voltar a acontecer)
+      document.getElementById('dSub').textContent = e.message === 'login' ? '' : 'Aberto pela segunda via (' + e.message + ')';
       const f = el('iframe'); f.src = 'bmh-diretoria?' + new URLSearchParams({ ...par, embutido: '1' }); f.setAttribute('allow', 'clipboard-write'); f.title = 'Pacientes do lote';
       f.style.cssText = 'width:100%;height:65vh;border:0;margin-top:8px'; corpo.append(f);
     });
