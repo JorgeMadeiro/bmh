@@ -45,6 +45,7 @@ const COLUNAS = {
   BMH_financeiro_mes: { chave: 's', mes: 's', unidade: 's', convenio: 's', sessoes: 'n', produzido: 'n', faturado: 'n', a_faturar: 'n', recebido: 'n', a_receber: 'n', glosado: 'n', atualizado_em: 's' },
   BMH_financeiro_detalhe: { chave: 's', mes: 's', unidade: 's', convenio: 's', situacao: 's', lote: 's', sessoes: 'n', valor: 'n', glosa: 'n', dias: 's', atualizado_em: 's' },
   BMH_financeiro_paciente: { chave: 's', mes: 's', unidade: 's', convenio: 's', situacao: 's', lote: 's', paciente_id: 's', paciente: 's', sessoes: 'n', valor: 'n', dias: 's', medicos: 's', atualizado_em: 's' },
+  BMH_conversoes: Object.fromEntries(['chave', 'evento', 'dia', 'paciente_id', 'unidade', 'telefone_hash', 'telefone_hash_sem9', 'email_hash', 'enviado_meta', 'enviado_google', 'modo', 'criado_em'].map((k) => [k, 's'])),   // avaliou e iniciou pelo iGut, em código (22/10/2026)
   BMH_whatsapp_meta: Object.fromEntries(['chave', 'momento', 'dia', 'telefone_hash', 'direcao', 'aparelho', 'tipo', 'texto', 'respondendo', 'apagar_em', 'origem', 'anuncio_id', 'ctwa_clid', 'referral_tipo'].map((k) => [k, 's'])),   // recebedor oficial da Meta (22/10/2026): telefone só em código, texto mascarado, 1 mês
   BMH_origem_leads: Object.fromEntries(['chave', 'lead_id', 'contato_id', 'frase', 'origem', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'cirurgiao_indicou', 'acao', 'modo', 'recebida_em'].map((k) => [k, 's'])),   // origem do lead pelo Kommo (22/10/2026)
   BMH_confirmacoes: Object.fromEntries(['chave', 'dia', 'paciente_id', 'unidade', 'hora', 'tipo', 'modo', 'status', 'criado_em'].map((k) => [k, 's'])),   // confirmação da véspera (22/10/2026)
@@ -590,6 +591,29 @@ function fluxoRecebedor() {
   return { name: 'BMH · WhatsApp · recebedor oficial (Meta)', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none', saveDataErrorExecution: 'none' }) };   // tem conversa de paciente
 }
 
+// ---------------- conversões pelo iGut (22/10/2026): avaliou e iniciou, em ensaio, sem enviar ----------------
+function fluxoConversoes() {
+  x = 0;
+  const IGUT = cred('httpCustomAuth', 'BMH · iGut (acesso)');
+  IDS.conversoes ||= {}; IDS.conversoes.manual ||= 'bmh-conversoes-' + crypto.randomBytes(6).toString('hex');
+  const n = {
+    agenda: no('Todo dia às 7h23', 'n8n-nodes-base.scheduleTrigger', 1.2, { rule: { interval: [{ field: 'cronExpression', expression: '23 7 * * *' }] } }),
+    manual: no('Rodar agora', 'n8n-nodes-base.webhook', 2, { path: IDS.conversoes.manual, responseMode: 'lastNode', options: {} }, { webhookId: crypto.randomUUID() }),
+    ontem: no('Ontem', 'n8n-nodes-base.code', 2, { jsCode: "// à mão: ?dia=AAAA-MM-DD refaz outro dia\nlet q = {}; try { q = $('Rodar agora').first().json.query || {}; } catch (e) {}\nconst dia = /^\\d{4}-\\d{2}-\\d{2}$/.test(q.dia || '') ? q.dia : $now.setZone('America/Sao_Paulo').minus({ days: 1 }).toISODate();\nreturn [{ json: { dia } }];" }),
+    pac: le('Pacientes (tabela)', 'BMH_financeiro_paciente'),
+    ag: no('Agenda de ontem', 'n8n-nodes-base.httpRequest', 4.2, { method: 'POST', url: 'https://api.igut.med.br/v2/consultas/buscar', authentication: 'genericCredentialType', genericAuthType: 'httpCustomAuth',
+      sendBody: true, specifyBody: 'json', jsonBody: "={{ JSON.stringify({ 'Agendamento.data': $('Ontem').first().json.dia, 'Agendamento.data_fim': $('Ontem').first().json.dia }) }}", options: { timeout: 120000 } },
+      { credentials: IGUT, executeOnce: true }),
+    monta: no('Monta os eventos', 'n8n-nodes-base.code', 2, { jsCode: ler('../../conversoes/eventos-igut.js').replace('/*__SHA256__*/', ler('../../comum/sha256.js')) }, { executeOnce: true }),
+    grava: grava('Grava as conversões', 'BMH_conversoes'),
+    resumo: no('Resumo', 'n8n-nodes-base.code', 2, { jsCode: "const it = $('Monta os eventos').all().map((i) => i.json);\nreturn [{ json: { dia: $('Ontem').first().json.dia, avaliou: it.filter((r) => r.evento === 'avaliou').length, iniciou: it.filter((r) => r.evento === 'iniciou').length, com_telefone: it.filter((r) => r.telefone_hash).length, com_email: it.filter((r) => r.email_hash).length } }];" }, { executeOnce: true }),
+    nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Conversões · eventos do iGut\n**Traz:** a agenda de ontem no iGut e o histórico de pacientes (BMH_financeiro_paciente)\n**Envia:** nada (ensaio); grava avaliou e iniciou em BMH_conversoes\n**Limites:** uma vez por paciente por dia; telefone e e-mail só em código (SHA-256); o agendou vem do Kommo\n\nO envio à Meta (pixel e conjunto de dados do WhatsApp) e ao Google (Data Manager) entra depois do parágrafo de medição na política de privacidade, primeiro em teste, como na Nexo.', width: 620, height: 220 }),
+  };
+  const cx = {}; liga(cx, n.agenda.name, n.ontem.name); liga(cx, n.manual.name, n.ontem.name);
+  for (const [a, b] of [[n.ontem, n.pac], [n.pac, n.ag], [n.ag, n.monta], [n.monta, n.grava], [n.grava, n.resumo]]) liga(cx, a.name, b.name);
+  return { name: 'BMH · Conversões · eventos do iGut', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none' }) };
+}
+
 function fluxoSearchConsole() {
   x = 0;
   const GSC = 'https://www.googleapis.com/webmasters/v3/sites/https%3A%2F%2Fhiperbaricabrasilia.com.br%2F/searchAnalytics/query';
@@ -645,7 +669,7 @@ function fluxoRadar() {
 
 // ---------------- vigia de fluxos parados (15/10/2026) ----------------
 // cada fluxo agendado anota em BMH_vigia quando começou; prazo máximo em horas, com folga (nunca alarme falso)
-const VIGIA = { confirmacao: 26, radar: 26, organico: 170, grava: 26, igut: 26, guardiao: 26, resumo: 26, numeros: 26, medicao: 170, mensal: 745, plantoes: 745, avaliacoes: 11 };
+const VIGIA = { conversoes: 26, confirmacao: 26, radar: 26, organico: 170, grava: 26, igut: 26, guardiao: 26, resumo: 26, numeros: 26, medicao: 170, mensal: 745, plantoes: 745, avaliacoes: 11 };
 function comVigia(chave, f) {
   if (!VIGIA[chave]) return f;
   const gatilhos = f.nodes.filter((n) => n.type === 'n8n-nodes-base.scheduleTrigger'); if (!gatilhos.length) return f;
@@ -722,7 +746,7 @@ function fluxoAvaliacoes() {
   const tags = (await api('tags?limit=100', 'GET')).data || []; const tagBMH = tags.find((t) => t.name === 'BMH');
     const so = process.argv.slice(2);   // ex.: node montar.js pagina guardiao (só esses)
   // o alerta vem primeiro: os outros precisam do id dele (errorWorkflow)
-  const fluxos = { alerta: fluxoAlerta, grava: fluxoGrava, pagina: fluxoPagina, igut: fluxoIgut, guardiao: fluxoGuardiao, botoes: fluxoBotoes, resumo: fluxoResumo, medicao: fluxoMedicao, mensal: fluxoMensal, numeros: fluxoNumeros, diretoria: fluxoPainelDiretoria, plantoes: fluxoPlantoes, plantoesEmails: fluxoPlantoesEmails, avaliacoes: fluxoAvaliacoes, nota: fluxoNota, vigia: fluxoVigia, organico: fluxoSearchConsole, radar: fluxoRadar, confirmacao: fluxoConfirmacao, origem: fluxoOrigem, recebedor: fluxoRecebedor };
+  const fluxos = { alerta: fluxoAlerta, grava: fluxoGrava, pagina: fluxoPagina, igut: fluxoIgut, guardiao: fluxoGuardiao, botoes: fluxoBotoes, resumo: fluxoResumo, medicao: fluxoMedicao, mensal: fluxoMensal, numeros: fluxoNumeros, diretoria: fluxoPainelDiretoria, plantoes: fluxoPlantoes, plantoesEmails: fluxoPlantoesEmails, avaliacoes: fluxoAvaliacoes, nota: fluxoNota, vigia: fluxoVigia, organico: fluxoSearchConsole, radar: fluxoRadar, confirmacao: fluxoConfirmacao, origem: fluxoOrigem, recebedor: fluxoRecebedor, conversoes: fluxoConversoes };
   for (const [chave, monta] of Object.entries(fluxos).filter(([k]) => !so.length || so.includes(k))) {
     const f = comVigia(chave, monta());
     if (!/^BMH · /.test(f.name)) throw new Error('nome sem BMH');
