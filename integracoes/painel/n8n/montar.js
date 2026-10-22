@@ -45,6 +45,7 @@ const COLUNAS = {
   BMH_financeiro_mes: { chave: 's', mes: 's', unidade: 's', convenio: 's', sessoes: 'n', produzido: 'n', faturado: 'n', a_faturar: 'n', recebido: 'n', a_receber: 'n', glosado: 'n', atualizado_em: 's' },
   BMH_financeiro_detalhe: { chave: 's', mes: 's', unidade: 's', convenio: 's', situacao: 's', lote: 's', sessoes: 'n', valor: 'n', glosa: 'n', dias: 's', atualizado_em: 's' },
   BMH_financeiro_paciente: { chave: 's', mes: 's', unidade: 's', convenio: 's', situacao: 's', lote: 's', paciente_id: 's', paciente: 's', sessoes: 'n', valor: 'n', dias: 's', medicos: 's', atualizado_em: 's' },
+  BMH_cliques_site: Object.fromEntries(['chave', 'registrado_em', 'pagina', 'botao', 'mensagem_inicio', 'gclid', 'gbraid', 'wbraid', 'fbclid', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'entrada', 'referencia', 'lead_id', 'ligado_em'].map((k) => [k, 's'])),   // clique no WhatsApp do site com gclid e UTM (22/10/2026)
   BMH_conversoes: Object.fromEntries(['chave', 'evento', 'dia', 'paciente_id', 'unidade', 'telefone_hash', 'telefone_hash_sem9', 'email_hash', 'enviado_meta', 'enviado_google', 'modo', 'criado_em'].map((k) => [k, 's'])),   // avaliou e iniciou pelo iGut, em código (22/10/2026)
   BMH_whatsapp_meta: Object.fromEntries(['chave', 'momento', 'dia', 'telefone_hash', 'direcao', 'aparelho', 'tipo', 'texto', 'respondendo', 'apagar_em', 'origem', 'anuncio_id', 'ctwa_clid', 'referral_tipo'].map((k) => [k, 's'])),   // recebedor oficial da Meta (22/10/2026): telefone só em código, texto mascarado, 1 mês
   BMH_origem_leads: Object.fromEntries(['chave', 'lead_id', 'contato_id', 'frase', 'origem', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'cirurgiao_indicou', 'acao', 'modo', 'recebida_em'].map((k) => [k, 's'])),   // origem do lead pelo Kommo (22/10/2026)
@@ -614,6 +615,20 @@ function fluxoConversoes() {
   return { name: 'BMH · Conversões · eventos do iGut', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none' }) };
 }
 
+// ---------------- clique no WhatsApp do site (22/10/2026): recebe da tag do Tag Manager e grava, sem dado pessoal ----------------
+function fluxoCliques() {
+  x = 0;
+  IDS.origem ||= {}; IDS.origem.clique ||= 'bmh-site-whatsapp-' + crypto.randomBytes(6).toString('hex');
+  const n = {
+    recebe: no('Recebe o clique', 'n8n-nodes-base.webhook', 2, { httpMethod: 'POST', path: IDS.origem.clique, responseMode: 'onReceived', options: {} }, { webhookId: crypto.randomUUID() }),
+    limpa: codigo('Limpa o clique', '../../origem/clique-recebe.js', { executeOnce: true }),
+    grava: grava('Grava o clique', 'BMH_cliques_site'),
+    nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Site · clique no WhatsApp\n**Traz:** a tag "BMH · origem do clique no WhatsApp" do Tag Manager (integracoes/tag-manager/tag-clique-whatsapp.html)\n**Envia:** nada; grava em BMH_cliques_site\n**Limites:** sem dado pessoal (página, botão, começo da mensagem pronta, gclid, UTMs, entrada e site de origem); 200 caracteres por campo\n\nO fluxo de origem do Kommo liga cada conversa ao clique mais recente da mesma página (3 min depois a 180 min antes), como na Nexo.', width: 620, height: 200 }),
+  };
+  const cx = {}; for (const [a, b] of [[n.recebe, n.limpa], [n.limpa, n.grava]]) liga(cx, a.name, b.name);
+  return { name: 'BMH · Site · clique no WhatsApp', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none' }) };
+}
+
 function fluxoSearchConsole() {
   x = 0;
   const GSC = 'https://www.googleapis.com/webmasters/v3/sites/https%3A%2F%2Fhiperbaricabrasilia.com.br%2F/searchAnalytics/query';
@@ -746,7 +761,7 @@ function fluxoAvaliacoes() {
   const tags = (await api('tags?limit=100', 'GET')).data || []; const tagBMH = tags.find((t) => t.name === 'BMH');
     const so = process.argv.slice(2);   // ex.: node montar.js pagina guardiao (só esses)
   // o alerta vem primeiro: os outros precisam do id dele (errorWorkflow)
-  const fluxos = { alerta: fluxoAlerta, grava: fluxoGrava, pagina: fluxoPagina, igut: fluxoIgut, guardiao: fluxoGuardiao, botoes: fluxoBotoes, resumo: fluxoResumo, medicao: fluxoMedicao, mensal: fluxoMensal, numeros: fluxoNumeros, diretoria: fluxoPainelDiretoria, plantoes: fluxoPlantoes, plantoesEmails: fluxoPlantoesEmails, avaliacoes: fluxoAvaliacoes, nota: fluxoNota, vigia: fluxoVigia, organico: fluxoSearchConsole, radar: fluxoRadar, confirmacao: fluxoConfirmacao, origem: fluxoOrigem, recebedor: fluxoRecebedor, conversoes: fluxoConversoes };
+  const fluxos = { alerta: fluxoAlerta, grava: fluxoGrava, pagina: fluxoPagina, igut: fluxoIgut, guardiao: fluxoGuardiao, botoes: fluxoBotoes, resumo: fluxoResumo, medicao: fluxoMedicao, mensal: fluxoMensal, numeros: fluxoNumeros, diretoria: fluxoPainelDiretoria, plantoes: fluxoPlantoes, plantoesEmails: fluxoPlantoesEmails, avaliacoes: fluxoAvaliacoes, nota: fluxoNota, vigia: fluxoVigia, organico: fluxoSearchConsole, radar: fluxoRadar, confirmacao: fluxoConfirmacao, origem: fluxoOrigem, recebedor: fluxoRecebedor, conversoes: fluxoConversoes, cliques: fluxoCliques };
   for (const [chave, monta] of Object.entries(fluxos).filter(([k]) => !so.length || so.includes(k))) {
     const f = comVigia(chave, monta());
     if (!/^BMH · /.test(f.name)) throw new Error('nome sem BMH');

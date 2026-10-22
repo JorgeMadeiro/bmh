@@ -1,0 +1,26 @@
+<script>
+// BMH · origem do clique no WhatsApp (22/10/2026). Guarda na sessão o que veio no endereço de chegada (gclid, UTMs etc.) e,
+// no clique em link do WhatsApp, manda ao n8n: página, botão, começo da mensagem pronta e a chegada. Nada pessoal.
+(function () {
+  try {
+    var KEYS = ['gclid', 'gbraid', 'wbraid', 'fbclid', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+    var st = {};
+    try { st = JSON.parse(sessionStorage.getItem('bmh_origem') || '{}'); } catch (e) {}
+    var q = new URLSearchParams(location.search), mudou = false;
+    KEYS.forEach(function (k) { var v = q.get(k); if (v) { st[k] = v.slice(0, 200); mudou = true; } });
+    if (mudou) st.entrada = location.pathname;
+    if (!st.referencia) { if (document.referrer) { if (document.referrer.indexOf(location.host) < 0) { st.referencia = document.referrer.split('?')[0].slice(0, 200); mudou = true; } } }
+    if (!st.gclid) { var c = /(?:^|;\s*)_gcl_aw=([^;]+)/.exec(document.cookie); if (c) { st.gclid = String(c[1]).split('.').slice(2).join('.').slice(0, 200); mudou = true; } }
+    if (mudou) { try { sessionStorage.setItem('bmh_origem', JSON.stringify(st)); } catch (e) {} }
+    document.addEventListener('click', function (ev) {
+      var a = ev.target.closest ? ev.target.closest('a[href]') : null; if (!a) return;
+      var h = a.getAttribute('href') || ''; if (!/wa\.me\/|api\.whatsapp\.com/.test(h)) return;
+      var d = new URLSearchParams(); d.set('pagina', location.pathname); d.set('botao', String(a.className || '').slice(0, 80));
+      var m = /[?&]text=([^&]*)/.exec(h); var t = ''; if (m) { try { t = decodeURIComponent(m[1].replace(/\+/g, ' ')); } catch (e) {} }
+      d.set('mensagem_inicio', t.slice(0, 60));
+      KEYS.concat(['entrada', 'referencia']).forEach(function (k) { if (st[k]) d.set(k, st[k]); });
+      if (navigator.sendBeacon) navigator.sendBeacon('__ENDERECO__', d);
+    }, true);
+  } catch (e) {}
+})();
+</script>
