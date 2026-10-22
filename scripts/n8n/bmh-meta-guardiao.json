@@ -844,6 +844,110 @@
     "height": 420,
     "content": "## BMH · Meta · guardião diário (homologação)\n**Traz:** a conta de anúncios do Meta da BMH (`act_327952129944258`): limite de gastos, saldo pré-pago, campanhas, conjuntos, anúncios, números de ontem, 3 e 7 dias, gasto do mês e alterações de ontem (credencial `BMH · Meta Instagram (token)`, só leitura).\n**Envia:** uma mensagem no robô BMH alertas com avisos e o que proporia; grava em `BMH_guardiao_registro` (plataforma meta) só com `guardiao_meta_grava = sim` na `BMH_config`.\n**Limites:** só simulação, não aplica nada e não tem botão; nenhuma pausa proposta deixa a conta sem anúncio antes de `meta_no_ar_ate` (regra do Jorge, 20/10/2026: a conta não para até 31/10); nunca sobe verba.\n\nRegras: verba da conta (o menor entre limite e saldo livre, pela média de 7 dias) com menos de `meta_dias_aviso` (5) dias ou acabando antes de `meta_no_ar_ate`; conta fora do ar; conjunto ligado sem exibição ontem; frequência acima de `meta_freq_max` (4) em 7 dias; anúncio reprovado ou com problema; alteração de quem não está em `meta_alteracoes_da_casa`; conjunto de mensagem com `meta_limite_sem_conversa` (R$ 40) em 3 dias sem conversa; teto `meta_teto_mes` (ou `meta_teto_mes_AAAA-MM`). Frequência e anúncio com problema só voltam depois de 7 dias.\n\nAs regras moram em `BMH_Claude_VSL/scripts/n8n/bmh-meta-guardiao-decide.js` e se testam com `testa-guardiao-meta.js` (dados de hoje, pelo cofre). Manual: `/webhook/bmh-meta-guardiao-3e8d1c5a07?teste=1`. Método: `Central_Claude/frentes/metodo-meta-ads.md`."
    }
+  },
+  {
+   "id": "6812c835-34bf-5f0a-8975-73f53bdf545e",
+   "name": "Vigia · marca que rodou",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    0,
+    420
+   ],
+   "parameters": {
+    "jsCode": "return [{ json: { chave: 'meta_guardiao', nome: \"BMH · Meta · guardião diário\", ultima_vez: $now.toISO(), max_horas: 26, avisado_em: '' } }];"
+   }
+  },
+  {
+   "id": "d16af2fc-813b-5d20-aad3-f0e7a021525c",
+   "name": "Vigia · grava",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    240,
+    420
+   ],
+   "parameters": {
+    "operation": "upsert",
+    "dataTableId": {
+     "__rl": true,
+     "value": "0kBTGpt8EjCjmR9t",
+     "mode": "id",
+     "cachedResultName": "BMH_vigia"
+    },
+    "filters": {
+     "conditions": [
+      {
+       "keyName": "chave",
+       "keyValue": "={{ $json.chave }}"
+      }
+     ]
+    },
+    "columns": {
+     "mappingMode": "defineBelow",
+     "value": {
+      "chave": "={{ $json.chave }}",
+      "nome": "={{ $json.nome }}",
+      "ultima_vez": "={{ $json.ultima_vez }}",
+      "max_horas": "={{ $json.max_horas }}",
+      "avisado_em": "={{ $json.avisado_em }}"
+     },
+     "matchingColumns": [],
+     "schema": [
+      {
+       "id": "chave",
+       "displayName": "chave",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "nome",
+       "displayName": "nome",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "ultima_vez",
+       "displayName": "ultima_vez",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "max_horas",
+       "displayName": "max_horas",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "number",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "avisado_em",
+       "displayName": "avisado_em",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      }
+     ]
+    },
+    "options": {}
+   }
   }
  ],
  "connections": {
@@ -852,6 +956,11 @@
     [
      {
       "node": "Quando",
+      "type": "main",
+      "index": 0
+     },
+     {
+      "node": "Vigia · marca que rodou",
       "type": "main",
       "index": 0
      }
@@ -1062,6 +1171,17 @@
     [
      {
       "node": "Explica a recusa do Telegram",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Vigia · marca que rodou": {
+   "main": [
+    [
+     {
+      "node": "Vigia · grava",
       "type": "main",
       "index": 0
      }

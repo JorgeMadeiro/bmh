@@ -88,6 +88,11 @@ lig = {}
 def liga(a, b): lig.setdefault(a, {'main': [[]]})['main'][0].append({'node': b, 'type': 'main', 'index': 0})
 for a, b in zip(seq, seq[1:]): liga(a, b)
 liga(manual, 'Quando')
+# Vigia (22/10/2026): o horário anota em BMH_vigia; o "BMH · Vigia · fluxos parados" avisa se passar de 26 h sem rodar
+sys.path.insert(0, AQUI)
+from _vigia_bmh import nos_vigia, liga_vigia
+nos += nos_vigia('meta_numeros', 'BMH · Meta · números do dia', (0, 420))
+liga_vigia(lig, 'Todo dia às 6h05')
 CONF = {'executionOrder': 'v1', 'timezone': 'America/Sao_Paulo', 'saveDataSuccessExecution': 'all', 'saveDataErrorExecution': 'all',
         'errorWorkflow': '7u3CuyjESsHmCtMW', 'executionTimeout': 900}
 json.dump({'name': 'BMH · Meta · números do dia (homologação)', 'nodes': nos, 'connections': lig, 'settings': CONF},

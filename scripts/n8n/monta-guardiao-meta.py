@@ -132,6 +132,11 @@ liga(decide, prepara); liga(decide, monta)
 liga(prepara, registra); liga(monta, telegram)
 liga(telegram, para, saida=0)      # mandou: confere se a leitura falhou e, se sim, para em erro
 liga(telegram, explica, saida=1)   # saída 1 = erro (onError continueErrorOutput)
+# Vigia (22/10/2026): o horário anota em BMH_vigia; o "BMH · Vigia · fluxos parados" avisa se passar de 26 h sem rodar
+import sys; sys.path.insert(0, AQUI)
+from _vigia_bmh import nos_vigia, liga_vigia
+nos += nos_vigia('meta_guardiao', 'BMH · Meta · guardião diário', (0, 420))
+liga_vigia(ligacoes, 'Todo dia às 7h35')
 
 fluxo = {'name': 'BMH · Meta · guardião diário (homologação)', 'nodes': nos, 'connections': ligacoes,
          'settings': {'executionOrder': 'v1', 'timezone': 'America/Sao_Paulo', 'saveDataSuccessExecution': 'all',

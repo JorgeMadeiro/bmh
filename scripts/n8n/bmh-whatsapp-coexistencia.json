@@ -1,0 +1,362 @@
+{
+ "name": "BMH · WhatsApp · coexistência com o Kommo (homologação)",
+ "nodes": [
+  {
+   "id": "e1526651-30fc-5a03-a510-ca10d744cb44",
+   "name": "Todo dia às 9h17",
+   "type": "n8n-nodes-base.scheduleTrigger",
+   "typeVersion": 1.2,
+   "position": [
+    0,
+    0
+   ],
+   "parameters": {
+    "rule": {
+     "interval": [
+      {
+       "field": "cronExpression",
+       "expression": "17 9 * * *"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "4e558b49-2cb6-5c96-a7e3-48149f5ca26b",
+   "name": "Manual",
+   "type": "n8n-nodes-base.webhook",
+   "typeVersion": 2,
+   "position": [
+    0,
+    200
+   ],
+   "parameters": {
+    "path": "bmh-coexistencia-4c19e7a2d8",
+    "options": {}
+   },
+   "webhookId": "2dbd2a7b-2f21-5434-ac51-a5e495cfc41c"
+  },
+  {
+   "id": "0c5a7774-c325-557c-b55b-5ee22b0ae58c",
+   "name": "Quando",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    240,
+    0
+   ],
+   "parameters": {
+    "jsCode": "// Manual com ?teste=1: manda sempre uma mensagem marcada 🧪 (mesmo calado), e ?desde=AAAA-MM-DD simula a data da virada.\nlet q = {}; try { if ($('Manual').isExecuted) q = $('Manual').first().json.query || {}; } catch (e) {}\nreturn [{ json: { agora: $now.toISO(), teste: !!q.teste, desde_teste: /^\\d{4}-\\d{2}-\\d{2}$/.test(q.desde || '') ? q.desde : '' } }];\n"
+   }
+  },
+  {
+   "id": "ba9f3361-8b19-5b36-9bf1-10f1ed82c99c",
+   "name": "Config",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    480,
+    0
+   ],
+   "parameters": {
+    "operation": "get",
+    "dataTableId": {
+     "__rl": true,
+     "value": "V4NRHS9mc1kvigix",
+     "mode": "id",
+     "cachedResultName": "BMH_config"
+    },
+    "returnAll": true
+   },
+   "alwaysOutputData": true,
+   "executeOnce": true
+  },
+  {
+   "id": "49dc8b1b-107d-5db2-a98f-22f46ebf1668",
+   "name": "Ecos do celular (tabela)",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    720,
+    0
+   ],
+   "parameters": {
+    "operation": "get",
+    "dataTableId": {
+     "__rl": true,
+     "value": "ll7XMHZ9sWkenCgb",
+     "mode": "id",
+     "cachedResultName": "BMH_whatsapp_mensagens"
+    },
+    "matchType": "allConditions",
+    "filters": {
+     "conditions": [
+      {
+       "keyName": "direcao",
+       "keyValue": "equipe"
+      },
+      {
+       "keyName": "aparelho",
+       "keyValue": "celular"
+      }
+     ]
+    },
+    "returnAll": true
+   },
+   "alwaysOutputData": true,
+   "executeOnce": true
+  },
+  {
+   "id": "01fe4de7-2d70-5cb4-b0e4-1d6eb8f2fb77",
+   "name": "Decide",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    960,
+    0
+   ],
+   "parameters": {
+    "jsCode": "// Regra copiada de scripts/n8n/bmh-coexistencia.js (BMH_Claude_VSL) pelo monta-coexistencia.py: editar lá.\n// Vigia da coexistência do WhatsApp da recepção da BMH com o Kommo (22/10/2026). A Meta desliga a coexistência se o app\n// WhatsApp Business do celular ficar 14 dias sem abrir. Abrir o app a Meta não avisa; o que chega é o eco de mensagem mandada\n// pelo celular (recebedor oficial: direcao \"equipe\", aparelho \"celular\", na BMH_whatsapp_mensagens). Então: sem eco do celular\n// há `coexistencia_dias_aviso` (10) dias, avisa todo dia, com o que fazer para zerar a contagem.\n//\n// Só liga depois da virada: sem `coexistencia_desde` (AAAA-MM-DD) na BMH_config, fica calado, mesmo com o fluxo ligado. Usa só\n// a hora das mensagens (nunca texto nem telefone). Fonte: este arquivo; o montador embute o texto no nó do n8n.\nfunction avisoCoexistencia(momentosEco, cfg, agoraISO) {\n  const desde = /^\\d{4}-\\d{2}-\\d{2}$/.test(String(cfg.coexistencia_desde || '')) ? cfg.coexistencia_desde : '';\n  if (!desde) return null;\n  const agora = new Date(agoraISO);\n  const inicio = new Date(desde + 'T00:00:00-03:00');\n  if (agora < inicio) return null;\n  const LIMITE = Number(cfg.coexistencia_dias_aviso || 10), META = 14;\n  // só eco depois da virada e nunca no futuro (relógio errado não zera a contagem)\n  const ecos = momentosEco.map(m => new Date(m)).filter(d => !isNaN(d) && d >= inicio && d <= agora).sort((a, b) => b - a);\n  const ref = ecos[0] || inicio;\n  const dias = (agora - ref) / 864e5;\n  if (dias < LIMITE) return null;\n  const br = d => new Date(d.getTime() - 3 * 3600e3).toISOString();\n  const dm = d => br(d).slice(8, 10) + '/' + br(d).slice(5, 7), hm = d => br(d).slice(11, 16);\n  const prazo = new Date(ref.getTime() + META * 864e5);\n  const quando = ecos[0] ? `a última foi em ${dm(ref)} às ${hm(ref)}` : `desde a virada, em ${dm(inicio)}`;\n  const texto = `📱 BMH · WhatsApp da recepção: há ${Math.floor(dias)} dias não vejo mensagem mandada pelo celular (${quando}).\\n\\n` +\n    (dias >= META\n      ? `Passou de ${META} dias: se ninguém abriu o app WhatsApp Business no celular da recepção, a Meta pode ter desligado a ligação com o Kommo. Conferir no Kommo se as conversas continuam chegando.`\n      : `A Meta desliga a ligação com o Kommo se o app WhatsApp Business do celular da recepção ficar ${META} dias sem abrir (prazo por volta de ${dm(prazo)}). Abrir o app no celular e mandar qualquer mensagem por ele zera a contagem (só abrir também vale para a Meta, mas eu não vejo, e o aviso continua).`);\n  return { dias: Math.floor(dias), ultimo: ecos[0] ? ecos[0].toISOString() : '', texto };\n}\n\nconst Q = $('Quando').first().json;\nconst cfg = Object.fromEntries($('Config').all().map(i => i.json).filter(r => r && r.chave).map(r => [r.chave, r.valor]));\nif (Q.desde_teste) cfg.coexistencia_desde = Q.desde_teste;\n// só a hora: texto e telefone das mensagens não saem deste nó\nconst momentos = $('Ecos do celular (tabela)').all().map(i => i.json && i.json.momento).filter(Boolean);\nconst r = avisoCoexistencia(momentos, cfg, Q.agora);\nif (!Q.teste) return r ? [{ json: { texto: r.texto } }] : [];\nreturn [{ json: { texto: '🧪 TESTE da vigia da coexistência\\n' + (r ? r.texto : `calado: ${momentos.length} mensagens do celular lidas; virada ${cfg.coexistencia_desde || 'ainda não marcada'}`) } }];\n"
+   }
+  },
+  {
+   "id": "95ff2f0a-7a90-5ac4-9855-40179198adcd",
+   "name": "Telegram · aviso",
+   "type": "n8n-nodes-base.telegram",
+   "typeVersion": 1.2,
+   "position": [
+    1200,
+    0
+   ],
+   "parameters": {
+    "chatId": "8708228589",
+    "text": "={{ String($json.texto || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') }}",
+    "additionalFields": {
+     "appendAttribution": false,
+     "parse_mode": "HTML"
+    }
+   },
+   "credentials": {
+    "telegramApi": {
+     "id": "SgQHWuJOuMWeVbPi",
+     "name": "BMH · Telegram (robô BMH alertas)"
+    }
+   },
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000
+  },
+  {
+   "id": "adf691fd-2e39-5f4c-8d53-1e24c4f5246f",
+   "name": "Sobre este fluxo",
+   "type": "n8n-nodes-base.stickyNote",
+   "typeVersion": 1,
+   "position": [
+    0,
+    -460
+   ],
+   "parameters": {
+    "width": 1000,
+    "height": 360,
+    "content": "## BMH · WhatsApp · coexistência com o Kommo (homologação)\n**Traz:** a hora das mensagens mandadas pelo celular da recepção (`BMH_whatsapp_mensagens`, direcao `equipe`, aparelho `celular`, gravadas pelo recebedor oficial da Meta) e `coexistencia_desde` da `BMH_config`.\n**Envia:** aviso no robô BMH alertas com 10 dias (`coexistencia_dias_aviso`) sem mensagem mandada pelo celular: a Meta desliga a coexistência com o Kommo se o app ficar 14 dias sem abrir.\n**Limites:** calado antes da virada (sem `coexistencia_desde`); usa só a hora, nunca texto nem telefone; não guarda execução (a tabela tem dado de paciente); abrir o app sem mandar mensagem a Meta não avisa, então o aviso continua até alguém mandar uma pelo celular.\n\nManual: `/webhook/bmh-coexistencia-4c19e7a2d8?teste=1` (sempre responde, marcado 🧪) e `&desde=AAAA-MM-DD` para simular a virada. Regra em `BMH_Claude_VSL/scripts/n8n/bmh-coexistencia.js`."
+   }
+  },
+  {
+   "id": "9649fa70-17da-55c1-a2fc-974cf0443702",
+   "name": "Vigia · marca que rodou",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    0,
+    440
+   ],
+   "parameters": {
+    "jsCode": "return [{ json: { chave: 'coexistencia', nome: \"BMH · WhatsApp · coexistência com o Kommo\", ultima_vez: $now.toISO(), max_horas: 26, avisado_em: '' } }];"
+   }
+  },
+  {
+   "id": "173cf992-e68b-552a-b211-0bd910a416c1",
+   "name": "Vigia · grava",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    240,
+    440
+   ],
+   "parameters": {
+    "operation": "upsert",
+    "dataTableId": {
+     "__rl": true,
+     "value": "0kBTGpt8EjCjmR9t",
+     "mode": "id",
+     "cachedResultName": "BMH_vigia"
+    },
+    "filters": {
+     "conditions": [
+      {
+       "keyName": "chave",
+       "keyValue": "={{ $json.chave }}"
+      }
+     ]
+    },
+    "columns": {
+     "mappingMode": "defineBelow",
+     "value": {
+      "chave": "={{ $json.chave }}",
+      "nome": "={{ $json.nome }}",
+      "ultima_vez": "={{ $json.ultima_vez }}",
+      "max_horas": "={{ $json.max_horas }}",
+      "avisado_em": "={{ $json.avisado_em }}"
+     },
+     "matchingColumns": [],
+     "schema": [
+      {
+       "id": "chave",
+       "displayName": "chave",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "nome",
+       "displayName": "nome",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "ultima_vez",
+       "displayName": "ultima_vez",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "max_horas",
+       "displayName": "max_horas",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "number",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "avisado_em",
+       "displayName": "avisado_em",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      }
+     ]
+    },
+    "options": {}
+   }
+  }
+ ],
+ "connections": {
+  "Todo dia às 9h17": {
+   "main": [
+    [
+     {
+      "node": "Quando",
+      "type": "main",
+      "index": 0
+     },
+     {
+      "node": "Vigia · marca que rodou",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Quando": {
+   "main": [
+    [
+     {
+      "node": "Config",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Config": {
+   "main": [
+    [
+     {
+      "node": "Ecos do celular (tabela)",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Ecos do celular (tabela)": {
+   "main": [
+    [
+     {
+      "node": "Decide",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Decide": {
+   "main": [
+    [
+     {
+      "node": "Telegram · aviso",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Manual": {
+   "main": [
+    [
+     {
+      "node": "Quando",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Vigia · marca que rodou": {
+   "main": [
+    [
+     {
+      "node": "Vigia · grava",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  }
+ },
+ "settings": {
+  "executionOrder": "v1",
+  "timezone": "America/Sao_Paulo",
+  "saveDataSuccessExecution": "none",
+  "saveDataErrorExecution": "none",
+  "saveManualExecutions": false,
+  "errorWorkflow": "7u3CuyjESsHmCtMW",
+  "executionTimeout": 300
+ }
+}

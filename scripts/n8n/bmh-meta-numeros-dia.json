@@ -634,6 +634,110 @@
     "height": 330,
     "content": "## BMH · Meta · números do dia (homologação)\n**Traz:** da conta do Meta da BMH (`act_327952129944258`, credencial `BMH · Meta Instagram (token)`, só leitura) o gasto, exibições, alcance, cliques no link e conversas por anúncio e por dia, e a verba da conta (limite, saldo pré-pago e orçamentos ligados).\n**Envia:** linhas na `BMH_meta_anuncios_dia`: uma por anúncio por dia (`tipo = anuncio`) e uma foto da conta por dia (`tipo = conta`), lidas pelo resumo das 8h.\n**Limites:** só lê a Meta; regrava os 3 últimos dias às 6h05; leitura com erro para o fluxo (alerta de falha) e nada é gravado pela metade.\n\nManual: `/webhook/bmh-meta-numeros-7b2e91f4c6?teste=1` (não grava) ou `?desde=AAAA-MM-DD` (carrega até 31 dias). Regras em `BMH_Claude_VSL/scripts/n8n/bmh-meta-numeros.js`, testadas com `testa-numeros-meta.js`."
    }
+  },
+  {
+   "id": "9fbf84bd-35d5-54ae-a336-a4c31554e9da",
+   "name": "Vigia · marca que rodou",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    0,
+    420
+   ],
+   "parameters": {
+    "jsCode": "return [{ json: { chave: 'meta_numeros', nome: \"BMH · Meta · números do dia\", ultima_vez: $now.toISO(), max_horas: 26, avisado_em: '' } }];"
+   }
+  },
+  {
+   "id": "6e463e27-39f1-5393-99b4-f385ee3c0503",
+   "name": "Vigia · grava",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    240,
+    420
+   ],
+   "parameters": {
+    "operation": "upsert",
+    "dataTableId": {
+     "__rl": true,
+     "value": "0kBTGpt8EjCjmR9t",
+     "mode": "id",
+     "cachedResultName": "BMH_vigia"
+    },
+    "filters": {
+     "conditions": [
+      {
+       "keyName": "chave",
+       "keyValue": "={{ $json.chave }}"
+      }
+     ]
+    },
+    "columns": {
+     "mappingMode": "defineBelow",
+     "value": {
+      "chave": "={{ $json.chave }}",
+      "nome": "={{ $json.nome }}",
+      "ultima_vez": "={{ $json.ultima_vez }}",
+      "max_horas": "={{ $json.max_horas }}",
+      "avisado_em": "={{ $json.avisado_em }}"
+     },
+     "matchingColumns": [],
+     "schema": [
+      {
+       "id": "chave",
+       "displayName": "chave",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "nome",
+       "displayName": "nome",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "ultima_vez",
+       "displayName": "ultima_vez",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "max_horas",
+       "displayName": "max_horas",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "number",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "avisado_em",
+       "displayName": "avisado_em",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      }
+     ]
+    },
+    "options": {}
+   }
   }
  ],
  "connections": {
@@ -642,6 +746,11 @@
     [
      {
       "node": "Quando",
+      "type": "main",
+      "index": 0
+     },
+     {
+      "node": "Vigia · marca que rodou",
       "type": "main",
       "index": 0
      }
@@ -763,6 +872,17 @@
     [
      {
       "node": "Quando",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Vigia · marca que rodou": {
+   "main": [
+    [
+     {
+      "node": "Vigia · grava",
       "type": "main",
       "index": 0
      }
