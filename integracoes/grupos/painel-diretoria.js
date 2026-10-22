@@ -25,6 +25,16 @@ for (const r of opc) {
   a[3] += +r.agendadas || 0; a[4] += +r.atendidas || 0; a[5] += +r.faltas || 0; a[6] += +r.cobradas || 0; a[7] += +r.avaliacoes_agendadas || 0; a[8] += +r.avaliacoes_feitas || 0;
 }
 const OC = Object.values(ocM).filter((a) => a[3] || a[7]);
+// operação por mês e câmara (22/10/2026, multiplace × monoplace ao tocar no mês):
+// [mes, unidade, câmara, agendadas, atendidas, faltas, cobradas, lugares, dias com atendimento]
+const opk = linhas('Operação por câmara (tabela)'), okM = {};
+for (const r of opk) {
+  if (r.dia >= hoje.toISODate()) continue;
+  const k = r.dia.slice(0, 7) + '|' + r.unidade + '|' + r.camara;
+  const a = (okM[k] ||= [r.dia.slice(0, 7), r.unidade, r.camara, 0, 0, 0, 0, 0, 0]);
+  a[3] += +r.agendadas || 0; a[4] += +r.atendidas || 0; a[5] += +r.faltas || 0; a[6] += +r.cobradas || 0; a[7] += +r.lugares || 0; if (+r.atendidas) a[8]++;
+}
+const OK = Object.values(okM).filter((a) => a[3]);
 const atualizado = [...fin, ...op].map((r) => r.atualizado_em || '').sort().pop() || '';
 // detalhe por lote (só valor > 0): [mes, unidade, convênio, situação, lote, sessões, valor, dias]
 const X = det.filter((r) => +r.valor > 0.5).map((r) => [r.mes, r.unidade, r.convenio, r.situacao, r.lote, +r.sessoes || 0, Math.round(+r.valor), r.dias || '']);
@@ -33,8 +43,8 @@ const PZ = prz.filter((r) => +r.valor_pago > 0).map((r) => [r.mes, r.unidade, r.
 // atOp: a operação (ontem e hoje) é a última parte gravada na carga (o financeiro sai em ~1 min; os pacientes por lote, desde
 // 20/10/2026, só gravam o que mudou): o botão Atualizar só diz "pronto" quando ela for mais nova que o pedido (medido em 20/10/2026)
 // a carga grava a operação em duas tabelas (total e por convênio): "pronto" só quando as duas forem novas
-const ultOp = op.map((r) => r.atualizado_em || '').sort().pop() || '', ultOc = opc.map((r) => r.atualizado_em || '').sort().pop() || '';
-const atOp = ultOc && ultOc < ultOp ? ultOc : ultOp;
+const ult = (t) => t.map((r) => r.atualizado_em || '').sort().pop() || '';
+const atOp = [ult(op), ult(opc), ult(opk)].filter(Boolean).sort()[0] || '';   // a mais velha das três: só "pronto" com todas novas
 // etapas da carga, na ordem em que gravam: financeiro (~1 min), lotes, prazos, pacientes (a parte longa) e operação (fim)
 const ultima = (t) => t.map((r) => r.atualizado_em || '').sort().pop() || '';
 const ET = { fin: ultima(fin), det: ultima(det), prazo: ultima(prz) };
@@ -43,7 +53,10 @@ const pedido = Number((linhas('Pedido (tabela)').find((r) => r.chave === 'ultimo
 // primeiro dia da operação gravada (09/09/2023): o mês dele é incompleto e não serve de base para variação (20/10/2026: set/24
 // aparecia com +156% contra um setembro/23 de 21 dias)
 const inicioOp = op.map((r) => r.dia).filter(Boolean).sort()[0] || '';
-const DADOS = { F, O, OC, X, PZ, inicioOp, hoje: hoje.toISODate(), atOp, ET, pedido, atualizado: atualizado ? DateTime.fromISO(atualizado).setZone('America/Sao_Paulo').toFormat("dd/LL 'às' HH:mm") : '—' };
+// e o de cada unidade e câmara (22/10/2026: Taguatinga começou em 27/01/2025 e jan/26 aparecia com +2.468%)
+const inicioDe = (rows, k) => { const o = {}; for (const r of rows) if (+r.agendadas) { const c = k(r); if (!o[c] || r.dia < o[c]) o[c] = r.dia; } return o; };
+const inicioU = inicioDe(op, (r) => r.unidade), inicioK = inicioDe(opk, (r) => r.unidade + '|' + r.camara);
+const DADOS = { F, O, OC, OK, X, PZ, inicioOp, inicioU, inicioK, hoje: hoje.toISODate(), atOp, ET, pedido, atualizado: atualizado ? DateTime.fromISO(atualizado).setZone('America/Sao_Paulo').toFormat("dd/LL 'às' HH:mm") : '—' };
 const json = JSON.stringify(DADOS).replace(/</g, '\\u003c');
 
 const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -61,7 +74,7 @@ h2{font-size:16px;font-weight:800;margin:20px 0 2px}h2+p.s{margin:0 0 10px;color
 .d{font-size:12px;font-weight:700}.d.up{color:var(--bom)}.d.down{color:var(--ruim)}
 .tab{overflow-x:auto;border:1px solid var(--fio);border-radius:6px}table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
 th,td{padding:8px 10px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--fio)}th{background:var(--nevoa);font-weight:700;font-size:12px}
-th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:#fff}th:first-child{background:var(--nevoa)}tr.tot td{font-weight:800;background:var(--nevoa)}
+th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:#fff}th:first-child{background:var(--nevoa)}tr.tot td{font-weight:800;background:var(--nevoa)}td.abre{cursor:pointer;color:var(--azul-texto);font-weight:700}td.abre::after{content:' ▸';font-size:11px}td.abre.aberto::after{content:' ▾'}tr.sub td{background:#F5F8FB;font-size:12px;color:var(--sec)}tr.sub td:first-child{padding-left:22px;background:#F5F8FB}
 .periodo{display:flex;gap:4px;align-items:center;font-size:13px;color:var(--sec)}.periodo select{padding:7px 8px}
 .check{display:flex;gap:6px;align-items:center;font-size:13px;font-weight:600;min-height:36px}.check input{width:18px;height:18px;accent-color:var(--marinho)}
 .lista{margin:0;padding:0;list-style:none;border:1px solid var(--fio);border-radius:6px}.lista li{display:flex;justify-content:space-between;gap:12px;padding:9px 12px;border-bottom:1px solid var(--fio)}.lista li:last-child{border:0}
@@ -230,8 +243,10 @@ function desenha() {
   // detalhe que antes ficava nos quadros do início (20/10/2026): variação contra o ano e o mês anteriores (só mês fechado: mês
   // parcial contra mês cheio seria alarme falso), dias com atendimento, sessões por dia (essa compara o mês parcial) e faltas cobradas
   // Var. ano (pedido do Jorge, 20/10/2026): o mesmo mês do ano anterior, porque a BMH tem sazonalidade; a do mês fica ao lado
-  const mesIncompleto = D.inicioOp && !D.inicioOp.endsWith('-01') ? D.inicioOp.slice(0, 7) : '';
-  const varia = (a, b, m, base) => { if (m >= mesAtual || !b || base === mesIncompleto || m === mesIncompleto) return el('td', '—'); const v = Math.round(100 * (a - b) / b); return el('td', (v > 0 ? '+' : '') + v + '%', v > 0 ? 'd up' : v < 0 ? 'd down' : ''); };
+  // mês de início que não começa no dia 1 é incompleto: não compara nem serve de base (da clínica, da unidade ou da câmara)
+  const incompleto = d => d && !d.endsWith('-01') ? d.slice(0, 7) : '';
+  const inicio = U ? (D.inicioU[U] || '') : D.inicioOp, mesIncompleto = incompleto(inicio);
+  const varia = (a, b, m, base, inc = mesIncompleto) => { if (m >= mesAtual || !b || base === inc || m === inc) return el('td', '—'); const v = Math.round(100 * (a - b) / b); return el('td', (v > 0 ? '+' : '') + v + '%', v > 0 ? 'd up' : v < 0 ? 'd down' : ''); };
   const anoAntes = m => (+m.slice(0, 4) - 1) + m.slice(4);
   // com convênio no filtro (20/10/2026): sessões, faltas, cobradas e avaliações só dele; dias e lugares são da clínica, e a
   // ocupação vira "quanto da ocupação veio desse convênio" (sessões dele ÷ lugares da clínica)
@@ -239,11 +254,23 @@ function desenha() {
     for (const x of D.OC) { if (x[0] !== m || x[2] !== C || (U && x[1] !== U)) continue; r.ag+=x[3]; r.at+=x[4]; r.fa+=x[5]; r.co+=x[6]; r.aa+=x[7]; r.af+=x[8]; } return r; };
   document.getElementById('sOp').textContent = '* mês em andamento, até ontem · Var. ano: sessões contra o mesmo mês do ano anterior · Var. mês: contra o mês anterior · Dias: dias com atendimento'
     + (C ? ' · ' + C + ': sessões, faltas, cobradas e avaliações só desse convênio; Dias e Por dia contam os dias da clínica; Ocupação = parte da ocupação da clínica que veio desse convênio' : '');
+  // multiplace × monoplace (22/10/2026): tocar no mês abre uma linha por câmara (sem convênio no filtro: a câmara não se divide por convênio)
+  const ORDEM = ['Multiplace|Asa Sul', 'Monoplace|Asa Sul', 'Monoplace|Taguatinga'];
+  const cams = m => D.OK.filter(x => x[0] === m && (!U || x[1] === U)).sort((a, b) => ORDEM.indexOf(a[2] + '|' + a[1]) - ORDEM.indexOf(b[2] + '|' + b[1]));
+  const camDe = (m, x) => (D.OK.find(y => y[0] === m && y[1] === x[1] && y[2] === x[2]) || [])[4] || 0;
+  if (!C) document.getElementById('sOp').textContent += ' · toque no mês para ver multiplace e monoplace';
   const co = el('tr'); ['Mês','Sessões','Var. ano','Var. mês','Dias','Por dia','Ocupação','Faltas','Cobradas','Avaliações'].forEach(t => co.append(el('th', t))); to.append(co);
   for (const m of [...new Set(D.O.map(r => r[0]))].sort().reverse()) { const r = opx(m); if (!(r.ag || r.aa) || !noPeriodo(m)) continue; const tr = el('tr');
-    [nomeMes(m) + (m === mesAtual ? '*' : '') + (m === mesIncompleto ? ' (desde ' + D.inicioOp.slice(8, 10) + '/' + D.inicioOp.slice(5, 7) + ')' : ''), r.at.toLocaleString('pt-BR'), varia(r.at, opx(anoAntes(m)).at, m, anoAntes(m)), varia(r.at, opx(anterior(m)).at, m, anterior(m)), String(r.dias), r.dias ? Math.round(r.at / r.dias).toLocaleString('pt-BR') : '—', pct(r.at, r.lu), m >= CONTROLE ? pct(r.fa, r.ag) : '—', m >= CONTROLE ? r.co.toLocaleString('pt-BR') : '—', m >= AVALIACOES ? r.af.toLocaleString('pt-BR') : '—']
-      .forEach(x => tr.append(typeof x === 'string' ? el('td', x) : x)); to.append(tr); }
+    [nomeMes(m) + (m === mesAtual ? '*' : '') + (m === mesIncompleto ? ' (desde ' + inicio.slice(8, 10) + '/' + inicio.slice(5, 7) + ')' : ''), r.at.toLocaleString('pt-BR'), varia(r.at, opx(anoAntes(m)).at, m, anoAntes(m)), varia(r.at, opx(anterior(m)).at, m, anterior(m)), String(r.dias), r.dias ? Math.round(r.at / r.dias).toLocaleString('pt-BR') : '—', pct(r.at, r.lu), m >= CONTROLE ? pct(r.fa, r.ag) : '—', m >= CONTROLE ? r.co.toLocaleString('pt-BR') : '—', m >= AVALIACOES ? r.af.toLocaleString('pt-BR') : '—']
+      .forEach(x => tr.append(typeof x === 'string' ? el('td', x) : x)); to.append(tr);
+    const cs = C ? [] : cams(m);
+    if (cs.length) { const td = tr.firstChild; td.classList.add('abre'); if (abertos.has(m)) td.classList.add('aberto'); td.onclick = () => { abertos.has(m) ? abertos.delete(m) : abertos.add(m); desenha(); }; }
+    if (cs.length && abertos.has(m)) for (const x of cs) { const st = el('tr', null, 'sub'), ik = D.inicioK[x[1] + '|' + x[2]] || '', inc = incompleto(ik);
+      [x[2] + (U ? '' : ' · ' + x[1]) + (m === inc ? ' (desde ' + ik.slice(8, 10) + '/' + ik.slice(5, 7) + ')' : ''), x[4].toLocaleString('pt-BR'), varia(x[4], camDe(anoAntes(m), x), m, anoAntes(m), inc), varia(x[4], camDe(anterior(m), x), m, anterior(m), inc), String(x[8]),
+        x[8] ? Math.round(x[4] / x[8]).toLocaleString('pt-BR') : '—', pct(x[4], x[7]), m >= CONTROLE ? pct(x[5], x[3]) : '—', m >= CONTROLE ? x[6].toLocaleString('pt-BR') : '—', '—']
+        .forEach(v => st.append(typeof v === 'string' ? el('td', v) : v)); to.append(st); } }
 }
+const abertos = new Set();   // meses abertos na Operação (continuam abertos ao trocar unidade ou período)
 document.querySelectorAll('#uni button').forEach(b => b.onclick = () => { document.querySelectorAll('#uni button').forEach(x => x.classList.remove('on')); b.classList.add('on'); U = b.dataset.u; desenha(); });
 sel.onchange = () => { C = sel.value; desenha(); };
 const todosMeses = [...new Set([...D.F.map(r => r[0]), ...D.O.map(r => r[0])])].sort();

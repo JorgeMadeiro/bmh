@@ -49,6 +49,12 @@
   nada ia para lote (a faturar de R$ 200 a 380 mil por mês); de mai a out/2024 o lote era lançado mas o pagamento não era
   marcado (jun/24 com 21% recebido); faltas não eram marcadas (0% até set/2024, 13% em nov/2024); avaliações só a partir de
   mar/2024. A operação começa em 09/09/2023: set/23 aparece "(desde 09/09)" e não serve de base para variação.
+- **Operação por câmara (22/10/2026):** `BMH_operacao_camara` (`operacao-camara-monta.js`, dia × câmara: multiplace e
+  monoplace da Asa Sul, monoplace de Taguatinga; agendadas, atendidas, faltas, cobradas, lugares). Histórico desde set/2023
+  (3.417 linhas); a soma das câmaras bate com o total em todos os 1.761 dias × unidade. No painel, tocar no mês (seta) abre
+  uma linha por câmara, com a ocupação de cada uma; sem divisão por câmara quando há convênio no filtro.
+- **Mês de início incompleto:** o primeiro mês da clínica (set/23, desde 09/09), de cada unidade (Taguatinga, desde 27/01/2025)
+  e de cada câmara aparece "(desde dd/mm)" e não entra em variação (Taguatinga jan/26 aparecia +2.468%).
 - **Valor bruto, sempre (decisão do Jorge, 20/10/2026):** não descontar retenção de imposto (`retencao_em_reais`: R$ 2.600
   em 242 sessões em 26 meses) nem estorno (`total_estorno`: 3 sessões, R$ 1.419). Não é pendência de conferência.
 - **Auditoria de 20/10/2026 (iGut × tabelas, set/24 a out/26):** produção, sessões, recebido, a receber, a faturar e glosado
