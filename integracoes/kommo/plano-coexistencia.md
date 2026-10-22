@@ -150,6 +150,19 @@ a coexistência.
   fica como tarefa, não como etapa. Depois de **1 a 2 meses de mensagens** no Kommo, pensar no SDR (atendente de IA) com
   base nas conversas reais.
 
+## 5B. Decisões do documento de aprovação (22/10/2026)
+
+O Jorge pediu tudo num documento para aprovar: **"BMH no Kommo: plano para aprovação"**
+(https://claude.ai/artifact/U8SVWZABXmzn1xEyWPwa7P, exporta para PDF). Ali estão o funil, os campos, as cinco mensagens, a
+origem por canal, o motor, a virada, os custos, os riscos e a lista para marcar. O que muda aqui:
+- Funil de 7 etapas com **"Aguardando convênio"** (tarefa de cobrança em 3 dias úteis); o automático do iGut só move para
+  frente. "Só dúvida" vai para Perdido com tarefa de retomar em 7 dias; quem não é paciente, etiqueta "não é oportunidade".
+- **Confirmação de agenda pronta no dia da virada** (pedido do Jorge): véspera às 18h, modelo de utilidade aprovado pela
+  Meta com "Confirmo" e "Preciso remarcar", uma por paciente por dia; o aparelho que confirma hoje fica ligado até a nova
+  rodar uma semana sem falha.
+- Pedido de avaliação no Google na fase 2, em "Concluiu", para todos os que concluíram.
+- Frases novas: Instagram da BMH e Perfil do Google; página /indicacao/ com QR por cirurgião.
+
 ## 6. Custos
 
 - **Kommo:** a partir de 01/09/2026, o Avançado custa US$ 30 por usuário por mês para cliente novo. Com 4 usuários, uns
