@@ -45,6 +45,7 @@ const COLUNAS = {
   BMH_financeiro_mes: { chave: 's', mes: 's', unidade: 's', convenio: 's', sessoes: 'n', produzido: 'n', faturado: 'n', a_faturar: 'n', recebido: 'n', a_receber: 'n', glosado: 'n', atualizado_em: 's' },
   BMH_financeiro_detalhe: { chave: 's', mes: 's', unidade: 's', convenio: 's', situacao: 's', lote: 's', sessoes: 'n', valor: 'n', glosa: 'n', dias: 's', atualizado_em: 's' },
   BMH_financeiro_paciente: { chave: 's', mes: 's', unidade: 's', convenio: 's', situacao: 's', lote: 's', paciente_id: 's', paciente: 's', sessoes: 'n', valor: 'n', dias: 's', medicos: 's', atualizado_em: 's' },
+  BMH_origem_conversas: Object.fromEntries(['chave', 'telefone_hash', 'primeira_msg_em', 'origem', 'como', 'clique_chave', 'pagina', 'gclid', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'ctwa_clid'].map((k) => [k, 's'])),   // origem de cada conversa nova, sem depender do Kommo (22/10/2026)
   BMH_cliques_site: Object.fromEntries(['chave', 'registrado_em', 'pagina', 'botao', 'mensagem_inicio', 'gclid', 'gbraid', 'wbraid', 'fbclid', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'entrada', 'referencia', 'lead_id', 'ligado_em'].map((k) => [k, 's'])),   // clique no WhatsApp do site com gclid e UTM (22/10/2026)
   BMH_conversoes: Object.fromEntries(['chave', 'evento', 'dia', 'paciente_id', 'unidade', 'telefone_hash', 'telefone_hash_sem9', 'telefone_hash_google', 'email_hash', 'enviado_meta', 'enviado_google', 'modo', 'criado_em'].map((k) => [k, 's'])),   // avaliou e iniciou pelo iGut, em código (22/10/2026)
   BMH_whatsapp_meta: Object.fromEntries(['chave', 'momento', 'dia', 'telefone_hash', 'direcao', 'aparelho', 'tipo', 'texto', 'respondendo', 'apagar_em', 'origem', 'anuncio_id', 'ctwa_clid', 'referral_tipo'].map((k) => [k, 's'])),   // recebedor oficial da Meta (22/10/2026): telefone só em código, texto mascarado, 1 mês
@@ -685,6 +686,37 @@ function fluxoEnvioConversoes() {
   return { name: 'BMH · Conversões · envio (Meta e Google)', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none' }) };
 }
 
+// ---------------- origem das conversas do WhatsApp (22/10/2026): frase, clique e "provável pelo tempo", sem o Kommo ----------------
+function fluxoOrigemConversas() {
+  x = 0;
+  const filtro = (nome, valor) => no(nome, 'n8n-nodes-base.filter', 2.2, { conditions: { options: { caseSensitive: true, leftValue: '', typeValidation: 'loose', version: 2 }, combinator: 'and',
+    conditions: [{ id: crypto.randomUUID(), leftValue: '={{ $json.tipo }}', rightValue: valor, operator: { type: 'string', operation: 'equals' } }] }, options: {} });
+  const n = {
+    agenda: no('A cada 10 minutos', 'n8n-nodes-base.scheduleTrigger', 1.2, { rule: { interval: [{ field: 'cronExpression', expression: '4,14,24,34,44,54 * * * *' }] } }),
+    msgs: le('Mensagens (tabela)', 'BMH_whatsapp_meta'), cliques: le('Cliques (tabela)', 'BMH_cliques_site'), feitas: le('Origem das conversas (tabela)', 'BMH_origem_conversas'),
+    liga_: codigo('Liga cliques e conversas', '../../origem/liga-conversas.js', { executeOnce: true }),
+    soConv: filtro('Só as conversas', 'conversa'), gravaConv: grava('Grava a origem da conversa', 'BMH_origem_conversas'),
+    soClique: filtro('Só os cliques ligados', 'clique'), gravaClique: grava('Marca o clique ligado', 'BMH_cliques_site'),
+    nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Origem · conversas do WhatsApp\n**Traz:** BMH_whatsapp_meta (recebedor oficial), BMH_cliques_site (tag do Tag Manager)\n**Envia:** nada; grava BMH_origem_conversas e marca o clique ligado\n**Limites:** últimas 24 h; conversa nova = sem mensagem do mesmo telefone nos 7 dias anteriores; provável pelo tempo só com 1 conversa e 1 clique, como na Nexo\n\nNa virada, o fluxo de origem do Kommo lê esta tabela pelo telefone em código para levar gclid e UTMs ao lead.', width: 620, height: 220 }),
+  };
+  const cx = {}; for (const [a, b] of [[n.agenda, n.msgs], [n.msgs, n.cliques], [n.cliques, n.feitas], [n.feitas, n.liga_], [n.liga_, n.soConv], [n.soConv, n.gravaConv], [n.liga_, n.soClique], [n.soClique, n.gravaClique]]) liga(cx, a.name, b.name);
+  return { name: 'BMH · Origem · conversas do WhatsApp', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none' }) };
+}
+
+// ---------------- lembrete do celular da Asa Sul (22/10/2026) ----------------
+// O WhatsApp da recepção está em coexistência (app + API oficial). Se o WhatsApp Business ficar 14 dias sem ser aberto no
+// celular, a Meta desliga a coexistência e o recebedor e o Kommo param de receber. Dias 1, 11 e 21: intervalo de até 11 dias.
+function fluxoLembreteCelular() {
+  x = 0;
+  const n = {
+    agenda: no('Dias 1, 11 e 21 às 9h07', 'n8n-nodes-base.scheduleTrigger', 1.2, { rule: { interval: [{ field: 'cronExpression', expression: '7 9 1,11,21 * *' }] } }),
+    tg: no('Telegram · lembrete', 'n8n-nodes-base.telegram', 1.2, { chatId: CHAT, text: '📱 <b>Lembrete do WhatsApp da recepção</b>\nAbra hoje o WhatsApp Business no celular da Asa Sul, (61) 3346-6005. Basta abrir. Se o app ficar 14 dias sem ser aberto, a Meta desliga a conexão oficial e o recebedor (e o Kommo) param de receber as mensagens.', additionalFields: { appendAttribution: false, parse_mode: 'HTML' } }, { credentials: TG }),
+    nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · WhatsApp · lembrete do celular\n**Traz:** nada\n**Envia:** um lembrete no Telegram nos dias 1, 11 e 21\n**Limites:** só lembra; não confere se o app foi aberto\n\nCoexistência (app + API oficial): 14 dias sem abrir o app no celular e a Meta desliga.', width: 520, height: 180 }),
+  };
+  const cx = {}; liga(cx, n.agenda.name, n.tg.name);
+  return { name: 'BMH · WhatsApp · lembrete do celular', nodes: Object.values(n), connections: cx, settings: ajustes() };
+}
+
 function fluxoSearchConsole() {
   x = 0;
   const GSC = 'https://www.googleapis.com/webmasters/v3/sites/https%3A%2F%2Fhiperbaricabrasilia.com.br%2F/searchAnalytics/query';
@@ -740,7 +772,7 @@ function fluxoRadar() {
 
 // ---------------- vigia de fluxos parados (15/10/2026) ----------------
 // cada fluxo agendado anota em BMH_vigia quando começou; prazo máximo em horas, com folga (nunca alarme falso)
-const VIGIA = { envio: 26, conversoes: 26, confirmacao: 26, radar: 26, organico: 170, grava: 26, igut: 26, guardiao: 26, resumo: 26, numeros: 26, medicao: 170, mensal: 745, plantoes: 745, avaliacoes: 11 };
+const VIGIA = { conversas: 2, envio: 26, conversoes: 26, confirmacao: 26, radar: 26, organico: 170, grava: 26, igut: 26, guardiao: 26, resumo: 26, numeros: 26, medicao: 170, mensal: 745, plantoes: 745, avaliacoes: 11 };
 function comVigia(chave, f) {
   if (!VIGIA[chave]) return f;
   const gatilhos = f.nodes.filter((n) => n.type === 'n8n-nodes-base.scheduleTrigger'); if (!gatilhos.length) return f;
@@ -817,7 +849,7 @@ function fluxoAvaliacoes() {
   const tags = (await api('tags?limit=100', 'GET')).data || []; const tagBMH = tags.find((t) => t.name === 'BMH');
     const so = process.argv.slice(2);   // ex.: node montar.js pagina guardiao (só esses)
   // o alerta vem primeiro: os outros precisam do id dele (errorWorkflow)
-  const fluxos = { alerta: fluxoAlerta, grava: fluxoGrava, pagina: fluxoPagina, igut: fluxoIgut, guardiao: fluxoGuardiao, botoes: fluxoBotoes, resumo: fluxoResumo, medicao: fluxoMedicao, mensal: fluxoMensal, numeros: fluxoNumeros, diretoria: fluxoPainelDiretoria, plantoes: fluxoPlantoes, plantoesEmails: fluxoPlantoesEmails, avaliacoes: fluxoAvaliacoes, nota: fluxoNota, vigia: fluxoVigia, organico: fluxoSearchConsole, radar: fluxoRadar, confirmacao: fluxoConfirmacao, origem: fluxoOrigem, recebedor: fluxoRecebedor, conversoes: fluxoConversoes, cliques: fluxoCliques, envio: fluxoEnvioConversoes };
+  const fluxos = { alerta: fluxoAlerta, grava: fluxoGrava, pagina: fluxoPagina, igut: fluxoIgut, guardiao: fluxoGuardiao, botoes: fluxoBotoes, resumo: fluxoResumo, medicao: fluxoMedicao, mensal: fluxoMensal, numeros: fluxoNumeros, diretoria: fluxoPainelDiretoria, plantoes: fluxoPlantoes, plantoesEmails: fluxoPlantoesEmails, avaliacoes: fluxoAvaliacoes, nota: fluxoNota, vigia: fluxoVigia, organico: fluxoSearchConsole, radar: fluxoRadar, confirmacao: fluxoConfirmacao, origem: fluxoOrigem, recebedor: fluxoRecebedor, conversoes: fluxoConversoes, cliques: fluxoCliques, envio: fluxoEnvioConversoes, conversas: fluxoOrigemConversas, celular: fluxoLembreteCelular };
   for (const [chave, monta] of Object.entries(fluxos).filter(([k]) => !so.length || so.includes(k))) {
     const f = comVigia(chave, monta());
     if (!/^BMH · /.test(f.name)) throw new Error('nome sem BMH');

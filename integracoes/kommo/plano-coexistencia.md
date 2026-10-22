@@ -192,6 +192,20 @@ Kommo, à Meta ou ao Google.
   conversões **secundárias** novas ("BMH · Avaliou (iGut)" 7864686655 e "BMH · Iniciou tratamento (iGut)" 7864686658,
   fora do lance), 24 aceitos depois de umas horas de propagação. Cada evento vai uma vez (chave), marcado na tabela.
 
+**Achado de 22/10/2026 (fim do dia): a conta oficial do WhatsApp já existe.** No portfólio da BMH há a conta de WhatsApp
+198826156641686 ("Brasília Medicina Hiperbárica", aprovada, verificada) com o número +55 61 3346-6005 (id 181090498424438)
+em **CLOUD_API e no aplicativo ao mesmo tempo** (coexistência já ligada), sem modelos e sem nenhum app assinado; o usuário
+do sistema "BMH Integrações" tem acesso de gestão. Consequências:
+- o recebedor oficial pode ligar **já**, sem o Kommo: falta só `META_APP_SECRET` no .env (o Jorge grava) e rodar
+  `scripts/meta-whatsapp-assinar.js assinar` (o `WHATSAPP_WEBHOOK_VERIFY` já foi gerado);
+- a confirmação da véspera também não depende do Kommo: modelo `confirmacao_sessao_v1` (utilidade) enviado à Meta em
+  22/10 (pendente de aprovação); envio pela API oficial e resposta "Confirmo" → iGut (`statusatendimento` 1) montados em
+  ensaio; ligar com `confirmacao_modo = real` quando o aparelho que confirma hoje for desligado (senão o paciente recebe duas);
+- no dia do Kommo, conectar o Kommo a ESSA conta (ver com o suporte do Kommo como ele assume uma conta que já está na API
+  oficial; não criar outra).
+- Montado também: origem das conversas a cada 10 min (`BMH_origem_conversas`: frase, clique com gclid, "provável pelo
+  tempo", código do anúncio; `origem/testa-liga-conversas.js` 9 de 9) e o lembrete do celular da Asa Sul (dias 1, 11 e 21).
+
 **Na virada, nesta ordem:** `scripts/kommo/montar.js --real`; renomear o ganho para "Concluiu" e criar na tela o robô de horário e as tarefas; ligar a
 coexistência; registrar o webhook de conta no fluxo de origem e acrescentar o PATCH; assinar o número com o app da BMH
 apontando para o recebedor; modelo de confirmação aprovado na Meta e envio ligado (`confirmacao_modo = real`); depois de

@@ -47,7 +47,8 @@
   "BMH_origem_leads": "W3vVI35KlBrgJmGl",
   "BMH_whatsapp_meta": "eEdJOFOiZU9ATxy1",
   "BMH_conversoes": "LJ2AJwr4fPw9igHq",
-  "BMH_cliques_site": "tAjvufM0w2L1wV8y"
+  "BMH_cliques_site": "tAjvufM0w2L1wV8y",
+  "BMH_origem_conversas": "L4MBOv0WNGS7UBZN"
  },
  "fluxos": {
   "grava": "AeQIImClkXtRrWIf",
@@ -76,7 +77,9 @@
   "recebedor": "YES97ES0JdBQW4bt",
   "conversoes": "ANTADSXOLtNNdIwR",
   "cliques": "RPhtJXgsrcEHVAD9",
-  "envio": "JPeyXTZTqTgq5Unz"
+  "envio": "JPeyXTZTqTgq5Unz",
+  "conversas": "3XdFaCRJ2qbvdRHE",
+  "celular": "y15BzNHpuNDUyL93"
  },
  "whatsapp": {
   "caminho": "bmh-whatsapp-daeff8542cee5cef6c6a8832",
