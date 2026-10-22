@@ -40,7 +40,10 @@ const ultima = (t) => t.map((r) => r.atualizado_em || '').sort().pop() || '';
 const ET = { fin: ultima(fin), det: ultima(det), prazo: ultima(prz) };
 // último pedido do botão, de qualquer pessoa (trava para todos, 20/10/2026)
 const pedido = Number((linhas('Pedido (tabela)').find((r) => r.chave === 'ultimo') || {}).pedido) || 0;
-const DADOS = { F, O, OC, X, PZ, hoje: hoje.toISODate(), atOp, ET, pedido, atualizado: atualizado ? DateTime.fromISO(atualizado).setZone('America/Sao_Paulo').toFormat("dd/LL 'às' HH:mm") : '—' };
+// primeiro dia da operação gravada (09/09/2023): o mês dele é incompleto e não serve de base para variação (20/10/2026: set/24
+// aparecia com +156% contra um setembro/23 de 21 dias)
+const inicioOp = op.map((r) => r.dia).filter(Boolean).sort()[0] || '';
+const DADOS = { F, O, OC, X, PZ, inicioOp, hoje: hoje.toISODate(), atOp, ET, pedido, atualizado: atualizado ? DateTime.fromISO(atualizado).setZone('America/Sao_Paulo').toFormat("dd/LL 'às' HH:mm") : '—' };
 const json = JSON.stringify(DADOS).replace(/</g, '\\u003c');
 
 const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -222,7 +225,8 @@ function desenha() {
   // detalhe que antes ficava nos quadros do início (20/10/2026): variação contra o ano e o mês anteriores (só mês fechado: mês
   // parcial contra mês cheio seria alarme falso), dias com atendimento, sessões por dia (essa compara o mês parcial) e faltas cobradas
   // Var. ano (pedido do Jorge, 20/10/2026): o mesmo mês do ano anterior, porque a BMH tem sazonalidade; a do mês fica ao lado
-  const varia = (a, b, m) => { if (m >= mesAtual || !b) return el('td', '—'); const v = Math.round(100 * (a - b) / b); return el('td', (v > 0 ? '+' : '') + v + '%', v > 0 ? 'd up' : v < 0 ? 'd down' : ''); };
+  const mesIncompleto = D.inicioOp && !D.inicioOp.endsWith('-01') ? D.inicioOp.slice(0, 7) : '';
+  const varia = (a, b, m, base) => { if (m >= mesAtual || !b || base === mesIncompleto || m === mesIncompleto) return el('td', '—'); const v = Math.round(100 * (a - b) / b); return el('td', (v > 0 ? '+' : '') + v + '%', v > 0 ? 'd up' : v < 0 ? 'd down' : ''); };
   const anoAntes = m => (+m.slice(0, 4) - 1) + m.slice(4);
   // com convênio no filtro (20/10/2026): sessões, faltas, cobradas e avaliações só dele; dias e lugares são da clínica, e a
   // ocupação vira "quanto da ocupação veio desse convênio" (sessões dele ÷ lugares da clínica)
@@ -232,7 +236,7 @@ function desenha() {
     + (C ? ' · ' + C + ': sessões, faltas, cobradas e avaliações só desse convênio; Dias e Por dia contam os dias da clínica; Ocupação = parte da ocupação da clínica que veio desse convênio' : '');
   const co = el('tr'); ['Mês','Sessões','Var. ano','Var. mês','Dias','Por dia','Ocupação','Faltas','Cobradas','Avaliações'].forEach(t => co.append(el('th', t))); to.append(co);
   for (const m of [...new Set(D.O.map(r => r[0]))].sort().reverse()) { const r = opx(m); if (!(r.ag || r.aa) || !noPeriodo(m)) continue; const tr = el('tr');
-    [nomeMes(m) + (m === mesAtual ? '*' : ''), r.at.toLocaleString('pt-BR'), varia(r.at, opx(anoAntes(m)).at, m), varia(r.at, opx(anterior(m)).at, m), String(r.dias), r.dias ? Math.round(r.at / r.dias).toLocaleString('pt-BR') : '—', pct(r.at, r.lu), m >= CONTROLE ? pct(r.fa, r.ag) : '—', m >= CONTROLE ? r.co.toLocaleString('pt-BR') : '—', m >= AVALIACOES ? r.af.toLocaleString('pt-BR') : '—']
+    [nomeMes(m) + (m === mesAtual ? '*' : '') + (m === mesIncompleto ? ' (desde ' + D.inicioOp.slice(8, 10) + '/' + D.inicioOp.slice(5, 7) + ')' : ''), r.at.toLocaleString('pt-BR'), varia(r.at, opx(anoAntes(m)).at, m, anoAntes(m)), varia(r.at, opx(anterior(m)).at, m, anterior(m)), String(r.dias), r.dias ? Math.round(r.at / r.dias).toLocaleString('pt-BR') : '—', pct(r.at, r.lu), m >= CONTROLE ? pct(r.fa, r.ag) : '—', m >= CONTROLE ? r.co.toLocaleString('pt-BR') : '—', m >= AVALIACOES ? r.af.toLocaleString('pt-BR') : '—']
       .forEach(x => tr.append(typeof x === 'string' ? el('td', x) : x)); to.append(tr); }
 }
 document.querySelectorAll('#uni button').forEach(b => b.onclick = () => { document.querySelectorAll('#uni button').forEach(x => x.classList.remove('on')); b.classList.add('on'); U = b.dataset.u; desenha(); });

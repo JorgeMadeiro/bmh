@@ -45,6 +45,10 @@
   financeiro). Histórico desde set/2023 (21.263 linhas); a soma por convênio bate com o total em todos os 1.757 dias ×
   unidade. Com convênio no filtro, a Operação mostra só dele; Dias e lugares são da clínica, e a Ocupação vira a parte da
   ocupação que veio desse convênio.
+- **Por que há "—" antes de nov/2024 (conferido em 22/10/2026):** o iGut tem os números, mas incompletos. Até abr/2024 quase
+  nada ia para lote (a faturar de R$ 200 a 380 mil por mês); de mai a out/2024 o lote era lançado mas o pagamento não era
+  marcado (jun/24 com 21% recebido); faltas não eram marcadas (0% até set/2024, 13% em nov/2024); avaliações só a partir de
+  mar/2024. A operação começa em 09/09/2023: set/23 aparece "(desde 09/09)" e não serve de base para variação.
 - **Valor bruto, sempre (decisão do Jorge, 20/10/2026):** não descontar retenção de imposto (`retencao_em_reais`: R$ 2.600
   em 242 sessões em 26 meses) nem estorno (`total_estorno`: 3 sessões, R$ 1.419). Não é pendência de conferência.
 - **Auditoria de 20/10/2026 (iGut × tabelas, set/24 a out/26):** produção, sessões, recebido, a receber, a faturar e glosado
