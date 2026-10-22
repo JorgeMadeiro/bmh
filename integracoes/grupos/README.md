@@ -60,6 +60,10 @@
   base completa (senão "—"); Var. mês não se aplica. A seta do Período abre a soma de cada câmara.
 - **Mês de início incompleto:** o primeiro mês da clínica (set/23, desde 09/09), de cada unidade (Taguatinga, desde 27/01/2025)
   e de cada câmara aparece "(desde dd/mm)" e não entra em variação (Taguatinga jan/26 aparecia +2.468%).
+- **Lista de pacientes em aba nova (22/10/2026):** o n8n manda as páginas de webhook com `Content-Security-Policy: sandbox`
+  (sem `allow-same-origin`): a página do painel fica com origem "null", e o Safari não manda a senha numa consulta feita de
+  dentro dela ("Load failed") nem numa moldura (fica em branco). "pacientes ›" agora é um link que abre a lista em aba nova
+  (navegação sempre leva a senha). Testado no motor do Safari (WebKit) com a senha só nas páginas abertas.
 - **Valor bruto, sempre (decisão do Jorge, 20/10/2026):** não descontar retenção de imposto (`retencao_em_reais`: R$ 2.600
   em 242 sessões em 26 meses) nem estorno (`total_estorno`: 3 sessões, R$ 1.419). Não é pendência de conferência.
 - **Auditoria de 20/10/2026 (iGut × tabelas, set/24 a out/26):** produção, sessões, recebido, a receber, a faturar e glosado

@@ -157,9 +157,7 @@ let corteMesG = '';
 const celula = (v, sit, meses, rot) => { const td = el('td', v); if (sit && v !== '—' && v !== '<1' || (sit && v === '<1')) { td.className = 'cl'; td.onclick = () => abre(sit, meses, '', rot); } return td; };
 // dias "3,4,5,9" do mês 2025-09 → "03/09/25 a 05/09/25, 09/09/25" (data completa: pedido do Jorge, 20/10/2026)
 const datas = (s, mes) => { const fim = '/' + String(mes).slice(5, 7) + '/' + String(mes).slice(2, 4), dd = n => String(n).padStart(2, '0') + fim; const d = [...new Set(String(s || '').split(',').map(Number).filter(Boolean))].sort((a, b) => a - b); const o = []; for (let i = 0; i < d.length; i++) { let j = i; while (j + 1 < d.length && d[j + 1] === d[j] + 1) j++; o.push(j > i + 1 ? dd(d[i]) + ' a ' + dd(d[j]) : j === i + 1 ? dd(d[i]) + ', ' + dd(d[j]) : dd(d[i])); i = j; } return o.join(', '); };
-let ultimo = null;
 function abre(sit, meses, conv, rot) {
-  ultimo = [sit, meses, conv, rot];
   const ms = new Set(meses), alvoConv = conv || C;
   // o particular não tem lote: entra no "recebido" como uma linha por mês e unidade (cartão, D+1)
   const part = sit !== 'recebido' ? [] : D.F.filter(x => x[2] === 'PARTICULAR' && x[7] > 0.5 && x[0] >= CONTROLE)   // antes de nov/2024 não há lista de pacientes (nem entra no total)
@@ -177,40 +175,16 @@ function abre(sit, meses, conv, rot) {
       const l = el('div', null, 'lin');
       const desc = (x[4] !== '-' ? 'Lote ' + x[4] + ' · ' : '') + nomeMes(x[0]) + ' · ' + x[1] + ' · ' + x[5] + (x[5] === 1 ? ' sessão' : ' sessões') + (x[7] ? ' · ' + datas(x[7], x[0]) : '');
       const esq = el('span', desc);
-      {   // 3º nível: pacientes do lote (ou do particular do mês), na própria janela, lidos da tabela gravada
-        const a = el('span', ' · pacientes ›', 'cl'); a.onclick = () => pacientes({ mes: x[0], unidade: x[1], convenio: /^PARTICULAR/.test(x[2]) ? 'PARTICULAR' : x[2], situacao: x[3], lote: x[4] }); esq.append(a);
+      {   // 3º nível: pacientes do lote (ou do particular do mês), lidos da tabela gravada. Abre em aba nova (22/10/2026): o n8n
+          // isola a página do painel (CSP "sandbox", origem "null") e o Safari não manda a senha numa consulta feita de dentro
+          // dela ("Load failed"), nem numa moldura; abrir uma página nova sempre leva a senha, e o painel fica como estava
+        const a = el('a', ' · pacientes ›', 'cl'); a.href = 'bmh-diretoria?' + new URLSearchParams({ mes: x[0], unidade: x[1], convenio: /^PARTICULAR/.test(x[2]) ? 'PARTICULAR' : x[2], situacao: x[3], lote: x[4] });
+        a.target = '_blank'; a.rel = 'noopener'; a.style.textDecoration = 'none'; esq.append(a);
       }
       l.append(esq, el('span', 'R$ ' + x[6].toLocaleString('pt-BR'))); corpo.append(l);
     });
   });
   document.getElementById('det').classList.add('on'); document.body.style.overflow = 'hidden';
-}
-// ---- 3º nível: pacientes do lote, dentro da janela. Mesmo login do painel (só a diretoria acessa); consulta na hora.
-function pacientes(par) {
-  const corpo = document.getElementById('dCorpo'); corpo.replaceChildren();
-  const volta = el('span', '‹ voltar', 'cl'); volta.onclick = () => abre(...ultimo); corpo.append(volta);
-  document.getElementById('dTit').textContent = 'Pacientes'; document.getElementById('dSub').textContent = 'Consultando o iGut agora…';
-  // falha momentânea (rede, servidor ocupado): tenta de novo sozinho 2 vezes; persistindo, vai pela segunda via (22/10/2026)
-  const tenta = n => fetch('bmh-diretoria?' + new URLSearchParams({ ...par, formato: 'json' }), { cache: 'no-store', credentials: 'same-origin' })   // mesmo endereço do painel: reaproveita o login
-    .then(r => { if (r.status === 401) throw new Error('login'); if (!r.ok) throw new Error('erro ' + r.status); return r.json(); })
-    .catch(e => { if (e.message === 'login' || n >= 2) throw e; return new Promise(ok => setTimeout(ok, 1500 * (n + 1))).then(() => tenta(n + 1)); });
-  tenta(0)
-    .then(d => {
-      document.getElementById('dTit').textContent = d.titulo; document.getElementById('dSub').textContent = d.sub;
-      if (!d.pacientes.length) { corpo.append(el('p', 'Nenhum paciente nessa situação (pode ter mudado desde a última atualização do painel).', 'sub')); return; }
-      d.pacientes.forEach(p => { const l = el('div', null, 'lin'); const e = el('span'); e.append(el('b', p.nome)); e.append(document.createElement('br'), document.createTextNode(p.sessoes + (p.sessoes === 1 ? ' sessão' : ' sessões') + ' · ' + p.dias + (p.medicos ? ' · ' + p.medicos : ''))); l.append(e, el('span', 'R$ ' + p.valor.toLocaleString('pt-BR'))); corpo.append(l); });
-      corpo.append(el('p', 'Dado de paciente: não encaminhar fora da equipe responsável.', 'sub'));
-    })
-    .catch(e => {
-      // qualquer falha (login não reenviado, erro do servidor ou da rede, mesmo depois de 3 tentativas) vai pela segunda via
-      // segunda via: alguns navegadores não reenviam o login numa consulta feita pela página; carregando como página
-      // (dentro da janela), o navegador sempre reaproveita o login do painel
-      document.getElementById('dTit').textContent = 'Pacientes';
-      // sem ser o login, mostra o motivo (para achar a causa se voltar a acontecer)
-      document.getElementById('dSub').textContent = e.message === 'login' ? '' : 'Aberto pela segunda via (' + e.message + ')';
-      const f = el('iframe'); f.src = 'bmh-diretoria?' + new URLSearchParams({ ...par, embutido: '1' }); f.setAttribute('allow', 'clipboard-write'); f.title = 'Pacientes do lote';
-      f.style.cssText = 'width:100%;height:65vh;border:0;margin-top:8px'; corpo.append(f);
-    });
 }
 const fecha = () => { document.getElementById('det').classList.remove('on'); document.body.style.overflow = ''; };
 document.querySelector('#det .fechar').onclick = fecha; document.getElementById('det').onclick = e => { if (e.target.id === 'det') fecha(); }; document.addEventListener('keydown', e => { if (e.key === 'Escape') fecha(); });
