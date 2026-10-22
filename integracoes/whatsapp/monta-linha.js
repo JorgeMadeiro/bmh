@@ -2,7 +2,8 @@
 const base = $('Prepara a mensagem').item.json;
 const transcricao = base.transcrever ? String($json.text || '').trim() : '';
 const texto = String(base.texto || transcricao).replace(/\b\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b/g, '[cpf]');
-const apagar = new Date(base.momento); apagar.setMonth(apagar.getMonth() + 6);
+// Guarda: 6 meses na observação pela Evolution (09/10/2026); 1 mês no recebedor oficial da Meta (22/10/2026)
+const apagar = new Date(base.momento); apagar.setMonth(apagar.getMonth() + (base.guardar_meses || 6));
 // Origem pelo começo da mensagem pronta (15/10/2026). Só a primeira frase do paciente; o fluxo grava à parte em BMH_whatsapp_origens.
 // Mudar uma mensagem pronta (site, anúncio, link da bio) pede ajustar aqui também.
 const ORIGENS = [

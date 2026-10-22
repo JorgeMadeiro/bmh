@@ -133,6 +133,17 @@ a coexistência.
 7. **Quem constrói:** o Gerente BMH na VPS ou esta janela do Mac. As duas têm acesso; o que exige o Mac (app da Meta,
    credenciais do n8n) fica aqui de qualquer jeito.
 
+**Respostas do Jorge (22/10/2026):**
+- 2: a Evolution não entra de jeito nenhum. O número já tem 4 aparelhos conectados, o máximo, e por isso a observação de
+  09/10 nunca começou.
+- 3: dois usuários por enquanto.
+- 4: guardar o texto por **1 mês** no início (no lugar de 6), com a leitura pela Central.
+- 6: lista de cirurgiões ainda não; o QR nasce pronto para receber nomes.
+- 7: construir pela janela do Mac, com o Gerente BMH na VPS acompanhando pelo git e assumindo a operação depois da
+  virada.
+
+Em aberto: a 1 (Business ou comum) e a 5. A recomendação para a 5 é etapa própria, que se tira se ninguém travar.
+
 ## 6. Custos
 
 - **Kommo:** a partir de 01/09/2026, o Avançado custa US$ 30 por usuário por mês para cliente novo. Com 4 usuários, uns
