@@ -15,7 +15,7 @@ const ent = (field, value) => ({ object: 'whatsapp_business_account', entry: [{ 
 const casos = [
   ['paciente pelo anúncio de clique para WhatsApp', ent('messages', { contacts: [{ wa_id: '5561999990000' }], messages: [{ from: '5561999990000', id: 'wamid.A', timestamp: String(ts), type: 'text',
     text: { body: 'Olá! Vim pelo anúncio e quero saber da câmara' }, referral: { source_type: 'ad', source_id: '120000000001', headline: 'Pós-operatório', ctwa_clid: 'CLID123' } }] }),
-    (r) => r.length === 1 && r[0].direcao === 'paciente' && r[0].ctwa_clid === 'CLID123' && r[0].anuncio_id === '120000000001' && monta(r[0]).origem === 'anuncio_google'],
+    (r) => r.length === 1 && r[0].direcao === 'paciente' && r[0].ctwa_clid === 'CLID123' && r[0].anuncio_id === '120000000001'],   // a origem pela frase saiu daqui (22/10/2026): é da monta-meta.js, testada em testa-monta-meta.js
   ['áudio do paciente pede transcrição', ent('messages', { messages: [{ from: '5561999990000', id: 'wamid.B', timestamp: String(ts), type: 'audio', audio: { id: 'MID9' } }] }),
     (r) => r[0].transcrever === true && r[0].media_id === 'MID9' && monta(r[0], 'transcrito aqui').texto === 'transcrito aqui'],
   ['equipe respondeu pelo celular, CPF some', ent('smb_message_echoes', { message_echoes: [{ from: '556133466005', to: '5561999990000', id: 'wamid.C', timestamp: String(ts + 60), type: 'text',

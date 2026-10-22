@@ -45,6 +45,7 @@ const COLUNAS = {
   BMH_financeiro_mes: { chave: 's', mes: 's', unidade: 's', convenio: 's', sessoes: 'n', produzido: 'n', faturado: 'n', a_faturar: 'n', recebido: 'n', a_receber: 'n', glosado: 'n', atualizado_em: 's' },
   BMH_financeiro_detalhe: { chave: 's', mes: 's', unidade: 's', convenio: 's', situacao: 's', lote: 's', sessoes: 'n', valor: 'n', glosa: 'n', dias: 's', atualizado_em: 's' },
   BMH_financeiro_paciente: { chave: 's', mes: 's', unidade: 's', convenio: 's', situacao: 's', lote: 's', paciente_id: 's', paciente: 's', sessoes: 'n', valor: 'n', dias: 's', medicos: 's', atualizado_em: 's' },
+  BMH_whatsapp_meta: Object.fromEntries(['chave', 'momento', 'dia', 'telefone_hash', 'direcao', 'aparelho', 'tipo', 'texto', 'respondendo', 'apagar_em', 'origem', 'anuncio_id', 'ctwa_clid', 'referral_tipo'].map((k) => [k, 's'])),   // recebedor oficial da Meta (22/10/2026): telefone só em código, texto mascarado, 1 mês
   BMH_origem_leads: Object.fromEntries(['chave', 'lead_id', 'contato_id', 'frase', 'origem', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'cirurgiao_indicou', 'acao', 'modo', 'recebida_em'].map((k) => [k, 's'])),   // origem do lead pelo Kommo (22/10/2026)
   BMH_confirmacoes: Object.fromEntries(['chave', 'dia', 'paciente_id', 'unidade', 'hora', 'tipo', 'modo', 'status', 'criado_em'].map((k) => [k, 's'])),   // confirmação da véspera (22/10/2026)
   BMH_diretoria_chave: { chave: 's', token: 's', anterior: 's', dia: 's' },   // chave do dia da lista de pacientes (22/10/2026)
@@ -566,6 +567,29 @@ function fluxoOrigem() {
   return { name: 'BMH · Kommo · origem do lead', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none' }) };
 }
 
+// ---------------- recebedor oficial da Meta (22/10/2026): o app da BMH assina o WhatsApp da recepção (coexistência) ----------------
+// Substitui a observação pela Evolution (que não entra no número: 4 aparelhos já conectados). GET = a verificação que a Meta faz
+// ao assinar (devolve o hub.challenge); POST = cada mensagem do paciente, eco do que a equipe mandou pelo celular e status do
+// que saiu pelo Kommo. Grava em BMH_whatsapp_meta com o telefone só em código, texto mascarado e guarda de 1 mês; o
+// código do anúncio (ctwa_clid) serve à origem e às conversões. Fica ligado; só recebe algo depois da assinatura.
+function fluxoRecebedor() {
+  x = 0;
+  IDS.whatsapp ||= {}; IDS.whatsapp.meta ||= 'bmh-whatsapp-meta-' + crypto.randomBytes(8).toString('hex');
+  const frases = JSON.stringify(JSON.parse(ler('../../origem/frases.json')).frases);
+  const n = {
+    verifica: no('Verificação da Meta', 'n8n-nodes-base.webhook', 2, { httpMethod: 'GET', path: IDS.whatsapp.meta, responseMode: 'responseNode', options: {} }, { webhookId: crypto.randomUUID() }),
+    responde: no('Devolve o desafio', 'n8n-nodes-base.respondToWebhook', 1.1, { respondWith: 'text', responseBody: "={{ ($json.query || {})['hub.mode'] === 'subscribe' ? String(($json.query || {})['hub.challenge'] || '') : 'ok' }}", options: {} }),
+    recebe: no('Recebe da Meta', 'n8n-nodes-base.webhook', 2, { httpMethod: 'POST', path: IDS.whatsapp.meta, responseMode: 'onReceived', options: {} }, { webhookId: crypto.randomUUID() }),
+    prepara: codigo('Prepara a mensagem', '../../whatsapp/prepara-meta.js', { executeOnce: true }),
+    monta: no('Monta a linha', 'n8n-nodes-base.code', 2, { jsCode: ler('../../whatsapp/monta-meta.js').replace('/*__FRASES__*/[]', frases) }, { executeOnce: true }),
+    grava: grava('Grava a mensagem', 'BMH_whatsapp_meta'),
+    nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · WhatsApp · recebedor oficial (Meta)\n**Traz:** o webhook do app da BMH assinando o WhatsApp da recepção (coexistência com o Kommo)\n**Envia:** nada; grava em BMH_whatsapp_meta\n**Limites:** telefone só em código (SHA-256); CPF, telefone e e-mail mascarados no texto; guarda de 1 mês; áudio sem transcrição nesta fase\n\nNa virada: assinar o número com o app (scripts como o meta-whatsapp-assinar.py da Nexo) apontando para este endereço. A limpeza diária (4h37) apaga as vencidas.', width: 620, height: 220 }),
+  };
+  const cx = {}; liga(cx, n.verifica.name, n.responde.name);
+  for (const [a, b] of [[n.recebe, n.prepara], [n.prepara, n.monta], [n.monta, n.grava]]) liga(cx, a.name, b.name);
+  return { name: 'BMH · WhatsApp · recebedor oficial (Meta)', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none', saveDataErrorExecution: 'none' }) };   // tem conversa de paciente
+}
+
 function fluxoSearchConsole() {
   x = 0;
   const GSC = 'https://www.googleapis.com/webmasters/v3/sites/https%3A%2F%2Fhiperbaricabrasilia.com.br%2F/searchAnalytics/query';
@@ -698,7 +722,7 @@ function fluxoAvaliacoes() {
   const tags = (await api('tags?limit=100', 'GET')).data || []; const tagBMH = tags.find((t) => t.name === 'BMH');
     const so = process.argv.slice(2);   // ex.: node montar.js pagina guardiao (só esses)
   // o alerta vem primeiro: os outros precisam do id dele (errorWorkflow)
-  const fluxos = { alerta: fluxoAlerta, grava: fluxoGrava, pagina: fluxoPagina, igut: fluxoIgut, guardiao: fluxoGuardiao, botoes: fluxoBotoes, resumo: fluxoResumo, medicao: fluxoMedicao, mensal: fluxoMensal, numeros: fluxoNumeros, diretoria: fluxoPainelDiretoria, plantoes: fluxoPlantoes, plantoesEmails: fluxoPlantoesEmails, avaliacoes: fluxoAvaliacoes, nota: fluxoNota, vigia: fluxoVigia, organico: fluxoSearchConsole, radar: fluxoRadar, confirmacao: fluxoConfirmacao, origem: fluxoOrigem };
+  const fluxos = { alerta: fluxoAlerta, grava: fluxoGrava, pagina: fluxoPagina, igut: fluxoIgut, guardiao: fluxoGuardiao, botoes: fluxoBotoes, resumo: fluxoResumo, medicao: fluxoMedicao, mensal: fluxoMensal, numeros: fluxoNumeros, diretoria: fluxoPainelDiretoria, plantoes: fluxoPlantoes, plantoesEmails: fluxoPlantoesEmails, avaliacoes: fluxoAvaliacoes, nota: fluxoNota, vigia: fluxoVigia, organico: fluxoSearchConsole, radar: fluxoRadar, confirmacao: fluxoConfirmacao, origem: fluxoOrigem, recebedor: fluxoRecebedor };
   for (const [chave, monta] of Object.entries(fluxos).filter(([k]) => !so.length || so.includes(k))) {
     const f = comVigia(chave, monta());
     if (!/^BMH · /.test(f.name)) throw new Error('nome sem BMH');
