@@ -46,7 +46,7 @@ Tudo ──► painel da BMH: canal ► contato ► avaliação ► tratamento �
 |---|---|---|
 | 1. Novo contato | primeira mensagem | o Kommo |
 | 2. Em conversa | primeira resposta | a equipe ou o n8n (pelo tempo de resposta) |
-| 3. Pedido e autorização | falta pedido médico ou guia do convênio | a equipe (pergunta 1 do esboço: vira etapa ou tarefa) |
+| ~~3. Pedido e autorização~~ | fica como **tarefa** no lead (decisão de 22/10: funil simples primeiro) | a equipe |
 | 4. Avaliação agendada | avaliação marcada no iGut | o n8n, pelo iGut |
 | 5. Avaliou | avaliação finalizada no iGut | o n8n, pelo iGut |
 | 6. Em tratamento | primeira sessão finalizada | o n8n, pelo iGut |
@@ -142,7 +142,13 @@ a coexistência.
 - 7: construir pela janela do Mac, com o Gerente BMH na VPS acompanhando pelo git e assumindo a operação depois da
   virada.
 
-Em aberto: a 1 (Business ou comum) e a 5. A recomendação para a 5 é etapa própria, que se tira se ninguém travar.
+- 1 (22/10): o número está no **WhatsApp Business**, num celular que fica na Asa Sul, mas a equipe **não usa o celular**:
+  atende pelo WhatsApp Web nos computadores. Consequência: alguém precisa **abrir o app nesse celular pelo menos a cada 14
+  dias** (senão a Meta desliga a coexistência) e conferir a versão (2.24.17 ou maior) antes da virada. Vira lembrete
+  automático no Telegram depois da virada.
+- 5 (22/10): **primeiro implantar o Kommo com um funil simples e resolutivo, nos moldes da Nexo**; "pedido e autorização"
+  fica como tarefa, não como etapa. Depois de **1 a 2 meses de mensagens** no Kommo, pensar no SDR (atendente de IA) com
+  base nas conversas reais.
 
 ## 6. Custos
 
