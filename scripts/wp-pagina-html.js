@@ -49,6 +49,8 @@ function monta(html, imagem) {
     return `https://wa.me/${NUMERO}?text=${encodeURIComponent(MENSAGENS[k])}`;
   });
   html = html.replace(/\{\{svg:([a-z]+)\}\}/g, (_, k) => SVG[k]);
+  // página que monta a mensagem no navegador (ex.: /indicacao/, 22/10/2026): o número e o modelo da frase, da lista única
+  html = html.replace(/\{\{numero\}\}/g, NUMERO).replace(/\{\{frase:([a-z_]+)\}\}/g, (_, k) => { const f = require('../integracoes/origem/frases.json').frases.find((x) => x.chave === k); if (!f) throw new Error('frase desconhecida: ' + k); return JSON.stringify(f.mensagem); });
   const sobrou = html.match(/\{\{[^}]+\}\}/);
   if (sobrou) throw new Error('marca não resolvida: ' + sobrou[0]);
   if (/&&/.test(html)) throw new Error('o arquivo tem "&&": o WordPress quebra isso em script (lição 48 da Nexo)');

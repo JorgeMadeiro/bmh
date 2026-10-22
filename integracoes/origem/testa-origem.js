@@ -26,4 +26,6 @@ const real = roda(plano('Olá! Encontrei a BMH no Google e quero saber.'), { ori
 confere('real monta o PATCH com os ids', real.acao === 'gravar no lead' && real.patch[0].custom_fields_values.length === 4 && real.patch[0].custom_fields_values[0].field_id === 11 && real.patch[0]._embedded.tags[0].name === 'google');
 const aninhado = roda({ message: { add: [{ text: 'Olá! Sou mergulhador e quero agendar uma avaliação.', type: 'incoming', entity_type: 'lead', entity_id: '9' }] } })[0].json;
 confere('corpo já aninhado', aninhado.frase === 'mergulho' && aninhado.lead_id === 9);
+const generico = roda(plano('Olá! Vim pela indicação do meu médico e quero agendar uma avaliação.'))[0].json;
+confere('indicação sem nome não inventa cirurgião', generico.frase === 'indicacao' && generico.cirurgiao_indicou === '');
 console.log(`${ok} de ${ok + falhas} casos certos`); process.exit(falhas ? 1 : 0);

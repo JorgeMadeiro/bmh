@@ -137,7 +137,7 @@
       "utm_source": "cirurgiao",
       "utm_medium": "indicacao",
       "utm_content": "QR do cirurgião",
-      "captura": "indica[cç][aã]o d[oa]s? (?:dr\\(a\\)\\.?|dra?\\.?|doutora?)?\\s*(.+?)\\s+e quero"
+      "captura": "indica[cç][aã]o d[oa]s? (?:dr\\(a\\)\\.?|dra?\\.?|doutora?)\\s*(.+?)\\s+e quero"
     }
   ]
 }

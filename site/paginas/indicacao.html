@@ -1,0 +1,24 @@
+<!-- BMH · /indicacao/ (22/10/2026, motor do Kommo): destino do QR no cartão de cada cirurgião parceiro. O nome vem no próprio
+     endereço do QR (?dr=Nome), então nenhuma lista de cirurgiões fica pública no site. Abre o WhatsApp da BMH com a frase
+     "Vim pela indicação do Dr(a). Nome", da lista única integracoes/origem/frases.json, que marca a origem e o cirurgião no
+     lead do Kommo. Sem nome no endereço: "Vim pela indicação do meu médico" (origem cirurgião, sem nome). Fora do Google
+     (noindex) e do mapa do site. Sem "&&" no script (o WordPress quebra). -->
+<style>
+.bmh-ind{font-family:'Libre Franklin',system-ui,-apple-system,'Segoe UI',sans-serif;max-width:420px;margin:0 auto;padding:48px 20px;text-align:center;color:#142033}
+.bmh-ind img{width:120px;height:auto;margin:0 auto 20px;display:block}
+.bmh-ind h1{font-size:22px;line-height:1.25;color:#002375;margin:0 0 10px}
+.bmh-ind p{font-size:16px;line-height:1.5;margin:0 0 22px;color:#2B3850}
+.bmh-ind .bmh-ind__dr{font-size:15px;font-weight:600;color:#002375;margin:0 0 6px}
+.bmh-ind a.bmh-ind__btn{display:inline-flex;align-items:center;gap:10px;min-height:52px;padding:0 26px;border-radius:999px;background:#34A9CF;color:#00143F;font-weight:700;text-decoration:none;font-size:17px}
+.bmh-ind a.bmh-ind__btn svg{width:22px;height:22px}
+.bmh-ind small{display:block;margin-top:18px;color:#4A5568;font-size:13px}
+</style>
+<div class="bmh-ind">
+<img src="{{img:bmh-logo.png}}" alt="BMH Brasília Medicina Hiperbárica" width="300" height="159">
+<p class="bmh-ind__dr" id="bmh-ind-dr"></p>
+<h1>Abrindo o WhatsApp da BMH</h1>
+<p>Câmara hiperbárica com médico em todas as sessões, na Asa Sul e em Taguatinga.</p>
+<a class="bmh-ind__btn" id="bmh-ind-wa" href="https://wa.me/{{numero}}">{{svg:wa}}Abrir o WhatsApp</a>
+<small>Se não abrir sozinho, toque no botão. Todos os dias, das 7h às 19h.</small>
+</div>
+<script>(function(){var q=new URLSearchParams(location.search),n=(q.get('dr')||'').replace(/[^A-Za-zÀ-ÿ' .()-]/g,'').replace(/\s+/g,' ').trim().slice(0,60);var modelo={{frase:indicacao}};var msg=n?modelo.replace('{nome}',n):'Olá! Vim pela indicação do meu médico e quero agendar uma avaliação.';var a=document.getElementById('bmh-ind-wa');a.href='https://wa.me/{{numero}}?text='+encodeURIComponent(msg);if(n){document.getElementById('bmh-ind-dr').textContent='Indicação do Dr(a). '+n;}setTimeout(function(){location.replace(a.href);},1500);})();</script>
