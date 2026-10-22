@@ -47,6 +47,7 @@ const COLUNAS = {
   BMH_financeiro_paciente: { chave: 's', mes: 's', unidade: 's', convenio: 's', situacao: 's', lote: 's', paciente_id: 's', paciente: 's', sessoes: 'n', valor: 'n', dias: 's', medicos: 's', atualizado_em: 's' },
   BMH_diretoria_pedido: { chave: 's', pedido: 's' },   // hora (ms) do último toque em "Atualizar agora" (trava para todos, 20/10/2026)
   BMH_prazo_recebimento: { chave: 's', mes: 's', unidade: 's', convenio: 's', valor_pago: 'n', dias_x_valor: 'n', sessoes_pagas: 'n', atualizado_em: 's' },
+  BMH_operacao_camconv: { chave: 's', dia: 's', unidade: 's', camara: 's', convenio: 's', agendadas: 'n', atendidas: 'n', faltas: 'n', cobradas: 'n', atualizado_em: 's' },   // 22/10/2026: câmara × convênio
   BMH_operacao_camara: { chave: 's', dia: 's', unidade: 's', camara: 's', agendadas: 'n', atendidas: 'n', faltas: 'n', cobradas: 'n', lugares: 'n', atualizado_em: 's' },   // 22/10/2026: mono × multi na Operação
   BMH_operacao_conv: { chave: 's', dia: 's', unidade: 's', convenio: 's', agendadas: 'n', atendidas: 'n', faltas: 'n', cobradas: 'n', avaliacoes_agendadas: 'n', avaliacoes_feitas: 'n', atualizado_em: 's' },   // 20/10/2026: filtro de convênio na Operação
   BMH_operacao_dia: { chave: 's', dia: 's', unidade: 's', agendadas: 'n', atendidas: 'n', faltas: 'n', cobradas: 'n', lugares: 'n', avaliacoes_agendadas: 'n', avaliacoes_feitas: 'n', atualizado_em: 's' },
@@ -375,12 +376,16 @@ function fluxoNumeros() {
     gOpC: grava('Grava operação por convênio', 'BMH_operacao_conv'),
     mOpK: codigo('Monta operação por câmara', '../../grupos/operacao-camara-monta.js', { executeOnce: true }),
     gOpK: grava('Grava operação por câmara', 'BMH_operacao_camara'),
+    leOpKC: no('Operação por câmara e convênio (dias refeitos)', 'n8n-nodes-base.dataTable', 1.1, { operation: 'get', dataTableId: tabela('BMH_operacao_camconv'), returnAll: true, matchType: 'allConditions',
+      filters: { conditions: [{ keyName: 'dia', condition: 'gte', keyValue: "={{ $('Dias').all().map((i) => i.json.dia).sort()[0] || '9999' }}" }] } }, { alwaysOutputData: true, executeOnce: true }),
+    mOpKC: codigo('Monta operação por câmara e convênio', '../../grupos/operacao-camconv-monta.js', { executeOnce: true }),
+    gOpKC: grava('Grava operação por câmara e convênio', 'BMH_operacao_camconv'),
     nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Diretoria · grava os números\n**Traz:** iGut (financeiro, lotes, prazos, pacientes, agenda)\n**Envia:** tabelas BMH_financeiro_* e BMH_operacao_dia\n**Limites:** nome de paciente só em BMH_financeiro_paciente; execução não guardada\n\nToda noite às 23h40: financeiro da produção (13 meses, BI do iGut) → BMH_financeiro_mes; operação de ontem e hoje (agenda do iGut, dia a dia) → BMH_operacao_dia. Só totais. Manual: /webhook/bmh-diretoria-grava?desde=AAAA-MM-DD&ate=AAAA-MM-DD. Lido pela página BMH · Diretoria (painel). Código em integracoes/grupos/.', width: 560, height: 200 }),
   };
   const cx = {};
   for (const t of [n.agenda_, n.manual, n.botao]) cx[t.name] = { main: [[{ node: n.pend.name, type: 'main', index: 0 }, { node: n.dias.name, type: 'main', index: 0 }]] };
   liga(cx, n.pend.name, n.meses.name);
-  for (const [a, b] of [[n.meses, n.bi], [n.bi, n.conv], [n.conv, n.leFin], [n.leFin, n.leDet], [n.leDet, n.mFin], [n.mFin, n.gFin], [n.leDet, n.mDet], [n.mDet, n.gDet], [n.leDet, n.lePrazo], [n.lePrazo, n.mPrazo], [n.mPrazo, n.gPrazo], [n.leDet, n.lePac], [n.lePac, n.mPac], [n.mPac, n.gPac], [n.dias, n.ag], [n.ag, n.leOpC], [n.leOpC, n.mOpC], [n.mOpC, n.gOpC], [n.ag, n.mOpK], [n.mOpK, n.gOpK], [n.ag, n.mOp], [n.mOp, n.gOp]]) liga(cx, a.name, b.name);
+  for (const [a, b] of [[n.meses, n.bi], [n.bi, n.conv], [n.conv, n.leFin], [n.leFin, n.leDet], [n.leDet, n.mFin], [n.mFin, n.gFin], [n.leDet, n.mDet], [n.mDet, n.gDet], [n.leDet, n.lePrazo], [n.lePrazo, n.mPrazo], [n.mPrazo, n.gPrazo], [n.leDet, n.lePac], [n.lePac, n.mPac], [n.mPac, n.gPac], [n.dias, n.ag], [n.ag, n.leOpC], [n.leOpC, n.mOpC], [n.mOpC, n.gOpC], [n.ag, n.mOpK], [n.mOpK, n.gOpK], [n.ag, n.leOpKC], [n.leOpKC, n.mOpKC], [n.mOpKC, n.gOpKC], [n.ag, n.mOp], [n.mOp, n.gOp]]) liga(cx, a.name, b.name);
   return { name: 'BMH · Diretoria · grava os números', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none' }) };   // resposta do iGut tem dado de paciente
 }
 
@@ -410,7 +415,7 @@ function fluxoPainelDiretoria() {
     ehLista: se('É lista de pacientes?', "={{ !!($json.query || {}).situacao }}"),   // JSON (?formato=json) ou página dentro da janela (?embutido=1)
     // página
     fin: le('Financeiro (tabela)', 'BMH_financeiro_mes'), op: le('Operação (tabela)', 'BMH_operacao_dia'), det: le('Detalhes (tabela)', 'BMH_financeiro_detalhe'), prazo: le('Prazo (tabela)', 'BMH_prazo_recebimento'),
-    pedTab: le('Pedido (tabela)', 'BMH_diretoria_pedido'), opcTab: le('Operação por convênio (tabela)', 'BMH_operacao_conv'), opkTab: le('Operação por câmara (tabela)', 'BMH_operacao_camara'),
+    pedTab: le('Pedido (tabela)', 'BMH_diretoria_pedido'), opcTab: le('Operação por convênio (tabela)', 'BMH_operacao_conv'), opkTab: le('Operação por câmara (tabela)', 'BMH_operacao_camara'), opkcTab: le('Operação por câmara e convênio (tabela)', 'BMH_operacao_camconv'),
     monta: codigo('Monta a página', '../../grupos/painel-diretoria.js', { executeOnce: true }),
     entrega: no('Entrega a página', 'n8n-nodes-base.respondToWebhook', 1.1, { respondWith: 'text', responseBody: '={{ $json.html }}', options: { responseHeaders: { entries: [{ name: 'Content-Type', value: 'text/html; charset=utf-8' }, { name: 'Cache-Control', value: 'no-store' }, { name: 'X-Robots-Tag', value: 'noindex' }] } } }),
     // pacientes do lote (3º nível): lê a tabela gravada às 23h40 (abre na hora; funciona com o iGut fora do ar)
@@ -425,7 +430,7 @@ function fluxoPainelDiretoria() {
   cx[n.dispara.name] = { main: [[{ node: n.gravaPed.name, type: 'main', index: 0 }], [{ node: n.respondePedido.name, type: 'main', index: 0 }]] };
   liga(cx, n.gravaPed.name, n.pede.name); liga(cx, n.pede.name, n.respondePedido.name);
   cx[n.ehLista.name] = { main: [[{ node: n.pacTab.name, type: 'main', index: 0 }], [{ node: n.fin.name, type: 'main', index: 0 }]] };
-  for (const [a, b] of [[n.fin, n.op], [n.op, n.det], [n.det, n.prazo], [n.prazo, n.pedTab], [n.pedTab, n.opcTab], [n.opcTab, n.opkTab], [n.opkTab, n.monta], [n.monta, n.entrega], [n.pacTab, n.fimLista], [n.fimLista, n.lista], [n.lista, n.entregaLista]]) liga(cx, a.name, b.name);
+  for (const [a, b] of [[n.fin, n.op], [n.op, n.det], [n.det, n.prazo], [n.prazo, n.pedTab], [n.pedTab, n.opcTab], [n.opcTab, n.opkTab], [n.opkTab, n.opkcTab], [n.opkcTab, n.monta], [n.monta, n.entrega], [n.pacTab, n.fimLista], [n.fimLista, n.lista], [n.lista, n.entregaLista]]) liga(cx, a.name, b.name);
   return { name: 'BMH · Diretoria (painel)', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none', saveDataErrorExecution: 'none' }) };   // tem nome de paciente: não guarda execução
 }
 
