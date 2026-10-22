@@ -45,6 +45,7 @@ const COLUNAS = {
   BMH_financeiro_mes: { chave: 's', mes: 's', unidade: 's', convenio: 's', sessoes: 'n', produzido: 'n', faturado: 'n', a_faturar: 'n', recebido: 'n', a_receber: 'n', glosado: 'n', atualizado_em: 's' },
   BMH_financeiro_detalhe: { chave: 's', mes: 's', unidade: 's', convenio: 's', situacao: 's', lote: 's', sessoes: 'n', valor: 'n', glosa: 'n', dias: 's', atualizado_em: 's' },
   BMH_financeiro_paciente: { chave: 's', mes: 's', unidade: 's', convenio: 's', situacao: 's', lote: 's', paciente_id: 's', paciente: 's', sessoes: 'n', valor: 'n', dias: 's', medicos: 's', atualizado_em: 's' },
+  BMH_confirmacoes: Object.fromEntries(['chave', 'dia', 'paciente_id', 'unidade', 'hora', 'tipo', 'modo', 'status', 'criado_em'].map((k) => [k, 's'])),   // confirmação da véspera (22/10/2026)
   BMH_diretoria_chave: { chave: 's', token: 's', anterior: 's', dia: 's' },   // chave do dia da lista de pacientes (22/10/2026)
   BMH_diretoria_pedido: { chave: 's', pedido: 's' },   // hora (ms) do último toque em "Atualizar agora" (trava para todos, 20/10/2026)
   BMH_prazo_recebimento: { chave: 's', mes: 's', unidade: 's', convenio: 's', valor_pago: 'n', dias_x_valor: 'n', sessoes_pagas: 'n', atualizado_em: 's' },
@@ -516,6 +517,33 @@ function fluxoPlantoesEmails() {
 }
 
 // ---------------- Google orgânico da semana (15/10/2026) ----------------
+// ---------------- confirmação da véspera (22/10/2026): pronta para o Kommo; até lá em ensaio, sem mandar nada ----------------
+// O Jorge: "quando for ligar já tem que estar pronto a questão de confirmação de agenda". Lê a agenda de amanhã no iGut,
+// monta uma confirmação por paciente e grava em BMH_confirmacoes. O envio pelo Kommo (modelo de utilidade aprovado pela Meta,
+// botões "Confirmo" e "Preciso remarcar") entra quando a conta existir; até a nova rodar uma semana sem falha, o aparelho que
+// confirma hoje continua ligado.
+function fluxoConfirmacao() {
+  x = 0;
+  const IGUT = cred('httpCustomAuth', 'BMH · iGut (acesso)');
+  IDS.agenda ||= {}; IDS.agenda.confirmacao ||= 'bmh-agenda-confirmacao-' + crypto.randomBytes(6).toString('hex');
+  const n = {
+    agenda: no('Todo dia às 18h03', 'n8n-nodes-base.scheduleTrigger', 1.2, { rule: { interval: [{ field: 'cronExpression', expression: '3 18 * * *' }] } }),
+    manual: no('Rodar agora', 'n8n-nodes-base.webhook', 2, { path: IDS.agenda.confirmacao, responseMode: 'lastNode', options: {} }, { webhookId: crypto.randomUUID() }),
+    amanha: no('Amanhã', 'n8n-nodes-base.code', 2, { jsCode: "// à mão: ?dia=AAAA-MM-DD monta a de outro dia (teste)\nlet q = {}; try { q = $('Rodar agora').first().json.query || {}; } catch (e) {}\nconst dia = /^\\d{4}-\\d{2}-\\d{2}$/.test(q.dia || '') ? q.dia : $now.setZone('America/Sao_Paulo').plus({ days: 1 }).toISODate();\nreturn [{ json: { dia } }];" }),
+    config: le('Config', 'BMH_config'),
+    ag: no('Agenda de amanhã', 'n8n-nodes-base.httpRequest', 4.2, { method: 'POST', url: 'https://api.igut.med.br/v2/consultas/buscar', authentication: 'genericCredentialType', genericAuthType: 'httpCustomAuth',
+      sendBody: true, specifyBody: 'json', jsonBody: "={{ JSON.stringify({ 'Agendamento.data': $('Amanhã').first().json.dia, 'Agendamento.data_fim': $('Amanhã').first().json.dia }) }}", options: { timeout: 120000 } },
+      { credentials: IGUT, executeOnce: true }),
+    monta: codigo('Monta as confirmações', '../../agenda/confirmacao-monta.js', { executeOnce: true }),
+    grava: grava('Grava as confirmações', 'BMH_confirmacoes'),
+    resumo: no('Resumo', 'n8n-nodes-base.code', 2, { jsCode: "// só contagens (é o que o \"Rodar agora\" devolve)\nconst it = $('Monta as confirmações').all().map((i) => i.json), c = (f) => it.filter(f).length;\nreturn [{ json: { dia: $('Amanhã').first().json.dia, modo: it[0]?.modo || '-', total: it.length, asa_sul: c((r) => r.unidade === 'Asa Sul'), taguatinga: c((r) => r.unidade === 'Taguatinga'), sessoes: c((r) => r.tipo === 'sessão'), avaliacoes: c((r) => r.tipo === 'avaliação'), fora: JSON.parse(it[0]?.fora_hoje || '{}') } }];" }, { executeOnce: true }),
+    nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Agenda · confirmação da véspera\n**Traz:** a agenda de amanhã no iGut\n**Envia:** hoje nada (ensaio); com o Kommo, a mensagem de confirmação com os botões Confirmo e Preciso remarcar\n**Limites:** uma por paciente por dia (o primeiro horário); fora: falta já marcada, horário bloqueado, celular inválido e consulta que não é avaliação\n\nModo na chave `confirmacao_modo` de BMH_config (ensaio | real). Na tabela fica só o código do paciente, a unidade e o horário; nome e celular só passam no modo real, para o envio. Execução com sucesso não é guardada.', width: 620, height: 240 }),
+  };
+  const cx = {}; liga(cx, n.agenda.name, n.amanha.name); liga(cx, n.manual.name, n.amanha.name);
+  for (const [a, b] of [[n.amanha, n.config], [n.config, n.ag], [n.ag, n.monta], [n.monta, n.grava], [n.grava, n.resumo]]) liga(cx, a.name, b.name);
+  return { name: 'BMH · Agenda · confirmação da véspera', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none' }) };   // no modo real passa nome e celular
+}
+
 function fluxoSearchConsole() {
   x = 0;
   const GSC = 'https://www.googleapis.com/webmasters/v3/sites/https%3A%2F%2Fhiperbaricabrasilia.com.br%2F/searchAnalytics/query';
@@ -571,7 +599,7 @@ function fluxoRadar() {
 
 // ---------------- vigia de fluxos parados (15/10/2026) ----------------
 // cada fluxo agendado anota em BMH_vigia quando começou; prazo máximo em horas, com folga (nunca alarme falso)
-const VIGIA = { radar: 26, organico: 170, grava: 26, igut: 26, guardiao: 26, resumo: 26, numeros: 26, medicao: 170, mensal: 745, plantoes: 745, avaliacoes: 11 };
+const VIGIA = { confirmacao: 26, radar: 26, organico: 170, grava: 26, igut: 26, guardiao: 26, resumo: 26, numeros: 26, medicao: 170, mensal: 745, plantoes: 745, avaliacoes: 11 };
 function comVigia(chave, f) {
   if (!VIGIA[chave]) return f;
   const gatilhos = f.nodes.filter((n) => n.type === 'n8n-nodes-base.scheduleTrigger'); if (!gatilhos.length) return f;
@@ -648,7 +676,7 @@ function fluxoAvaliacoes() {
   const tags = (await api('tags?limit=100', 'GET')).data || []; const tagBMH = tags.find((t) => t.name === 'BMH');
     const so = process.argv.slice(2);   // ex.: node montar.js pagina guardiao (só esses)
   // o alerta vem primeiro: os outros precisam do id dele (errorWorkflow)
-  const fluxos = { alerta: fluxoAlerta, grava: fluxoGrava, pagina: fluxoPagina, igut: fluxoIgut, guardiao: fluxoGuardiao, botoes: fluxoBotoes, resumo: fluxoResumo, medicao: fluxoMedicao, mensal: fluxoMensal, numeros: fluxoNumeros, diretoria: fluxoPainelDiretoria, plantoes: fluxoPlantoes, plantoesEmails: fluxoPlantoesEmails, avaliacoes: fluxoAvaliacoes, nota: fluxoNota, vigia: fluxoVigia, organico: fluxoSearchConsole, radar: fluxoRadar };
+  const fluxos = { alerta: fluxoAlerta, grava: fluxoGrava, pagina: fluxoPagina, igut: fluxoIgut, guardiao: fluxoGuardiao, botoes: fluxoBotoes, resumo: fluxoResumo, medicao: fluxoMedicao, mensal: fluxoMensal, numeros: fluxoNumeros, diretoria: fluxoPainelDiretoria, plantoes: fluxoPlantoes, plantoesEmails: fluxoPlantoesEmails, avaliacoes: fluxoAvaliacoes, nota: fluxoNota, vigia: fluxoVigia, organico: fluxoSearchConsole, radar: fluxoRadar, confirmacao: fluxoConfirmacao };
   for (const [chave, monta] of Object.entries(fluxos).filter(([k]) => !so.length || so.includes(k))) {
     const f = comVigia(chave, monta());
     if (!/^BMH · /.test(f.name)) throw new Error('nome sem BMH');
