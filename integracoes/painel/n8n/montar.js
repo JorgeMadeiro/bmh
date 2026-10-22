@@ -46,7 +46,7 @@ const COLUNAS = {
   BMH_financeiro_detalhe: { chave: 's', mes: 's', unidade: 's', convenio: 's', situacao: 's', lote: 's', sessoes: 'n', valor: 'n', glosa: 'n', dias: 's', atualizado_em: 's' },
   BMH_financeiro_paciente: { chave: 's', mes: 's', unidade: 's', convenio: 's', situacao: 's', lote: 's', paciente_id: 's', paciente: 's', sessoes: 'n', valor: 'n', dias: 's', medicos: 's', atualizado_em: 's' },
   BMH_cliques_site: Object.fromEntries(['chave', 'registrado_em', 'pagina', 'botao', 'mensagem_inicio', 'gclid', 'gbraid', 'wbraid', 'fbclid', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'entrada', 'referencia', 'lead_id', 'ligado_em'].map((k) => [k, 's'])),   // clique no WhatsApp do site com gclid e UTM (22/10/2026)
-  BMH_conversoes: Object.fromEntries(['chave', 'evento', 'dia', 'paciente_id', 'unidade', 'telefone_hash', 'telefone_hash_sem9', 'email_hash', 'enviado_meta', 'enviado_google', 'modo', 'criado_em'].map((k) => [k, 's'])),   // avaliou e iniciou pelo iGut, em código (22/10/2026)
+  BMH_conversoes: Object.fromEntries(['chave', 'evento', 'dia', 'paciente_id', 'unidade', 'telefone_hash', 'telefone_hash_sem9', 'telefone_hash_google', 'email_hash', 'enviado_meta', 'enviado_google', 'modo', 'criado_em'].map((k) => [k, 's'])),   // avaliou e iniciou pelo iGut, em código (22/10/2026)
   BMH_whatsapp_meta: Object.fromEntries(['chave', 'momento', 'dia', 'telefone_hash', 'direcao', 'aparelho', 'tipo', 'texto', 'respondendo', 'apagar_em', 'origem', 'anuncio_id', 'ctwa_clid', 'referral_tipo'].map((k) => [k, 's'])),   // recebedor oficial da Meta (22/10/2026): telefone só em código, texto mascarado, 1 mês
   BMH_origem_leads: Object.fromEntries(['chave', 'lead_id', 'contato_id', 'frase', 'origem', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'cirurgiao_indicou', 'acao', 'modo', 'recebida_em'].map((k) => [k, 's'])),   // origem do lead pelo Kommo (22/10/2026)
   BMH_confirmacoes: Object.fromEntries(['chave', 'dia', 'paciente_id', 'unidade', 'hora', 'tipo', 'modo', 'status', 'criado_em'].map((k) => [k, 's'])),   // confirmação da véspera (22/10/2026)
@@ -629,6 +629,42 @@ function fluxoCliques() {
   return { name: 'BMH · Site · clique no WhatsApp', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none' }) };
 }
 
+// ---------------- envio das conversões à Meta e ao Google (22/10/2026) ----------------
+function fluxoEnvioConversoes() {
+  x = 0;
+  const META = { httpQueryAuth: { id: 'HXdesRATFOJkYxhK', name: 'BMH · Meta Instagram (token)' } };   // token do usuário do sistema "Claude BMH" (só graph.facebook.com)
+  IDS.conversoes ||= {}; IDS.conversoes.envio ||= 'bmh-conversoes-envio-' + crypto.randomBytes(6).toString('hex');
+  const n = {
+    agenda: no('Todo dia às 8h17', 'n8n-nodes-base.scheduleTrigger', 1.2, { rule: { interval: [{ field: 'cronExpression', expression: '17 8 * * *' }] } }),
+    manual: no('Rodar agora', 'n8n-nodes-base.webhook', 2, { path: IDS.conversoes.envio, responseMode: 'lastNode', options: {} }, { webhookId: crypto.randomUUID() }),
+    config: le('Config', 'BMH_config'),
+    tab: le('Conversões (tabela)', 'BMH_conversoes'),
+    monta: codigo('Monta os envios', '../../conversoes/envio-monta.js', { executeOnce: true }),
+    seMeta: se('Manda à Meta?', '={{ $json.manda_meta }}'),
+    meta: no('Meta · envia', 'n8n-nodes-base.httpRequest', 4.2, { method: 'POST', url: 'https://graph.facebook.com/v23.0/1526867428059043/events', authentication: 'genericCredentialType', genericAuthType: 'httpQueryAuth',
+      sendBody: true, specifyBody: 'json', jsonBody: "={{ JSON.stringify($('Monta os envios').first().json.meta_corpo) }}", options: { timeout: 60000 } }, { credentials: META, executeOnce: true, onError: 'continueRegularOutput', alwaysOutputData: true }),
+    token: no('Google · renova o acesso', 'n8n-nodes-base.httpRequest', 4.2, { method: 'POST', url: 'https://oauth2.googleapis.com/token', authentication: 'genericCredentialType', genericAuthType: 'httpCustomAuth', sendBody: true, contentType: 'json', specifyBody: 'json', jsonBody: '{}', options: {} }, { credentials: ADS, executeOnce: true }),
+    lotes: no('Lotes do Google', 'n8n-nodes-base.code', 2, { jsCode: "const m = $('Monta os envios').first().json;\nreturn m.manda_google ? m.google.map((g) => ({ json: g })) : [];" }, { executeOnce: true, alwaysOutputData: true }),
+    seLote: se('Tem lote?', '={{ !!$json.destino }}'),
+    google: no('Google · envia', 'n8n-nodes-base.httpRequest', 4.2, { method: 'POST', url: 'https://datamanager.googleapis.com/v1/events:ingest', sendHeaders: true,
+      headerParameters: { parameters: [{ name: 'Authorization', value: "={{ 'Bearer ' + $('Google · renova o acesso').first().json.access_token }}" }] },
+      sendBody: true, specifyBody: 'json', jsonBody: '={{ JSON.stringify($json.corpo) }}', options: { timeout: 60000 } }, { onError: 'continueRegularOutput', alwaysOutputData: true }),
+    marca: codigo('Marca os enviados', '../../conversoes/envio-marca.js', { executeOnce: true }),
+    filtra: no('Só as linhas', 'n8n-nodes-base.filter', 2.2, { conditions: { options: { caseSensitive: true, leftValue: '', typeValidation: 'loose', version: 2 }, combinator: 'and',
+      conditions: [{ id: crypto.randomUUID(), leftValue: '={{ $json.chave }}', rightValue: '', operator: { type: 'string', operation: 'notEmpty', singleValue: true } }] }, options: {} }),
+    grava: grava('Grava o enviado', 'BMH_conversoes'),
+    resumo: no('Resumo', 'n8n-nodes-base.code', 2, { jsCode: "return $('Marca os enviados').all().filter((i) => i.json.resumo);" }, { executeOnce: true }),
+    nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Conversões · envio (Meta e Google)\n**Traz:** BMH_conversoes (avaliou e iniciou, do iGut)\n**Envia:** Meta (API de Conversões, pixel 1526867428059043, presencial) e Google Ads (Data Manager, conversões secundárias 7864686655 e 7864686658)\n**Limites:** só telefone e e-mail em código; sem nome, tratamento nem valor; uma vez por evento (chave); marca enviado só no modo real\n\nModo: ?modo= no Rodar agora ou a chave conversoes_envio_modo (simular | teste | real). Política de privacidade com o parágrafo de medição desde 07/10/2026.', width: 620, height: 240 }),
+  };
+  const cx = {}; liga(cx, n.agenda.name, n.config.name); liga(cx, n.manual.name, n.config.name);
+  for (const [a, b] of [[n.config, n.tab], [n.tab, n.monta], [n.monta, n.seMeta], [n.meta, n.token], [n.token, n.lotes], [n.lotes, n.seLote], [n.google, n.marca]]) liga(cx, a.name, b.name);
+  cx[n.seMeta.name] = { main: [[{ node: n.meta.name, type: 'main', index: 0 }], [{ node: n.token.name, type: 'main', index: 0 }]] };
+  cx[n.seLote.name] = { main: [[{ node: n.google.name, type: 'main', index: 0 }], [{ node: n.marca.name, type: 'main', index: 0 }]] };
+  cx[n.marca.name] = { main: [[{ node: n.filtra.name, type: 'main', index: 0 }, { node: n.resumo.name, type: 'main', index: 0 }]] };
+  liga(cx, n.filtra.name, n.grava.name);
+  return { name: 'BMH · Conversões · envio (Meta e Google)', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none' }) };
+}
+
 function fluxoSearchConsole() {
   x = 0;
   const GSC = 'https://www.googleapis.com/webmasters/v3/sites/https%3A%2F%2Fhiperbaricabrasilia.com.br%2F/searchAnalytics/query';
@@ -684,7 +720,7 @@ function fluxoRadar() {
 
 // ---------------- vigia de fluxos parados (15/10/2026) ----------------
 // cada fluxo agendado anota em BMH_vigia quando começou; prazo máximo em horas, com folga (nunca alarme falso)
-const VIGIA = { conversoes: 26, confirmacao: 26, radar: 26, organico: 170, grava: 26, igut: 26, guardiao: 26, resumo: 26, numeros: 26, medicao: 170, mensal: 745, plantoes: 745, avaliacoes: 11 };
+const VIGIA = { envio: 26, conversoes: 26, confirmacao: 26, radar: 26, organico: 170, grava: 26, igut: 26, guardiao: 26, resumo: 26, numeros: 26, medicao: 170, mensal: 745, plantoes: 745, avaliacoes: 11 };
 function comVigia(chave, f) {
   if (!VIGIA[chave]) return f;
   const gatilhos = f.nodes.filter((n) => n.type === 'n8n-nodes-base.scheduleTrigger'); if (!gatilhos.length) return f;
@@ -761,7 +797,7 @@ function fluxoAvaliacoes() {
   const tags = (await api('tags?limit=100', 'GET')).data || []; const tagBMH = tags.find((t) => t.name === 'BMH');
     const so = process.argv.slice(2);   // ex.: node montar.js pagina guardiao (só esses)
   // o alerta vem primeiro: os outros precisam do id dele (errorWorkflow)
-  const fluxos = { alerta: fluxoAlerta, grava: fluxoGrava, pagina: fluxoPagina, igut: fluxoIgut, guardiao: fluxoGuardiao, botoes: fluxoBotoes, resumo: fluxoResumo, medicao: fluxoMedicao, mensal: fluxoMensal, numeros: fluxoNumeros, diretoria: fluxoPainelDiretoria, plantoes: fluxoPlantoes, plantoesEmails: fluxoPlantoesEmails, avaliacoes: fluxoAvaliacoes, nota: fluxoNota, vigia: fluxoVigia, organico: fluxoSearchConsole, radar: fluxoRadar, confirmacao: fluxoConfirmacao, origem: fluxoOrigem, recebedor: fluxoRecebedor, conversoes: fluxoConversoes, cliques: fluxoCliques };
+  const fluxos = { alerta: fluxoAlerta, grava: fluxoGrava, pagina: fluxoPagina, igut: fluxoIgut, guardiao: fluxoGuardiao, botoes: fluxoBotoes, resumo: fluxoResumo, medicao: fluxoMedicao, mensal: fluxoMensal, numeros: fluxoNumeros, diretoria: fluxoPainelDiretoria, plantoes: fluxoPlantoes, plantoesEmails: fluxoPlantoesEmails, avaliacoes: fluxoAvaliacoes, nota: fluxoNota, vigia: fluxoVigia, organico: fluxoSearchConsole, radar: fluxoRadar, confirmacao: fluxoConfirmacao, origem: fluxoOrigem, recebedor: fluxoRecebedor, conversoes: fluxoConversoes, cliques: fluxoCliques, envio: fluxoEnvioConversoes };
   for (const [chave, monta] of Object.entries(fluxos).filter(([k]) => !so.length || so.includes(k))) {
     const f = comVigia(chave, monta());
     if (!/^BMH · /.test(f.name)) throw new Error('nome sem BMH');

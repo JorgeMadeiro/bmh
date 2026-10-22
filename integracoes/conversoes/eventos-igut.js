@@ -4,7 +4,8 @@
 //   - iniciou: sessão de câmara finalizada sem falta de quem não teve sessão antes (pela tabela de pacientes por lote,
 //     desde nov/2024): é o "paciente novo" do custo por paciente (meta de R$ 200).
 // O "agendou" vem do Kommo (etapa "Avaliação agendada"), como na Nexo. Telefone e e-mail só em código (SHA-256): telefone
-// com DDI sem "+" (com e sem o 9, porque cadastros antigos vêm sem ele), e-mail em minúsculas. Nada é enviado daqui: o
+// com DDI sem "+" para a Meta (com e sem o 9, porque cadastros antigos vêm sem ele) e com "+" para o Google; e-mail em
+// minúsculas. Nada é enviado daqui: o
 // envio à Meta e ao Google lê BMH_conversoes depois, em ensaio até o parágrafo de medição entrar na política de privacidade.
 /*__SHA256__*/
 const AGENDAS = { 111: 'sessao', 112: 'sessao', 121: 'sessao', 113: 'consulta', 120: 'consulta' }, UNI = { 111: 'Asa Sul', 112: 'Asa Sul', 113: 'Asa Sul', 120: 'Taguatinga', 121: 'Taguatinga' };
@@ -27,6 +28,6 @@ for (const x of lista) {
   if (!evento) continue;
   const chave = evento + '|' + pid + '|' + dia; if (out[chave]) continue;
   const [t1, t2] = tel(x.Paciente?.celular), email = String(x.Paciente?.email || '').trim().toLowerCase();
-  out[chave] = { chave, evento, dia, paciente_id: pid, unidade: UNI[id], telefone_hash: t1 ? sha256(t1) : '', telefone_hash_sem9: t2 ? sha256(t2) : '', email_hash: /@/.test(email) ? sha256(email) : '', enviado_meta: '', enviado_google: '', modo: 'ensaio', criado_em: agora };
+  out[chave] = { chave, evento, dia, paciente_id: pid, unidade: UNI[id], telefone_hash: t1 ? sha256(t1) : '', telefone_hash_sem9: t2 ? sha256(t2) : '', telefone_hash_google: t1 ? sha256('+' + t1) : '', email_hash: /@/.test(email) ? sha256(email) : '', enviado_meta: '', enviado_google: '', modo: 'ensaio', criado_em: agora };
 }
 return Object.values(out).map((json) => ({ json }));
