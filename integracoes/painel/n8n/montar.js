@@ -49,7 +49,7 @@ const COLUNAS = {
   BMH_conversoes: Object.fromEntries(['chave', 'evento', 'dia', 'paciente_id', 'unidade', 'telefone_hash', 'telefone_hash_sem9', 'telefone_hash_google', 'email_hash', 'enviado_meta', 'enviado_google', 'modo', 'criado_em'].map((k) => [k, 's'])),   // avaliou e iniciou pelo iGut, em código (22/10/2026)
   BMH_whatsapp_meta: Object.fromEntries(['chave', 'momento', 'dia', 'telefone_hash', 'direcao', 'aparelho', 'tipo', 'texto', 'respondendo', 'apagar_em', 'origem', 'anuncio_id', 'ctwa_clid', 'referral_tipo'].map((k) => [k, 's'])),   // recebedor oficial da Meta (22/10/2026): telefone só em código, texto mascarado, 1 mês
   BMH_origem_leads: Object.fromEntries(['chave', 'lead_id', 'contato_id', 'frase', 'origem', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'cirurgiao_indicou', 'acao', 'modo', 'recebida_em'].map((k) => [k, 's'])),   // origem do lead pelo Kommo (22/10/2026)
-  BMH_confirmacoes: Object.fromEntries(['chave', 'dia', 'paciente_id', 'unidade', 'hora', 'tipo', 'modo', 'status', 'criado_em'].map((k) => [k, 's'])),   // confirmação da véspera (22/10/2026)
+  BMH_confirmacoes: Object.fromEntries(['chave', 'dia', 'paciente_id', 'unidade', 'hora', 'tipo', 'agendamentos', 'telefone_hash', 'wamid', 'resposta', 'respondido_em', 'modo', 'status', 'criado_em'].map((k) => [k, 's'])),   // confirmação da véspera (22/10/2026)
   BMH_diretoria_chave: { chave: 's', token: 's', anterior: 's', dia: 's' },   // chave do dia da lista de pacientes (22/10/2026)
   BMH_diretoria_pedido: { chave: 's', pedido: 's' },   // hora (ms) do último toque em "Atualizar agora" (trava para todos, 20/10/2026)
   BMH_prazo_recebimento: { chave: 's', mes: 's', unidade: 's', convenio: 's', valor_pago: 'n', dias_x_valor: 'n', sessoes_pagas: 'n', atualizado_em: 's' },
@@ -538,13 +538,21 @@ function fluxoConfirmacao() {
     ag: no('Agenda de amanhã', 'n8n-nodes-base.httpRequest', 4.2, { method: 'POST', url: 'https://api.igut.med.br/v2/consultas/buscar', authentication: 'genericCredentialType', genericAuthType: 'httpCustomAuth',
       sendBody: true, specifyBody: 'json', jsonBody: "={{ JSON.stringify({ 'Agendamento.data': $('Amanhã').first().json.dia, 'Agendamento.data_fim': $('Amanhã').first().json.dia }) }}", options: { timeout: 120000 } },
       { credentials: IGUT, executeOnce: true }),
-    monta: codigo('Monta as confirmações', '../../agenda/confirmacao-monta.js', { executeOnce: true }),
+    monta: no('Monta as confirmações', 'n8n-nodes-base.code', 2, { jsCode: ler('../../agenda/confirmacao-monta.js').replace('/*__SHA256__*/', ler('../../comum/sha256.js')) }, { executeOnce: true }),
     grava: grava('Grava as confirmações', 'BMH_confirmacoes'),
+    // envio pela API oficial (22/10/2026): só no modo real, com o modelo confirmacao_sessao_v1 aprovado pela Meta
+    real: no('Só no modo real', 'n8n-nodes-base.filter', 2.2, { conditions: { options: { caseSensitive: true, leftValue: '', typeValidation: 'loose', version: 2 }, combinator: 'and',
+      conditions: [{ id: crypto.randomUUID(), leftValue: '={{ $json.modo }}', rightValue: 'real', operator: { type: 'string', operation: 'equals' } }] }, options: {} }),
+    envia: no('Manda a confirmação', 'n8n-nodes-base.httpRequest', 4.2, { method: 'POST', url: 'https://graph.facebook.com/v23.0/181090498424438/messages', authentication: 'genericCredentialType', genericAuthType: 'httpQueryAuth',
+      sendBody: true, specifyBody: 'json', jsonBody: "={{ JSON.stringify({ messaging_product: 'whatsapp', to: $json.envio.telefone, type: 'template', template: { name: 'confirmacao_sessao_v1', language: { code: 'pt_BR' }, components: [{ type: 'body', parameters: [$json.envio.nome, $json.envio.unidade, $json.envio.dia, $json.envio.hora].map((text) => ({ type: 'text', text: String(text) })) }] } }) }}",
+      options: { timeout: 30000, batching: { batch: { batchSize: 10, batchInterval: 1000 } } } }, { credentials: { httpQueryAuth: { id: 'HXdesRATFOJkYxhK', name: 'BMH · Meta Instagram (token)' } }, onError: 'continueRegularOutput', alwaysOutputData: true }),
+    resultado: codigo('Resultado do envio', '../../agenda/confirmacao-envio.js', { executeOnce: true }),
+    gravaEnvio: grava('Grava o envio', 'BMH_confirmacoes'),
     resumo: no('Resumo', 'n8n-nodes-base.code', 2, { jsCode: "// só contagens (é o que o \"Rodar agora\" devolve)\nconst it = $('Monta as confirmações').all().map((i) => i.json), c = (f) => it.filter(f).length;\nreturn [{ json: { dia: $('Amanhã').first().json.dia, modo: it[0]?.modo || '-', total: it.length, asa_sul: c((r) => r.unidade === 'Asa Sul'), taguatinga: c((r) => r.unidade === 'Taguatinga'), sessoes: c((r) => r.tipo === 'sessão'), avaliacoes: c((r) => r.tipo === 'avaliação'), fora: JSON.parse(it[0]?.fora_hoje || '{}') } }];" }, { executeOnce: true }),
-    nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Agenda · confirmação da véspera\n**Traz:** a agenda de amanhã no iGut\n**Envia:** hoje nada (ensaio); com o Kommo, a mensagem de confirmação com os botões Confirmo e Preciso remarcar\n**Limites:** uma por paciente por dia (o primeiro horário); fora: falta já marcada, horário bloqueado, celular inválido e consulta que não é avaliação\n\nModo na chave `confirmacao_modo` de BMH_config (ensaio | real). Na tabela fica só o código do paciente, a unidade e o horário; nome e celular só passam no modo real, para o envio. Execução com sucesso não é guardada.', width: 620, height: 240 }),
+    nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Agenda · confirmação da véspera\n**Traz:** a agenda de amanhã no iGut\n**Envia:** no modo real, a mensagem de confirmação (modelo confirmacao_sessao_v1) pela API oficial do WhatsApp da recepção, com os botões Confirmo e Preciso remarcar; a resposta é tratada no recebedor oficial\n**Limites:** uma por paciente por dia (o primeiro horário); fora: falta já marcada, horário bloqueado, celular inválido e consulta que não é avaliação\n\nModo na chave `confirmacao_modo` de BMH_config (ensaio | real). Na tabela fica só o código do paciente, a unidade e o horário; nome e celular só passam no modo real, para o envio. Execução com sucesso não é guardada.', width: 620, height: 240 }),
   };
   const cx = {}; liga(cx, n.agenda.name, n.amanha.name); liga(cx, n.manual.name, n.amanha.name);
-  for (const [a, b] of [[n.amanha, n.config], [n.config, n.ag], [n.ag, n.monta], [n.monta, n.grava], [n.grava, n.resumo]]) liga(cx, a.name, b.name);
+  for (const [a, b] of [[n.amanha, n.config], [n.config, n.ag], [n.ag, n.monta], [n.monta, n.grava], [n.grava, n.resumo], [n.monta, n.real], [n.real, n.envia], [n.envia, n.resultado], [n.resultado, n.gravaEnvio]]) liga(cx, a.name, b.name);
   return { name: 'BMH · Agenda · confirmação da véspera', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none' }) };   // no modo real passa nome e celular
 }
 
@@ -585,10 +593,22 @@ function fluxoRecebedor() {
     prepara: codigo('Prepara a mensagem', '../../whatsapp/prepara-meta.js', { executeOnce: true }),
     monta: no('Monta a linha', 'n8n-nodes-base.code', 2, { jsCode: ler('../../whatsapp/monta-meta.js').replace('/*__FRASES__*/[]', frases) }, { executeOnce: true }),
     grava: grava('Grava a mensagem', 'BMH_whatsapp_meta'),
+    // resposta ao botão da confirmação da véspera (22/10/2026)
+    ehResp: no('É resposta da confirmação?', 'n8n-nodes-base.filter', 2.2, { conditions: { options: { caseSensitive: false, leftValue: '', typeValidation: 'loose', version: 2 }, combinator: 'and',
+      conditions: [{ id: crypto.randomUUID(), leftValue: "={{ ['confirmo', 'preciso remarcar'].includes(String($json.texto || '').trim().toLowerCase()) && $json.direcao === 'paciente' }}", rightValue: '', operator: { type: 'boolean', operation: 'true', singleValue: true } }] }, options: {} }),
+    cfgResp: le('Config da resposta', 'BMH_config'),
+    confTab: le('Confirmações (tabela)', 'BMH_confirmacoes'),
+    decide: codigo('Decide a resposta', '../../agenda/confirmacao-resposta.js', { executeOnce: true }),
+    gravaResp: grava('Grava a resposta', 'BMH_confirmacoes'),
+    confirma: no('Confirma no iGut?', 'n8n-nodes-base.filter', 2.2, { conditions: { options: { caseSensitive: true, leftValue: '', typeValidation: 'loose', version: 2 }, combinator: 'and',
+      conditions: [{ id: crypto.randomUUID(), leftValue: '={{ $json.confirmar_igut }}', rightValue: '', operator: { type: 'boolean', operation: 'true', singleValue: true } }] }, options: {} }),
+    separa: no('Um por agendamento', 'n8n-nodes-base.code', 2, { jsCode: "return $input.all().flatMap((i) => (i.json.agendamento_lista || []).map((id) => ({ json: { id } })));" }),
+    igut: no('iGut · confirma', 'n8n-nodes-base.httpRequest', 4.2, { method: 'POST', url: 'https://api.igut.med.br/v2/consultas/statusatendimento', authentication: 'genericCredentialType', genericAuthType: 'httpCustomAuth',
+      sendBody: true, specifyBody: 'json', jsonBody: "={{ JSON.stringify({ 'Agendamento.id': $json.id, 'Agendamento.status': 1 }) }}", options: { timeout: 60000 } }, { credentials: cred('httpCustomAuth', 'BMH · iGut (acesso)') }),
     nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · WhatsApp · recebedor oficial (Meta)\n**Traz:** o webhook do app da BMH assinando o WhatsApp da recepção (coexistência com o Kommo)\n**Envia:** nada; grava em BMH_whatsapp_meta\n**Limites:** telefone só em código (SHA-256); CPF, telefone e e-mail mascarados no texto; guarda de 1 mês; áudio sem transcrição nesta fase\n\nNa virada: assinar o número com o app (scripts como o meta-whatsapp-assinar.py da Nexo) apontando para este endereço. A limpeza diária (4h37) apaga as vencidas.', width: 620, height: 220 }),
   };
   const cx = {}; liga(cx, n.verifica.name, n.responde.name);
-  for (const [a, b] of [[n.recebe, n.prepara], [n.prepara, n.monta], [n.monta, n.grava]]) liga(cx, a.name, b.name);
+  for (const [a, b] of [[n.recebe, n.prepara], [n.prepara, n.monta], [n.monta, n.grava], [n.monta, n.ehResp], [n.ehResp, n.cfgResp], [n.cfgResp, n.confTab], [n.confTab, n.decide], [n.decide, n.gravaResp], [n.decide, n.confirma], [n.confirma, n.separa], [n.separa, n.igut]]) liga(cx, a.name, b.name);
   return { name: 'BMH · WhatsApp · recebedor oficial (Meta)', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none', saveDataErrorExecution: 'none' }) };   // tem conversa de paciente
 }
 

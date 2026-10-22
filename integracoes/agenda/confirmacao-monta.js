@@ -1,9 +1,12 @@
 // Confirmação da véspera (22/10/2026, pedido do Jorge: pronta no dia da virada para o Kommo). Lê a agenda de amanhã no
 // iGut e monta UMA confirmação por paciente por dia (o primeiro horário dele), das sessões de câmara e das avaliações.
 // Fica de fora: falta já marcada (faltou, desmarcado, desistiu), horário bloqueado, agenda sem paciente e celular inválido.
-// Modo (chave `confirmacao_modo` em BMH_config): "ensaio" (padrão) só grava a lista; "real" também entrega para o envio
-// pelo Kommo (o nó de envio entra quando o Kommo da BMH existir). Nome e celular só saem no modo real, para o envio;
-// na tabela fica só o código do paciente, a unidade e o horário.
+// Modo (chave `confirmacao_modo` em BMH_config): "ensaio" (padrão) só grava a lista; "real" também manda a mensagem pela
+// API oficial do WhatsApp da recepção (modelo confirmacao_sessao_v1, aprovado pela Meta; 22/10/2026: a conta oficial já
+// existe em coexistência, então não depende do Kommo). Nome e celular só saem no modo real, para o envio; na tabela fica o
+// código do paciente, a unidade, o horário, os agendamentos do dia (para confirmar no iGut) e o telefone em código (para
+// ligar a resposta "Confirmo" ou "Preciso remarcar" à mensagem).
+/*__SHA256__*/
 const AGENDAS = { 111: { u: 'Asa Sul', t: 'sessao' }, 112: { u: 'Asa Sul', t: 'sessao' }, 113: { u: 'Asa Sul', t: 'consulta' }, 120: { u: 'Taguatinga', t: 'consulta' }, 121: { u: 'Taguatinga', t: 'sessao' } };
 const NAO_VEIO = ['faltou', 'desmarcado', 'desistiu'];
 const norm = (s) => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').trim().toLowerCase();
@@ -26,12 +29,14 @@ for (const x of lista) {
   const hora = String(x.Agendamento?.horario || '').slice(0, 5), fone = celular(x.Paciente?.celular);
   if (!fone) { fora.sem_celular++; continue; }
   const atual = porPaciente[pid];
-  if (!atual || hora < atual.hora) porPaciente[pid] = { pid: String(pid), hora, unidade: ag.u, tipo: ag.t === 'sessao' ? 'sessão' : 'avaliação', fone, nome: String(x.Paciente?.nome || '').trim().split(/\s+/)[0] || '' };
+  const agId = String(x.Agendamento?.id || ''), lista_ = (porPaciente[pid]?.agendamentos || []).concat(agId ? [agId] : []);
+  if (!atual || hora < atual.hora) porPaciente[pid] = { pid: String(pid), hora, unidade: ag.u, tipo: ag.t === 'sessao' ? 'sessão' : 'avaliação', fone, nome: String(x.Paciente?.nome || '').trim().split(/\s+/)[0] || '', agendamentos: lista_ };
+  else atual.agendamentos = lista_;
 }
 const [a, m, d] = dia.split('-'), diaTexto = Number(d) + ' de ' + MES[Number(m) - 1];
 const nomeProprio = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : '';
 return Object.values(porPaciente).sort((p, q) => p.hora.localeCompare(q.hora)).map((p) => ({ json: {
-  chave: dia + '|' + p.pid, dia, paciente_id: p.pid, unidade: p.unidade, hora: p.hora, tipo: p.tipo, modo, status: modo === 'real' ? 'a enviar' : 'ensaio', criado_em: agora,
+  chave: dia + '|' + p.pid, dia, paciente_id: p.pid, unidade: p.unidade, hora: p.hora, tipo: p.tipo, agendamentos: [...new Set(p.agendamentos)].join(','), telefone_hash: sha256(p.fone), wamid: '', resposta: '', respondido_em: '', modo, status: modo === 'real' ? 'a enviar' : 'ensaio', criado_em: agora,
   fora_hoje: JSON.stringify(fora),
   // só para o envio (modo real); não vai para a tabela
   ...(modo === 'real' ? { envio: { telefone: p.fone, nome: nomeProprio(p.nome), unidade: p.unidade, dia: diaTexto, hora: p.hora.replace(':', 'h') } } : {}),
