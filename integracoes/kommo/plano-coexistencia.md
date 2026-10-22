@@ -163,6 +163,31 @@ origem por canal, o motor, a virada, os custos, os riscos e a lista para marcar.
 - Pedido de avaliação no Google na fase 2, em "Concluiu", para todos os que concluíram.
 - Frases novas: Instagram da BMH e Perfil do Google; página /indicacao/ com QR por cirurgião.
 
+## 5C. O motor pronto, só aguardando o Kommo (22/10/2026, fim do dia)
+
+Pedido do Jorge: "deixe tudo pronto só aguardando o Kommo". Tudo em ensaio, testado, sem mandar nada a paciente, ao
+Kommo, à Meta ou ao Google.
+
+| Peça | Onde está | Situação | Teste |
+|---|---|---|---|
+| Confirmação da véspera | fluxo "BMH · Agenda · confirmação da véspera" (18h03), `integracoes/agenda/confirmacao-monta.js`, tabela `BMH_confirmacoes` | ligado em ensaio; falta o envio pelo Kommo (modelo de utilidade aprovado pela Meta, botões) | 23/10: 65 confirmações (45 Asa Sul, 20 Taguatinga) |
+| Lista única de frases | `integracoes/origem/frases.json` | os botões do site, o leitor do Kommo e o recebedor da Meta leem dela | `testa-origem.js` 26 de 26 |
+| Origem no lead | fluxo "BMH · Kommo · origem do lead", `integracoes/origem/origem-kommo.js`, tabela `BMH_origem_leads` | ligado em ensaio; na virada: webhook de conta do Kommo + PATCH no lead (5/s) | mensagem simulada gravada certa |
+| Kommo por código | `scripts/kommo/montar.js` (ensaio sem `--real`) | pronto; roda no 1º dia do teste grátis e grava `kommo_campos` | ensaio lista funil, 16 campos, 9 etiquetas, 7 motivos |
+| Páginas /instagram/ e /indicacao/ | WordPress 1423 e 1421, rascunho, noindex | publicar na virada (com o "pode") | iPhone simulado: frase certa, origem reconhecida |
+| Cartão com QR por cirurgião | `scripts/qr-cirurgiao.py` → `marketing/qr-cirurgioes/` | exemplo gerado; nomes só com o ok de cada cirurgião | renderizado |
+| Recebedor oficial da Meta | fluxo "BMH · WhatsApp · recebedor oficial (Meta)", `whatsapp/monta-meta.js`, tabela `BMH_whatsapp_meta` | ligado; recebe depois da assinatura do número pelo app da BMH | `testa-monta-meta.js` 7 de 7; verificação e mensagem simulada no ar |
+| Limpeza | "BMH · WhatsApp · apaga conversas vencidas" (4h37) | inclui `BMH_whatsapp_meta` (1 mês) | linha de teste apagada |
+| Conversões | fluxo "BMH · Conversões · eventos do iGut" (7h23), `conversoes/eventos-igut.js`, tabela `BMH_conversoes` | ligado em ensaio (avaliou e iniciou; agendou vem do Kommo); envio à Meta e ao Google depois, primeiro em teste | 21/10: 5 avaliou, 4 iniciou |
+| Clique do site | fluxo "BMH · Site · clique no WhatsApp", `origem/clique-recebe.js`, tabela `BMH_cliques_site`; tag na **versão 8 do Tag Manager, não publicada** | publicar a versão 8 com o "pode" e o `scripts/testa-tags.js` | navegador: gclid e UTM da chegada levados à 2ª página |
+| LGPD | política de privacidade (página 1336) | já tem o parágrafo de medição dos anúncios (07/10) | lido em 22/10 |
+
+**Na virada, nesta ordem:** publicar a versão 8 do Tag Manager e as páginas /instagram/ e /indicacao/ (com o "pode");
+`scripts/kommo/montar.js --real`; renomear o ganho para "Concluiu" e criar na tela o robô de horário e as tarefas; ligar a
+coexistência; registrar o webhook de conta no fluxo de origem e acrescentar o PATCH; assinar o número com o app da BMH
+apontando para o recebedor; modelo de confirmação aprovado na Meta e envio ligado (`confirmacao_modo = real`); depois de
+uma semana sem falha, desligar o aparelho que confirma hoje.
+
 ## 6. Custos
 
 - **Kommo:** a partir de 01/09/2026, o Avançado custa US$ 30 por usuário por mês para cliente novo. Com 4 usuários, uns
