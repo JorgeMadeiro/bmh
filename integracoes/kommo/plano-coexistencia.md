@@ -182,8 +182,17 @@ Kommo, à Meta ou ao Google.
 | Clique do site | fluxo "BMH · Site · clique no WhatsApp", `origem/clique-recebe.js`, tabela `BMH_cliques_site`; tag na **versão 8 do Tag Manager, não publicada** | publicar a versão 8 com o "pode" e o `scripts/testa-tags.js` | navegador: gclid e UTM da chegada levados à 2ª página |
 | LGPD | política de privacidade (página 1336) | já tem o parágrafo de medição dos anúncios (07/10) | lido em 22/10 |
 
-**Na virada, nesta ordem:** publicar a versão 8 do Tag Manager e as páginas /instagram/ e /indicacao/ (com o "pode");
-`scripts/kommo/montar.js --real`; renomear o ganho para "Concluiu" e criar na tela o robô de horário e as tarefas; ligar a
+**Ligado de verdade em 22/10/2026, com o "pode" do Jorge ("deixar somente o Kommo"):**
+- Tag Manager **versão 8 publicada** (teste antes e depois igual, só acrescenta a tag do clique; conferido no site no ar:
+  o clique manda página, botão, mensagem, gclid e UTM ao n8n).
+- Páginas **/instagram/ e /indicacao/ publicadas** (noindex, fora do mapa do site, GTM, GA4 e Clarity carregando, frase
+  certa no iPhone simulado).
+- **Conversões em modo real** (`conversoes_envio_modo = real`, fluxo "BMH · Conversões · envio (Meta e Google)", 8h17):
+  Meta, API de Conversões no pixel 1526867428059043, 24 eventos aceitos (20 e 21/10); Google Ads, Data Manager, duas
+  conversões **secundárias** novas ("BMH · Avaliou (iGut)" 7864686655 e "BMH · Iniciou tratamento (iGut)" 7864686658,
+  fora do lance), 24 aceitos depois de umas horas de propagação. Cada evento vai uma vez (chave), marcado na tabela.
+
+**Na virada, nesta ordem:** `scripts/kommo/montar.js --real`; renomear o ganho para "Concluiu" e criar na tela o robô de horário e as tarefas; ligar a
 coexistência; registrar o webhook de conta no fluxo de origem e acrescentar o PATCH; assinar o número com o app da BMH
 apontando para o recebedor; modelo de confirmação aprovado na Meta e envio ligado (`confirmacao_modo = real`); depois de
 uma semana sem falha, desligar o aparelho que confirma hoje.
