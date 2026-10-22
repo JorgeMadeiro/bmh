@@ -2,7 +2,9 @@
 // tabela BMH_financeiro_paciente (gravada às 23h40, decisão do Jorge de guardar os nomes no n8n): abre na hora e serve
 // de cópia se o iGut cair. Antes consultava o iGut na hora: nome de paciente não fica em tabela nem no histórico do n8n (execução com sucesso não é salva).
 // Parâmetros: mes=AAAA-MM, unidade, convenio, situacao (a_faturar | a_receber | recebido | glosado), lote (ou "-").
-const q = $('Painel da diretoria').first().json.query || {};
+// vem pelo endereço da lista (com a chave do dia, desde 22/10/2026) ou pelo do painel (com login)
+let q = {}; try { q = $('Lista de pacientes (webhook)').first().json.query || {}; } catch (e) {}
+if (!q.mes) { try { q = $('Painel da diretoria').first().json.query || {}; } catch (e) {} }
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const n = (v) => Number(v) || 0;
 const MES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
@@ -37,7 +39,7 @@ li b{display:block;font-weight:700}li span{font-size:13px;color:#4A5568}li stron
 .aviso{font-size:12px;color:#4A5568;margin-top:16px}</style></head><body>
 ${q.embutido ? `<main style="padding-top:0"><h1 style="font-size:17px;margin:4px 0 2px">${esc(titulo)}</h1><p style="margin:0 0 10px;color:#4A5568;font-size:13px">${esc(sub)}</p>` : `<header><h1>${esc(titulo)}</h1><p>${esc(sub)}</p></header><main>`}
 ${ps.length ? '<ul>' + linhas + '</ul>' : '<p>Nenhum paciente nessa situação (pode ter mudado desde a última atualização do painel).</p>'}
-<p class="aviso">Dado de paciente: não encaminhar fora da equipe responsável.</p>${q.embutido ? '' : '<p class="aviso">Para voltar ao painel, feche esta aba.</p>'}</main>
+<p class="aviso">Dado de paciente: não encaminhar fora da equipe responsável.</p></main>
 </body></html>`;
 // o painel pede em JSON (?formato=json) e mostra dentro da própria janela de detalhe
 const dados = { titulo, sub, texto, pacientes: ps.map((p) => ({ nome: p.nome, sessoes: p.sessoes, dias: datas(p.dias), medicos: [...p.medicos].join(', '), valor: Math.round(p.valor) })) };

@@ -41,7 +41,8 @@
   "BMH_diretoria_pedido": "PBk8GDVDUV14V5yg",
   "BMH_operacao_conv": "QffRYCKFxVRkJnoY",
   "BMH_operacao_camara": "voOTrnCXntt8wSrr",
-  "BMH_operacao_camconv": "TJpA7hXYffYUgwTO"
+  "BMH_operacao_camconv": "TJpA7hXYffYUgwTO",
+  "BMH_diretoria_chave": "p4kUGIgoOKLbRDb7"
  },
  "fluxos": {
   "grava": "AeQIImClkXtRrWIf",
@@ -73,6 +74,7 @@
   "caminho": "bmh-perfil-avaliacoes-693566a0dd11"
  },
  "diretoria": {
-  "atualiza": "bmh-diretoria-atualiza-a75690890abbc2a3"
+  "atualiza": "bmh-diretoria-atualiza-a75690890abbc2a3",
+  "lista": "bmh-diretoria-lista-16b46c238eb57708"
  }
 }

@@ -65,7 +65,13 @@ const inicioOp = op.map((r) => r.dia).filter(Boolean).sort()[0] || '';
 // e o de cada unidade e câmara (22/10/2026: Taguatinga começou em 27/01/2025 e jan/26 aparecia com +2.468%)
 const inicioDe = (rows, k) => { const o = {}; for (const r of rows) if (+r.agendadas) { const c = k(r); if (!o[c] || r.dia < o[c]) o[c] = r.dia; } return o; };
 const inicioU = inicioDe(op, (r) => r.unidade), inicioK = inicioDe(opk, (r) => r.unidade + '|' + r.camara);
-const DADOS = { F, O, OC, OK, KC, X, PZ, inicioOp, inicioU, inicioK, hoje: hoje.toISODate(), atOp, ET, pedido, atualizado: atualizado ? DateTime.fromISO(atualizado).setZone('America/Sao_Paulo').toFormat("dd/LL 'às' HH:mm") : '—' };
+// chave do dia da lista de pacientes (22/10/2026): o n8n isola a página (CSP "sandbox", origem "null") e o Safari não manda a
+// senha numa consulta feita de dentro dela. A lista vem por um endereço próprio, sem senha, que só aceita esta chave; ela troca
+// todo dia (vale a de hoje e a de ontem) e só aparece para quem abriu o painel com login
+const aleatorio = () => { try { return crypto.randomUUID().replace(/-/g, ''); } catch (e) { return Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16)).join(''); } };
+const chaveAtual = linhas('Chave da lista (tabela)').find((r) => r.chave === 'lista') || {};
+const chaveLista = chaveAtual.dia === hoje.toISODate() && chaveAtual.token ? chaveAtual : { chave: 'lista', token: aleatorio(), anterior: chaveAtual.token || '', dia: hoje.toISODate() };
+const DADOS = { F, O, OC, OK, KC, X, lista: { caminho: '__CAMINHO_LISTA__', t: chaveLista.token }, PZ, inicioOp, inicioU, inicioK, hoje: hoje.toISODate(), atOp, ET, pedido, atualizado: atualizado ? DateTime.fromISO(atualizado).setZone('America/Sao_Paulo').toFormat("dd/LL 'às' HH:mm") : '—' };
 const json = JSON.stringify(DADOS).replace(/</g, '\\u003c');
 
 const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -157,7 +163,9 @@ let corteMesG = '';
 const celula = (v, sit, meses, rot) => { const td = el('td', v); if (sit && v !== '—' && v !== '<1' || (sit && v === '<1')) { td.className = 'cl'; td.onclick = () => abre(sit, meses, '', rot); } return td; };
 // dias "3,4,5,9" do mês 2025-09 → "03/09/25 a 05/09/25, 09/09/25" (data completa: pedido do Jorge, 20/10/2026)
 const datas = (s, mes) => { const fim = '/' + String(mes).slice(5, 7) + '/' + String(mes).slice(2, 4), dd = n => String(n).padStart(2, '0') + fim; const d = [...new Set(String(s || '').split(',').map(Number).filter(Boolean))].sort((a, b) => a - b); const o = []; for (let i = 0; i < d.length; i++) { let j = i; while (j + 1 < d.length && d[j + 1] === d[j] + 1) j++; o.push(j > i + 1 ? dd(d[i]) + ' a ' + dd(d[j]) : j === i + 1 ? dd(d[i]) + ', ' + dd(d[j]) : dd(d[i])); i = j; } return o.join(', '); };
+let ultimo = null;
 function abre(sit, meses, conv, rot) {
+  ultimo = [sit, meses, conv, rot];
   const ms = new Set(meses), alvoConv = conv || C;
   // o particular não tem lote: entra no "recebido" como uma linha por mês e unidade (cartão, D+1)
   const part = sit !== 'recebido' ? [] : D.F.filter(x => x[2] === 'PARTICULAR' && x[7] > 0.5 && x[0] >= CONTROLE)   // antes de nov/2024 não há lista de pacientes (nem entra no total)
@@ -175,16 +183,31 @@ function abre(sit, meses, conv, rot) {
       const l = el('div', null, 'lin');
       const desc = (x[4] !== '-' ? 'Lote ' + x[4] + ' · ' : '') + nomeMes(x[0]) + ' · ' + x[1] + ' · ' + x[5] + (x[5] === 1 ? ' sessão' : ' sessões') + (x[7] ? ' · ' + datas(x[7], x[0]) : '');
       const esq = el('span', desc);
-      {   // 3º nível: pacientes do lote (ou do particular do mês), lidos da tabela gravada. Abre em aba nova (22/10/2026): o n8n
-          // isola a página do painel (CSP "sandbox", origem "null") e o Safari não manda a senha numa consulta feita de dentro
-          // dela ("Load failed"), nem numa moldura; abrir uma página nova sempre leva a senha, e o painel fica como estava
-        const a = el('a', ' · pacientes ›', 'cl'); a.href = 'bmh-diretoria?' + new URLSearchParams({ mes: x[0], unidade: x[1], convenio: /^PARTICULAR/.test(x[2]) ? 'PARTICULAR' : x[2], situacao: x[3], lote: x[4] });
-        a.target = '_blank'; a.rel = 'noopener'; a.style.textDecoration = 'none'; esq.append(a);
+      {   // 3º nível: pacientes do lote (ou do particular do mês), na própria janela, lidos da tabela gravada
+        const a = el('span', ' · pacientes ›', 'cl'); a.onclick = () => pacientes({ mes: x[0], unidade: x[1], convenio: /^PARTICULAR/.test(x[2]) ? 'PARTICULAR' : x[2], situacao: x[3], lote: x[4] }); esq.append(a);
       }
       l.append(esq, el('span', 'R$ ' + x[6].toLocaleString('pt-BR'))); corpo.append(l);
     });
   });
   document.getElementById('det').classList.add('on'); document.body.style.overflow = 'hidden';
+}
+// ---- 3º nível: pacientes do lote, dentro da janela, pelo endereço da lista com a chave do dia (funciona no Safari)
+function pacientes(par) {
+  const corpo = document.getElementById('dCorpo'); corpo.replaceChildren();
+  const volta = el('span', '‹ voltar', 'cl'); volta.onclick = () => abre(...ultimo); corpo.append(volta);
+  document.getElementById('dTit').textContent = 'Pacientes'; document.getElementById('dSub').textContent = 'Abrindo a lista…';
+  const url = D.lista.caminho + '?' + new URLSearchParams({ ...par, formato: 'json', t: D.lista.t });
+  // falha momentânea (rede, servidor ocupado): tenta de novo sozinho 2 vezes
+  const tenta = n => fetch(url, { cache: 'no-store', credentials: 'omit' }).then(r => { if (!r.ok) throw new Error(r.status === 403 ? 'chave vencida' : 'erro ' + r.status); return r.json(); })
+    .catch(e => { if (e.message === 'chave vencida' || n >= 2) throw e; return new Promise(ok => setTimeout(ok, 1500 * (n + 1))).then(() => tenta(n + 1)); });
+  tenta(0).then(d => {
+    document.getElementById('dTit').textContent = d.titulo; document.getElementById('dSub').textContent = d.sub;
+    if (!d.pacientes.length) { corpo.append(el('p', 'Nenhum paciente nessa situação (pode ter mudado desde a última atualização do painel).', 'sub')); return; }
+    d.pacientes.forEach(p => { const l = el('div', null, 'lin'); const e = el('span'); e.append(el('b', p.nome)); e.append(document.createElement('br'), document.createTextNode(p.sessoes + (p.sessoes === 1 ? ' sessão' : ' sessões') + ' · ' + p.dias + (p.medicos ? ' · ' + p.medicos : ''))); l.append(e, el('span', 'R$ ' + p.valor.toLocaleString('pt-BR'))); corpo.append(l); });
+    corpo.append(el('p', 'Dado de paciente: não encaminhar fora da equipe responsável.', 'sub'));
+  }).catch(e => {
+    document.getElementById('dSub').textContent = e.message === 'chave vencida' ? 'O painel ficou aberto desde ontem: recarregue a página e abra de novo.' : 'Não consegui abrir a lista (' + e.message + '). Tente de novo em instantes.';
+  });
 }
 const fecha = () => { document.getElementById('det').classList.remove('on'); document.body.style.overflow = ''; };
 document.querySelector('#det .fechar').onclick = fecha; document.getElementById('det').onclick = e => { if (e.target.id === 'det') fecha(); }; document.addEventListener('keydown', e => { if (e.key === 'Escape') fecha(); });
@@ -291,4 +314,4 @@ sAte.onchange = () => { ATE = sAte.value; if (DE && ATE < DE) { DE = ATE; sDe.va
 
 desenha();
 </script></body></html>`;
-return [{ json: { html } }];
+return [{ json: { html, chave: 'lista', token: chaveLista.token, anterior: chaveLista.anterior || '', dia: chaveLista.dia } }];

@@ -45,6 +45,7 @@ const COLUNAS = {
   BMH_financeiro_mes: { chave: 's', mes: 's', unidade: 's', convenio: 's', sessoes: 'n', produzido: 'n', faturado: 'n', a_faturar: 'n', recebido: 'n', a_receber: 'n', glosado: 'n', atualizado_em: 's' },
   BMH_financeiro_detalhe: { chave: 's', mes: 's', unidade: 's', convenio: 's', situacao: 's', lote: 's', sessoes: 'n', valor: 'n', glosa: 'n', dias: 's', atualizado_em: 's' },
   BMH_financeiro_paciente: { chave: 's', mes: 's', unidade: 's', convenio: 's', situacao: 's', lote: 's', paciente_id: 's', paciente: 's', sessoes: 'n', valor: 'n', dias: 's', medicos: 's', atualizado_em: 's' },
+  BMH_diretoria_chave: { chave: 's', token: 's', anterior: 's', dia: 's' },   // chave do dia da lista de pacientes (22/10/2026)
   BMH_diretoria_pedido: { chave: 's', pedido: 's' },   // hora (ms) do último toque em "Atualizar agora" (trava para todos, 20/10/2026)
   BMH_prazo_recebimento: { chave: 's', mes: 's', unidade: 's', convenio: 's', valor_pago: 'n', dias_x_valor: 'n', sessoes_pagas: 'n', atualizado_em: 's' },
   BMH_operacao_camconv: { chave: 's', dia: 's', unidade: 's', camara: 's', convenio: 's', agendadas: 'n', atendidas: 'n', faltas: 'n', cobradas: 'n', atualizado_em: 's' },   // 22/10/2026: câmara × convênio
@@ -392,6 +393,7 @@ function fluxoNumeros() {
 // ---------------- fluxo 11: painel da diretoria (página + pacientes do lote, tudo num endereço só) ----------------
 // Um painel só (Jorge, 09/10/2026): a mesma URL entrega a página e, quando o painel pede (?formato=json&situacao=...),
 // a lista de pacientes de um lote, consultada na hora no iGut. Mesmo endereço = o navegador reaproveita o login.
+function listaDiretoria() { IDS.diretoria ||= {}; return IDS.diretoria.lista ||= 'bmh-diretoria-lista-' + crypto.randomBytes(8).toString('hex'); }
 function botaoDiretoria() { IDS.diretoria ||= {}; return IDS.diretoria.atualiza ||= 'bmh-diretoria-atualiza-' + crypto.randomBytes(8).toString('hex'); }
 function fluxoPainelDiretoria() {
   x = 0;
@@ -416,12 +418,20 @@ function fluxoPainelDiretoria() {
     // página
     fin: le('Financeiro (tabela)', 'BMH_financeiro_mes'), op: le('Operação (tabela)', 'BMH_operacao_dia'), det: le('Detalhes (tabela)', 'BMH_financeiro_detalhe'), prazo: le('Prazo (tabela)', 'BMH_prazo_recebimento'),
     pedTab: le('Pedido (tabela)', 'BMH_diretoria_pedido'), opcTab: le('Operação por convênio (tabela)', 'BMH_operacao_conv'), opkTab: le('Operação por câmara (tabela)', 'BMH_operacao_camara'), opkcTab: le('Operação por câmara e convênio (tabela)', 'BMH_operacao_camconv'),
-    monta: codigo('Monta a página', '../../grupos/painel-diretoria.js', { executeOnce: true }),
+    chaveTab: le('Chave da lista (tabela)', 'BMH_diretoria_chave'),
+    monta: no('Monta a página', 'n8n-nodes-base.code', 2, { jsCode: ler('../../grupos/painel-diretoria.js').replace('__CAMINHO_LISTA__', process.env.N8N_URL.replace(/\/$/, '') + '/webhook/' + listaDiretoria()) }, { executeOnce: true }),   // endereço completo: a página também abre pela Central (central.cannlink.com.br/paineis/...)
+    gravaChave: grava('Grava a chave da lista', 'BMH_diretoria_chave'),
+    // lista de pacientes pelo endereço próprio (22/10/2026): sem senha do navegador (o Safari não a manda de dentro da página
+    // isolada pelo n8n); só responde com a chave do dia que o painel entrega a quem entrou com login
+    wLista: no('Lista de pacientes (webhook)', 'n8n-nodes-base.webhook', 2, { path: listaDiretoria(), responseMode: 'responseNode', options: {} }, { webhookId: crypto.randomUUID() }),
+    chavePed: le('Chave da lista (pedido)', 'BMH_diretoria_chave'),
+    confere: se('Chave certa?', "={{ (() => { const q = $('Lista de pacientes (webhook)').first().json.query || {}; const r = $('Chave da lista (pedido)').all().map((i) => i.json).find((x) => x && x.chave === 'lista') || {}; return !!q.t && (q.t === r.token || q.t === r.anterior); })() }}"),
+    nega: no('Recusa (chave errada)', 'n8n-nodes-base.respondToWebhook', 1.1, { respondWith: 'json', responseBody: '={{ JSON.stringify({ erro: "chave" }) }}', options: { responseCode: 403, responseHeaders: { entries: [{ name: 'Access-Control-Allow-Origin', value: '*' }, { name: 'Cache-Control', value: 'no-store' }] } } }),
     entrega: no('Entrega a página', 'n8n-nodes-base.respondToWebhook', 1.1, { respondWith: 'text', responseBody: '={{ $json.html }}', options: { responseHeaders: { entries: [{ name: 'Content-Type', value: 'text/html; charset=utf-8' }, { name: 'Cache-Control', value: 'no-store' }, { name: 'X-Robots-Tag', value: 'noindex' }] } } }),
     // pacientes do lote (3º nível): lê a tabela gravada às 23h40 (abre na hora; funciona com o iGut fora do ar)
     pacTab: le('Pacientes do lote (tabela)', 'BMH_financeiro_paciente'), fimLista: le('Fim da última atualização', 'BMH_operacao_dia'),
     lista: codigo('Lista os pacientes', '../../grupos/lote-pacientes.js'),
-    entregaLista: no('Entrega a lista', 'n8n-nodes-base.respondToWebhook', 1.1, { respondWith: 'text', responseBody: '={{ $json.corpo }}', options: { responseHeaders: { entries: [{ name: 'Content-Type', value: '={{ $json.tipo }}' }, { name: 'Cache-Control', value: 'no-store' }, { name: 'X-Robots-Tag', value: 'noindex' }] } } }),
+    entregaLista: no('Entrega a lista', 'n8n-nodes-base.respondToWebhook', 1.1, { respondWith: 'text', responseBody: '={{ $json.corpo }}', options: { responseHeaders: { entries: [{ name: 'Content-Type', value: '={{ $json.tipo }}' }, { name: 'Cache-Control', value: 'no-store' }, { name: 'X-Robots-Tag', value: 'noindex' }, { name: 'Access-Control-Allow-Origin', value: '*' }] } } }),
     nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Diretoria (painel)\n**Traz:** tabelas da diretoria\n**Envia:** o painel da diretoria, com login\n**Limites:** só lê; execução não guardada\n\nUm painel só, login da diretoria (credencial \"BMH · Painel da diretoria (login)\"; cópia no .env em PAINEL_DIRETORIA_*). Página: lê BMH_financeiro_mes, BMH_operacao_dia e BMH_financeiro_detalhe (gravadas às 23h40). ?formato=json&situacao=...: pacientes de um lote, lidos de BMH_financeiro_paciente (gravada às 23h40; nomes guardados por decisão do Jorge); o n8n não guarda a execução.', width: 560, height: 200 }),
   };
   const cx = {}; liga(cx, n.pag.name, n.ehAtualiza.name);
@@ -430,7 +440,9 @@ function fluxoPainelDiretoria() {
   cx[n.dispara.name] = { main: [[{ node: n.gravaPed.name, type: 'main', index: 0 }], [{ node: n.respondePedido.name, type: 'main', index: 0 }]] };
   liga(cx, n.gravaPed.name, n.pede.name); liga(cx, n.pede.name, n.respondePedido.name);
   cx[n.ehLista.name] = { main: [[{ node: n.pacTab.name, type: 'main', index: 0 }], [{ node: n.fin.name, type: 'main', index: 0 }]] };
-  for (const [a, b] of [[n.fin, n.op], [n.op, n.det], [n.det, n.prazo], [n.prazo, n.pedTab], [n.pedTab, n.opcTab], [n.opcTab, n.opkTab], [n.opkTab, n.opkcTab], [n.opkcTab, n.monta], [n.monta, n.entrega], [n.pacTab, n.fimLista], [n.fimLista, n.lista], [n.lista, n.entregaLista]]) liga(cx, a.name, b.name);
+  liga(cx, n.wLista.name, n.chavePed.name); liga(cx, n.chavePed.name, n.confere.name);
+  cx[n.confere.name] = { main: [[{ node: n.pacTab.name, type: 'main', index: 0 }], [{ node: n.nega.name, type: 'main', index: 0 }]] };
+  for (const [a, b] of [[n.fin, n.op], [n.op, n.det], [n.det, n.prazo], [n.prazo, n.pedTab], [n.pedTab, n.opcTab], [n.opcTab, n.opkTab], [n.opkTab, n.opkcTab], [n.opkcTab, n.chaveTab], [n.chaveTab, n.monta], [n.monta, n.gravaChave], [n.monta, n.entrega], [n.pacTab, n.fimLista], [n.fimLista, n.lista], [n.lista, n.entregaLista]]) liga(cx, a.name, b.name);
   return { name: 'BMH · Diretoria (painel)', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none', saveDataErrorExecution: 'none' }) };   // tem nome de paciente: não guarda execução
 }
 
