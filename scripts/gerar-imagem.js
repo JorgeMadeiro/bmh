@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 /**
- * Gera imagem via API da OpenAI (gpt-image-1) e salva em PNG.
+ * Gera imagem via API da OpenAI (gpt-image-1.5) e salva em PNG.
+ * (O gpt-image-1 foi retirado pela OpenAI em 10/2026: toda chamada dava "does not exist".)
  *
  * Uso:
  *   node --env-file=.env scripts/gerar-imagem.js "PROMPT" "caminho/saida.png" [--formato carrossel|quadrado|paisagem] [--qualidade high|medium|low]
+ *     [--referencia modelo.png] (repetível: mesmo rosto, logo verdadeiro; vai para /images/edits)
  *
  * Formatos:
  *   carrossel (padrao) -> 1080x1350  (gera 1024x1536 e recorta)
@@ -30,6 +32,7 @@ const prompt = posicionais[0];
 const saida = posicionais[1];
 const formato = flag('formato', 'carrossel');
 const qualidade = flag('qualidade', 'high');
+const referencias = args.flatMap((a, i) => (a === '--referencia' ? [args[i + 1]] : []));
 
 if (!prompt || !saida) {
   console.error('Uso: node --env-file=.env scripts/gerar-imagem.js "PROMPT" "saida.png" [--formato carrossel|quadrado|paisagem] [--qualidade high|medium|low]');
@@ -45,26 +48,45 @@ const FORMATOS = {
   quadrado:  { size: '1024x1024', largura: 1080, altura: 1080 },
   paisagem:  { size: '1536x1024', largura: 1350, altura: 1080 },
 };
+for (const r of referencias) {
+  if (!r || !fs.existsSync(r)) {
+    console.error('Imagem de referencia nao encontrada: ' + r);
+    process.exit(1);
+  }
+}
+
 const cfg = FORMATOS[formato];
 if (!cfg) {
   console.error('Formato invalido: ' + formato + '. Use carrossel, quadrado ou paisagem.');
   process.exit(1);
 }
 
+// Com --referencia, vai para /images/edits com as imagens como modelo; sem, para /images/generations.
+async function pedir(corpo) {
+  const auth = { 'Authorization': 'Bearer ' + process.env.OPENAI_API_KEY };
+  if (!referencias.length) {
+    return fetch('https://api.openai.com/v1/images/generations', {
+      method: 'POST',
+      headers: { ...auth, 'Content-Type': 'application/json' },
+      body: JSON.stringify(corpo),
+    });
+  }
+  const form = new FormData();
+  for (const [k, v] of Object.entries(corpo)) form.append(k, String(v));
+  for (const r of referencias) {
+    const tipo = /\.jpe?g$/i.test(r) ? 'image/jpeg' : /\.webp$/i.test(r) ? 'image/webp' : 'image/png';
+    form.append('image[]', new Blob([fs.readFileSync(r)], { type: tipo }), path.basename(r));
+  }
+  return fetch('https://api.openai.com/v1/images/edits', { method: 'POST', headers: auth, body: form });
+}
+
 (async () => {
-  const resp = await fetch('https://api.openai.com/v1/images/generations', {
-    method: 'POST',
-    headers: {
-      'Authorization': 'Bearer ' + process.env.OPENAI_API_KEY,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'gpt-image-1',
-      prompt,
-      size: cfg.size,
-      quality: qualidade,
-      n: 1,
-    }),
+  const resp = await pedir({
+    model: 'gpt-image-1.5',
+    prompt,
+    size: cfg.size,
+    quality: qualidade,
+    n: 1,
   });
 
   if (!resp.ok) {
