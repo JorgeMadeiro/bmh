@@ -3,7 +3,7 @@
 // de cada regra (BMH_config: guardiao_modo_teto, guardiao_modo_pausa; padrão "simulacao").
 // Regras: (1) grupo com R$ 40 em 3 dias sem contato → pausa (menos campanha em teste até a data, EM_TESTE); (2) orçamento que leva o mês acima do teto → corta na mesma
 // proporção (teto atingido → pausa as campanhas); (3) anúncio reprovado → avisa; (4) alteração feita por outra pessoa
-// (ex.: a Triunfo, fora do time desde 28/10/2026) ontem → avisa; erro de API → avisa. Nunca sobe orçamento: só avisa quando está abaixo do teto.
+// (a Triunfo teve os acessos removidos em 28/10/2026: toda alteração de terceiro é estranha) ontem → avisa; erro de API → avisa. Nunca sobe orçamento: só avisa quando está abaixo do teto.
 const Q = $('Quando').first().json;
 const cfg = Object.fromEntries($('Config').all().map(i => i.json).filter(r => r.chave).map(r => [r.chave, r.valor]));
 // teto do mês: exceção por mês em BMH_config (teto_mes_AAAA-MM, ex.: outubro/2026 = 4400), senão teto_mes

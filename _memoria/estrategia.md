@@ -52,6 +52,8 @@ Terça — Asa Sul. Quinta — Taguatinga.
 - **A Triunfo não faz mais parte do time** (Jorge: "a partir de hoje a triunfo não faz mais parte do time"). Tráfego pago,
   no Google e na Meta, é só da casa.
 - Não mandar nada para a Triunfo nem contar com ela para nenhuma tarefa.
-- Os acessos dela o Jorge tira; a lista está no item 2 de `Central_Claude/frentes/trafego.md`. Até sair, qualquer
-  alteração dela nas contas é de terceiro, e os guardiões do Google e da Meta avisam.
+- **Acessos removidos em 28/10/2026**, no mesmo dia, conferido pela API pela janela do Mac: parceiro no portfólio da
+  Meta, conta de administração (MCC) e usuário no Google Ads, administradores no Tag Manager. O Tag Manager foi para a
+  versão 9, sem o Analytics e o Clarity da agência. A partir daí, qualquer alteração de terceiro no Google Ads ou na
+  Meta é estranha, e os guardiões avisam.
 

@@ -7,15 +7,18 @@
 
 ## O que existe (versão 3, publicada antes de 07/10/2026, montada pela agência)
 
+Atualizado em 28/10/2026 com a versão 9, que conferiu as tags pela API: a 12 é a que leva o `GT-57SF42Z` da BMH, e a 16
+levava o Analytics da agência (esta tabela trocava as duas).
+
 | Tag | O que faz | Observação |
 |---|---|---|
-| 16 "Tag do Google" (`GT-57SF42Z`) | leva o **Analytics da BMH `G-10HHN3PQP0`** e o **Google Ads `AW-958567409`** | é o caminho certo; não mexer |
+| 12 "Analises" (`GT-57SF42Z`) | leva o **Analytics da BMH `G-10HHN3PQP0`** e o **Google Ads `AW-958567409`** | é o caminho certo; não mexer |
 | 5 "[Contato] Whatsapp" (`awct`) | **conversão do Google Ads** `958567409/sySsCKHnuP8YEPGniskD` no clique em `api.whatsapp.com` ou `wa.me/` (acionadores 7 e 9) | a campanha aprende com ela; não mexer |
 | 11 Vinculador de conversões | guarda o clique do anúncio | |
-| 12 "Analises" e 15 "Tag Analytics" (`G-97ZBVMVR1Y`) | Analytics **de outra conta** (provavelmente da agência), configurado duas vezes | sair quando o Jorge liberar |
-| 17 "Google Analytics evento do GA4" | evento com o endereço da página como nome, para o `G-97ZBVMVR1Y` | quebrado; sai junto |
-| 14 Pixel da Meta `1526867428059043` | PageView | dono ainda não confirmado |
-| 13 Clarity `m9kxjnnvgm` | gravações | projeto da agência; o Jorge pediu acesso |
+| 15 "Tag Analytics" e 16 "Tag do Google" (`G-97ZBVMVR1Y`) | Analytics **de outra conta** (da agência), configurado duas vezes | **apagadas na versão 9 (28/10/2026)** |
+| 17 "Google Analytics evento do GA4" | evento com o endereço da página como nome, para o `G-97ZBVMVR1Y` | quebrado; **apagada na versão 9** |
+| 14 Pixel da Meta `1526867428059043` | PageView | **é da BMH**: dono o portfólio BMH e a conta de anúncios (conferido pela API em 20/10/2026) |
+| 13 Clarity `m9kxjnnvgm` | gravações | projeto da agência; pausada na versão 7, **apagada na versão 9** |
 
 ## Versão 4 (07/10/2026): **publicada** com o "pode" do Jorge
 
