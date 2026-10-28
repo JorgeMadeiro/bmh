@@ -1,0 +1,468 @@
+{
+ "name": "BMH · Google Ads · acessos da conta (homologação)",
+ "nodes": [
+  {
+   "id": "da93d3e3-691f-5af8-9bb8-74ec36308be7",
+   "name": "Todo dia às 7h45",
+   "type": "n8n-nodes-base.scheduleTrigger",
+   "typeVersion": 1.2,
+   "position": [
+    0,
+    0
+   ],
+   "parameters": {
+    "rule": {
+     "interval": [
+      {
+       "field": "cronExpression",
+       "expression": "45 7 * * *"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "d2e7f0d2-ae96-52da-8804-6191c2e63ee3",
+   "name": "Manual",
+   "type": "n8n-nodes-base.webhook",
+   "typeVersion": 2,
+   "position": [
+    0,
+    200
+   ],
+   "parameters": {
+    "path": "bmh-google-acessos-8d2a61f0b3",
+    "options": {}
+   },
+   "webhookId": "1e928639-00e3-57d4-ac96-3a288a27bdfb"
+  },
+  {
+   "id": "94c5975b-cd99-5942-9542-0d1f63eeb1d0",
+   "name": "Quando",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    240,
+    0
+   ],
+   "parameters": {
+    "jsCode": "// Manual com ?teste=1: lê e manda a mensagem marcada 🧪 (mesmo sem novidade), sem gravar a lista.\nlet q = {}; try { if ($('Manual').isExecuted) q = $('Manual').first().json.query || {}; } catch (e) {}\nreturn [{ json: { teste: !!q.teste } }];\n"
+   }
+  },
+  {
+   "id": "c4f7fde9-b02e-5fec-a6ba-552f45dce321",
+   "name": "Config",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    480,
+    0
+   ],
+   "parameters": {
+    "operation": "get",
+    "dataTableId": {
+     "__rl": true,
+     "value": "V4NRHS9mc1kvigix",
+     "mode": "id",
+     "cachedResultName": "BMH_config"
+    },
+    "returnAll": true
+   },
+   "alwaysOutputData": true,
+   "executeOnce": true
+  },
+  {
+   "id": "2c5b7124-6be5-5200-b509-88e3c398f292",
+   "name": "Google · renova o acesso",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    720,
+    0
+   ],
+   "parameters": {
+    "method": "POST",
+    "url": "https://oauth2.googleapis.com/token",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpCustomAuth",
+    "sendBody": true,
+    "contentType": "json",
+    "specifyBody": "json",
+    "jsonBody": "{}",
+    "options": {}
+   },
+   "credentials": {
+    "httpCustomAuth": {
+     "id": "Qewvtjz9JokCUvNy",
+     "name": "BMH · Google Ads (renovação do acesso)"
+    }
+   },
+   "executeOnce": true,
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000
+  },
+  {
+   "id": "237e181e-6900-5742-8cb4-25fdf67afe8c",
+   "name": "Decide",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    960,
+    0
+   ],
+   "parameters": {
+    "jsCode": "// Regra copiada de scripts/n8n/bmh-google-acessos.js (BMH_Claude_VSL) pelo monta-acessos-google.py: editar lá.\n// Vigia dos acessos à conta do Google Ads da BMH (5066798424), 28/10/2026. Depois da saída da Triunfo (acessos removidos em\n// 28/10), qualquer acesso novo é estranho. Todo dia lê os vínculos de gerente (MCC), os usuários e os convites pendentes,\n// compara com a lista do dia anterior (BMH_config google_acessos_vistos) e avisa só o que entrou. Saída não avisa (só\n// atualiza a lista). Na primeira rodada, sem lista anterior, só grava a base e manda uma mensagem de início, sem alarmar.\n// Fonte: este arquivo; o montador (monta-acessos-google.py) embute o texto no nó do n8n.\n\nconst GAQL_ACESSOS = {\n  gerentes: 'SELECT customer_manager_link.manager_customer, customer_manager_link.manager_link_id, customer_manager_link.status FROM customer_manager_link',\n  usuarios: 'SELECT customer_user_access.user_id, customer_user_access.email_address, customer_user_access.access_role, customer_user_access.access_creation_date_time, customer_user_access.inviter_user_email_address FROM customer_user_access',\n  convites: 'SELECT customer_user_access_invitation.email_address, customer_user_access_invitation.access_role, customer_user_access_invitation.invitation_status, customer_user_access_invitation.creation_date_time FROM customer_user_access_invitation',\n};\n\n// Respostas cruas do googleAds:search (results) → lista de acessos com chave estável e texto para o aviso.\nfunction listaAcessos(gerentes, usuarios, convites) {\n  const conta = rn => String(rn || '').replace('customers/', '').replace(/^(\\d{3})(\\d{3})(\\d{4})$/, '$1-$2-$3');\n  const PAPEL = { ADMIN: 'administrador', STANDARD: 'padrão', READ_ONLY: 'só leitura', EMAIL_ONLY: 'só e-mail' };\n  const out = [];\n  for (const x of gerentes || []) {\n    const l = x.customerManagerLink || {};\n    if (!['ACTIVE', 'PENDING'].includes(l.status)) continue;   // recusado, cancelado ou inativo não dá acesso\n    out.push({ chave: `gerente|${conta(l.managerCustomer)}|${l.status}`,\n      texto: `conta de administração ${conta(l.managerCustomer)} ${l.status === 'ACTIVE' ? 'ligada à conta' : 'com convite pendente'}` });\n  }\n  for (const x of usuarios || []) {\n    const u = x.customerUserAccess || {};\n    const email = String(u.emailAddress || '(sem e-mail)').toLowerCase();\n    out.push({ chave: `usuario|${email}|${u.accessRole}`,\n      texto: `${email} como ${PAPEL[u.accessRole] || u.accessRole}` + (u.inviterUserEmailAddress ? ` (convidado por ${u.inviterUserEmailAddress})` : '') });\n  }\n  for (const x of convites || []) {\n    const c = x.customerUserAccessInvitation || {};\n    if (c.invitationStatus !== 'PENDING') continue;\n    const email = String(c.emailAddress || '').toLowerCase();\n    out.push({ chave: `convite|${email}|${c.accessRole}`, texto: `convite pendente para ${email} como ${PAPEL[c.accessRole] || c.accessRole}` });\n  }\n  return out.sort((a, b) => (a.chave < b.chave ? -1 : 1));\n}\n\n// atuais: listaAcessos; vistosTexto: o JSON guardado na véspera (lista de chaves) ou vazio.\nfunction comparaAcessos(atuais, vistosTexto) {\n  let vistos = null;\n  try { vistos = vistosTexto ? JSON.parse(vistosTexto) : null; } catch (e) { vistos = null; }\n  const chaves = atuais.map(a => a.chave);\n  if (!Array.isArray(vistos)) return { base: true, novos: [], saiu: [], guardar: JSON.stringify(chaves) };\n  const antes = new Set(vistos), agora = new Set(chaves);\n  return { base: false, novos: atuais.filter(a => !antes.has(a.chave)), saiu: vistos.filter(k => !agora.has(k)), guardar: JSON.stringify(chaves) };\n}\n\nfunction mensagemAcessos(r, atuais, teste) {\n  const selo = teste ? '🧪 TESTE: nada foi gravado\\n' : '';\n  if (r.base) return selo + `🔐 Google Ads da BMH · vigia dos acessos começou. Lista de base (${atuais.length}):\\n` +\n    atuais.map(a => '• ' + a.texto).join('\\n') + '\\nDaqui em diante, aviso quando entrar alguém novo.';\n  if (r.novos.length) return selo + `🔐 Google Ads da BMH · acesso NOVO desde ontem (a Triunfo saiu em 28/10, então ninguém de fora deveria entrar):\\n` +\n    r.novos.map(a => '• ' + a.texto).join('\\n') + '\\nSe não foi você, tirar em Google Ads > Administrador > Acesso e segurança.';\n  return teste ? selo + `🔐 Google Ads da BMH · nenhum acesso novo (${atuais.length} na lista${r.saiu.length ? `, ${r.saiu.length} saíram` : ''}).` : '';\n}\n\nconst Q = $('Quando').first().json;\nconst cfg = Object.fromEntries($('Config').all().map(i => i.json).filter(r => r && r.chave).map(r => [r.chave, r.valor]));\nconst CONTA = '5066798424';\nconst token = $('Google · renova o acesso').first().json.access_token;\nif (!token) throw new Error('sem acesso (token) do Google Ads');\n// a mesma chamada do guardião do Google; erro aqui faz o fluxo parar em erro (alerta de falha) e a lista não é regravada\nconst busca = async q => { let out = [], pt; do { const r = await this.helpers.httpRequest({ method: 'POST', url: `https://googleads.googleapis.com/v25/customers/${CONTA}/googleAds:search`, headers: { Authorization: 'Bearer ' + token }, body: { query: q, ...(pt ? { pageToken: pt } : {}) }, json: true, timeout: 60000 }); out = out.concat(r.results || []); pt = r.nextPageToken; } while (pt); return out; };\nconst atuais = listaAcessos(await busca(GAQL_ACESSOS.gerentes), await busca(GAQL_ACESSOS.usuarios), await busca(GAQL_ACESSOS.convites));\nconst r = comparaAcessos(atuais, cfg.google_acessos_vistos);\nreturn [{ json: { texto: mensagemAcessos(r, atuais, Q.teste), guardar: r.guardar, novos: r.novos.length, teste: Q.teste } }];\n"
+   }
+  },
+  {
+   "id": "abc65270-082f-53fb-9242-35b1b15a4876",
+   "name": "Grava a lista?",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    1200,
+    -220
+   ],
+   "parameters": {
+    "jsCode": "// A lista do dia vira a base de amanhã; no teste, nada é gravado.\nconst d = $input.first().json;\nif (d.teste) return [];\nreturn [{ json: { chave: 'google_acessos_vistos', valor: d.guardar } }];\n"
+   }
+  },
+  {
+   "id": "ada58e90-2d9b-5910-b02b-c2658c22c6fd",
+   "name": "Grava (config)",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    1440,
+    -220
+   ],
+   "parameters": {
+    "operation": "upsert",
+    "dataTableId": {
+     "__rl": true,
+     "value": "V4NRHS9mc1kvigix",
+     "mode": "id",
+     "cachedResultName": "BMH_config"
+    },
+    "filters": {
+     "conditions": [
+      {
+       "keyName": "chave",
+       "keyValue": "={{ $json.chave }}"
+      }
+     ]
+    },
+    "columns": {
+     "mappingMode": "defineBelow",
+     "value": {
+      "chave": "={{ $json.chave }}",
+      "valor": "={{ $json.valor }}"
+     },
+     "matchingColumns": [],
+     "schema": [
+      {
+       "id": "chave",
+       "displayName": "chave",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "valor",
+       "displayName": "valor",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      }
+     ]
+    },
+    "options": {}
+   }
+  },
+  {
+   "id": "92f4ae91-9f18-5257-bbb8-15ed315d4379",
+   "name": "Tem mensagem?",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    1200,
+    220
+   ],
+   "parameters": {
+    "jsCode": "const t = $input.first().json.texto;\nreturn t ? [{ json: { texto: t } }] : [];\n"
+   }
+  },
+  {
+   "id": "111bd27a-a182-5a37-b89f-403170b00306",
+   "name": "Telegram · aviso",
+   "type": "n8n-nodes-base.telegram",
+   "typeVersion": 1.2,
+   "position": [
+    1440,
+    220
+   ],
+   "parameters": {
+    "chatId": "8708228589",
+    "text": "={{ String($json.texto || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') }}",
+    "additionalFields": {
+     "appendAttribution": false,
+     "parse_mode": "HTML"
+    }
+   },
+   "credentials": {
+    "telegramApi": {
+     "id": "SgQHWuJOuMWeVbPi",
+     "name": "BMH · Telegram (robô BMH alertas)"
+    }
+   },
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000
+  },
+  {
+   "id": "2fddcf7b-f774-524e-ae28-83fcd3ae11e9",
+   "name": "Sobre este fluxo",
+   "type": "n8n-nodes-base.stickyNote",
+   "typeVersion": 1,
+   "position": [
+    0,
+    -480
+   ],
+   "parameters": {
+    "width": 1000,
+    "height": 340,
+    "content": "## BMH · Google Ads · acessos da conta (homologação)\n**Traz:** da conta do Google Ads da BMH (5066798424) os vínculos de gerente (MCC), os usuários e os convites pendentes, pela mesma renovação de acesso do guardião do Google; e a lista da véspera em `BMH_config` (`google_acessos_vistos`).\n**Envia:** aviso no robô BMH alertas quando entra um acesso novo (conta de administração, usuário, papel mudado ou convite), e grava a lista do dia.\n**Limites:** só lê o Google Ads; saída de acesso não avisa; a primeira rodada só grava a base; erro de leitura para o fluxo (alerta de falha) sem regravar a lista. A Triunfo teve os acessos removidos em 28/10/2026: desde então, todo acesso novo é estranho.\n\nManual: `/webhook/bmh-google-acessos-8d2a61f0b3?teste=1` (manda marcado 🧪, sem gravar). Regra em `BMH_Claude_VSL/scripts/n8n/bmh-google-acessos.js`."
+   }
+  },
+  {
+   "id": "bca85bc2-d8e0-5db4-9e1d-cf2e6c5f1737",
+   "name": "Vigia · marca que rodou",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    0,
+    440
+   ],
+   "parameters": {
+    "jsCode": "return [{ json: { chave: 'google_acessos', nome: \"BMH · Google Ads · acessos da conta\", ultima_vez: $now.toISO(), max_horas: 26, avisado_em: '' } }];"
+   }
+  },
+  {
+   "id": "7b577ba8-22c9-57c9-8104-9724196d22e5",
+   "name": "Vigia · grava",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    240,
+    440
+   ],
+   "parameters": {
+    "operation": "upsert",
+    "dataTableId": {
+     "__rl": true,
+     "value": "0kBTGpt8EjCjmR9t",
+     "mode": "id",
+     "cachedResultName": "BMH_vigia"
+    },
+    "filters": {
+     "conditions": [
+      {
+       "keyName": "chave",
+       "keyValue": "={{ $json.chave }}"
+      }
+     ]
+    },
+    "columns": {
+     "mappingMode": "defineBelow",
+     "value": {
+      "chave": "={{ $json.chave }}",
+      "nome": "={{ $json.nome }}",
+      "ultima_vez": "={{ $json.ultima_vez }}",
+      "max_horas": "={{ $json.max_horas }}",
+      "avisado_em": "={{ $json.avisado_em }}"
+     },
+     "matchingColumns": [],
+     "schema": [
+      {
+       "id": "chave",
+       "displayName": "chave",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "nome",
+       "displayName": "nome",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "ultima_vez",
+       "displayName": "ultima_vez",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "max_horas",
+       "displayName": "max_horas",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "number",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "avisado_em",
+       "displayName": "avisado_em",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      }
+     ]
+    },
+    "options": {}
+   }
+  }
+ ],
+ "connections": {
+  "Todo dia às 7h45": {
+   "main": [
+    [
+     {
+      "node": "Quando",
+      "type": "main",
+      "index": 0
+     },
+     {
+      "node": "Vigia · marca que rodou",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Quando": {
+   "main": [
+    [
+     {
+      "node": "Config",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Config": {
+   "main": [
+    [
+     {
+      "node": "Google · renova o acesso",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Google · renova o acesso": {
+   "main": [
+    [
+     {
+      "node": "Decide",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Manual": {
+   "main": [
+    [
+     {
+      "node": "Quando",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Decide": {
+   "main": [
+    [
+     {
+      "node": "Grava a lista?",
+      "type": "main",
+      "index": 0
+     },
+     {
+      "node": "Tem mensagem?",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Grava a lista?": {
+   "main": [
+    [
+     {
+      "node": "Grava (config)",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Tem mensagem?": {
+   "main": [
+    [
+     {
+      "node": "Telegram · aviso",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Vigia · marca que rodou": {
+   "main": [
+    [
+     {
+      "node": "Vigia · grava",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  }
+ },
+ "settings": {
+  "executionOrder": "v1",
+  "timezone": "America/Sao_Paulo",
+  "saveDataSuccessExecution": "all",
+  "saveDataErrorExecution": "all",
+  "errorWorkflow": "7u3CuyjESsHmCtMW",
+  "executionTimeout": 300
+ }
+}
