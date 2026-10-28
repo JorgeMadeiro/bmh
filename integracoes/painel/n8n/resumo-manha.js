@@ -10,6 +10,8 @@ const hoje = $now.setZone('America/Sao_Paulo').startOf('day'), ontem = hoje.minu
 const O = ontem.toISODate(), M0 = ontem.startOf('month').toISODate();
 const ant = ontem.minus({ months: 1 }), A0 = ant.startOf('month').toISODate(), A1 = ant.set({ day: Math.min(ontem.day, ant.daysInMonth) }).toISODate();
 const mesNome = d => d.setLocale('pt-BR').toFormat('LLLL');
+// mesmo período do ano anterior (pedido do Jorge, 28/10/2026): a BMH tem sazonalidade, o mês anterior sozinho engana
+const ano = ontem.minus({ years: 1 }), Y0 = ano.startOf('month').toISODate(), Y1 = ano.set({ day: Math.min(ontem.day, ano.daysInMonth) }).toISODate();
 const soma = (rs, f) => rs.reduce((s, r) => s + num(r[f]), 0);
 // anúncios
 const adsO = ads.filter(r => r.dia === O), adsM = ads.filter(r => entre(r.dia, M0, O));
@@ -30,9 +32,9 @@ const cada = (g, c) => c >= 0.5 ? ` (${brl(g / c)} cada)` : '';
 const wO = site.filter(r => r.dia === O && r.tipo === 'whatsapp'), PAGO = c => /Paid|Cross-network/.test(c || '');
 const wTot = soma(wO, 'cliques'), wAds = soma(wO.filter(r => PAGO(r.canal)), 'cliques');
 // iGut
-const igO = igut.filter(r => r.dia === O), igM = igut.filter(r => entre(r.dia, M0, O)), igA = igut.filter(r => entre(r.dia, A0, A1));
+const igO = igut.filter(r => r.dia === O), igM = igut.filter(r => entre(r.dia, M0, O)), igA = igut.filter(r => entre(r.dia, A0, A1)), igY = igut.filter(r => entre(r.dia, Y0, Y1));
 const porUn = igO.map(r => r.unidade + ' ' + int(r.atendimentos)).join(' · ');
-const sM = soma(igM, 'atendimentos'), vM = soma(igM, 'valor'), sA = soma(igA, 'atendimentos'), vA = soma(igA, 'valor');
+const sM = soma(igM, 'atendimentos'), vM = soma(igM, 'valor'), sA = soma(igA, 'atendimentos'), vA = soma(igA, 'valor'), sY = soma(igY, 'atendimentos'), vY = soma(igY, 'valor');
 // guardião de hoje
 const gHoje = guard.filter(r => r.data === hoje.toISODate());
 const pendentes = gHoje.filter(r => r.acao !== 'avisar' && r.resultado === 'simulado').length;
@@ -54,6 +56,7 @@ t.push('• Anúncios: ' + brl(gM) + (teto ? ' de ' + brl(teto) : '') + ritmo + 
 t.push('• Contatos do Google Ads: ' + int(cM) + cada(gM, cM));
 if (igM.length) t.push('• iGut: ' + int(sM) + ' sessões · ' + brl(vM) + ' produzidos');
 if (igA.length) t.push('• Mesmo período de ' + mesNome(ant) + ': ' + int(sA) + ' sessões (' + pct(sM, sA) + ') · ' + brl(vA) + ' (' + pct(vM, vA) + ')');
+if (igY.length) t.push('• Mesmo período de ' + mesNome(ano) + ' de ' + ano.year + ': ' + int(sY) + ' sessões (' + pct(sM, sY) + ') · ' + brl(vY) + ' (' + pct(vM, vY) + ')');
 t.push('');
 t.push('🛡️ Guardião: ' + (pendentes ? pendentes + (pendentes === 1 ? ' proposta esperando' : ' propostas esperando') + ' o seu Aplicar ou Ignorar (mensagens acima).' : gHoje.length ? 'só avisos hoje (mensagem acima).' : 'nada a corrigir hoje.'));
 if (atraso.length) { t.push(''); t.push(...atraso); }
