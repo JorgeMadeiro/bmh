@@ -1,0 +1,655 @@
+{
+ "name": "BMH · Anúncios · revisão da semana (homologação)",
+ "nodes": [
+  {
+   "id": "e293a0a9-1989-5e40-a582-27d205333193",
+   "name": "Toda segunda às 8h30",
+   "type": "n8n-nodes-base.scheduleTrigger",
+   "typeVersion": 1.2,
+   "position": [
+    0,
+    0
+   ],
+   "parameters": {
+    "rule": {
+     "interval": [
+      {
+       "field": "cronExpression",
+       "expression": "30 8 * * 1"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "a9f1cae7-11c7-545e-8f83-3b7c52995d8a",
+   "name": "Manual",
+   "type": "n8n-nodes-base.webhook",
+   "typeVersion": 2,
+   "position": [
+    0,
+    200
+   ],
+   "parameters": {
+    "path": "bmh-revisao-semana-1f6c93ad27",
+    "options": {}
+   },
+   "webhookId": "0671d6cb-3308-51f0-8f3c-7e6f639bd24f"
+  },
+  {
+   "id": "b8f8d14c-faec-5711-9851-e20f9dc42698",
+   "name": "Quando",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    240,
+    0
+   ],
+   "parameters": {
+    "jsCode": "// A semana da revisão: segunda a domingo da semana passada. Manual: ?teste=1 (manda marcado 🧪, não grava) e\n// ?segunda=AAAA-MM-DD para refazer a revisão de outra segunda.\nlet q = {}; try { if ($('Manual').isExecuted) q = $('Manual').first().json.query || {}; } catch (e) {}\nconst hoje = $now.setZone('America/Sao_Paulo').startOf('day');\nlet seg = hoje.startOf('week');\nif (/^\\d{4}-\\d{2}-\\d{2}$/.test(q.segunda || '')) { const s = DateTime.fromISO(q.segunda, { zone: 'America/Sao_Paulo' }); if (s.isValid && s.weekday === 1) seg = s; }\nconst fim = seg.minus({ days: 1 });\nreturn [{ json: { segunda: seg.toISODate(), semana_ini: seg.minus({ days: 7 }).toISODate(), semana_fim: fim.toISODate(), ant_ini: seg.minus({ days: 14 }).toISODate(),\n  ant_fim: seg.minus({ days: 8 }).toISODate(), mes_ini: fim.startOf('month').toISODate(), d30: seg.minus({ days: 30 }).toISODate(), agora: $now.toISO(), teste: !!q.teste } }];\n"
+   }
+  },
+  {
+   "id": "afe4f673-9df6-5beb-a21b-71c0f75ad8e2",
+   "name": "Config",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    480,
+    0
+   ],
+   "parameters": {
+    "operation": "get",
+    "dataTableId": {
+     "__rl": true,
+     "value": "V4NRHS9mc1kvigix",
+     "mode": "id",
+     "cachedResultName": "BMH_config"
+    },
+    "returnAll": true
+   },
+   "alwaysOutputData": true,
+   "executeOnce": true
+  },
+  {
+   "id": "1d3cb6c1-d7b9-515d-b025-0d00d9d5aeb6",
+   "name": "Google (tabela)",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    720,
+    0
+   ],
+   "parameters": {
+    "operation": "get",
+    "dataTableId": {
+     "__rl": true,
+     "value": "1TSLyd68TBzYajYq",
+     "mode": "id",
+     "cachedResultName": "BMH_google_anuncios_dia"
+    },
+    "returnAll": true
+   },
+   "alwaysOutputData": true,
+   "executeOnce": true
+  },
+  {
+   "id": "147a2c1c-9457-5437-9fd2-7a3fbb377d4c",
+   "name": "Meta (tabela)",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    960,
+    0
+   ],
+   "parameters": {
+    "operation": "get",
+    "dataTableId": {
+     "__rl": true,
+     "value": "JMvvyiF8uT6iqgQL",
+     "mode": "id",
+     "cachedResultName": "BMH_meta_anuncios_dia"
+    },
+    "returnAll": true
+   },
+   "alwaysOutputData": true,
+   "executeOnce": true
+  },
+  {
+   "id": "bf01b92d-006c-5a29-9fd6-e4c733e083f4",
+   "name": "Registro (tabela)",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    1200,
+    0
+   ],
+   "parameters": {
+    "operation": "get",
+    "dataTableId": {
+     "__rl": true,
+     "value": "E1ewiB9pcohZpSfw",
+     "mode": "id",
+     "cachedResultName": "BMH_guardiao_registro"
+    },
+    "returnAll": true
+   },
+   "alwaysOutputData": true,
+   "executeOnce": true
+  },
+  {
+   "id": "71162c8f-819e-5d86-99e2-d20137d0f94a",
+   "name": "Decide",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    1440,
+    0
+   ],
+   "parameters": {
+    "jsCode": "// Regra copiada de scripts/n8n/bmh-revisao-semana.js (BMH_Claude_VSL) pelo monta-revisao-semana.py: editar lá.\n// Seção da BMH na revisão semanal de tráfego (segunda 8h30), 28/10/2026. Pelo método da Nexo (Central_Claude/frentes/\n// metodo-meta-ads.md, seção 6), adaptado ao que a BMH mede hoje (sem CRM: contato = conversão do Google, WhatsApp e ligação, e\n// conversa iniciada do Meta). Lê as tabelas de números (BMH_google_anuncios_dia, BMH_meta_anuncios_dia) e o registro dos\n// guardiões; devolve os blocos de texto e até 6 propostas. Fonte: este arquivo; o montador embute o texto no nó do n8n e o\n// testa-revisao-semana.js roda com os dados de verdade pelo cofre.\n//\n// Nesta fase (homologação, simulação): proposta é só texto, sem botão, e não vai para o registro dos guardiões. A tabela do\n// Google não tem o id do grupo, então aplicar por botão pede, na produção, a leitura do id pela API.\n//\n// D: segunda (AAAA-MM-DD), semana_ini e semana_fim (segunda a domingo da semana passada), ant_ini e ant_fim (a anterior),\n// mes_ini (1º dia do mês de semana_fim), d30 (30 dias antes da segunda). T: google, meta, registro (linhas das tabelas).\nfunction revisaoSemana(D, T, cfg) {\n  const num = v => Number(v) || 0;\n  const brl = v => 'R$ ' + Math.round(num(v)).toLocaleString('pt-BR');\n  const int = v => Math.round(num(v)).toLocaleString('pt-BR');\n  const dm = d => d.slice(8, 10) + '/' + d.slice(5, 7);\n  const entre = (d, a, b) => d >= a && d <= b;\n  const pct = (a, b) => b ? ` (${a >= b ? '+' : ''}${Math.round((a / b - 1) * 100)}%)` : '';\n  const cada = (g, c) => c >= 0.5 ? `, ${brl(g / c)} cada` : '';\n  const soma = (rs, f) => rs.reduce((s, r) => s + num(r[f]), 0);\n  const contatosG = r => num(r.contatos) + num(r.ligacoes);\n  const google = (T.google || []).filter(r => r && r.dia), meta = (T.meta || []).filter(r => r && r.dia && r.tipo === 'anuncio');\n  const contaMeta = (T.meta || []).filter(r => r && r.tipo === 'conta').sort((a, b) => (a.dia < b.dia ? -1 : 1)).pop();\n  const PAUSA_MIN = Number(cfg.revisao_pausa_min || 60), ALERTA_30 = Number(cfg.revisao_alerta_30d || 50);\n  // campanha em teste com régua própria fica fora da revisão até a data (a mesma exceção do guardião do Google)\n  const EM_TESTE = [[/teste 4 semanas/i, '2026-11-05']];\n  const emTeste = nome => EM_TESTE.some(([re, ate]) => re.test(nome) && D.segunda <= ate);\n  const blocos = [], propostas = [], alertas = [];\n\n  // ---------- Google ----------\n  const gS = google.filter(r => entre(r.dia, D.semana_ini, D.semana_fim)), gA = google.filter(r => entre(r.dia, D.ant_ini, D.ant_fim));\n  const gM = google.filter(r => entre(r.dia, D.mes_ini, D.semana_fim));\n  const tetoG = num(cfg['teto_mes_' + D.mes_ini.slice(0, 7)] || cfg.teto_mes);\n  const porGrupo = rs => { const m = {}; for (const r of rs) { const k = r.campanha + ' › ' + r.grupo; (m[k] ||= { alvo: k, campanha: r.campanha, gasto: 0, contatos: 0 }); m[k].gasto += num(r.gasto); m[k].contatos += contatosG(r); } return Object.values(m); };\n  const gruposS = porGrupo(gS).sort((a, b) => b.gasto - a.gasto);\n  const gGasto = soma(gS, 'gasto'), gCont = gS.reduce((s, r) => s + contatosG(r), 0), gGastoA = soma(gA, 'gasto'), gContA = gA.reduce((s, r) => s + contatosG(r), 0);\n  blocos.push({ titulo: 'Google Ads', texto: [\n    `Semana: ${brl(gGasto)}${pct(gGasto, gGastoA)} · ${int(gCont)} ${Math.round(gCont) === 1 ? 'contato' : 'contatos'}${cada(gGasto, gCont)} (semana anterior: ${brl(gGastoA)}, ${int(gContA)}${cada(gGastoA, gContA)})`,\n    `Mês até ${dm(D.semana_fim)}: ${brl(soma(gM, 'gasto'))}${tetoG ? ' de ' + brl(tetoG) : ''} · ${int(gM.reduce((s, r) => s + contatosG(r), 0))} contatos`,\n    ...gruposS.slice(0, 4).map(g => `• ${g.alvo}: ${brl(g.gasto)}, ${int(g.contatos)} ${Math.round(g.contatos) === 1 ? 'contato' : 'contatos'}${cada(g.gasto, g.contatos)}${emTeste(g.campanha) ? ' (em teste, régua própria)' : ''}`),\n  ].join('\\n') });\n  const mediaG = gCont >= 0.5 ? gGasto / gCont : null;\n  for (const g of gruposS) {\n    if (emTeste(g.campanha) || g.gasto < PAUSA_MIN) continue;\n    const caro = mediaG && g.contatos >= 0.5 && g.gasto / g.contatos >= 3 * mediaG;\n    if (g.contatos < 0.5 || caro) propostas.push({ plataforma: 'google', regra: g.contatos < 0.5 ? 'rev_pausar_sem_contato' : 'rev_pausar_caro', alvo: g.alvo, alvo_id: '',\n      acao: 'pausar', valor_antes: g.gasto.toFixed(2), valor_novo: '', gasto: g.gasto,\n      motivo: g.contatos < 0.5 ? `${brl(g.gasto)} na semana sem nenhum contato` : `${brl(g.gasto / g.contatos)} por contato, 3 vezes ou mais a média da conta (${brl(mediaG)})` });\n  }\n  for (const g of porGrupo(google.filter(r => entre(r.dia, D.d30, D.semana_fim)))) if (!emTeste(g.campanha) && g.gasto >= ALERTA_30 && g.contatos < 0.5)\n    alertas.push(`• Google ${g.alvo}: ${brl(g.gasto)} em 30 dias sem contato`);\n\n  // ---------- Meta ----------\n  const mS = meta.filter(r => entre(r.dia, D.semana_ini, D.semana_fim)), mA = meta.filter(r => entre(r.dia, D.ant_ini, D.ant_fim));\n  const mM = meta.filter(r => entre(r.dia, D.mes_ini, D.semana_fim)), m30 = meta.filter(r => entre(r.dia, D.d30, D.semana_fim));\n  const tetoM = num(cfg['meta_teto_mes_' + D.mes_ini.slice(0, 7)] || cfg.meta_teto_mes);\n  const mGasto = soma(mS, 'gasto'), mConv = soma(mS, 'conversas'), mCliq = soma(mS, 'cliques_link'), mGastoA = soma(mA, 'gasto'), mConvA = soma(mA, 'conversas');\n  const temConversa30 = soma(m30, 'conversas') >= 1;\n  blocos.push({ titulo: 'Meta', texto: [\n    `Semana: ${brl(mGasto)}${pct(mGasto, mGastoA)} · ${int(mConv)} ${Math.round(mConv) === 1 ? 'conversa' : 'conversas'}${cada(mGasto, mConv)} · ${int(mCliq)} cliques no link (semana anterior: ${brl(mGastoA)}, ${int(mConvA)} conversas)`,\n    `Mês até ${dm(D.semana_fim)}: ${brl(soma(mM, 'gasto'))}${tetoM ? ' de ' + brl(tetoM) : ''}`,\n    contaMeta && num(contaMeta.verba_restante) > 0 ? `Verba da conta: ${brl(contaMeta.verba_restante)}${contaMeta.acaba_em ? ', até ' + dm(contaMeta.acaba_em) : ''} (foto de ${dm(contaMeta.dia)})` : '',\n    temConversa30 ? '' : 'As campanhas ligadas são de engajamento e não trazem conversa: a decisão sobre elas é a P3 da auditoria de 20/10, não da régua.',\n  ].filter(Boolean).join('\\n') });\n  if (temConversa30) {\n    const porConj = {}; for (const r of mS) { const k = r.conjunto_id; (porConj[k] ||= { alvo: r.campanha + ' › ' + r.conjunto, alvo_id: k, gasto: 0, conversas: 0 }); porConj[k].gasto += num(r.gasto); porConj[k].conversas += num(r.conversas); }\n    const mediaM = mConv >= 1 ? mGasto / mConv : null;\n    for (const c of Object.values(porConj)) {\n      if (c.gasto < PAUSA_MIN) continue;\n      const caro = mediaM && c.conversas >= 1 && c.gasto / c.conversas >= 3 * mediaM;\n      if (c.conversas < 1 || caro) propostas.push({ plataforma: 'meta', regra: c.conversas < 1 ? 'rev_pausar_sem_contato' : 'rev_pausar_caro', alvo: c.alvo, alvo_id: c.alvo_id,\n        acao: 'pausar', valor_antes: c.gasto.toFixed(2), valor_novo: '', gasto: c.gasto,\n        motivo: c.conversas < 1 ? `${brl(c.gasto)} na semana sem nenhuma conversa` : `${brl(c.gasto / c.conversas)} por conversa, 3 vezes ou mais a média (${brl(mediaM)})` });\n    }\n  }\n\n  // ---------- Guardiões na semana ----------\n  const reg = (T.registro || []).filter(r => r && r.data && entre(r.data, D.semana_ini, D.semana_fim));\n  const resumoReg = plat => { const rs = reg.filter(r => r.plataforma === plat); if (!rs.length) return '';\n    const c = {}; for (const r of rs) { const k = r.acao === 'avisar' ? 'avisos' : r.resultado === 'aplicado' ? 'aplicados' : /^ignorado/.test(r.resultado) ? 'ignorados' : r.resultado === 'simulado' ? 'propostas sem decisão' : r.resultado; c[k] = (c[k] || 0) + 1; }\n    return `${plat === 'google' ? 'Google' : 'Meta'}: ` + Object.entries(c).map(([k, n]) => `${n} ${k}`).join(', '); };\n  blocos.push({ titulo: 'Guardiões na semana', texto: [resumoReg('google'), resumoReg('meta')].filter(Boolean).join('\\n') || 'Nenhum aviso nem proposta na semana.' });\n  if (alertas.length) blocos.push({ titulo: 'Sem contato em 30 dias (só leitura)', texto: alertas.join('\\n') });\n  blocos.push({ titulo: 'Medição', texto: 'Sem CRM ainda: contato é a conversão do Google (WhatsApp e ligação) e a conversa iniciada do Meta. Agendamento e paciente novo entram com o Kommo.' });\n\n  // nunca propor pausar tudo de um canal: se as pausas cobrem todos os grupos ou conjuntos com gasto na semana, ficam só como leitura\n  for (const plat of ['google', 'meta']) {\n    const comGasto = plat === 'google' ? gruposS.filter(g => g.gasto > 0).length : new Set(mS.filter(r => num(r.gasto) > 0).map(r => r.conjunto_id)).size;\n    const ps = propostas.filter(p => p.plataforma === plat);\n    if (ps.length && ps.length >= comGasto) for (const p of ps) { p.acao = 'avisar'; p.motivo += '. Não proponho pausar: deixaria o canal sem anúncio.'; }\n  }\n  propostas.sort((a, b) => b.gasto - a.gasto);\n  return { blocos, propostas: propostas.slice(0, 6) };\n}\n\n// Texto do Telegram (robô BMH alertas) e linhas da BMH_anuncios_revisao: blocos nas vagas 1 a 6 e propostas nas vagas 101 a\n// 106, sempre todas, as sem conteúdo vazias, para uma rodada nova não deixar bloco ou proposta velha na tabela.\nfunction montaRevisao(D, R, agoraISO, teste) {\n  const dm = d => d.slice(8, 10) + '/' + d.slice(5, 7);\n  const t = [(teste ? '🧪 TESTE: nada foi gravado\\n' : '') + `📊 BMH · revisão de tráfego da semana ${dm(D.semana_ini)} a ${dm(D.semana_fim)} (homologação, simulação)`];\n  for (const b of R.blocos) t.push('', `<${b.titulo}>`, b.texto);\n  t.push('', R.propostas.length ? 'Ajustes que eu proporia (nada muda; sem botão nesta fase):' : 'Nenhum ajuste proposto pela régua.');\n  R.propostas.forEach((p, i) => t.push(`${i + 1}. ${p.acao === 'pausar' ? 'Pausar' : 'Olhar'} ${p.plataforma === 'google' ? 'o grupo' : 'o conjunto'} \"${p.alvo}\": ${p.motivo}`));\n  let texto = t.join('\\n').replace(/^<(.*)>$/gm, '▸ $1');\n  if (texto.length > 3800) texto = texto.slice(0, texto.lastIndexOf('\\n', 3800)) + '\\n(...)';\n  const base = { semana: D.segunda, plataforma: '', regra: '', alvo_id: '', alvo: '', acao: '', valor_antes: '', valor_novo: '', registro_chave: '', resultado: '', atualizado_em: agoraISO };\n  const linhas = [];\n  for (let i = 0; i < 6; i++) { const b = R.blocos[i];\n    linhas.push({ ...base, chave: `${D.segunda}|bloco|${i + 1}`, tipo: 'bloco', ordem: i + 1, titulo: b ? b.titulo : '', texto: b ? b.texto : '' }); }\n  for (let i = 0; i < 6; i++) { const p = R.propostas[i];\n    linhas.push({ ...base, chave: `${D.segunda}|proposta|${101 + i}`, tipo: 'proposta', ordem: 101 + i, titulo: p ? `${p.acao === 'pausar' ? 'Pausar' : 'Olhar'} ${p.alvo}` : '', texto: p ? p.motivo : '',\n      ...(p ? { plataforma: p.plataforma, regra: p.regra, alvo_id: p.alvo_id, alvo: p.alvo, acao: p.acao, valor_antes: p.valor_antes, valor_novo: p.valor_novo, resultado: 'simulado' } : {}) }); }\n  return { texto, linhas };\n}\n\nconst D = $('Quando').first().json;\nconst linhas = n => $(n).all().map(i => i.json).filter(r => r && (r.chave || r.dia));\nconst cfg = Object.fromEntries(linhas('Config').map(r => [r.chave, r.valor]));\nconst T = { google: linhas('Google (tabela)'), meta: linhas('Meta (tabela)'), registro: linhas('Registro (tabela)') };\nconst { texto, linhas: paraGravar } = montaRevisao(D, revisaoSemana(D, T, cfg), D.agora, D.teste);\nreturn [{ json: { texto, linhas: paraGravar, teste: D.teste } }];\n"
+   }
+  },
+  {
+   "id": "4f56d7c0-607d-5e5e-84bd-b82abbfbb474",
+   "name": "Linhas para gravar",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    1680,
+    -220
+   ],
+   "parameters": {
+    "jsCode": "// No teste, nada é gravado.\nconst d = $input.first().json;\nif (d.teste) return [];\nreturn d.linhas.map(json => ({ json }));\n"
+   }
+  },
+  {
+   "id": "4eb6f899-258f-5ab2-8288-f823f92ac6c7",
+   "name": "Grava (revisão)",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    1920,
+    -220
+   ],
+   "parameters": {
+    "operation": "upsert",
+    "dataTableId": {
+     "__rl": true,
+     "value": "5CHmKzr2hdHlSiv6",
+     "mode": "id",
+     "cachedResultName": "BMH_anuncios_revisao"
+    },
+    "filters": {
+     "conditions": [
+      {
+       "keyName": "chave",
+       "keyValue": "={{ $json.chave }}"
+      }
+     ]
+    },
+    "columns": {
+     "mappingMode": "defineBelow",
+     "value": {
+      "chave": "={{ $json.chave }}",
+      "semana": "={{ $json.semana }}",
+      "tipo": "={{ $json.tipo }}",
+      "ordem": "={{ $json.ordem }}",
+      "titulo": "={{ $json.titulo }}",
+      "texto": "={{ $json.texto }}",
+      "plataforma": "={{ $json.plataforma }}",
+      "regra": "={{ $json.regra }}",
+      "alvo_id": "={{ $json.alvo_id }}",
+      "alvo": "={{ $json.alvo }}",
+      "acao": "={{ $json.acao }}",
+      "valor_antes": "={{ $json.valor_antes }}",
+      "valor_novo": "={{ $json.valor_novo }}",
+      "registro_chave": "={{ $json.registro_chave }}",
+      "resultado": "={{ $json.resultado }}",
+      "atualizado_em": "={{ $json.atualizado_em }}"
+     },
+     "matchingColumns": [],
+     "schema": [
+      {
+       "id": "chave",
+       "displayName": "chave",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "semana",
+       "displayName": "semana",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "tipo",
+       "displayName": "tipo",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "ordem",
+       "displayName": "ordem",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "number",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "titulo",
+       "displayName": "titulo",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "texto",
+       "displayName": "texto",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "plataforma",
+       "displayName": "plataforma",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "regra",
+       "displayName": "regra",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "alvo_id",
+       "displayName": "alvo_id",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "alvo",
+       "displayName": "alvo",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "acao",
+       "displayName": "acao",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "valor_antes",
+       "displayName": "valor_antes",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "valor_novo",
+       "displayName": "valor_novo",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "registro_chave",
+       "displayName": "registro_chave",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "resultado",
+       "displayName": "resultado",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "atualizado_em",
+       "displayName": "atualizado_em",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      }
+     ]
+    },
+    "options": {}
+   }
+  },
+  {
+   "id": "ccd2e4b9-11a0-5b1d-9415-9ecbea9fe22d",
+   "name": "Telegram · revisão",
+   "type": "n8n-nodes-base.telegram",
+   "typeVersion": 1.2,
+   "position": [
+    1680,
+    220
+   ],
+   "parameters": {
+    "chatId": "8708228589",
+    "text": "={{ String($json.texto || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') }}",
+    "additionalFields": {
+     "appendAttribution": false,
+     "parse_mode": "HTML"
+    }
+   },
+   "credentials": {
+    "telegramApi": {
+     "id": "SgQHWuJOuMWeVbPi",
+     "name": "BMH · Telegram (robô BMH alertas)"
+    }
+   },
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000
+  },
+  {
+   "id": "8b9dbd44-d152-56fb-8190-78a30316859c",
+   "name": "Sobre este fluxo",
+   "type": "n8n-nodes-base.stickyNote",
+   "typeVersion": 1,
+   "position": [
+    0,
+    -500
+   ],
+   "parameters": {
+    "width": 1000,
+    "height": 380,
+    "content": "## BMH · Anúncios · revisão da semana (homologação)\n**Traz:** as tabelas de números (`BMH_google_anuncios_dia`, `BMH_meta_anuncios_dia`), o registro dos guardiões e a `BMH_config` (tetos).\n**Envia:** a seção da BMH na revisão semanal única de tráfego (segunda 8h30, combinada com o Gerente Nexo) no robô BMH alertas, e as linhas na `BMH_anuncios_revisao` (blocos nas vagas 1 a 6, propostas nas vagas 101 a 106), que o Gerente Nexo lê para citar a BMH.\n**Limites:** simulação: proposta só em texto, sem botão e sem registro; régua do método da Nexo (pausar com R$ 60 na semana sem contato ou custo 3 vezes a média; leitura de R$ 50 em 30 dias sem contato); nunca propõe pausar o canal inteiro; no Meta, só vale com conversa nos últimos 30 dias; campanha em teste fica fora até a data dela. Sem CRM: contato é conversão do Google e conversa do Meta.\n\nManual: `/webhook/bmh-revisao-semana-1f6c93ad27?teste=1` (não grava) e `&segunda=AAAA-MM-DD`. Regra em `BMH_Claude_VSL/scripts/n8n/bmh-revisao-semana.js`."
+   }
+  },
+  {
+   "id": "5e15ff6a-cd5a-5bc0-9810-7dbbc27e58fa",
+   "name": "Vigia · marca que rodou",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    0,
+    440
+   ],
+   "parameters": {
+    "jsCode": "return [{ json: { chave: 'revisao_semana', nome: \"BMH · Anúncios · revisão da semana\", ultima_vez: $now.toISO(), max_horas: 170, avisado_em: '' } }];"
+   }
+  },
+  {
+   "id": "e29c621b-5c14-5b5b-8f31-0346a7421e72",
+   "name": "Vigia · grava",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    240,
+    440
+   ],
+   "parameters": {
+    "operation": "upsert",
+    "dataTableId": {
+     "__rl": true,
+     "value": "0kBTGpt8EjCjmR9t",
+     "mode": "id",
+     "cachedResultName": "BMH_vigia"
+    },
+    "filters": {
+     "conditions": [
+      {
+       "keyName": "chave",
+       "keyValue": "={{ $json.chave }}"
+      }
+     ]
+    },
+    "columns": {
+     "mappingMode": "defineBelow",
+     "value": {
+      "chave": "={{ $json.chave }}",
+      "nome": "={{ $json.nome }}",
+      "ultima_vez": "={{ $json.ultima_vez }}",
+      "max_horas": "={{ $json.max_horas }}",
+      "avisado_em": "={{ $json.avisado_em }}"
+     },
+     "matchingColumns": [],
+     "schema": [
+      {
+       "id": "chave",
+       "displayName": "chave",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "nome",
+       "displayName": "nome",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "ultima_vez",
+       "displayName": "ultima_vez",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "max_horas",
+       "displayName": "max_horas",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "number",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "avisado_em",
+       "displayName": "avisado_em",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      }
+     ]
+    },
+    "options": {}
+   }
+  }
+ ],
+ "connections": {
+  "Toda segunda às 8h30": {
+   "main": [
+    [
+     {
+      "node": "Quando",
+      "type": "main",
+      "index": 0
+     },
+     {
+      "node": "Vigia · marca que rodou",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Quando": {
+   "main": [
+    [
+     {
+      "node": "Config",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Config": {
+   "main": [
+    [
+     {
+      "node": "Google (tabela)",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Google (tabela)": {
+   "main": [
+    [
+     {
+      "node": "Meta (tabela)",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Meta (tabela)": {
+   "main": [
+    [
+     {
+      "node": "Registro (tabela)",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Registro (tabela)": {
+   "main": [
+    [
+     {
+      "node": "Decide",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Manual": {
+   "main": [
+    [
+     {
+      "node": "Quando",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Decide": {
+   "main": [
+    [
+     {
+      "node": "Linhas para gravar",
+      "type": "main",
+      "index": 0
+     },
+     {
+      "node": "Telegram · revisão",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Linhas para gravar": {
+   "main": [
+    [
+     {
+      "node": "Grava (revisão)",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Vigia · marca que rodou": {
+   "main": [
+    [
+     {
+      "node": "Vigia · grava",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  }
+ },
+ "settings": {
+  "executionOrder": "v1",
+  "timezone": "America/Sao_Paulo",
+  "saveDataSuccessExecution": "all",
+  "saveDataErrorExecution": "all",
+  "errorWorkflow": "7u3CuyjESsHmCtMW",
+  "executionTimeout": 300
+ }
+}
