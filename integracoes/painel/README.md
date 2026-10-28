@@ -27,7 +27,7 @@
     em todos os dias desde set/2023 (recarga em blocos de 15 dias em 08/10/2026; o iGut falha em blocos grandes).
 - "BMH · Anúncios · guardião diário" (7h30, só Google Ads): R$ 40 em 3 dias sem contato → pausa o grupo; orçamento que
   leva o mês acima do teto → corta na proporção (teto atingido → pausa); anúncio reprovado e alteração feita por outra
-  pessoa (ex.: agência) → avisa. Modo por regra em BMH_config (`guardiao_modo_teto`, `guardiao_modo_pausa`: simulacao |
+  pessoa (ex.: a Triunfo, fora do time desde 28/10/2026) → avisa. Modo por regra em BMH_config (`guardiao_modo_teto`, `guardiao_modo_pausa`: simulacao |
   real); **começou em simulação em 08/10/2026**; **regra do teto em modo real desde 08/10/2026** ("pode ligar o guardião do teto"), regra de pausa segue em simulação (com botão no Telegram) por 2 semanas. Registro em BMH_guardiao_registro; o painel mostra os 3 últimos dias.
   Teste: `/webhook/bmh-guardiao?teste=1` (não grava nem aplica; manda no Telegram marcado como TESTE, sem botões).
 

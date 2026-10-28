@@ -5,9 +5,8 @@
 ## Fase
 
 Operação clínica rodando em duas unidades. **Site novo no ar desde 07/10/2026** (home nativa, sem Elementor;
-plano em `saidas/site-novo/plano-site.md`). **O Claude assume o site; no Google Ads e na Meta a agência Triunfo
-continua até o fim do teste de gestão própria** (07/10/2026 dizia "a agência sai"; corrigido pelo Jorge em 11/10 e
-12/10/2026, ver "Decisões de 12/10/2026"). **Modelo: fazer na BMH o que é feito na Nexo** (medição até "agendou" e "foi
+plano em `saidas/site-novo/plano-site.md`). **O Claude cuida do site, do Google Ads e da Meta: a agência Triunfo saiu
+do time em 28/10/2026** (ver "Decisões de 28/10/2026"). **Modelo: fazer na BMH o que é feito na Nexo** (medição até "agendou" e "foi
 atendido", origem de cada contato, conversões devolvidas ao Google e à Meta, relatório de anúncios).
 Anúncio do Google rodando: ~R$ 3.300 a 3.800/mês, ~R$ 37 por contato (diagnóstico em
 `marketing/campanhas/google-ads-diagnostico-2026-10-07.md`).
@@ -29,6 +28,7 @@ Anúncio do Google rodando: ~R$ 3.300 a 3.800/mês, ~R$ 37 por contato (diagnós
 
 - **Google Ads:** a Triunfo foi orientada a **não mexer na campanha de pesquisa até 05/11/2026** (fim da medição da
   reorganização feita daqui em 08/10), mantendo o acesso. Até lá, um só gestor; a decisão de saída fica para depois de 05/11.
+  **Superado em 28/10/2026:** a Triunfo saiu do time, e a casa é o único gestor.
 - **WhatsApp "BMH Recepção":** reconexão na **semana de 13/10/2026** (precisa do celular da recepção); o mês de observação
   recomeça a contar da reconexão.
 - **Número único para as automações de todas as marcas.**
@@ -41,9 +41,17 @@ Terça — Asa Sul. Quinta — Taguatinga.
 ## Decisões de 15/10/2026
 
 - **CAC de até R$ 200 por paciente novo.** Só o CRM mede (meta: CRM medindo em novembro/2026).
-- **A Triunfo sai** (reunião do Jorge na semana de 19/10); o acesso dela é retirado quando sair.
+- **A Triunfo sai** (reunião do Jorge na semana de 19/10); o acesso dela é retirado quando sair. **Saiu em 28/10/2026.**
 - **Google e site 100% antes da Meta.** Verba só sobe depois da estratégia consolidada e do CRM.
 - **Site num pacote só** (as 4 fases de uma vez) e ajustes do Google Ads já, sem esperar 05/11.
 - **Pedido de avaliação** fica para quando houver SDR, como na Nexo.
 - Estratégia completa: `marketing/estrategia-site-e-google-ads-2026-10-15.md`.
+
+## Decisões de 28/10/2026
+
+- **A Triunfo não faz mais parte do time** (Jorge: "a partir de hoje a triunfo não faz mais parte do time"). Tráfego pago,
+  no Google e na Meta, é só da casa.
+- Não mandar nada para a Triunfo nem contar com ela para nenhuma tarefa.
+- Os acessos dela o Jorge tira; a lista está no item 2 de `Central_Claude/frentes/trafego.md`. Até sair, qualquer
+  alteração dela nas contas é de terceiro, e os guardiões do Google e da Meta avisam.
 

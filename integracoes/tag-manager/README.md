@@ -62,4 +62,5 @@ instalação automática do Clarity; as variáveis dela são nativas (Analytics 
   restaurou no mesmo dia. No gerenciamento de acesso só tem gente da BMH. "Qual o Melhor Suplemento" (558222149) foi
   para a lixeira; "Grupo NEXO" (555910815) ficou lá e some em 13/11/2026.
 - **Google Ads:** a agência entra pela conta de administração "MCC - Triunfo Dig." (969-748-3650, desde 04/08/2025,
-  não é dona da conta). Fica enquanto ela cuidar das campanhas.
+  não é dona da conta). **A Triunfo saiu do time em 28/10/2026:** o Jorge tira esse acesso (lista no item 2 de
+  `Central_Claude/frentes/trafego.md`); até sair, toda alteração por ela é de terceiro.
