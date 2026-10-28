@@ -54,6 +54,20 @@ instalação automática do Clarity; as variáveis dela são nativas (Analytics 
 **Teste:** antes, os dois Clarity carregavam juntos; depois de publicar, só o `yv1gceupsa`, com GA4, Ads e Meta iguais.
 **Voltar atrás:** publicar a versão 6.
 
+## Versão 9 (28/10/2026): **publicada** com o "pode" do Jorge (a Triunfo saiu do time)
+
+"Triunfo fora: sai o Analytics da agência e o Clarity antigo (28/10/2026)" (script: `integracoes/tag-manager/versao-9-rascunho.js`).
+Apagadas as tags 15 "Tag Analytics" e 16 "Tag do Google" (as duas com o `G-97ZBVMVR1Y`, que não é de nenhuma
+propriedade da BMH: conferido pela API do Analytics, a BMH só tem o `G-10HHN3PQP0`), a 17 (evento quebrado para o mesmo
+`G-97ZBVMVR1Y`) e a 13 (Clarity `m9kxjnnvgm`, da agência, pausada desde a 7). A tag 12 "Analises" é a que leva o
+`GT-57SF42Z` (Analytics e Google Ads da BMH) e ficou. **Teste:** antes, cada página mandava 2 page_view e 2 eventos
+quebrados ao `G-97ZBVMVR1Y`; no rascunho e depois de publicar, nada vai para ele, e Analytics da BMH, conversão do
+WhatsApp, cliques, pixel e Clarity seguem iguais. **Voltar atrás:** publicar a versão 8.
+
+**Acessos em 28/10/2026:** Tag Manager sem a agência (o Jorge tirou os administradores dela); Analytics da BMH só com o
+Jorge, a conta de serviço `bmh-site` e os grupos automáticos do vínculo com o Google Ads; Clarity só com o Jorge; Google
+Ads sem o usuário do Thiago e sem a gerente da Triunfo (969-748-3650, desvinculada); Meta sem a Triunfo.
+
 ## Acessos (conferido em 09/10/2026)
 
 - **Tag Manager:** jorgemadeirotorres@gmail.com é o único administrador. bmhiperbarica@gmail.com (muita gente usa) passou
@@ -62,5 +76,5 @@ instalação automática do Clarity; as variáveis dela são nativas (Analytics 
   restaurou no mesmo dia. No gerenciamento de acesso só tem gente da BMH. "Qual o Melhor Suplemento" (558222149) foi
   para a lixeira; "Grupo NEXO" (555910815) ficou lá e some em 13/11/2026.
 - **Google Ads:** a agência entra pela conta de administração "MCC - Triunfo Dig." (969-748-3650, desde 04/08/2025,
-  não é dona da conta). **A Triunfo saiu do time em 28/10/2026:** o Jorge tira esse acesso (lista no item 2 de
-  `Central_Claude/frentes/trafego.md`); até sair, toda alteração por ela é de terceiro.
+  não é dona da conta). **A Triunfo saiu do time em 28/10/2026;** no mesmo dia o Jorge desvinculou essa conta e tirou o
+  usuário do Thiago (conferido pela API do Google Ads).
