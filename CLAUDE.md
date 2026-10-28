@@ -184,7 +184,7 @@ PATH/EUA). Não inventar número, estudo ou percentual.
 
 - [x] Geração de imagem via API OpenAI (`scripts/gerar-imagem.js`)
 - [ ] Instagram (a estruturar)
-- [ ] Tráfego pago: hoje pela agência Triunfo, como as outras marcas; a saída depende do teste de gestão própria em curso (Jorge, 11/10/2026). **Sem preço nos anúncios** (decisão de 11/10/2026)
+- [ ] Tráfego pago: pela casa; a agência Triunfo saiu do time em 28/10/2026 (decisão do Jorge). **Sem preço nos anúncios** (decisão de 11/10/2026)
 
 ## Skills globais, iguais em todas as pastas (11/10/2026)
 
