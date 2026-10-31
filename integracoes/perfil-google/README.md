@@ -100,3 +100,12 @@ projeto. Cota 0 (erro 429 com `quota_limit_value: "0"`) = não aprovado; 200 ou 
 4. Apontar o "site" de cada perfil para a página da própria unidade, com UTM:
    `/hiperbarica-asa-sul/?utm_source=google&utm_medium=organic&utm_campaign=perfil-asa-sul` e o mesmo para Taguatinga.
    Nunca usar o projeto ou a autorização da Nexo para os perfis da BMH.
+
+## Ocorrências
+
+- **30/10/2026, 17:37 (Brasília):** "BMH · Perfil do Google · avaliações" (`yNozxi1jNwRbLhFR`), execução 750547, erro 503 do
+  Google no nó "Avaliações do perfil" (BMH_falhas, linha 6). Isolado: a `BMH_falhas` não tem outra linha desse fluxo, e a
+  vigia marcou rodadas até 31/10, 7h37. Nada se perdeu: o nó lê todas as avaliações sem resposta, sem janela de tempo, e
+  tira só as que já viraram proposta; a rodada seguinte, 30 min depois, pega a mesma avaliação. Conferido em 31/10 pelo
+  Gerente BMH. **Se repetir:** pôr nova tentativa na chamada do Google dentro do nó (ele é de código, então a tentativa
+  vai no código ou nas opções do nó), numa cópia de homologação, e pedir pelo porteiro.
