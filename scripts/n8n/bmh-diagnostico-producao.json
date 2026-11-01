@@ -1,0 +1,293 @@
+{
+ "name": "BMH · Produção diária · diagnóstico do envio (homologação)",
+ "nodes": [
+  {
+   "id": "cf66c113-5af0-590d-a0f8-0fc5b4a37009",
+   "name": "Manual",
+   "type": "n8n-nodes-base.webhook",
+   "typeVersion": 2,
+   "position": [
+    0,
+    0
+   ],
+   "parameters": {
+    "path": "bmh-diagnostico-producao-5b7e2c91",
+    "responseMode": "lastNode",
+    "options": {}
+   },
+   "webhookId": "8e46a849-ae91-59bc-b38d-271c09d30c18"
+  },
+  {
+   "id": "dff394eb-3fae-5024-9e8d-8a195be17a6b",
+   "name": "Evolution · estado",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    240,
+    0
+   ],
+   "parameters": {
+    "url": "https://apiwp-afiliados.cannlink.com.br/instance/connectionState/Madeiro",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpHeaderAuth",
+    "options": {
+     "timeout": 30000
+    }
+   },
+   "credentials": {
+    "httpHeaderAuth": {
+     "id": "FaVy4E4519vzp2EO",
+     "name": "Evolution afiliados · instância Madeiro (Dr Jorge)"
+    }
+   },
+   "executeOnce": true,
+   "retryOnFail": true,
+   "maxTries": 2,
+   "waitBetweenTries": 3000,
+   "onError": "continueRegularOutput",
+   "alwaysOutputData": true
+  },
+  {
+   "id": "414bf35d-09bc-522d-86c4-b3cb55d52734",
+   "name": "Evolution · instância",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    480,
+    0
+   ],
+   "parameters": {
+    "url": "https://apiwp-afiliados.cannlink.com.br/instance/fetchInstances",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpHeaderAuth",
+    "options": {
+     "timeout": 30000
+    },
+    "sendQuery": true,
+    "queryParameters": {
+     "parameters": [
+      {
+       "name": "instanceName",
+       "value": "Madeiro"
+      }
+     ]
+    }
+   },
+   "credentials": {
+    "httpHeaderAuth": {
+     "id": "FaVy4E4519vzp2EO",
+     "name": "Evolution afiliados · instância Madeiro (Dr Jorge)"
+    }
+   },
+   "executeOnce": true,
+   "retryOnFail": true,
+   "maxTries": 2,
+   "waitBetweenTries": 3000,
+   "onError": "continueRegularOutput",
+   "alwaysOutputData": true
+  },
+  {
+   "id": "c36ae14a-4d91-5d3b-ac87-063790eaa154",
+   "name": "Grupos",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    720,
+    0
+   ],
+   "parameters": {
+    "jsCode": "return [{\"json\": {\"nome\": \"BMH ADM Asa Sul\", \"jid\": \"556191523103-1530882330@g.us\"}}, {\"json\": {\"nome\": \"BMH ADM Taguatinga\", \"jid\": \"120363393827994218@g.us\"}}, {\"json\": {\"nome\": \"Diretoria\", \"jid\": \"120363205793119192@g.us\"}}];\n"
+   }
+  },
+  {
+   "id": "1e100dc6-5f08-5b12-9407-74a174025bea",
+   "name": "Evolution · grupo",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    960,
+    0
+   ],
+   "parameters": {
+    "url": "https://apiwp-afiliados.cannlink.com.br/group/findGroupInfos/Madeiro",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpHeaderAuth",
+    "options": {
+     "timeout": 30000
+    },
+    "sendQuery": true,
+    "queryParameters": {
+     "parameters": [
+      {
+       "name": "groupJid",
+       "value": "={{ $json.jid }}"
+      }
+     ]
+    }
+   },
+   "credentials": {
+    "httpHeaderAuth": {
+     "id": "FaVy4E4519vzp2EO",
+     "name": "Evolution afiliados · instância Madeiro (Dr Jorge)"
+    }
+   },
+   "retryOnFail": true,
+   "maxTries": 2,
+   "waitBetweenTries": 3000,
+   "onError": "continueRegularOutput",
+   "alwaysOutputData": true
+  },
+  {
+   "id": "a72b4943-c6e5-5164-aee1-fb18cb87fadd",
+   "name": "iGut · agenda de hoje",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.4,
+   "position": [
+    1200,
+    0
+   ],
+   "parameters": {
+    "method": "POST",
+    "url": "https://api.igut.med.br/v2/consultas/buscar",
+    "sendHeaders": true,
+    "headerParameters": {
+     "parameters": [
+      {
+       "name": "Content-Type",
+       "value": "application/json"
+      }
+     ]
+    },
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "={\n  \"Agendamento.data\": \"{{ $now.toFormat('yyyy-MM-dd') }}\",\n  \"Agendamento.data_fim\": \"{{ $now.toFormat('yyyy-MM-dd') }}\"\n}",
+    "options": {
+     "response": {
+      "response": {
+       "responseFormat": "json"
+      }
+     }
+    },
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpCustomAuth"
+   },
+   "credentials": {
+    "httpCustomAuth": {
+     "id": "ZezjclTyK2soW4a8",
+     "name": "BMH · iGut (acesso)"
+    }
+   },
+   "executeOnce": true,
+   "retryOnFail": true,
+   "maxTries": 2,
+   "waitBetweenTries": 3000,
+   "onError": "continueRegularOutput",
+   "alwaysOutputData": true
+  },
+  {
+   "id": "99d52324-1e26-5552-bf5d-b2709438d78b",
+   "name": "Resumo",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    1440,
+    0
+   ],
+   "parameters": {
+    "jsCode": "// Regra em scripts/n8n/bmh-diagnostico-producao.js (BMH_Claude_VSL), copiada pelo montador.\n// Resumo do diagnóstico do envio da agenda diária (01/11/2026). Entrada: respostas cruas da Evolution (estado, instância,\n// grupos) e do iGut (agenda de hoje). Saída: só o que decide o diagnóstico, sem telefone e sem nome de paciente.\nfunction resumoDiagnostico(estado, instancia, grupos, agenda) {\n  const erro = r => (r && r.error) ? String(r.error.message || r.error.description || JSON.stringify(r.error)).slice(0, 200) : '';\n  const fim4 = s => String(s || '').replace(/\\D/g, '').slice(-4);\n  const inst = Array.isArray(instancia) ? instancia[0] : (instancia && instancia.instance) || instancia || {};\n  const dono = String(inst.ownerJid || inst.owner || '').split('@')[0].split(':')[0];\n  const out = {\n    instancia: { estado: (estado && (estado.instance?.state || estado.state)) || '', erro: erro(estado),\n      numero_final: dono ? fim4(dono) : '', status_lista: inst.connectionStatus || inst.status || '', erro_lista: erro(instancia) },\n    grupos: grupos.map(g => {\n      const r = g.resposta || {};\n      const parts = Array.isArray(r.participants) ? r.participants : [];\n      const meu = parts.find(p => dono && String(p.id || '').split('@')[0].split(':')[0] === dono);\n      return { nome: g.nome, jid: g.jid, achou: !!(r.id || r.subject), assunto: r.subject || '', tamanho: r.size || parts.length || 0,\n        numero_no_grupo: dono ? !!meu : null, admin: meu ? (meu.admin || 'membro') : '', so_admin_envia: r.announce === true, erro: erro(r) };\n    }),\n    igut: { erro: erro(agenda), total: 0, por_local: {}, por_profissional: {}, ids_que_o_fluxo_espera: { local: ['1', '2'], profissional: ['111', '112', '113', '120', '121'] } },\n  };\n  const lista = Array.isArray(agenda?.data) ? agenda.data : [];\n  for (const d of lista) {\n    out.igut.total++;\n    const l = String(d.Local?.id ?? '?'), p = String(d.Profissional?.id ?? '?');\n    out.igut.por_local[l] = (out.igut.por_local[l] || 0) + 1;\n    out.igut.por_profissional[p] = (out.igut.por_profissional[p] || 0) + 1;\n  }\n  const pistas = [];\n  if (out.instancia.estado && out.instancia.estado !== 'open') pistas.push(`instância Madeiro está \"${out.instancia.estado}\": desconectada, o envio falha e o fluxo engole o erro`);\n  if (out.instancia.erro) pistas.push('não consegui ler o estado da instância: ' + out.instancia.erro);\n  for (const g of out.grupos) {\n    if (!g.achou) pistas.push(`grupo ${g.nome} não encontrado pela instância (${g.erro || 'sem resposta'}): id mudou ou o número saiu`);\n    else if (g.numero_no_grupo === false) pistas.push(`o número da instância não está no grupo ${g.nome}`);\n    else if (g.so_admin_envia && g.admin === 'membro') pistas.push(`o grupo ${g.nome} só deixa administrador mandar, e a instância é membro comum`);\n  }\n  const fora = Object.keys(out.igut.por_profissional).filter(p => !out.igut.ids_que_o_fluxo_espera.profissional.includes(p) && p !== '?');\n  if (out.igut.total && fora.length) pistas.push(`a agenda de hoje tem profissionais que o fluxo não conhece: ${fora.join(', ')} (as mensagens só montam com 111, 112, 120 e 121)`);\n  if (out.igut.total && !out.igut.por_profissional['121']) pistas.push('nenhuma sessão do profissional 121 hoje: a mensagem de Taguatinga não é montada');\n  if (out.igut.erro) pistas.push('não consegui ler a agenda no iGut: ' + out.igut.erro);\n  out.pistas = pistas.length ? pistas : ['nada errado à vista: instância aberta, grupos achados com o número dentro e a agenda com os ids esperados'];\n  return out;\n}\n\nconst um = n => { try { return $(n).first().json; } catch (e) { return { error: { message: String(e.message || e) } }; } };\nconst grupos = $('Grupos').all().map((g, i) => ({ nome: g.json.nome, jid: g.json.jid, resposta: ($('Evolution · grupo').all()[i] || {}).json }));\nreturn [{ json: resumoDiagnostico(um('Evolution · estado'), um('Evolution · instância'), grupos, um('iGut · agenda de hoje')) }];\n"
+   }
+  },
+  {
+   "id": "75265587-d87a-5d1f-8e98-85a907272533",
+   "name": "Sobre este fluxo",
+   "type": "n8n-nodes-base.stickyNote",
+   "typeVersion": 1,
+   "position": [
+    0,
+    -360
+   ],
+   "parameters": {
+    "width": 900,
+    "height": 300,
+    "content": "## BMH · Produção diária · diagnóstico do envio (homologação)\n**Traz:** o estado da instância Madeiro na Evolution, os 3 grupos do \"Produção Diaria e Mensal BMH\" (EkmBucG5LoEutBUa) e a agenda de hoje no iGut, com as mesmas credenciais do fluxo.\n**Envia:** só a resposta do Manual: um resumo sem telefone e sem nome de paciente.\n**Limites:** só leitura; não manda mensagem a ninguém; não guarda execução.\n\nManual: `/webhook/bmh-diagnostico-producao-5b7e2c91`. Pedido da Central em 01/11/2026 (a agenda dos grupos BMH ADM parou de chegar sem erro)."
+   }
+  }
+ ],
+ "connections": {
+  "Manual": {
+   "main": [
+    [
+     {
+      "node": "Evolution · estado",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Evolution · estado": {
+   "main": [
+    [
+     {
+      "node": "Evolution · instância",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Evolution · instância": {
+   "main": [
+    [
+     {
+      "node": "Grupos",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Grupos": {
+   "main": [
+    [
+     {
+      "node": "Evolution · grupo",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Evolution · grupo": {
+   "main": [
+    [
+     {
+      "node": "iGut · agenda de hoje",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "iGut · agenda de hoje": {
+   "main": [
+    [
+     {
+      "node": "Resumo",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  }
+ },
+ "settings": {
+  "executionOrder": "v1",
+  "timezone": "America/Sao_Paulo",
+  "saveDataSuccessExecution": "none",
+  "saveDataErrorExecution": "none",
+  "saveManualExecutions": false,
+  "errorWorkflow": "7u3CuyjESsHmCtMW",
+  "executionTimeout": 120
+ }
+}
