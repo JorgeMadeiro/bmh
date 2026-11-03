@@ -464,6 +464,12 @@ function fluxoPlantoes() {
     agenda_: no('Dia 1 às 8h', 'n8n-nodes-base.scheduleTrigger', 1.2, { rule: { interval: [{ field: 'cronExpression', expression: '0 8 1 * *' }] } }),
     manual: no('Manual', 'n8n-nodes-base.webhook', 2, { path: 'bmh-plantoes-mes', options: {} }, { webhookId: crypto.randomUUID() }),
     mes: codigo('Qual mês', '../../plantoes/n8n/qual-mes.js'),
+    // agenda do iGut dia a dia (03/11/2026): dia sem sessão não vira lacuna; a tarde da lacuna sai pela última sessão + 1h30
+    dias: codigo('Dias do mês', '../../plantoes/n8n/dias-do-mes.js'),
+    ag: no('Agenda do dia', 'n8n-nodes-base.httpRequest', 4.2, { method: 'POST', url: 'https://api.igut.med.br/v2/consultas/buscar', authentication: 'genericCredentialType', genericAuthType: 'httpCustomAuth',
+      sendBody: true, specifyBody: 'json', jsonBody: "={{ JSON.stringify({ 'Agendamento.data': $json.dia, 'Agendamento.data_fim': $json.dia }) }}",
+      options: { timeout: 120000, batching: { batch: { batchSize: 3, batchInterval: 500 } } } }, { credentials: cred('httpCustomAuth', 'BMH · iGut (acesso)'), alwaysOutputData: true, onError: 'continueRegularOutput' }),
+    hor: codigo('Horários do iGut', '../../plantoes/n8n/horarios.js'),
     resp: planilha('Respostas', 'GET', PLANILHA + '/values/Respostas!A1:O2000?valueRenderOption=UNFORMATTED_VALUE&dateTimeRenderOption=SERIAL_NUMBER'),
     abas: planilha('Abas da planilha', 'GET', PLANILHA + '?fields=sheets.properties(title,sheetId)'),
     monta: no('Monta o mês', 'n8n-nodes-base.code', 2, { jsCode: comMonta('../../plantoes/n8n/monta.js') }),
@@ -477,10 +483,10 @@ function fluxoPlantoes() {
     msg: codigo('Mensagem de divergências', '../../plantoes/n8n/mensagem.js'),
     tg: no('Telegram · divergências', 'n8n-nodes-base.telegram', 1.2, { chatId: CHAT, text: '={{ $json.texto }}', additionalFields: { appendAttribution: false, parse_mode: 'HTML' }, replyMarkup: 'inlineKeyboard',
       inlineKeyboard: { rows: [{ row: { buttons: [{ text: '✅ Pronto, gerar os e-mails', additionalFields: { callback_data: '={{ $json.botao }}' } }] } }] } }, { credentials: TG }),
-    nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Plantões · fechamento do mês\n**Traz:** respostas do formulário dos médicos\n**Envia:** aba do mês na planilha e divergências no Telegram\n**Limites:** não recria aba que existe; não inventa plantão\n\nDia 1 às 8h: lê a aba Respostas do formulário dos médicos (Planilha Prestação Serviço Médico), aplica as regras do fechamento (mês do plantão, turnos da BMH, Específico vira manhã + tarde, duplicados, nome e CRM) e cria a aba "MM/AA" com fórmulas; os turnos sem formulário entram no fim da aba, em vermelho, até o Jorge preencher nome e CRM. Manda as divergências no Telegram com o botão "Pronto". Não inventa plantão. Manual: /webhook/bmh-plantoes-mes?mes=AAAA-MM (&refazer=1 recria; &prefixo=teste para testar). Código em integracoes/plantoes/.', width: 600, height: 240 }),
+    nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Plantões · fechamento do mês\n**Traz:** respostas do formulário dos médicos e os horários da agenda do iGut\n**Envia:** aba do mês na planilha e divergências no Telegram\n**Limites:** não recria aba que existe; não inventa plantão\n\nDia 1 às 8h: lê a aba Respostas do formulário dos médicos (Planilha Prestação Serviço Médico), aplica as regras do fechamento (mês do plantão, turnos da BMH, Específico vira manhã + tarde, duplicados, nome e CRM) e cria a aba "MM/AA" com fórmulas; os turnos sem formulário entram no fim da aba, em vermelho, até o Jorge preencher nome e CRM (só onde o iGut tem sessão; a tarde termina na última sessão + 1h30, regra de 03/11/2026). Manda as divergências no Telegram com o botão "Pronto". Não inventa plantão. Manual: /webhook/bmh-plantoes-mes?mes=AAAA-MM (&refazer=1 recria; &prefixo=teste para testar). Código em integracoes/plantoes/.', width: 600, height: 240 }),
   };
   const cx = {}; liga(cx, n.agenda_.name, n.mes.name); liga(cx, n.manual.name, n.mes.name);
-  for (const [a, b] of [[n.mes, n.resp], [n.resp, n.abas], [n.abas, n.monta], [n.monta, n.existe], [n.avisoExiste, n.tgExiste], [n.cria, n.pedidos], [n.pedidos, n.valores], [n.valores, n.formata], [n.formata, n.msg], [n.msg, n.tg]]) liga(cx, a.name, b.name);
+  for (const [a, b] of [[n.mes, n.dias], [n.dias, n.ag], [n.ag, n.hor], [n.hor, n.resp], [n.resp, n.abas], [n.abas, n.monta], [n.monta, n.existe], [n.avisoExiste, n.tgExiste], [n.cria, n.pedidos], [n.pedidos, n.valores], [n.valores, n.formata], [n.formata, n.msg], [n.msg, n.tg]]) liga(cx, a.name, b.name);
   cx[n.existe.name] = { main: [[{ node: n.avisoExiste.name, type: 'main', index: 0 }], [{ node: n.cria.name, type: 'main', index: 0 }]] };
   return { name: 'BMH · Plantões · fechamento do mês', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none' }) };
 }

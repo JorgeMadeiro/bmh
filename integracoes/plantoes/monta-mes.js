@@ -2,9 +2,12 @@
 // "Planilha Prestação Serviço Médico"). Mesmas regras do prompt que o Jorge usava, mais as regras de turno da BMH:
 //   Asa Sul: manhã 8:00–14:00, tarde 15:00–20:30 · Taguatinga: manhã 8:00–14:00, tarde 15:00–19:00 · R$ 75/hora.
 // Entrada: RESP (valores da aba Respostas, com data/hora em número de série) e MES ("AAAA-MM").
+// HOR (opcional, "AAAA-MM-DD|Unidade" → { n, primeira, ultima } em horas, da agenda do iGut): regra do Jorge de 03/11/2026
+// para os turnos sem formulário: dia e unidade sem sessão não viram lacuna, e a tarde da lacuna termina na última sessão
+// + 1h30. O que o médico lançou no formulário não muda. Dia que o iGut não respondeu fica com o horário padrão.
 // Saída: linhas da aba do mês (com subtotais e total), cobertura por dia e a lista de divergências. Não inventa plantão.
 // Usado no n8n (nó "Monta o mês") e no teste local (integracoes/plantoes/testa.js).
-function montarMes(RESP, MES, VALOR_HORA = 75) {
+function montarMes(RESP, MES, VALOR_HORA = 75, HOR = null) {
   const FIM_TARDE = { 'Asa Sul': 20.5, 'Taguatinga': 19 };
   const [cab, ...L] = RESP;
   const col = (re) => cab.findIndex((c) => re.test(String(c)));
@@ -70,8 +73,11 @@ function montarMes(RESP, MES, VALOR_HORA = 75) {
     for (const u of ['Asa Sul', 'Taguatinga']) {
       const rs = linhas.filter((r) => r.dia === dia && r.unidade === u); linha[u] = rs.length;
       const temM = rs.some((r) => r.turno === 'Manhã'), temT = rs.some((r) => r.turno === 'Tarde');
-      for (const t of [['Manhã', temM], ['Tarde', temT]]) if (!t[1]) lacunas.push({ dia, dataSerial: Math.floor(Date.UTC(Number(dia.slice(0, 4)), Number(dia.slice(5, 7)) - 1, d) / 864e5 + 25569), unidade: u, turno: t[0], ini: t[0] === 'Manhã' ? 8 : 15, fim: t[0] === 'Manhã' ? 14 : (FIM_TARDE[u] || 19) });
-      if (!temM || !temT) div.lacunas.push(`${String(d).padStart(2, '0')}/${MES.slice(5)} (${sem}) · ${u}: ${!temM && !temT ? 'nenhum registro' : 'falta a ' + (temM ? 'tarde' : 'manhã')}`);
+      const h = HOR && HOR[dia + '|' + u];   // sem h: iGut sem resposta, vale o horário padrão
+      const fimT = h && h.n ? Math.round((h.ultima + 1.5) * 60) / 60 : (FIM_TARDE[u] || 19);
+      const faltaM = !temM && (!h || (h.n > 0 && h.primeira < 14)), faltaT = !temT && (!h || (h.n > 0 && fimT > 15));
+      for (const t of [['Manhã', faltaM], ['Tarde', faltaT]]) if (t[1]) lacunas.push({ dia, dataSerial: Math.floor(Date.UTC(Number(dia.slice(0, 4)), Number(dia.slice(5, 7)) - 1, d) / 864e5 + 25569), unidade: u, turno: t[0], ini: t[0] === 'Manhã' ? 8 : 15, fim: t[0] === 'Manhã' ? 14 : fimT });
+      if (faltaM || faltaT) div.lacunas.push(`${String(d).padStart(2, '0')}/${MES.slice(5)} (${sem}) · ${u}: ${faltaM && faltaT ? 'nenhum registro' : 'falta a ' + (faltaM ? 'manhã' : 'tarde')}${faltaT && h ? ` (saída ${hhmm(fimT)}: última sessão ${hhmm(h.ultima)} + 1h30)` : ''}`);
       for (const t of ['Manhã', 'Tarde']) { const ms = rs.filter((r) => r.turno === t); if (ms.length > 1) div.doisMedicos.push(`${String(d).padStart(2, '0')}/${MES.slice(5)} · ${u} · ${t}: ${ms.map((r) => r.nome + ' (' + hhmm(r.ini) + '–' + hhmm(r.fim) + ')').join(' e ')}`); }
       for (const r of rs) if (r.turno === 'Tarde' && r.fim < (FIM_TARDE[u] || 19) - 0.01) div.tardesCurtas.push(`${String(d).padStart(2, '0')}/${MES.slice(5)} (${sem}${['sábado', 'domingo'].includes(sem) ? '' : ', dia útil'}) · ${u} · ${r.nome}: terminou ${hhmm(r.fim)} (horário da unidade: ${hhmm(FIM_TARDE[u] || 19)})`);
     }
