@@ -362,10 +362,13 @@ function desenhar() {
 
   // Destaque: custo por paciente agendado (06/10/2026, Jorge: o tráfego vai até o agendamento)
   let destaque;
-  const platsContato = () => [['google', 'Google Ads', contatos, div(gasto, contatos) ? brl(div(gasto, contatos)) + ' por contato' : '—'], ['organico', 'Orgânico', orgConv.length, 'sem custo'], ['meta', 'Meta', null, 'quando o token sair']]
-    .filter(([p]) => naPlat(p)).map(([p, n, cn, c]) => `<div class="plat"><em style="color:var(--${p})">${n}</em><span>${cn == null ? '—' : int(cn) + (p === 'google' ? ' contatos' : ' cliques no WhatsApp')}</span><b>${c}</b></div>`).join('');
+  // por plataforma (03/11/2026: a Meta entrou; antes o Google levava o total)
+  const daP = p => { const a = ads.filter(x => x.p === p); return { g: soma(a, 'gasto'), c: soma(a, 'contatos') + soma(a, 'ligacoes') }; }, cG = daP('google'), cM = daP('meta');
+  const custoC = x => div(x.g, x.c) ? brl(div(x.g, x.c)) + ' por contato' : x.g ? brl0(x.g) + ', nenhum contato' : '—';
+  const platsContato = () => [['google', 'Google Ads', cG.c, custoC(cG)], ['organico', 'Orgânico', orgConv.length, 'sem custo'], ['meta', 'Meta', cM.c, custoC(cM)]]
+    .filter(([p]) => naPlat(p)).map(([p, n, cn, c]) => `<div class="plat"><em style="color:var(--${p})">${n}</em><span>${cn == null ? '—' : int(cn) + (p === 'google' ? ' contatos' : p === 'meta' ? (cn === 1 ? ' conversa' : ' conversas') : ' cliques no WhatsApp')}</span><b>${c}</b></div>`).join('');
   if (d.bmh && !d.mede_atendimento) destaque = `<div class="rot">Custo por contato</div><div class="val">${brl0(div(gasto, contatos))}</div>
-      <p>Cada contato que veio do anúncio (clique no WhatsApp do site ou ligação) custou, em média, <b>${brl(div(gasto, contatos))}</b>. Foram <b>${int(contatos)}</b> contatos para <b>${brl0(gasto)}</b> investidos.</p>
+      <p>Cada contato que veio do anúncio (no Google, clique no WhatsApp do site ou ligação; na Meta, conversa iniciada) custou, em média, <b>${brl(div(gasto, contatos))}</b>. Foram <b>${int(contatos)}</b> contatos para <b>${brl0(gasto)}</b> investidos.</p>
       <p>A recepção atende no WhatsApp do celular: o custo por paciente atendido aparece quando a conversa passar por um sistema. Os atendimentos do período entram pelo iGut.</p>`;
   else if (M.ag) destaque = `<div class="rot">Custo por paciente agendado</div><div class="val">${brl0(div(M.gasto, M.ag))}</div>
       <p>Cada pessoa que chegou por anúncio e agendou custou, em média, <b>${brl(div(M.gasto, M.ag))}</b>. Foram <b>${int(M.ag)}</b> ${M.ag === 1 ? 'agendamento' : 'agendamentos'} para <b>${brl0(M.gasto)}</b> investidos${M.parcial ? ' nos dias em que a origem foi medida' : ''}.</p>`;
@@ -595,7 +598,8 @@ function secaoMetricas(x) {
   const txCp = div(cp, ag), txCpA = div(cpA, agA), cpCp = div(M.gasto, M.cp), cpCpA = div(MA.gasto, MA.cp);
   const soMedidos = M.parcial ? ' · só dias medidos' : '';
   // Campanhas de alcance/remarketing do Meta não buscam clique: ficam fora das leituras de CTR, clique → contato e frequência
-  const alcanceMeta = a => a.p === 'meta' && /alcance|reconhecimento|rmkt|remarketing/i.test(a.camp);
+  // na BMH (03/11/2026) as campanhas da Meta são de engajamento, distribuição e seguidores: não buscam conversa e ficam fora destas leituras
+  const alcanceMeta = a => a.p === 'meta' && /alcance|reconhecimento|rmkt|remarketing|engajamento|distribui|video view|seguidores|trafego|tráfego/i.test(a.camp);
   const porP = (p, k) => soma(ads.filter(a => a.p === p && !alcanceMeta(a)), k);
   const alcMsg = alc.filter(r => !/alcance|reconhecimento|rmkt|remarketing/i.test(r.camp)); const freqMsg = soma(alcMsg, 'alcance') ? soma(alcMsg, 'impr') / soma(alcMsg, 'alcance') : null;
   const ctrG = div(porP('google', 'cliques'), porP('google', 'impr')), ctrM = div(porP('meta', 'cliques'), porP('meta', 'impr'));
@@ -638,7 +642,7 @@ function secaoMetricas(x) {
     ${(() => { // Etapa do investimento (07/10/2026, Jorge): 3 cartões como as outras etapas. Teto pelo filtro de plataforma,
       // no mês em que o período termina (o mesmo do bloco "contra o teto"); com campanha escolhida, não se aplica.
       const m = d.mes, pl = E.plataforma === 'google' || E.plataforma === 'meta' ? (m?.plataformas || []).find(x => x.p === E.plataforma) : null;
-      const t = E.campanha || !m ? null : pl ? { gasto: pl.gasto, teto: pl.teto, proj: pl.projecao } : { gasto: m.gasto, teto: m.teto, proj: m.projecao };
+      const t = E.campanha || !m || (E.dados.bmh && E.plataforma === 'meta' && !pl) ? null : pl ?{ gasto: pl.gasto, teto: pl.teto, proj: pl.projecao } : { gasto: m.gasto, teto: m.teto, proj: m.projecao };
       const nomeMes = m ? MESES[Number(m.inicio.slice(5, 7)) - 1] : '', fechou = m && m.dia === m.dias;
       const selo = !t || !t.teto ? '' : t.proj > t.teto * 1.02 ? `<span class="delta ruim">${fechou ? 'passou' : 'vai passar'} do teto</span>` : `<span class="delta bom">${fechou ? 'dentro' : 'no ritmo'} do teto</span>`;
       return et(1, 'Investiram', 'quanto foi para os anúncios', `

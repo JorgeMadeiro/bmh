@@ -9,7 +9,12 @@ const entre = (d, a, b) => d >= a && d <= b, num = v => Number(v) || 0;
 // ---------- anúncios ----------
 const adRow = r => ({ p: 'google', d: r.dia, camp: r.campanha, grupo: r.grupo, ad_id: 'g' + r.ad_id, ad: r.grupo + ' · anúncio …' + String(r.ad_id).slice(-4), link: '',
   gasto: num(r.gasto), impr: num(r.impressoes), cliques: num(r.cliques), contatos: num(r.contatos), ligacoes: num(r.ligacoes), atend_plat: 0, plat_ag: 0, plat_cp: 0 });
-const anuncios = ads.filter(r => entre(r.dia, P.inicio, P.fim)).map(adRow), anuncios_ant = ads.filter(r => entre(r.dia, P.ant.inicio, P.ant.fim)).map(adRow);
+// Meta (03/11/2026): uma linha por anúncio e dia; contato = conversa iniciada. O teto do mês segue só o do Google (o da Meta não foi decidido)
+let metaAds = []; try { metaAds = linhas('Meta (tabela)').filter(r => r.tipo === 'anuncio'); } catch (e) {}
+const metaRow = r => ({ p: 'meta', d: r.dia, camp: r.campanha, grupo: r.conjunto, ad_id: 'm' + r.ad_id, ad: r.anuncio, link: '',
+  gasto: num(r.gasto), impr: num(r.impressoes), cliques: num(r.cliques_link), contatos: num(r.conversas), ligacoes: 0, atend_plat: 0, plat_ag: 0, plat_cp: 0 });
+const doPeriodo = (a, b) => [...ads.filter(r => entre(r.dia, a, b)).map(adRow), ...metaAds.filter(r => entre(r.dia, a, b)).map(metaRow)];
+const anuncios = doPeriodo(P.inicio, P.fim), anuncios_ant = doPeriodo(P.ant.inicio, P.ant.fim);
 const ultimaGravacao = ads.map(r => r.atualizado_em || '').sort().pop() || '';
 const mesGasto = ads.filter(r => entre(r.dia, P.mes_inicio, P.fim)).reduce((s, r) => s + num(r.gasto), 0);
 // parcela do período: ponderada pelas buscas possíveis de cada dia (impressões ÷ parcela)
@@ -68,7 +73,7 @@ return [{ json: {
     'Botões por caso e por lugar (evento clique_whatsapp) medidos desde 08/10/2026; o painel conta o clique do Analytics, que tem histórico.',
     'Telefone pelo site medido desde 08/10/2026; antes, só as ligações feitas pelo anúncio.',
     'Teto: média do investimento mensal dos últimos 12 meses (out/2025 a set/2026, R$ 3.641), arredondada para R$ ' + teto.toLocaleString('pt-BR') + '.',
-    'Atendidos e receita entram com o iGut. Meta e Instagram, quando o token sair. Perfil do Google pela API do Perfil da Empresa desde 14/10/2026 (aprovação do Google), com o histórico que ela guarda.',
+    'Atendidos e receita entram com o iGut. Meta Ads desde 01/10/2026 (antes disso a Meta aparece zerada; contato do Meta = conversa iniciada); Instagram orgânico ainda não. O teto do mês é só o do Google. Perfil do Google pela API do Perfil da Empresa desde 14/10/2026 (aprovação do Google), com o histórico que ela guarda.',
     'Números gravados todo dia às 6h10 (BMH · Painel · grava o dia); a página só lê.',
   ],
 } }];
