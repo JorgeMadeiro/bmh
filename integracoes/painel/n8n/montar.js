@@ -264,12 +264,15 @@ function fluxoResumo() {
     config: le('Config', 'BMH_config'), ads: le('Anúncios (tabela)', 'BMH_google_anuncios_dia'), site: le('Site · cliques (tabela)', 'BMH_site_cliques_dia'),
     igut: le('iGut (tabela)', 'BMH_igut_dia'), guard: le('Guardião (tabela)', 'BMH_guardiao_registro'),
     token: no('Google · renova o acesso', 'n8n-nodes-base.httpRequest', 4.2, { method: 'POST', url: 'https://oauth2.googleapis.com/token', authentication: 'genericCredentialType', genericAuthType: 'httpCustomAuth', sendBody: true, contentType: 'json', specifyBody: 'json', jsonBody: '{}', options: {} }, { credentials: ADS, executeOnce: true, onError: 'continueRegularOutput', alwaysOutputData: true }),
+    meta: no('Meta · saldo da conta', 'n8n-nodes-base.httpRequest', 4.2, { method: 'GET', url: 'https://graph.facebook.com/v23.0/act_327952129944258', authentication: 'genericCredentialType', genericAuthType: 'httpQueryAuth',
+      sendQuery: true, queryParameters: { parameters: [{ name: 'fields', value: 'is_prepay_account,spend_cap,amount_spent,funding_source_details{display_string},insights.date_preset(last_7d){spend}' }] }, options: { timeout: 30000 } },
+      { credentials: { httpQueryAuth: { id: 'HXdesRATFOJkYxhK', name: 'BMH · Meta Instagram (token)' } }, executeOnce: true, onError: 'continueRegularOutput', alwaysOutputData: true }),
     monta: codigoResumo,
     envia: telegram('Envia no Telegram', '={{ $json.texto }}'),
-    nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Telegram · resumo da manhã\n**Traz:** tabelas do painel e do iGut\n**Envia:** resumo das 8h no Telegram\n**Limites:** uma mensagem por dia; só números\n\nTodo dia às 8h, no robô BMH alertas: Google Ads, WhatsApp pelo site e iGut de ontem; o mês até ontem contra o teto e contra o mesmo período do mês anterior; propostas do guardião esperando decisão. Lê as mesmas tabelas do painel. Manual: /webhook/bmh-resumo-manha.', width: 560, height: 200 }),
+    nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Telegram · resumo da manhã\n**Traz:** tabelas do painel e do iGut\n**Envia:** resumo das 8h no Telegram\n**Limites:** uma mensagem por dia; só números\n\nTodo dia às 8h, no robô BMH alertas: Google Ads, WhatsApp pelo site e iGut de ontem; o mês até ontem contra o teto e contra o mesmo período do mês anterior; saldo pré-pago do Google Ads e da Meta, com ⚠️ quando faltar 7 dias ou menos; propostas do guardião esperando decisão. Lê as mesmas tabelas do painel. Manual: /webhook/bmh-resumo-manha.', width: 560, height: 220 }),
   };
   const cx = {}; liga(cx, n.manual.name, n.config.name);
-  const ordem = [n.agenda, n.config, n.ads, n.site, n.igut, n.guard, n.token, n.monta, n.envia];
+  const ordem = [n.agenda, n.config, n.ads, n.site, n.igut, n.guard, n.token, n.meta, n.monta, n.envia];
   for (let i = 0; i < ordem.length - 1; i++) liga(cx, ordem[i].name, ordem[i + 1].name);
   return { name: 'BMH · Telegram · resumo da manhã', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'all' }) };
 }
