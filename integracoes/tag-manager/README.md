@@ -71,6 +71,17 @@ WhatsApp, cliques, pixel e Clarity seguem iguais. **Voltar atrás:** publicar a 
 Jorge, a conta de serviço `bmh-site` e os grupos automáticos do vínculo com o Google Ads; Clarity só com o Jorge; Google
 Ads sem o usuário do Thiago e sem a gerente da Triunfo (969-748-3650, desvinculada); Meta sem a Triunfo.
 
+## Versão 10 (03/11/2026): **criada e testada, NÃO publicada**
+
+"Meta: evento de contato no clique do WhatsApp e do telefone (03/11/2026)" (script: `integracoes/tag-manager/versao-10-rascunho.js`),
+pedido do Jorge ("pode fazer o pixel já"; proposta P5 da auditoria da Meta de 20/10). Só acrescenta as tags 30 "BMH · Meta ·
+Contact no WhatsApp" (acionador 21, com o caso do botão) e 31 "BMH · Meta · Contact no telefone" (acionador 22), as duas
+depois da tag 14 (pixel `1526867428059043`), com `trackSingle` e sem dado da pessoa. A política de privacidade já cita o pixel.
+**Teste (ambiente Latest, envios bloqueados):** rascunho igual à versão 9 publicada em todos os casos (GA4 com caso e local,
+conversão do Ads, WhatsApp, telefone, como chegar, Clarity), mais `Meta Contact` no clique do WhatsApp (home e `/lp/`) e do
+telefone. A publicação pela conta de serviço foi barrada pela permissão da sessão: publicar à mão em Versões, versão 10,
+Publicar, e depois rodar `scripts/testa-tags.js` na versão publicada. **Voltar atrás:** publicar a versão 9.
+
 ## Acessos (conferido em 09/10/2026)
 
 - **Tag Manager:** jorgemadeirotorres@gmail.com é o único administrador. bmhiperbarica@gmail.com (muita gente usa) passou
