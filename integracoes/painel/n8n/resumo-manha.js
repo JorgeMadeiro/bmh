@@ -26,6 +26,31 @@ try {
   const orc = {}; for (const x of r.results || []) orc[x.campaignBudget.resourceName] = Number(x.campaignBudget.amountMicros) / 1e6;
   B = Object.values(orc).reduce((s, v) => s + v, 0);
 } catch (e) {}
+// saldo da conta pré-paga (pedido do Jorge, 03/11/2026: "sempre avisar se estiver próximo de terminar"): crédito aprovado
+// menos o já gasto (o Google atualiza com algumas horas de atraso); os dias saem da média real dos últimos 7 dias
+let saldo = null;
+try {
+  const tok = $('Google · renova o acesso').first().json.access_token;
+  const r = await this.helpers.httpRequest({ method: 'POST', url: 'https://googleads.googleapis.com/v25/customers/5066798424/googleAds:search', headers: { Authorization: 'Bearer ' + tok },
+    body: { query: "SELECT account_budget.status, account_budget.approved_spending_limit_micros, account_budget.adjusted_spending_limit_micros, account_budget.amount_served_micros, account_budget.approved_end_time_type, account_budget.approved_end_date_time FROM account_budget WHERE account_budget.status = 'APPROVED'" }, json: true, timeout: 60000 });
+  const vigente = (r.results || []).map(x => x.accountBudget).filter(b => (b.approvedSpendingLimitMicros || b.adjustedSpendingLimitMicros) && (b.approvedEndTimeType === 'FOREVER' || String(b.approvedEndDateTime || '') > hoje.toFormat('yyyy-MM-dd HH:mm:ss')));
+  if (vigente.length) saldo = vigente.reduce((s, b) => s + (Number(b.adjustedSpendingLimitMicros || b.approvedSpendingLimitMicros) - Number(b.amountServedMicros || 0)) / 1e6, 0);
+} catch (e) {}
+const S7 = hoje.minus({ days: 7 }).toISODate(), media7 = soma(ads.filter(r => entre(r.dia, S7, O)), 'gasto') / 7;
+const diasSaldo = saldo !== null && media7 > 0 ? Math.floor(saldo / media7) : null;
+// Meta pré-paga (mesmo pedido): o que acaba primeiro, o saldo pago ou o limite de gastos da conta, e a média dos últimos 7 dias
+let meta = null;
+try {
+  const m = $('Meta · saldo da conta').first().json;
+  const txt = String(m.funding_source_details?.display_string || '').match(/R\$\s*([\d.,]+)/), cap = num(m.spend_cap) / 100;
+  const pago = txt ? Number(/,\d{2}$/.test(txt[1]) ? txt[1].replace(/\./g, '').replace(',', '.') : txt[1].replace(/,/g, '')) : null;
+  const limite = cap > 0 ? cap - num(m.amount_spent) / 100 : null;
+  const resta = [pago, limite].filter(v => v !== null && Number.isFinite(v));
+  if (m.is_prepay_account && resta.length) {
+    const dia = num(m.insights?.data?.[0]?.spend) / 7, v = Math.min(...resta);
+    meta = { v, dia, pelo: limite !== null && limite <= v && (pago === null || limite < pago) ? 'limite' : 'saldo', dias: dia > 0 ? Math.floor(v / dia) : null };
+  }
+} catch (e) {}
 const proj = B === null ? gM / ontem.day * ontem.daysInMonth : gM + B * (restantes || 0);
 const cada = (g, c) => c >= 0.5 ? ` (${brl(g / c)} cada)` : '';
 // WhatsApp pelo site
@@ -54,6 +79,10 @@ t.push('📅 ' + mesNome(ontem).replace(/^./, c => c.toUpperCase()) + ' até ont
 const ritmo = B === null ? ' · no ritmo, fecha em ' : ' · com ' + brl(B) + '/dia, fecha em ';
 t.push('• Anúncios: ' + brl(gM) + (teto ? ' de ' + brl(teto) : '') + ritmo + brl(proj) + (teto && proj > teto * 1.02 ? ' ⚠️ acima do teto' : ''));
 t.push('• Contatos do Google Ads: ' + int(cM) + cada(gM, cM));
+if (saldo !== null) t.push('• Saldo da conta do Google Ads: ' + brl(saldo) + (diasSaldo === null ? '' : diasSaldo <= 0 ? ' ⚠️ acabando hoje: faça o pagamento já'
+  : ' · dá uns ' + diasSaldo + (diasSaldo === 1 ? ' dia' : ' dias') + ' (' + brl(media7) + '/dia), até ~' + hoje.plus({ days: diasSaldo }).toFormat('dd/LL') + (diasSaldo <= 7 ? ' ⚠️ faça o pagamento até ' + hoje.plus({ days: Math.max(diasSaldo - 2, 0) }).toFormat('dd/LL') : '')));
+if (meta) t.push('• Saldo da Meta: ' + brl(meta.v) + (meta.pelo === 'limite' ? ' (limite de gastos da conta)' : '') + (meta.dias === null ? '' : meta.dias <= 0 ? ' ⚠️ acabando hoje: ' + (meta.pelo === 'limite' ? 'aumente o limite de gastos já' : 'faça o pagamento já')
+  : ' · dá uns ' + meta.dias + (meta.dias === 1 ? ' dia' : ' dias') + ' (' + brl(meta.dia) + '/dia), até ~' + hoje.plus({ days: meta.dias }).toFormat('dd/LL') + (meta.dias <= 7 ? ' ⚠️ ' + (meta.pelo === 'limite' ? 'aumente o limite de gastos' : 'faça o pagamento') + ' até ' + hoje.plus({ days: Math.max(meta.dias - 2, 0) }).toFormat('dd/LL') : '')));
 if (igM.length) t.push('• iGut: ' + int(sM) + ' sessões · ' + brl(vM) + ' produzidos');
 if (igA.length) t.push('• Mesmo período de ' + mesNome(ant) + ': ' + int(sA) + ' sessões (' + pct(sM, sA) + ') · ' + brl(vA) + ' (' + pct(vM, vA) + ')');
 if (igY.length) t.push('• Mesmo período de ' + mesNome(ano) + ' de ' + ano.year + ': ' + int(sY) + ' sessões (' + pct(sM, sY) + ') · ' + brl(vY) + ' (' + pct(vM, vY) + ')');

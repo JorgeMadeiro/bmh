@@ -20,7 +20,12 @@
 - **Fluxos** (ids em `n8n-ids.json`; montar e reenviar com `node --env-file=.env integracoes/painel/n8n/montar.js`):
   - "BMH · Painel · grava o dia" (`AeQIImClkXtRrWIf`), 6h10: Google Ads, Analytics e Search Console dos últimos 28 dias →
     tabelas. Manual: `/webhook/bmh-painel-grava?dias=N` ou `?desde&ate`. Histórico carregado desde 01/09/2025.
-  - "BMH · Painel (página)" (`zwEgF9jUwX6TcHhK`): lê as tabelas e entrega `pagina.html`.
+  - "BMH · Painel (página)" (`zwEgF9jUwX6TcHhK`): lê as tabelas e entrega `pagina.html`. **Meta desde 03/11/2026:** lê
+    `BMH_meta_anuncios_dia` (linhas `tipo = anuncio`, gravadas às 6h05 por "BMH · Meta · números do dia",
+    `0FskpyELgh7nBqF0`, com dados desde 01/10/2026; contato da Meta = conversa iniciada). O teto do mês segue só o do
+    Google enquanto a Meta não tiver teto (`meta_teto_mes`). As campanhas de engajamento, distribuição e seguidores ficam
+    fora das leituras de "campanha de mensagem" (CTR e clique que vira conversa), que eram da Nexo e dariam alarme falso.
+    Conferido com outubro: R$ 635,08 na tabela, igual à API da Meta.
   - "BMH · iGut · atendimentos do dia" (`gPRwxWVpbMT0q4AP`), 3h20: sessões realizadas e pacientes distintos por dia e
     unidade (produção do iGut; linha de faturamento não conta), últimos 7 dias. Histórico desde set/2023 (o iGut não tem
     dados antes; jan a mar/2023 responde "Found no matching data"). Taguatinga desde jan/2025. Valor produzido gravado

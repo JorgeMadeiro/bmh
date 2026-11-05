@@ -22,7 +22,12 @@
    (`monta-mes.js`: mês da data do plantão; Específico vira manhã + tarde; duplicados pelo médico, fica o envio mais
    recente; nome mais longo e CRM mais frequente), cria a aba "MM/AA" (com as lacunas em vermelho no fim) com fórmulas (separador `;`, a
    planilha é pt-BR), e manda as divergências no Telegram com o botão **"Pronto, gerar os e-mails"**. Se a aba já existe,
-   não mexe (avisa). No refazer, apaga também a "Cobertura MM/AA" antiga, se houver. Manual: `/webhook/bmh-plantoes-mes?mes=AAAA-MM` (`&refazer=1` recria; `&prefixo=teste` testa).
+   não mexe (avisa). No refazer, apaga também a "Cobertura MM/AA" antiga, se houver.
+   **Horário da lacuna pelo iGut (regra do Jorge, 03/11/2026):** o fluxo lê a agenda de cada dia do mês (nós "Dias do
+   mês", "Agenda do dia", "Horários do iGut"; câmaras 111, 112 e 121, sessão finalizada sem falta). Dia e unidade sem
+   sessão não viram lacuna (ex.: os domingos de eleição, 04 e 25/10/2026); a tarde da lacuna termina na **última sessão +
+   1h30**. Vale só para quem não lançou: o que o médico pôs no formulário não muda. Dia que o iGut não respondeu fica
+   com o horário padrão. Conferido em 03/11 com outubro: 19 lacunas (eram 27), os mesmos horários lançados à mão. Manual: `/webhook/bmh-plantoes-mes?mes=AAAA-MM` (`&refazer=1` recria; `&prefixo=teste` testa).
 2. **Botão "Pronto"** (fluxo "BMH · Telegram · botões", `pl:AAAA-MM:ok`, só o chat do Jorge) → chama o fluxo 3 com chave.
 3. **"BMH · Plantões · e-mails do mês"** (`qNDy08i41junIQk9`): lê a aba do mês já completa + Pagamento, soma as sessões
    do mês (`BMH_operacao_dia`) e monta os e-mails (`emails.js`) no formato do Jorge. Com o Gmail autorizado, cria os dois
@@ -55,6 +60,15 @@
 - E-mail de honorários montado da aba "09/26" dele: R$ 46.253,75 (= total da aba). Produção: 1.128 + 601 (painel).
 - Teste ponta a ponta no n8n com `prefixo=teste` (aba "teste 09/26"): sem erro de fórmula; 13 turnos sem formulário no
   fim, em vermelho; preencher nome e CRM de um deles somou 6 h e R$ 450 no total, e apagar tirou de novo.
+
+## Outubro/2026 (03/11/2026)
+
+- 27 lacunas na aba "10/26". 15 preenchidas com o médico que a recepção posta nos grupos BMH ADM ("Médico plantonista
+  dia ..."; conversas exportadas pelo Jorge, lidas só no Mac, em `dados/plantoes/`) e a saída pela última sessão do
+  iGut + 1h30. 8 eram os domingos de eleição (sem sessão). Ficaram sem médico 22 e 24/10 em Taguatinga (sem aviso no
+  grupo). Total depois do preenchimento: R$ 42.363,75 (564h51). Cópia da aba antes em `dados/plantoes/`.
+- Lição: a instância Madeiro da Evolution não guarda as mensagens dos grupos (só envia); para ler o grupo, exportar a
+  conversa pelo celular.
 
 ## Falta
 

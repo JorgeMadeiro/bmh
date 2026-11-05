@@ -171,6 +171,7 @@ function fluxoPagina() {
     periodo: codigo('Qual período', 'qual-periodo.js'),
     ads: le('Anúncios (tabela)', 'BMH_google_anuncios_dia'), parc: le('Parcela (tabela)', 'BMH_google_parcela_dia'), site: le('Site · cliques (tabela)', 'BMH_site_cliques_dia'),
     org: le('Orgânico (tabela)', 'BMH_organico_diario'), hor: le('Horas (tabela)', 'BMH_horas'), igut: le('iGut (tabela)', 'BMH_igut_dia'), guard: le('Guardião (tabela)', 'BMH_guardiao_registro'),
+    meta: le('Meta (tabela)', 'BMH_meta_anuncios_dia'),   // gravada às 6h05 por "BMH · Meta · números do dia" (0FskpyELgh7nBqF0), desde 01/10/2026
     monta: codigo('Monta os dados', 'monta-os-dados.js'),
     json: no('Pede JSON?', 'n8n-nodes-base.if', 2.2, { conditions: { options: { caseSensitive: true, leftValue: '', typeValidation: 'loose', version: 2 }, combinator: 'and',
       conditions: [{ id: crypto.randomUUID(), leftValue: "={{ $('Painel').first().json.query.formato }}", rightValue: 'json', operator: { type: 'string', operation: 'equals' } }] }, options: {} }),
@@ -179,7 +180,7 @@ function fluxoPagina() {
     nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Painel (página)\n**Traz:** tabelas do painel\n**Envia:** a página do painel, com login\n**Limites:** só lê\n\nPágina do painel da BMH, igual à da Nexo (fluxo bKst8atLrI4rB2DM). Login: credencial "BMH · Painel (login)". ?formato=json devolve só os dados.\nLê as tabelas BMH_* gravadas às 6h10 (BMH · Painel · grava o dia). Página e código em integracoes/painel/ no workspace da BMH (montar.js reenvia).', width: 520, height: 200 }),
   };
   const cx = {};
-  const ordem = [n.painel, n.config, n.periodo, n.ads, n.parc, n.site, n.org, n.hor, n.igut, n.guard, n.monta, n.json];
+  const ordem = [n.painel, n.config, n.periodo, n.ads, n.parc, n.site, n.org, n.hor, n.igut, n.guard, n.meta, n.monta, n.json];
   for (let i = 0; i < ordem.length - 1; i++) liga(cx, ordem[i].name, ordem[i + 1].name);
   cx[n.json.name] = { main: [[{ node: n.entregaJson.name, type: 'main', index: 0 }], [{ node: n.entrega.name, type: 'main', index: 0 }]] };
   return { name: 'BMH · Painel (página)', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none' }) };
@@ -264,12 +265,15 @@ function fluxoResumo() {
     config: le('Config', 'BMH_config'), ads: le('Anúncios (tabela)', 'BMH_google_anuncios_dia'), site: le('Site · cliques (tabela)', 'BMH_site_cliques_dia'),
     igut: le('iGut (tabela)', 'BMH_igut_dia'), guard: le('Guardião (tabela)', 'BMH_guardiao_registro'),
     token: no('Google · renova o acesso', 'n8n-nodes-base.httpRequest', 4.2, { method: 'POST', url: 'https://oauth2.googleapis.com/token', authentication: 'genericCredentialType', genericAuthType: 'httpCustomAuth', sendBody: true, contentType: 'json', specifyBody: 'json', jsonBody: '{}', options: {} }, { credentials: ADS, executeOnce: true, onError: 'continueRegularOutput', alwaysOutputData: true }),
+    meta: no('Meta · saldo da conta', 'n8n-nodes-base.httpRequest', 4.2, { method: 'GET', url: 'https://graph.facebook.com/v23.0/act_327952129944258', authentication: 'genericCredentialType', genericAuthType: 'httpQueryAuth',
+      sendQuery: true, queryParameters: { parameters: [{ name: 'fields', value: 'is_prepay_account,spend_cap,amount_spent,funding_source_details{display_string},insights.date_preset(last_7d){spend}' }] }, options: { timeout: 30000 } },
+      { credentials: { httpQueryAuth: { id: 'HXdesRATFOJkYxhK', name: 'BMH · Meta Instagram (token)' } }, executeOnce: true, onError: 'continueRegularOutput', alwaysOutputData: true }),
     monta: codigoResumo,
     envia: telegram('Envia no Telegram', '={{ $json.texto }}'),
-    nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Telegram · resumo da manhã\n**Traz:** tabelas do painel e do iGut\n**Envia:** resumo das 8h no Telegram\n**Limites:** uma mensagem por dia; só números\n\nTodo dia às 8h, no robô BMH alertas: Google Ads, WhatsApp pelo site e iGut de ontem; o mês até ontem contra o teto e contra o mesmo período do mês anterior; propostas do guardião esperando decisão. Lê as mesmas tabelas do painel. Manual: /webhook/bmh-resumo-manha.', width: 560, height: 200 }),
+    nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Telegram · resumo da manhã\n**Traz:** tabelas do painel e do iGut\n**Envia:** resumo das 8h no Telegram\n**Limites:** uma mensagem por dia; só números\n\nTodo dia às 8h, no robô BMH alertas: Google Ads, WhatsApp pelo site e iGut de ontem; o mês até ontem contra o teto e contra o mesmo período do mês anterior; saldo pré-pago do Google Ads e da Meta, com ⚠️ quando faltar 7 dias ou menos; propostas do guardião esperando decisão. Lê as mesmas tabelas do painel. Manual: /webhook/bmh-resumo-manha.', width: 560, height: 220 }),
   };
   const cx = {}; liga(cx, n.manual.name, n.config.name);
-  const ordem = [n.agenda, n.config, n.ads, n.site, n.igut, n.guard, n.token, n.monta, n.envia];
+  const ordem = [n.agenda, n.config, n.ads, n.site, n.igut, n.guard, n.token, n.meta, n.monta, n.envia];
   for (let i = 0; i < ordem.length - 1; i++) liga(cx, ordem[i].name, ordem[i + 1].name);
   return { name: 'BMH · Telegram · resumo da manhã', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'all' }) };
 }
@@ -464,6 +468,12 @@ function fluxoPlantoes() {
     agenda_: no('Dia 1 às 8h', 'n8n-nodes-base.scheduleTrigger', 1.2, { rule: { interval: [{ field: 'cronExpression', expression: '0 8 1 * *' }] } }),
     manual: no('Manual', 'n8n-nodes-base.webhook', 2, { path: 'bmh-plantoes-mes', options: {} }, { webhookId: crypto.randomUUID() }),
     mes: codigo('Qual mês', '../../plantoes/n8n/qual-mes.js'),
+    // agenda do iGut dia a dia (03/11/2026): dia sem sessão não vira lacuna; a tarde da lacuna sai pela última sessão + 1h30
+    dias: codigo('Dias do mês', '../../plantoes/n8n/dias-do-mes.js'),
+    ag: no('Agenda do dia', 'n8n-nodes-base.httpRequest', 4.2, { method: 'POST', url: 'https://api.igut.med.br/v2/consultas/buscar', authentication: 'genericCredentialType', genericAuthType: 'httpCustomAuth',
+      sendBody: true, specifyBody: 'json', jsonBody: "={{ JSON.stringify({ 'Agendamento.data': $json.dia, 'Agendamento.data_fim': $json.dia }) }}",
+      options: { timeout: 120000, batching: { batch: { batchSize: 3, batchInterval: 500 } } } }, { credentials: cred('httpCustomAuth', 'BMH · iGut (acesso)'), alwaysOutputData: true, onError: 'continueRegularOutput' }),
+    hor: codigo('Horários do iGut', '../../plantoes/n8n/horarios.js'),
     resp: planilha('Respostas', 'GET', PLANILHA + '/values/Respostas!A1:O2000?valueRenderOption=UNFORMATTED_VALUE&dateTimeRenderOption=SERIAL_NUMBER'),
     abas: planilha('Abas da planilha', 'GET', PLANILHA + '?fields=sheets.properties(title,sheetId)'),
     monta: no('Monta o mês', 'n8n-nodes-base.code', 2, { jsCode: comMonta('../../plantoes/n8n/monta.js') }),
@@ -477,10 +487,10 @@ function fluxoPlantoes() {
     msg: codigo('Mensagem de divergências', '../../plantoes/n8n/mensagem.js'),
     tg: no('Telegram · divergências', 'n8n-nodes-base.telegram', 1.2, { chatId: CHAT, text: '={{ $json.texto }}', additionalFields: { appendAttribution: false, parse_mode: 'HTML' }, replyMarkup: 'inlineKeyboard',
       inlineKeyboard: { rows: [{ row: { buttons: [{ text: '✅ Pronto, gerar os e-mails', additionalFields: { callback_data: '={{ $json.botao }}' } }] } }] } }, { credentials: TG }),
-    nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Plantões · fechamento do mês\n**Traz:** respostas do formulário dos médicos\n**Envia:** aba do mês na planilha e divergências no Telegram\n**Limites:** não recria aba que existe; não inventa plantão\n\nDia 1 às 8h: lê a aba Respostas do formulário dos médicos (Planilha Prestação Serviço Médico), aplica as regras do fechamento (mês do plantão, turnos da BMH, Específico vira manhã + tarde, duplicados, nome e CRM) e cria a aba "MM/AA" com fórmulas; os turnos sem formulário entram no fim da aba, em vermelho, até o Jorge preencher nome e CRM. Manda as divergências no Telegram com o botão "Pronto". Não inventa plantão. Manual: /webhook/bmh-plantoes-mes?mes=AAAA-MM (&refazer=1 recria; &prefixo=teste para testar). Código em integracoes/plantoes/.', width: 600, height: 240 }),
+    nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Plantões · fechamento do mês\n**Traz:** respostas do formulário dos médicos e os horários da agenda do iGut\n**Envia:** aba do mês na planilha e divergências no Telegram\n**Limites:** não recria aba que existe; não inventa plantão\n\nDia 1 às 8h: lê a aba Respostas do formulário dos médicos (Planilha Prestação Serviço Médico), aplica as regras do fechamento (mês do plantão, turnos da BMH, Específico vira manhã + tarde, duplicados, nome e CRM) e cria a aba "MM/AA" com fórmulas; os turnos sem formulário entram no fim da aba, em vermelho, até o Jorge preencher nome e CRM (só onde o iGut tem sessão; a tarde termina na última sessão + 1h30, regra de 03/11/2026). Manda as divergências no Telegram com o botão "Pronto". Não inventa plantão. Manual: /webhook/bmh-plantoes-mes?mes=AAAA-MM (&refazer=1 recria; &prefixo=teste para testar). Código em integracoes/plantoes/.', width: 600, height: 240 }),
   };
   const cx = {}; liga(cx, n.agenda_.name, n.mes.name); liga(cx, n.manual.name, n.mes.name);
-  for (const [a, b] of [[n.mes, n.resp], [n.resp, n.abas], [n.abas, n.monta], [n.monta, n.existe], [n.avisoExiste, n.tgExiste], [n.cria, n.pedidos], [n.pedidos, n.valores], [n.valores, n.formata], [n.formata, n.msg], [n.msg, n.tg]]) liga(cx, a.name, b.name);
+  for (const [a, b] of [[n.mes, n.dias], [n.dias, n.ag], [n.ag, n.hor], [n.hor, n.resp], [n.resp, n.abas], [n.abas, n.monta], [n.monta, n.existe], [n.avisoExiste, n.tgExiste], [n.cria, n.pedidos], [n.pedidos, n.valores], [n.valores, n.formata], [n.formata, n.msg], [n.msg, n.tg]]) liga(cx, a.name, b.name);
   cx[n.existe.name] = { main: [[{ node: n.avisoExiste.name, type: 'main', index: 0 }], [{ node: n.cria.name, type: 'main', index: 0 }]] };
   return { name: 'BMH · Plantões · fechamento do mês', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none' }) };
 }
