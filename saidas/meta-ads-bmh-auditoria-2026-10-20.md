@@ -28,7 +28,7 @@ Pedido da Central (ordem do Jorge: a casa assume o Meta Ads da BMH). Feito pelo 
 | Dona | portfólio BMH `3231205376979050` |
 | Pagamento | pré-pago: Pix de R$ 500 em 07/08 e R$ 800 em 30/09 (no histórico de 90 dias) |
 | Limite de gastos da conta | R$ 11.820,55, gasto R$ 11.635,10: **restam R$ 185,45** (só o Jorge sobe) |
-| Saldo | R$ 211,10 disponível, R$ 15,46 já gastos e não cobrados: **livre R$ 195,54** |
+| Saldo | R$ 211,10 disponível, R$ 15,46 já gastos e não cobrados: **livre R$ 195,54**. Correção de 05/11/2026: o disponível já desconta o gasto, então o não cobrado não se tira dele (o saldo era R$ 211,10). Não mudou a data, porque o limite acabava antes |
 | Ritmo | R$ 22,35 por dia (média de 7 dias); orçamentos ligados somam R$ 23,26 por dia |
 | Quando para | **~28/10** (o limite acaba antes do saldo) |
 
