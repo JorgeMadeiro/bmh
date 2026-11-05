@@ -19,7 +19,10 @@ function decideMeta(E) {
   const FREQ_MAX = Number(cfg.meta_freq_max || 4);
   const LIM_SEM_CONVERSA = Number(cfg.meta_limite_sem_conversa || 40);
   const PISO = 6;                                               // menor orçamento diário que o guardião propõe
-  const TETO = Number(cfg['meta_teto_mes_' + E.hoje.slice(0, 7)] || cfg.meta_teto_mes || 0);
+  // teto do mês: a exceção do mês (meta_teto_mes_AAAA-MM), senão meta_teto_mes. "0" é teto zero (nada pode gastar), não "sem
+  // teto" (01/11/2026, decisão 116); só a chave ausente ou vazia desliga a regra.
+  const tetoTxt = [cfg['meta_teto_mes_' + E.hoje.slice(0, 7)], cfg.meta_teto_mes].find(v => v !== undefined && v !== null && String(v).trim() !== '');
+  const TETO = tetoTxt === undefined ? null : Number(String(tetoTxt).replace(',', '.'));
   const DA_CASA = new Set(['Meta', ...String(cfg.meta_alteracoes_da_casa || 'Claude BMH').split(',').map(s => s.trim()).filter(Boolean)]);
   const REPETE_EM_7 = new Set(['meta_frequencia', 'meta_anuncio_problema']);   // o resto aparece todo dia enquanto durar
 
@@ -51,7 +54,10 @@ function decideMeta(E) {
 
   // (2) verba da conta e continuidade (a conta mora em verbaDaConta, a mesma dos "números do dia")
   const { orc, B, ritmo, limite, verba, quem, dias, acaba } = verbaDaConta(E);
-  if (verba !== null && ritmo > 0) {
+  // Sem nenhum conjunto ligado (a conta parada de propósito, decisão 116 do Jorge em 01/11/2026), a verba não acaba em nada:
+  // sem aviso. Senão a média de 7 dias faria o guardião avisar todo dia, por uma semana, sem anúncio no ar.
+  const temLigado = ativos.some(c => campanhas.some(k => k.id === c.campaign_id && k.effective_status === 'ACTIVE'));
+  if (temLigado && verba !== null && ritmo > 0) {
     const antesDoPrazo = NO_AR_ATE && acaba < NO_AR_ATE;
     if (dias < DIAS_AVISO || antesDoPrazo) {
       let txt = `a verba da conta (${quem}) tem ${brl(verba)}: com ${brl(ritmo)}/dia ${B > 0 ? 'de orçamento ligado' : '(média de 7 dias)'} dura ${dias.toLocaleString('pt-BR', { maximumFractionDigits: 1 })} dias e acaba por volta de ${dm(acaba)}.`;
@@ -95,8 +101,9 @@ function decideMeta(E) {
       detalhe: `${brl(t.gasto)} em 3 dias sem nenhuma conversa iniciada.` }); }
 
   // (8) teto do mês: gasto até ontem + orçamentos ligados × dias que faltam (com hoje)
-  if (TETO) {
-    const G = E.dia > 1 ? num(E.mes) : 0, proj = G + B * E.restantes;
+  if (TETO !== null && !Number.isNaN(TETO)) {
+    // a conta para sozinha quando a verba (limite ou saldo) acaba: a projeção nunca passa do que ainda há para gastar
+    const G = E.dia > 1 ? num(E.mes) : 0, proj = G + Math.min(B * E.restantes, verba === null ? Infinity : Math.max(0, verba));
     if (G >= TETO) for (const o of orc)
       add({ regra: 'meta_teto', tipo: o.tipo, alvo_id: o.id, alvo: o.nome, acao: 'pausar', valor_antes: G.toFixed(2), detalhe: `o mês já gastou ${brl(G)} no Meta; o teto é ${brl(TETO)}.` });
     else if (B > 0 && proj > TETO * 1.02) {
@@ -148,7 +155,10 @@ function verbaDaConta(E) {
   const ritmo = B > 0 ? B : lista(E.dias7).reduce((s, d) => s + num(d.spend), 0) / 7;
   const limite = conta.spend_cap && num(conta.spend_cap) > 0 ? (num(conta.spend_cap) - num(conta.amount_spent)) / 100 : null;
   const saldoBruto = conta.is_prepay_account ? valor((conta.funding_source_details || {}).display_string) : null;
-  const saldo = saldoBruto === null ? null : saldoBruto - num(conta.balance) / 100;
+  // O saldo disponível da Meta já desconta o gasto (com imposto). O "balance" (não cobrado) não se tira dele: em 05/11/2026 o
+  // saldo livre calculado assim deu R$ 1,18 às 6h20 e a conta seguiu gastando; às 10h o balance caiu R$ 9,19 numa cobrança
+  // sem mexer no saldo, que caiu só o gasto (R$ 2,41)
+  const saldo = saldoBruto;
   const candidatos = [limite, saldo].filter(v => v !== null && !Number.isNaN(v));
   if (!candidatos.length) return { orc, B, ritmo, limite, saldo, verba: null, quem: '', dias: null, acaba: '' };
   const verba = Math.min(...candidatos);
