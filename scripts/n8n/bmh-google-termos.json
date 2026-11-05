@@ -1,0 +1,111 @@
+{
+ "name": "BMH · Google Ads · termos de busca (homologação)",
+ "nodes": [
+  {
+   "id": "cb459fdb-01e8-5ffb-bbfc-d28ab418cbcd",
+   "name": "Manual",
+   "type": "n8n-nodes-base.webhook",
+   "typeVersion": 2,
+   "position": [
+    0,
+    0
+   ],
+   "parameters": {
+    "path": "bmh-google-termos-7f30c4",
+    "responseMode": "lastNode",
+    "options": {}
+   },
+   "webhookId": "84a49847-38c9-54f0-91c5-2fdf1e6b8d6e"
+  },
+  {
+   "id": "2f535bef-39d6-5792-b345-1353a35036a4",
+   "name": "Google · renova o acesso",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    240,
+    0
+   ],
+   "parameters": {
+    "method": "POST",
+    "url": "https://oauth2.googleapis.com/token",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpCustomAuth",
+    "sendBody": true,
+    "contentType": "json",
+    "specifyBody": "json",
+    "jsonBody": "{}",
+    "options": {}
+   },
+   "credentials": {
+    "httpCustomAuth": {
+     "id": "Qewvtjz9JokCUvNy",
+     "name": "BMH · Google Ads (renovação do acesso)"
+    }
+   },
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000
+  },
+  {
+   "id": "37f0b6c3-4a5c-5f4e-bc00-31232b56c9c4",
+   "name": "Lê os termos",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    480,
+    0
+   ],
+   "parameters": {
+    "jsCode": "// Só leitura (decisão 114 do Jorge, 01/11/2026). A mesma chamada do guardião do Google.\nconst q = $('Manual').first().json.query || {};\nconst data = s => /^\\d{4}-\\d{2}-\\d{2}$/.test(s || '') ? s : '';\nconst desde = data(q.desde) || '2026-10-01', ate = data(q.ate) || '2026-10-31';\n// ?grupos=Nome 1,Nome 2 troca os grupos lidos (01/11/2026: conferir se os grupos de unidade têm a palavra antes da negativa B)\nconst GRUPOS = (q.grupos ? String(q.grupos).split(',').map(s => s.trim()).filter(Boolean).slice(0, 10) : [\"TESTE DE PALAVRAS\", \"Asa Sul\", \"Institucional + Concorrentes\"]);\nconst CONTA = '5066798424', token = $('Google · renova o acesso').first().json.access_token;\nif (!token) throw new Error('sem acesso (token) do Google Ads');\nconst busca = async q => { let out = [], pt; do { const r = await this.helpers.httpRequest({ method: 'POST', url: `https://googleads.googleapis.com/v25/customers/${CONTA}/googleAds:search`, headers: { Authorization: 'Bearer ' + token }, body: { query: q, ...(pt ? { pageToken: pt } : {}) }, json: true, timeout: 60000 }); out = out.concat(r.results || []); pt = r.nextPageToken; } while (pt); return out; };\nconst lista = GRUPOS.map(g => `'${g.replace(/'/g, \"\\\\'\")}'`).join(', ');\nconst per = `segments.date BETWEEN '${desde}' AND '${ate}'`;\nconst termos = await busca(`SELECT search_term_view.search_term, search_term_view.status, ad_group.name, campaign.name, metrics.cost_micros, metrics.clicks, metrics.impressions, metrics.conversions FROM search_term_view WHERE ${per} AND ad_group.name IN (${lista})`);\nconst palavras = await busca(`SELECT ad_group.name, ad_group_criterion.keyword.text, ad_group_criterion.keyword.match_type, ad_group_criterion.status, metrics.cost_micros, metrics.clicks, metrics.conversions FROM keyword_view WHERE ${per} AND ad_group.name IN (${lista}) AND ad_group_criterion.negative = FALSE`);\n// (05/11/2026: sem o filtro, as negativas do grupo vinham como palavra ENABLED, com gasto zero)\nconst negCamp = await busca(`SELECT campaign.name, campaign_criterion.keyword.text, campaign_criterion.keyword.match_type FROM campaign_criterion WHERE campaign_criterion.negative = TRUE AND campaign_criterion.type = 'KEYWORD' AND campaign.status != 'REMOVED'`);\nconst negGrupo = await busca(`SELECT ad_group.name, ad_group_criterion.keyword.text, ad_group_criterion.keyword.match_type FROM ad_group_criterion WHERE ad_group_criterion.negative = TRUE AND ad_group_criterion.type = 'KEYWORD' AND ad_group.name IN (${lista})`);\nlet listas = []; try { listas = await busca(`SELECT shared_set.name, shared_criterion.keyword.text, shared_criterion.keyword.match_type FROM shared_criterion WHERE shared_set.type = 'NEGATIVE_KEYWORDS'`); } catch (e) {}\nconst r2 = v => Math.round(Number(v || 0) / 1e4) / 100;\nconst grupos = {};\nfor (const g of GRUPOS) grupos[g] = { gasto: 0, cliques: 0, contatos: 0, termos: [], palavras: [], negativas_do_grupo: [] };\nfor (const x of termos) { const g = grupos[x.adGroup.name]; if (!g) continue; const t = { termo: x.searchTermView.searchTerm, situacao: x.searchTermView.status, gasto: r2(x.metrics.costMicros), cliques: Number(x.metrics.clicks || 0), impressoes: Number(x.metrics.impressions || 0), contatos: Math.round(Number(x.metrics.conversions || 0) * 10) / 10 };\n  g.termos.push(t); g.gasto += t.gasto; g.cliques += t.cliques; g.contatos += t.contatos; }\nfor (const x of palavras) { const g = grupos[x.adGroup.name]; if (g) g.palavras.push({ palavra: x.adGroupCriterion.keyword.text, tipo: x.adGroupCriterion.keyword.matchType, situacao: x.adGroupCriterion.status, gasto: r2(x.metrics.costMicros), cliques: Number(x.metrics.clicks || 0), contatos: Math.round(Number(x.metrics.conversions || 0) * 10) / 10 }); }\nfor (const x of negGrupo) { const g = grupos[x.adGroup.name]; if (g) g.negativas_do_grupo.push(x.adGroupCriterion.keyword.text + ' (' + x.adGroupCriterion.keyword.matchType + ')'); }\nfor (const g of Object.values(grupos)) { g.gasto = Math.round(g.gasto * 100) / 100; g.termos.sort((a, b) => b.gasto - a.gasto); g.palavras.sort((a, b) => b.gasto - a.gasto); }\nreturn [{ json: { periodo: { desde, ate }, grupos, negativas_da_campanha: negCamp.map(x => ({ campanha: x.campaign.name, termo: x.campaignCriterion.keyword.text, tipo: x.campaignCriterion.keyword.matchType })),\n  listas_de_negativas: listas.map(x => ({ lista: x.sharedSet.name, termo: x.sharedCriterion.keyword.text, tipo: x.sharedCriterion.keyword.matchType })) } }];\n"
+   }
+  },
+  {
+   "id": "6d037107-4412-50fb-bfd0-fb0e6f842740",
+   "name": "Sobre este fluxo",
+   "type": "n8n-nodes-base.stickyNote",
+   "typeVersion": 1,
+   "position": [
+    0,
+    -380
+   ],
+   "parameters": {
+    "width": 900,
+    "height": 300,
+    "content": "## BMH · Google Ads · termos de busca (homologação)\n**Traz:** do Google Ads da BMH (5066798424), no período pedido, os termos de busca, as palavras-chave e as negativas dos grupos TESTE DE PALAVRAS, Asa Sul e Institucional + Concorrentes, e as negativas da conta (campanhas e listas).\n**Envia:** só a resposta do Manual (JSON), para o Gerente BMH preparar as negativas.\n**Limites:** só leitura; não muda nada na conta; aplicar negativa é outro ok do Jorge (decisão 114, 01/11/2026).\n\nManual: `/webhook/bmh-google-termos-7f30c4?desde=AAAA-MM-DD&ate=AAAA-MM-DD` (padrão: outubro de 2026)."
+   }
+  }
+ ],
+ "connections": {
+  "Manual": {
+   "main": [
+    [
+     {
+      "node": "Google · renova o acesso",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Google · renova o acesso": {
+   "main": [
+    [
+     {
+      "node": "Lê os termos",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  }
+ },
+ "settings": {
+  "executionOrder": "v1",
+  "timezone": "America/Sao_Paulo",
+  "saveDataSuccessExecution": "all",
+  "saveDataErrorExecution": "all",
+  "errorWorkflow": "7u3CuyjESsHmCtMW",
+  "executionTimeout": 300
+ }
+}
