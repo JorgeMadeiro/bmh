@@ -1,0 +1,2128 @@
+{
+ "name": "Produção Diaria e Mensal BMH",
+ "nodes": [
+  {
+   "parameters": {
+    "url": "https://api.igut.med.br/v2/callcenters/profissionais/",
+    "sendHeaders": false,
+    "options": {},
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpCustomAuth"
+   },
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.4,
+   "position": [
+    -1600,
+    -464
+   ],
+   "id": "ffd42548-f9e4-49a1-a717-6aa6e0aa82b4",
+   "name": "Buscar ID de Médico/Agenda",
+   "credentials": {
+    "httpCustomAuth": {
+     "id": "0n8OhRsr6o2oHNjW",
+     "name": "BMH · iGut (acesso 2, passos soltos)"
+    }
+   }
+  },
+  {
+   "parameters": {
+    "url": "https://api.igut.med.br/v2/unidades",
+    "sendHeaders": false,
+    "options": {},
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpCustomAuth"
+   },
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.4,
+   "position": [
+    -1344,
+    -464
+   ],
+   "id": "f24e7e4f-7fec-4550-abdd-2fae4e8e43ba",
+   "name": "Buscar Unidade",
+   "credentials": {
+    "httpCustomAuth": {
+     "id": "ZezjclTyK2soW4a8",
+     "name": "BMH · iGut (acesso)"
+    }
+   }
+  },
+  {
+   "parameters": {
+    "url": "https://api.igut.med.br/v2/callcenters/especialidades",
+    "sendHeaders": false,
+    "options": {},
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpCustomAuth"
+   },
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.4,
+   "position": [
+    -1872,
+    -464
+   ],
+   "id": "dfc5e25e-eb35-4bec-8e87-e6fc1b2e8536",
+   "name": "Buscar ID de especialidade",
+   "credentials": {
+    "httpCustomAuth": {
+     "id": "0n8OhRsr6o2oHNjW",
+     "name": "BMH · iGut (acesso 2, passos soltos)"
+    }
+   }
+  },
+  {
+   "parameters": {
+    "jsCode": "// A resposta da API está em items[0].json\n\nconst resposta = items[0].json;\n\nif (!resposta.data || !Array.isArray(resposta.data)) {\n  return [];\n}\n\nreturn resposta.data.map(item => ({\n  json: item\n}));"
+   },
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    -1680,
+    608
+   ],
+   "id": "5d4e1c03-b96a-4970-9493-5228e5941f75",
+   "name": "Code in JavaScript"
+  },
+  {
+   "parameters": {
+    "method": "POST",
+    "url": "https://api.igut.med.br/v2/usuarios/login",
+    "sendHeaders": false,
+    "sendBody": false,
+    "options": {},
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpCustomAuth"
+   },
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.4,
+   "position": [
+    -2096,
+    80
+   ],
+   "id": "8fbbacbc-ff24-47e3-a448-586fcd958a38",
+   "name": "Gerar token usuario e senha ADM",
+   "credentials": {
+    "httpCustomAuth": {
+     "id": "XUQ8dIMSb7qVsRnu",
+     "name": "BMH · iGut (login ADM)"
+    }
+   }
+  },
+  {
+   "parameters": {
+    "method": "POST",
+    "url": "https://api.igut.med.br/v2/usuarios/login",
+    "sendHeaders": false,
+    "sendBody": false,
+    "options": {},
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpCustomAuth"
+   },
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.4,
+   "position": [
+    -1824,
+    80
+   ],
+   "id": "bc15121a-0f75-4cb4-a3c6-59bc7a506a81",
+   "name": "Gerar token usuario e senha JM",
+   "credentials": {
+    "httpCustomAuth": {
+     "id": "Oq9bSHDlc84H7XLP",
+     "name": "BMH · iGut (login JM)"
+    }
+   }
+  },
+  {
+   "parameters": {
+    "rules": {
+     "values": [
+      {
+       "conditions": {
+        "options": {
+         "caseSensitive": true,
+         "leftValue": "",
+         "typeValidation": "loose",
+         "version": 3
+        },
+        "conditions": [
+         {
+          "id": "d34c9c02-cb64-4f6b-8f1d-1df4b0625355",
+          "leftValue": "={{ $json.Local.id }}",
+          "rightValue": "=1",
+          "operator": {
+           "type": "string",
+           "operation": "equals"
+          }
+         }
+        ],
+        "combinator": "and"
+       },
+       "renameOutput": true,
+       "outputKey": "Asa Sul"
+      },
+      {
+       "conditions": {
+        "options": {
+         "caseSensitive": true,
+         "leftValue": "",
+         "typeValidation": "loose",
+         "version": 3
+        },
+        "conditions": [
+         {
+          "id": "de590268-4b21-45c2-9b43-0ec636eece17",
+          "leftValue": "={{ $json.Local.id }}",
+          "rightValue": "2",
+          "operator": {
+           "type": "string",
+           "operation": "equals"
+          }
+         }
+        ],
+        "combinator": "and"
+       },
+       "renameOutput": true,
+       "outputKey": "Taguatinga"
+      }
+     ]
+    },
+    "looseTypeValidation": true,
+    "options": {}
+   },
+   "type": "n8n-nodes-base.switch",
+   "typeVersion": 3.4,
+   "position": [
+    -624,
+    112
+   ],
+   "id": "5e7c0e75-7361-42d1-907e-a2b7189e5b6e",
+   "name": "Unidade"
+  },
+  {
+   "parameters": {
+    "rules": {
+     "values": [
+      {
+       "conditions": {
+        "options": {
+         "caseSensitive": true,
+         "leftValue": "",
+         "typeValidation": "loose",
+         "version": 3
+        },
+        "conditions": [
+         {
+          "id": "60b3c9ad-6217-4d16-9f12-543228f98be4",
+          "leftValue": "={{ $json.Profissional.id }}",
+          "rightValue": "121",
+          "operator": {
+           "type": "string",
+           "operation": "equals",
+           "name": "filter.operator.equals"
+          }
+         }
+        ],
+        "combinator": "and"
+       },
+       "renameOutput": true,
+       "outputKey": "Monoplace"
+      },
+      {
+       "conditions": {
+        "options": {
+         "caseSensitive": true,
+         "leftValue": "",
+         "typeValidation": "loose",
+         "version": 3
+        },
+        "conditions": [
+         {
+          "id": "211bd5d9-23ab-49f5-9af7-78dd0f42c5b3",
+          "leftValue": "={{ $json.Profissional.id }}",
+          "rightValue": "120",
+          "operator": {
+           "type": "string",
+           "operation": "equals",
+           "name": "filter.operator.equals"
+          }
+         }
+        ],
+        "combinator": "and"
+       },
+       "renameOutput": true,
+       "outputKey": "Consultas"
+      }
+     ]
+    },
+    "looseTypeValidation": true,
+    "options": {}
+   },
+   "type": "n8n-nodes-base.switch",
+   "typeVersion": 3.4,
+   "position": [
+    -304,
+    272
+   ],
+   "id": "a534ff5b-a8d8-404f-b981-d967e91308eb",
+   "name": "Agenda Taguatinga"
+  },
+  {
+   "parameters": {
+    "jsCode": "const PREPS = [\"DE\",\"DA\",\"DO\",\"DAS\",\"DOS\",\"E\"];\n\nfunction nomeCurto(nome) {\n  const t = nome.split(\" \");\n  const primeiro = t[0];\n  const resto = t.slice(1);\n  if (PREPS.includes(resto[0]) && resto[1]) return `${primeiro} ${resto[0]} ${resto[1]}`;\n  return `${primeiro} ${resto[0] || \"\"}`.trim();\n}\n\nconst dados = $input.all().map(i => i.json);\n\n// falta = Faltou, Desmarcado ou Desistiu (mesma regra do relatório da diretoria; ajustado em 09/10/2026).\n// Antes: quem não estava \"Finalizado\" às 19h05 contava como falta, inclusive a sessão ainda em andamento.\nconst validos = dados.filter(d =>\n  d.Profissional?.id === \"121\" && ![\"Faltou\", \"Desmarcado\", \"Desistiu\"].includes(d.Agendamento?.confirmado)\n);\nconst total = dados.filter(d => d.Profissional?.id === \"121\").length;\nconst faltas = total - validos.length;\n\n// horários extraídos dinamicamente do próprio agendamento\nconst horarios = [...new Set(validos.map(d => d.Agendamento.horario.slice(0,5)))]\n  .sort();\n\nconst grade = { 1:{}, 2:{}, 3:{}, 4:{} };\n\nhorarios.forEach(h => {\n  const doHorario = validos\n    .filter(d => d.Agendamento.horario.slice(0,5) === h)\n    .sort((a,b) => a.Agendamento.horario.localeCompare(b.Agendamento.horario));\n\n  doHorario.forEach((d, i) => {\n    if (i < 4) grade[i+1][h] = nomeCurto(d.Paciente.nome);\n  });\n});\n\nconst data = dados[0].Agendamento.data.split(\"-\").reverse().join(\"/\");\n\nlet texto = `*AGENDA HOJE ${data}*\\n`;\nfor (let c = 1; c <= 4; c++) {\n  texto += `\\n*MONOPLACE ${c}*\\n`;\n  horarios.forEach(h => {\n    texto += `${h} h – ${grade[c][h] || \"VAGO\"}\\n`;\n  });\n}\ntexto += `\\n*TOTAL DE PACIENTES: ${validos.length}*\\n*FALTAS: ${faltas}*`;\n\nreturn [{ json: { agenda: texto, total: validos.length, faltas } }];"
+   },
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    -16,
+    256
+   ],
+   "id": "13cc6a86-db6b-4de0-9919-0beeff99da7a",
+   "name": "Mensagem Agenda do dia"
+  },
+  {
+   "parameters": {
+    "rule": {
+     "interval": [
+      {
+       "field": "cronExpression",
+       "expression": "0 17 * * *"
+      }
+     ]
+    }
+   },
+   "type": "n8n-nodes-base.scheduleTrigger",
+   "typeVersion": 1.3,
+   "position": [
+    -2128,
+    608
+   ],
+   "id": "c9e007b0-654f-496d-a7fc-7a7eb82aa9b8",
+   "name": "Todo dia às 17h"
+  },
+  {
+   "parameters": {
+    "method": "POST",
+    "url": "https://api.igut.med.br/v2/consultas/buscar",
+    "sendHeaders": true,
+    "headerParameters": {
+     "parameters": [
+      {
+       "name": "Content-Type",
+       "value": "application/json"
+      }
+     ]
+    },
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "={\n  \"Agendamento.data\": \"{{ $now.toFormat('yyyy-MM-dd') }}\",\n  \"Agendamento.data_fim\": \"{{ $now.plus({ days: 1 }).toFormat('yyyy-MM-dd') }}\"\n}",
+    "options": {
+     "response": {
+      "response": {
+       "responseFormat": "json"
+      }
+     }
+    },
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpCustomAuth"
+   },
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.4,
+   "position": [
+    -1888,
+    608
+   ],
+   "id": "adb41ae1-3c28-4bf4-8d69-1f14d20abc36",
+   "name": "Buscar Agendamentos BMH",
+   "alwaysOutputData": false,
+   "credentials": {
+    "httpCustomAuth": {
+     "id": "ZezjclTyK2soW4a8",
+     "name": "BMH · iGut (acesso)"
+    }
+   }
+  },
+  {
+   "parameters": {
+    "url": "https://api.igut.med.br/v2/callcenters/especialidades",
+    "sendHeaders": false,
+    "options": {},
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpCustomAuth"
+   },
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.4,
+   "position": [
+    -1712,
+    -176
+   ],
+   "id": "b520099b-474c-471a-a8f0-32421e8a1a08",
+   "name": "Buscar ID de especialidade1",
+   "credentials": {
+    "httpCustomAuth": {
+     "id": "0n8OhRsr6o2oHNjW",
+     "name": "BMH · iGut (acesso 2, passos soltos)"
+    }
+   }
+  },
+  {
+   "parameters": {
+    "method": "POST",
+    "url": "https://api.igut.med.br/v2/usuarios/login",
+    "sendHeaders": false,
+    "sendBody": false,
+    "options": {},
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpCustomAuth"
+   },
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.4,
+   "position": [
+    -1344,
+    96
+   ],
+   "id": "f412e097-8c7a-4423-a708-1a5229a88c8c",
+   "name": "Gerar token usuario e senha ADM1",
+   "credentials": {
+    "httpCustomAuth": {
+     "id": "vBFyv797nU6UXcey",
+     "name": "BMH · iGut (login ADM1)"
+    }
+   }
+  },
+  {
+   "parameters": {
+    "method": "POST",
+    "url": "https://api.igut.med.br/v2/callcenters/disponibilidade",
+    "sendHeaders": false,
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "{\n  \"Disponibilidade.profissional_id\": 121,\n  \"Disponibilidade.tipoatendimento_id\":7 \n}",
+    "options": {},
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpCustomAuth"
+   },
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.4,
+   "position": [
+    -2112,
+    -448
+   ],
+   "id": "79e352cf-82fe-4848-82b3-ac739039bb01",
+   "name": "Buscar ID de disponibilidade",
+   "credentials": {
+    "httpCustomAuth": {
+     "id": "0n8OhRsr6o2oHNjW",
+     "name": "BMH · iGut (acesso 2, passos soltos)"
+    }
+   }
+  },
+  {
+   "parameters": {
+    "jsCode": "const PREPS = [\"DE\",\"DA\",\"DO\",\"DAS\",\"DOS\",\"E\"];\nconst ORDINAIS = [\"1°\",\"2°\",\"3°\",\"4°\",\"5°\",\"6°\",\"7°\",\"8°\",\"9°\",\"10°\"];\nconst CAP_MULTI = 8;\nconst CAP_MONO = 2;\n\nfunction nomeCurto(nome) {\n  const t = nome.trim().split(/\\s+/);\n  const primeiro = t[0];\n  const resto = t.slice(1);\n  if (!resto.length) return primeiro;\n  if (PREPS.includes(resto[0]) && resto[1]) return `${primeiro} ${resto[0]} ${resto[1]}`;\n  return `${primeiro} ${resto[0]}`;\n}\n\nconst hhmm = d => d.Agendamento.horario.slice(0, 5);\n// falta = Faltou, Desmarcado ou Desistiu (mesma regra do relatório da diretoria; ajustado em 09/10/2026)\nconst ativo = d => ![\"Faltou\", \"Desmarcado\", \"Desistiu\"].includes(d.Agendamento?.confirmado);\n\nconst dados = $input.all().flatMap(i =>\n  Array.isArray(i.json) ? i.json : (Array.isArray(i.json.data) ? i.json.data : [i.json])\n);\n\nconst multi = dados.filter(d => d.Profissional?.id === \"112\");\nconst mono  = dados.filter(d => d.Profissional?.id === \"111\");\n\nconst multiAtivos = multi.filter(ativo);\nconst monoAtivos  = mono.filter(ativo);\n\nconst totalPacientes = multiAtivos.length + monoAtivos.length;\nconst faltas = (multi.length - multiAtivos.length) + (mono.length - monoAtivos.length);\n\nconst data = dados[0].Agendamento.data.split(\"-\").reverse().join(\"/\");\nlet texto = `*AGENDA DE HOJE ${data}*\\n`;\n\n// ---------- SESSÕES MULTI ----------\n// horários vêm de TODOS os agendamentos (inclui desmarcados) → sessão vazia aparece\nconst horariosMulti = [...new Set(multi.map(hhmm))].sort();\n\nhorariosMulti.forEach((h, idx) => {\n  const nomes = multiAtivos\n    .filter(d => hhmm(d) === h)\n    .map(d => nomeCurto(d.Paciente.nome))\n    .sort((a, b) => a.localeCompare(b, \"pt-BR\"));\n\n  texto += `\\n*${ORDINAIS[idx]} SESSÃO MULTI – ${h}h*\\n`;\n  for (let i = 0; i < CAP_MULTI; i++) {\n    texto += `${i + 1}. ${nomes[i] || \"VAGO\"}\\n`;\n  }\n});\n\n// ---------- MONOPLACES ----------\nconst horariosMono = [...new Set(mono.map(hhmm))].sort();\nconst grade = {};\nfor (let c = 1; c <= CAP_MONO; c++) grade[c] = {};\n\nhorariosMono.forEach(h => {\n  monoAtivos\n    .filter(d => hhmm(d) === h)\n    .sort((a, b) => a.Agendamento.horario.localeCompare(b.Agendamento.horario))\n    .forEach((d, i) => {\n      if (i < CAP_MONO) grade[i + 1][h] = nomeCurto(d.Paciente.nome);\n    });\n});\n\nfor (let c = 1; c <= CAP_MONO; c++) {\n  texto += `\\n*MONOPLACE ${c}*\\n`;\n  horariosMono.forEach(h => {\n    texto += `${h} h – ${grade[c][h] || \"VAGO\"}\\n`;\n  });\n}\n\ntexto += `\\n*TOTAL DE PACIENTES: ${totalPacientes}*`;\ntexto += `\\n*FALTAS: ${faltas}*`;\n\nreturn [{ json: { agenda: texto, total: totalPacientes, faltas } }];"
+   },
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    0,
+    -96
+   ],
+   "id": "e79d7078-1bdc-4a73-a4cd-9437e3cb600e",
+   "name": "Mensagem Agenda do Diaa"
+  },
+  {
+   "parameters": {
+    "conditions": {
+     "options": {
+      "caseSensitive": true,
+      "leftValue": "",
+      "typeValidation": "strict",
+      "version": 3
+     },
+     "conditions": [
+      {
+       "id": "00f3acc2-23b7-4e82-8588-8791bb514e3a",
+       "leftValue": "={{ $json.Profissional.id }}",
+       "rightValue": "113",
+       "operator": {
+        "type": "string",
+        "operation": "notEquals"
+       }
+      }
+     ],
+     "combinator": "and"
+    },
+    "options": {}
+   },
+   "type": "n8n-nodes-base.if",
+   "typeVersion": 2.3,
+   "position": [
+    -320,
+    -80
+   ],
+   "id": "2f9e8ac3-312d-4731-8461-0c0f0a23554f",
+   "name": "É sessão?"
+  },
+  {
+   "parameters": {
+    "method": "POST",
+    "url": "https://apiwp-afiliados.cannlink.com.br/message/sendText/Madeiro",
+    "sendHeaders": false,
+    "sendBody": true,
+    "bodyParameters": {
+     "parameters": [
+      {
+       "name": "number",
+       "value": "120363393827994218@g.us"
+      },
+      {
+       "name": "text",
+       "value": "={{ $json.agenda }}"
+      }
+     ]
+    },
+    "options": {},
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpHeaderAuth"
+   },
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.4,
+   "position": [
+    480,
+    256
+   ],
+   "id": "83021356-3eba-48e0-890f-fa0c047bca7c",
+   "name": "Enviar mensagem Grupo Taguatinga",
+   "onError": "continueErrorOutput",
+   "credentials": {
+    "httpHeaderAuth": {
+     "id": "FaVy4E4519vzp2EO",
+     "name": "Evolution afiliados · instância Madeiro (Dr Jorge)"
+    }
+   }
+  },
+  {
+   "parameters": {
+    "method": "POST",
+    "url": "https://apiwp-afiliados.cannlink.com.br/message/sendText/Madeiro",
+    "sendHeaders": false,
+    "sendBody": true,
+    "bodyParameters": {
+     "parameters": [
+      {
+       "name": "number",
+       "value": "556191523103-1530882330@g.us"
+      },
+      {
+       "name": "text",
+       "value": "={{ $json.agenda }}"
+      }
+     ]
+    },
+    "options": {},
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpHeaderAuth"
+   },
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.4,
+   "position": [
+    480,
+    -96
+   ],
+   "id": "c27fd8af-3fa9-4856-8685-1c84427a09fc",
+   "name": "Enviar mensagem Grupo Asa Sul",
+   "onError": "continueErrorOutput",
+   "credentials": {
+    "httpHeaderAuth": {
+     "id": "FaVy4E4519vzp2EO",
+     "name": "Evolution afiliados · instância Madeiro (Dr Jorge)"
+    }
+   }
+  },
+  {
+   "parameters": {
+    "jsCode": "const CONSULTAS = [\"113\", \"120\"];\nconst SESSOES   = [\"111\", \"112\", \"121\"];\n\nconst UNIDADE = { \"113\": \"ASA SUL\", \"111\": \"ASA SUL\", \"112\": \"ASA SUL\",\n                  \"120\": \"TAGUATINGA\", \"121\": \"TAGUATINGA\" };\n\nconst faltou = d => [\"Desmarcado\", \"Desistiu\"].includes(d.Agendamento?.confirmado);\n\nconst dados = $input.all().flatMap(i =>\n  Array.isArray(i.json) ? i.json : (Array.isArray(i.json.data) ? i.json.data : [i.json])\n).filter(d => d.Agendamento);\n\nfunction contar(unidade, ids) {\n  const itens = dados.filter(d =>\n    ids.includes(d.Profissional?.id) && UNIDADE[d.Profissional?.id] === unidade\n  );\n  const faltas = itens.filter(faltou).length;\n  return { agendadas: itens.length, faltas, realizadas: itens.length - faltas };\n}\n\nfunction bloco(unidade) {\n  const c = contar(unidade, CONSULTAS);\n  const s = contar(unidade, SESSOES);\n  return `\\n*${unidade}*\\n`\n       + `Consultas:\\n`\n       + `       Agendadas: ${c.agendadas}\\n`\n       + `       Faltas: ${c.faltas}\\n`\n       + `       Realizadas: ${c.realizadas}\\n`\n       + `Sessões\\n`\n       + `       Agendadas: ${s.agendadas}\\n`\n       + `       Faltas: ${s.faltas}\\n`\n       + `       Realizadas: ${s.realizadas}\\n`;\n}\n\nconst data = dados[0].Agendamento.data.split(\"-\").reverse().join(\"/\");\n\nconst texto = `*Relatório Diário (${data})*\\n`\n            + bloco(\"ASA SUL\")\n            + bloco(\"TAGUATINGA\");\n\nreturn [{ json: { relatorio: texto } }];"
+   },
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    -1568,
+    80
+   ],
+   "id": "02fac570-c8bc-4e99-8dff-440d46c8884b",
+   "name": "Code in JavaScript2"
+  },
+  {
+   "parameters": {
+    "amount": 1
+   },
+   "type": "n8n-nodes-base.wait",
+   "typeVersion": 1.1,
+   "position": [
+    240,
+    -96
+   ],
+   "id": "54e884e7-6eba-4a54-b381-c26a59d47cb7",
+   "name": "Wait",
+   "webhookId": "b1f77bca-f74e-430f-947f-2a8768e2097b"
+  },
+  {
+   "parameters": {
+    "method": "POST",
+    "url": "https://apiwp-afiliados.cannlink.com.br/message/sendText/Madeiro",
+    "sendHeaders": false,
+    "sendBody": true,
+    "bodyParameters": {
+     "parameters": [
+      {
+       "name": "number",
+       "value": "120363205793119192@g.us"
+      },
+      {
+       "name": "text",
+       "value": "={{ $json.relatorio }}"
+      }
+     ]
+    },
+    "options": {},
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpHeaderAuth"
+   },
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.4,
+   "position": [
+    464,
+    -368
+   ],
+   "id": "ca0fb3bd-3499-496b-b88b-b127474a151c",
+   "name": "Enviar mensagem Grupo Diretoria",
+   "onError": "continueErrorOutput",
+   "credentials": {
+    "httpHeaderAuth": {
+     "id": "FaVy4E4519vzp2EO",
+     "name": "Evolution afiliados · instância Madeiro (Dr Jorge)"
+    }
+   }
+  },
+  {
+   "parameters": {
+    "rule": {
+     "interval": [
+      {
+       "field": "months",
+       "triggerAtHour": 7,
+       "triggerAtMinute": 30
+      }
+     ]
+    }
+   },
+   "type": "n8n-nodes-base.scheduleTrigger",
+   "typeVersion": 1.3,
+   "position": [
+    -2144,
+    1312
+   ],
+   "id": "b21bc1b1-b79e-4364-96ae-e3b1f58431be",
+   "name": "1x mês final do mês",
+   "disabled": true,
+   "notes": "Desligado em 09/10/2026: substituído pelo fluxo \"BMH · Diretoria · produção do mês\" (pedia o mês inteiro à agenda e dava 504)."
+  },
+  {
+   "parameters": {
+    "method": "POST",
+    "url": "https://api.igut.med.br/v2/consultas/buscar",
+    "sendHeaders": true,
+    "headerParameters": {
+     "parameters": [
+      {
+       "name": "Content-Type",
+       "value": "application/json"
+      }
+     ]
+    },
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "={\n  \"Agendamento.data\": \"{{ $now.minus({ months: 1 }).startOf('month').toFormat('yyyy-MM-dd') }}\",\n  \"Agendamento.data_fim\": \"{{ $now.minus({ months: 1 }).endOf('month').toFormat('yyyy-MM-dd') }}\"\n}",
+    "options": {
+     "response": {
+      "response": {
+       "responseFormat": "json"
+      }
+     }
+    },
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpCustomAuth"
+   },
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.4,
+   "position": [
+    -1904,
+    1312
+   ],
+   "id": "d3e07ac1-4c2c-4c4e-a040-d0cf4f1746b3",
+   "name": "Buscar Agendamentos BMH1",
+   "alwaysOutputData": false,
+   "retryOnFail": true,
+   "credentials": {
+    "httpCustomAuth": {
+     "id": "ZezjclTyK2soW4a8",
+     "name": "BMH · iGut (acesso)"
+    }
+   }
+  },
+  {
+   "parameters": {
+    "jsCode": "// A resposta da API está em items[0].json\n\nconst resposta = items[0].json;\n\nif (!resposta.data || !Array.isArray(resposta.data)) {\n  return [];\n}\n\nreturn resposta.data.map(item => ({\n  json: item\n}));"
+   },
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    -1696,
+    1312
+   ],
+   "id": "47d85d48-0cd6-44f7-9b8a-95abe0091164",
+   "name": "Code in JavaScript1"
+  },
+  {
+   "parameters": {
+    "assignments": {
+     "assignments": [
+      {
+       "id": "fc1240b9-cc38-4db3-90e5-2763f1eb8500",
+       "name": "Agendamento.id",
+       "value": "={{ $json.Agendamento.id }}",
+       "type": "string"
+      },
+      {
+       "id": "cc1ab9d0-f2f1-4aa8-9648-ef3e0d7967d2",
+       "name": "Paciente.id",
+       "value": "={{ $json.Paciente.id }}",
+       "type": "string"
+      },
+      {
+       "id": "389eecfa-b913-44a8-b4ab-37a400e364fa",
+       "name": "Paciente.nome",
+       "value": "={{ $json.Paciente.nome }}",
+       "type": "string"
+      },
+      {
+       "id": "5d32edb2-59d3-402c-ab52-673d8f4bf1a5",
+       "name": "Agendamento.data",
+       "value": "={{ $json.Agendamento.data }}",
+       "type": "string"
+      },
+      {
+       "id": "ba41f5b5-f55f-4bfe-a89e-716a407401b9",
+       "name": "Agendamento.horario",
+       "value": "={{ $json.Agendamento.horario }}",
+       "type": "string"
+      },
+      {
+       "id": "549d3d51-bdf9-4f4a-a9ff-f521e218a50e",
+       "name": "Profissional.id",
+       "value": "={{ $json.Profissional.id }}",
+       "type": "string"
+      },
+      {
+       "id": "fa538356-d028-4438-87df-b1ae4e202fae",
+       "name": "Local.id",
+       "value": "={{ $json.Local.id }}",
+       "type": "string"
+      },
+      {
+       "id": "77ebccea-8cb6-405b-8257-8a21c52e2fba",
+       "name": "Convenio.id",
+       "value": "={{ $json.Convenio.id }}",
+       "type": "string"
+      },
+      {
+       "id": "1d308421-9ada-45af-a090-1a6c0d66d8cf",
+       "name": "Agendamento.confirmado",
+       "value": "={{ $json.Agendamento.confirmado }}",
+       "type": "string"
+      },
+      {
+       "id": "927f4c76-186b-4213-905a-222a56d5ba47",
+       "name": "Agendamento.status",
+       "value": "={{ $json.Agendamento.status }}",
+       "type": "string"
+      },
+      {
+       "id": "b5042e77-e14a-4bd9-bc97-ac779dd6523e",
+       "name": "Agendamento.tipodeatendimento",
+       "value": "={{ $json.Agendamento.tipodeatendimento }}",
+       "type": "string"
+      }
+     ]
+    },
+    "options": {}
+   },
+   "type": "n8n-nodes-base.set",
+   "typeVersion": 3.4,
+   "position": [
+    -1472,
+    1312
+   ],
+   "id": "11c29db6-2a72-45cf-ba62-b64fa3df263f",
+   "name": "Edit Fields1"
+  },
+  {
+   "parameters": {
+    "jsCode": "const MAPA = {\n  111: { unidade: 'Asa Sul',    tipo: 'sessao',   equip: 'Monoplace'  },\n  112: { unidade: 'Asa Sul',    tipo: 'sessao',   equip: 'Multiplace' },\n  113: { unidade: 'Asa Sul',    tipo: 'consulta', equip: null         },\n  120: { unidade: 'Taguatinga', tipo: 'consulta', equip: null         },\n  121: { unidade: 'Taguatinga', tipo: 'sessao',   equip: 'Monoplace'  },\n};\n\nconst UNIDADES = ['Asa Sul', 'Taguatinga'];\nconst NAO_COMPARECEU = ['faltou', 'desmarcado'];\n\nconst norm = s => String(s ?? '')\n  .normalize('NFD').replace(/[\\u0300-\\u036f]/g, '')\n  .trim().toLowerCase();\n\nconst getCampo = (obj, alvo, prof = 0) => {\n  if (!obj || typeof obj !== 'object' || prof > 4) return '';\n  for (const [k, v] of Object.entries(obj)) {\n    if (norm(k).replace(/_/g, '') === alvo && typeof v === 'string') return v;\n  }\n  for (const v of Object.values(obj)) {\n    if (v && typeof v === 'object') {\n      const achado = getCampo(v, alvo, prof + 1);\n      if (achado) return achado;\n    }\n  }\n  return '';\n};\n\nconst ehRetorno = j => norm(getCampo(j, 'tipodeatendimento')).includes('retorno');\n\nconst d = {};\nUNIDADES.forEach(u => d[u] = {\n  sessoes: 0, faltasSes: 0, faltasCobradas: 0, semAviso: 0, foraDoPrazo: 0,\n  consultas: 0, retornos: 0, faltasCon: 0, faltasRet: 0, naoRealizados: 0, equip: {}\n});\n\nfor (const item of $input.all()) {\n  const cfg = MAPA[Number(item.json.Profissional?.id)];\n  if (!cfg) continue;\n  const u = d[cfg.unidade];\n\n  const conf = norm(getCampo(item.json, 'confirmado'));\n  const finalizado = norm(getCampo(item.json, 'status')) === 'finalizado';\n\n  // falta é contada com ou sem finalização\n  if (NAO_COMPARECEU.includes(conf)) {\n    if (cfg.tipo === 'sessao') {\n      u.faltasSes++;\n      if (finalizado) {                           // faltou mas foi cobrado = faturável\n        u.sessoes++;\n        u.equip[cfg.equip] = (u.equip[cfg.equip] || 0) + 1;\n        u.faltasCobradas++;\n        if (conf === 'faltou') u.semAviso++; else u.foraDoPrazo++;\n      }\n    } else {\n      if (ehRetorno(item.json)) u.faltasRet++;    // fora do relatório\n      else u.faltasCon++;\n    }\n    continue;\n  }\n\n  if (!finalizado) { u.naoRealizados++; continue; }\n\n  if (cfg.tipo === 'sessao') {\n    u.sessoes++;\n    u.equip[cfg.equip] = (u.equip[cfg.equip] || 0) + 1;\n  } else {\n    if (ehRetorno(item.json)) u.retornos++;\n    else u.consultas++;\n  }\n}\n\nconst ref = $now.minus({ months: 1 });\nconst mes = ref.setLocale('pt-BR').toFormat('LLLL/yyyy');\nconst titulo = mes.charAt(0).toUpperCase() + mes.slice(1);\n\nconst soma = k => UNIDADES.reduce((a, u) => a + d[u][k], 0);\nconst totalSes = soma('sessoes');\nconst totalFalSes = soma('faltasSes');\nconst totalCob = soma('faltasCobradas');\nconst totalCon = soma('consultas');\nconst totalRet = soma('retornos');\nconst totalFalCon = soma('faltasCon');\nconst ratio = totalCon ? (totalSes / totalCon).toFixed(1).replace('.', ',') : '—';\n\nconst linhaSes = u => {\n  const det = Object.entries(d[u].equip).map(([k, v]) => `${k} ${v}`).join(' | ');\n  return `    ${u}: ${d[u].sessoes}${det ? `  (${det})` : ''}`;\n};\n\nconst detFaltas = totalFalSes\n  ? ` (${totalCob} de ${totalFalSes} ${totalFalSes === 1 ? 'falta foi cobrada' : 'faltas foram cobradas'})`\n  : '';\n\nconst mensagem =\n`Produção — ${titulo}\n\nSESSÕES DE OHB\n${UNIDADES.map(linhaSes).join('\\n')}\n    Total: ${totalSes}${detFaltas}\n\nCONSULTAS\n${UNIDADES.map(u => `    ${u}: ${d[u].consultas}`).join('\\n')}\n    Total: ${totalCon}\n    Retornos: ${totalRet}\n    Faltas: ${totalFalCon}\n\nMédia sessões por consulta: ${ratio}\nAtt,`;\n\nreturn [{ json: { mensagem } }];"
+   },
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    -1248,
+    1312
+   ],
+   "id": "c68b1dbc-aae9-4d74-bd25-25bd079f0a13",
+   "name": "Code in JavaScript3"
+  },
+  {
+   "parameters": {
+    "method": "POST",
+    "url": "https://apiwp-afiliados.cannlink.com.br/message/sendText/Madeiro",
+    "sendHeaders": false,
+    "sendBody": true,
+    "bodyParameters": {
+     "parameters": [
+      {
+       "name": "number",
+       "value": "120363205793119192@g.us"
+      },
+      {
+       "name": "text",
+       "value": "={{ $json.mensagem }}"
+      }
+     ]
+    },
+    "options": {},
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpHeaderAuth"
+   },
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.4,
+   "position": [
+    -992,
+    1312
+   ],
+   "id": "de33d503-437c-4265-a6a1-3cfd71d03045",
+   "name": "Enviar mensagem Grupo Diretoria1",
+   "onError": "continueErrorOutput",
+   "credentials": {
+    "httpHeaderAuth": {
+     "id": "FaVy4E4519vzp2EO",
+     "name": "Evolution afiliados · instância Madeiro (Dr Jorge)"
+    }
+   }
+  },
+  {
+   "parameters": {
+    "assignments": {
+     "assignments": [
+      {
+       "id": "fc1240b9-cc38-4db3-90e5-2763f1eb8500",
+       "name": "Agendamento.id",
+       "value": "={{ $json.Agendamento.id }}",
+       "type": "string"
+      },
+      {
+       "id": "cc1ab9d0-f2f1-4aa8-9648-ef3e0d7967d2",
+       "name": "Paciente.id",
+       "value": "={{ $json.Paciente.id }}",
+       "type": "string"
+      },
+      {
+       "id": "389eecfa-b913-44a8-b4ab-37a400e364fa",
+       "name": "Paciente.nome",
+       "value": "={{ $json.Paciente.nome }}",
+       "type": "string"
+      },
+      {
+       "id": "5d32edb2-59d3-402c-ab52-673d8f4bf1a5",
+       "name": "Agendamento.data",
+       "value": "={{ $json.Agendamento.data }}",
+       "type": "string"
+      },
+      {
+       "id": "ba41f5b5-f55f-4bfe-a89e-716a407401b9",
+       "name": "Agendamento.horario",
+       "value": "={{ $json.Agendamento.horario }}",
+       "type": "string"
+      },
+      {
+       "id": "549d3d51-bdf9-4f4a-a9ff-f521e218a50e",
+       "name": "Profissional.id",
+       "value": "={{ $json.Profissional.id }}",
+       "type": "string"
+      },
+      {
+       "id": "fa538356-d028-4438-87df-b1ae4e202fae",
+       "name": "Local.id",
+       "value": "={{ $json.Local.id }}",
+       "type": "string"
+      },
+      {
+       "id": "77ebccea-8cb6-405b-8257-8a21c52e2fba",
+       "name": "Convenio.id",
+       "value": "={{ $json.Convenio.id }}",
+       "type": "string"
+      },
+      {
+       "id": "1d308421-9ada-45af-a090-1a6c0d66d8cf",
+       "name": "Agendamento.confirmado",
+       "value": "={{ $json.Agendamento.confirmado }}",
+       "type": "string"
+      },
+      {
+       "id": "927f4c76-186b-4213-905a-222a56d5ba47",
+       "name": "Agendamento.status",
+       "value": "={{ $json.Agendamento.status }}",
+       "type": "string"
+      },
+      {
+       "id": "b5042e77-e14a-4bd9-bc97-ac779dd6523e",
+       "name": "Agendamento.tipodeatendimento",
+       "value": "={{ $json.Agendamento.tipodeatendimento }}",
+       "type": "string"
+      }
+     ]
+    },
+    "options": {}
+   },
+   "type": "n8n-nodes-base.set",
+   "typeVersion": 3.4,
+   "position": [
+    -1488,
+    608
+   ],
+   "id": "3951ee5e-9756-4685-92ba-d7f1b38b939a",
+   "name": "Edit Fields"
+  },
+  {
+   "parameters": {
+    "jsCode": "// Relatório diário da diretoria da BMH (09/10/2026, pedido do Jorge): sessões, ocupação, faltas em %, avaliações,\n// comparação com o mesmo dia da semana passada e o que vem amanhã. Sai no fim estimado das sessões (fluxo \"Produção\n// Diaria e Mensal BMH\", nó \"Code in JavaScript4\"). Falta = Faltou, Desmarcado ou Desistiu (regra B do Jorge); cobrada =\n// falta com o atendimento finalizado. Ocupação = pacientes que vieram ÷ lugares do dia (multiplace 8 por sessão,\n// monoplace 2 na Asa Sul e 4 em Taguatinga, Taguatinga com grade de 7 horários). Só números: nenhum nome de paciente.\nconst MAPA = {\n  111: { u: 'ASA SUL', t: 'sessao', e: 'Monoplace', lugares: 2 },\n  112: { u: 'ASA SUL', t: 'sessao', e: 'Multiplace', lugares: 8 },\n  113: { u: 'ASA SUL', t: 'consulta' },\n  120: { u: 'TAGUATINGA', t: 'consulta' },\n  121: { u: 'TAGUATINGA', t: 'sessao', e: 'Monoplace', lugares: 4, grade: 7 },\n};\nconst UN = ['ASA SUL', 'TAGUATINGA'], NAO_VEIO = ['faltou', 'desmarcado', 'desistiu'];\nconst norm = (s) => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').trim().toLowerCase();\nconst pega = (n) => { try { return $(n).all().map((i) => i.json); } catch (e) { return []; } };\nconst hojeItens = pega('Hoje?').filter((d) => d && d.Agendamento);\nconst todos = pega('Edit Fields').filter((d) => d && d.Agendamento);\nlet passada = []; try { const j = $('Agenda da semana passada').first().json; passada = Array.isArray(j?.data) ? j.data : []; } catch (e) {}\n\nfunction resumo(lista) {\n  const d = {};\n  UN.forEach((u) => (d[u] = { ag: 0, veio: 0, fin: 0, faltas: 0, cobr: 0, equip: {}, horarios: {}, aval: { ag: 0, veio: 0 }, cons: { ag: 0, veio: 0 } }));\n  for (const r of lista) {\n    const id = Number(r.Profissional?.id), c = MAPA[id]; if (!c) continue;\n    const u = d[c.u], falta = NAO_VEIO.includes(norm(r.Agendamento?.confirmado)), fin = norm(r.Agendamento?.status) === 'finalizado';\n    if (c.t === 'sessao') {\n      u.ag++; (u.horarios[id] ||= new Set()).add(String(r.Agendamento?.horario || '').slice(0, 5));\n      if (falta) { u.faltas++; if (fin) u.cobr++; } else { u.veio++; if (fin) u.fin++; u.equip[c.e] = (u.equip[c.e] || 0) + 1; }\n    } else {\n      const alvo = norm(r.Agendamento?.tipodeatendimento).includes('avaliac') ? u.aval : u.cons;\n      alvo.ag++; if (!falta) alvo.veio++;\n    }\n  }\n  for (const u of UN) d[u].lugares = Object.entries(d[u].horarios).reduce((s, [id, hs]) => s + Math.max(hs.size, MAPA[id].grade || 0) * MAPA[id].lugares, 0);\n  return d;\n}\nconst pct = (a, b) => (b ? Math.round((100 * a) / b) + '%' : '—');\nconst total = (d) => UN.reduce((s, u) => ({ ag: s.ag + d[u].ag, veio: s.veio + d[u].veio, faltas: s.faltas + d[u].faltas, cobr: s.cobr + d[u].cobr, lugares: s.lugares + d[u].lugares, aval: s.aval + d[u].aval.veio }), { ag: 0, veio: 0, faltas: 0, cobr: 0, lugares: 0, aval: 0 });\n\nconst H = resumo(hojeItens), T = total(H), P = total(resumo(passada));\nconst diaISO = String(hojeItens[0]?.Agendamento?.data || $now.setZone('America/Sao_Paulo').toISODate()).slice(0, 10);\nconst dia = DateTime.fromISO(diaISO).setLocale('pt-BR');\nconst amanhaISO = dia.plus({ days: 1 }).toISODate();\nconst amanha = resumo(todos.filter((r) => String(r.Agendamento?.data || '').slice(0, 10) === amanhaISO));\nconst A = total(amanha), avalAmanha = UN.reduce((s, u) => s + amanha[u].aval.ag, 0);\n\n// formato curto para WhatsApp (ajuste do Jorge, 09/10/2026): sem \"lugares\", sem tipo de câmara em Taguatinga, total e\n// comparação em poucas linhas. Os lugares são calculados sozinhos pela agenda do dia (sessão extra soma; sessão a menos tira).\nconst bloco = (u) => {\n  const x = H[u], det = u === 'TAGUATINGA' ? '' : Object.entries(x.equip).map(([k, v]) => `${k.replace('plac', '').replace('Multie', 'Multi').replace('Monoe', 'Mono')} ${v}`).join(' | ');\n  const linhas = [`Sessões: ${x.veio}/${x.ag}${det ? ` (${det})` : ''}`];\n  if (x.veio > x.fin) linhas.push(`⚠️ ${x.veio - x.fin} sem finalizar no iGut`);\n  linhas.push(`Ocupação: ${pct(x.veio, x.lugares)}`);\n  linhas.push(`Faltas: ${x.faltas} (${pct(x.faltas, x.ag)})${x.cobr ? ` · ${x.cobr} ${x.cobr === 1 ? 'cobrada' : 'cobradas'}` : ''}`);\n  linhas.push(`Avaliações: ${x.aval.veio}/${x.aval.ag}`);\n  return `\\n*${u}*\\n` + linhas.join('\\n') + '\\n';\n};\nconst curto = (d) => d.setLocale('pt-BR').toFormat('ccc').replace('.', '');\nconst texto = hojeItens.length\n  ? `*Relatório Diário · ${dia.toFormat('dd/LL')} (${curto(dia)})*\\n` + UN.map(bloco).join('') +\n    `\\n*TOTAL:* ${T.veio} sessões · ${pct(T.veio, T.lugares)} ocupação · ${pct(T.faltas, T.ag)} faltas` +\n    (P.ag ? `\\n_${curto(dia).charAt(0).toUpperCase() + curto(dia).slice(1)} passada: ${P.veio} · ${pct(P.veio, P.lugares)} · ${pct(P.faltas, P.ag)}_` : '') +\n    `\\n*Amanhã:* ${A.ag - A.faltas} sessões · ${avalAmanha} ${avalAmanha === 1 ? 'avaliação' : 'avaliações'}`\n  : `*Relatório Diário · ${dia.toFormat('dd/LL')}*\\n\\nNenhum agendamento registrado.`;\nreturn [{ json: { relatorio: texto } }];\n"
+   },
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    -624,
+    -368
+   ],
+   "id": "168dc273-77fd-4d8e-91ce-3fa2fb4e08c7",
+   "name": "Code in JavaScript4"
+  },
+  {
+   "parameters": {
+    "jsCode": "const resposta = $input.first().json;\nconst lista = resposta?.data?.Produzido;\n\nif (!Array.isArray(lista)) {\n  throw new Error(`Esperava data.Produzido como array. Recebi: ${JSON.stringify(Object.keys(resposta?.data ?? {}))}`);\n}\n\nreturn lista.map(item => ({ json: item }));"
+   },
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    -1728,
+    1520
+   ],
+   "id": "20219878-bb2d-478e-b623-c9d00c33ce32",
+   "name": "Code in JavaScript5"
+  },
+  {
+   "parameters": {
+    "method": "POST",
+    "url": "https://api.igut.med.br/v2/businessintelligences/producao",
+    "sendHeaders": true,
+    "headerParameters": {
+     "parameters": [
+      {
+       "name": "Content-Type",
+       "value": "application/json"
+      }
+     ]
+    },
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "={\n  \"Agendamento.data\": \"{{ $now.minus({ months: 1 }).startOf('month').toFormat('yyyy-MM-dd') }}\",\n  \"Agendamento.data_fim\": \"{{ $now.minus({ months: 1 }).endOf('month').toFormat('yyyy-MM-dd') }}\"\n}",
+    "options": {
+     "response": {
+      "response": {
+       "responseFormat": "json"
+      }
+     }
+    },
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpCustomAuth"
+   },
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.4,
+   "position": [
+    -1904,
+    1520
+   ],
+   "id": "a9297cb5-3d10-418b-9f2f-a12c7b8cfd08",
+   "name": "BI",
+   "alwaysOutputData": false,
+   "retryOnFail": true,
+   "credentials": {
+    "httpCustomAuth": {
+     "id": "ZezjclTyK2soW4a8",
+     "name": "BMH · iGut (acesso)"
+    }
+   }
+  },
+  {
+   "parameters": {
+    "jsCode": "const UNIDADES_MAP = { 'unidade l2 sul': 'Asa Sul', 'unidade taguatinga': 'Taguatinga' };\nconst UNIDADES = ['Asa Sul', 'Taguatinga'];\n\nconst norm = s => String(s ?? '')\n  .normalize('NFD').replace(/[\\u0300-\\u036f]/g, '')\n  .trim().toLowerCase();\n\nconst d = {};\nUNIDADES.forEach(u => d[u] = { sessoes: 0, equip: {} });\nlet ignorados = 0, faturamento = 0;\nconst vistos = new Set();\n\nfor (const item of $input.all()) {\n  const j = item.json;\n\n  // linhas de faturamento (e_fatura_sessao = \"S\") não são sessões executadas\n  if (j.e_fatura_sessao) { faturamento++; continue; }\n\n  // proteção contra linha repetida do mesmo agendamento\n  const chave = `${j.agendamento_id}|${j.codigo}|${j.horario}`;\n  if (vistos.has(chave)) continue;\n  vistos.add(chave);\n\n  const unidade = UNIDADES_MAP[norm(j.nome)];\n  if (!unidade) { ignorados++; continue; }\n\n  const prof = norm(j.profissional);\n  const tipo = norm(j.TIPO) || norm(j.descricao);\n  if (prof.includes('consulta') || tipo.includes('consulta')) continue;\n\n  const u = d[unidade];\n  u.sessoes++;\n  const eq = prof.includes('multiplace') ? 'Multiplace'\n           : prof.includes('monoplace')  ? 'Monoplace'\n           : 'Outros';\n  u.equip[eq] = (u.equip[eq] || 0) + 1;\n}\n\nconst ref = $now.minus({ months: 1 });\nconst mes = ref.setLocale('pt-BR').toFormat('LLLL/yyyy');\nconst titulo = mes.charAt(0).toUpperCase() + mes.slice(1);\n\nconst totalSes = UNIDADES.reduce((a, u) => a + d[u].sessoes, 0);\n\nconst linhaSes = u => {\n  const det = Object.entries(d[u].equip)\n    .sort((a, b) => b[1] - a[1])\n    .map(([k, v]) => `${k} ${v}`).join(' | ');\n  return `    ${u}: ${d[u].sessoes}${det ? `  (${det})` : ''}`;\n};\n\nconst mensagem =\n`Produção — ${titulo}\n\nSESSÕES DE OHB\n${UNIDADES.map(linhaSes).join('\\n')}\n    Total: ${totalSes}\n\nAtt,`;\n\nreturn [{ json: { mensagem, ignorados, faturamento } }];"
+   },
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    -1488,
+    1520
+   ],
+   "id": "8ff0cf09-48c6-4c65-970e-31efbafc3855",
+   "name": "Code in JavaScript6"
+  },
+  {
+   "parameters": {
+    "conditions": {
+     "options": {
+      "caseSensitive": true,
+      "leftValue": "",
+      "typeValidation": "loose",
+      "version": 3
+     },
+     "conditions": [
+      {
+       "id": "512aa83c-35ce-473e-9edd-b6c0c1139450",
+       "leftValue": "={{ $json.Agendamento.data }}",
+       "rightValue": "={{ $now.toFormat('yyyy-MM-dd') }}",
+       "operator": {
+        "type": "dateTime",
+        "operation": "equals"
+       }
+      }
+     ],
+     "combinator": "and"
+    },
+    "looseTypeValidation": true,
+    "options": {}
+   },
+   "type": "n8n-nodes-base.if",
+   "typeVersion": 2.3,
+   "position": [
+    -1280,
+    608
+   ],
+   "id": "ba6543a3-78b6-400d-b72d-caefd125ff08",
+   "name": "Hoje?"
+  },
+  {
+   "parameters": {
+    "rules": {
+     "values": [
+      {
+       "conditions": {
+        "options": {
+         "caseSensitive": true,
+         "leftValue": "",
+         "typeValidation": "loose",
+         "version": 3
+        },
+        "conditions": [
+         {
+          "id": "d34c9c02-cb64-4f6b-8f1d-1df4b0625355",
+          "leftValue": "={{ $json.Local.id }}",
+          "rightValue": "=1",
+          "operator": {
+           "type": "string",
+           "operation": "equals"
+          }
+         }
+        ],
+        "combinator": "and"
+       },
+       "renameOutput": true,
+       "outputKey": "Asa Sul"
+      },
+      {
+       "conditions": {
+        "options": {
+         "caseSensitive": true,
+         "leftValue": "",
+         "typeValidation": "loose",
+         "version": 3
+        },
+        "conditions": [
+         {
+          "id": "de590268-4b21-45c2-9b43-0ec636eece17",
+          "leftValue": "={{ $json.Local.id }}",
+          "rightValue": "2",
+          "operator": {
+           "type": "string",
+           "operation": "equals"
+          }
+         }
+        ],
+        "combinator": "and"
+       },
+       "renameOutput": true,
+       "outputKey": "Taguatinga"
+      }
+     ]
+    },
+    "looseTypeValidation": true,
+    "options": {}
+   },
+   "type": "n8n-nodes-base.switch",
+   "typeVersion": 3.4,
+   "position": [
+    -640,
+    752
+   ],
+   "id": "132c0199-0b96-4a42-9116-b1dcf4f03d7f",
+   "name": "Unidade1"
+  },
+  {
+   "parameters": {
+    "rules": {
+     "values": [
+      {
+       "conditions": {
+        "options": {
+         "caseSensitive": true,
+         "leftValue": "",
+         "typeValidation": "loose",
+         "version": 3
+        },
+        "conditions": [
+         {
+          "id": "60b3c9ad-6217-4d16-9f12-543228f98be4",
+          "leftValue": "={{ $json.Profissional.id }}",
+          "rightValue": "121",
+          "operator": {
+           "type": "string",
+           "operation": "equals",
+           "name": "filter.operator.equals"
+          }
+         }
+        ],
+        "combinator": "and"
+       },
+       "renameOutput": true,
+       "outputKey": "Monoplace"
+      },
+      {
+       "conditions": {
+        "options": {
+         "caseSensitive": true,
+         "leftValue": "",
+         "typeValidation": "loose",
+         "version": 3
+        },
+        "conditions": [
+         {
+          "id": "211bd5d9-23ab-49f5-9af7-78dd0f42c5b3",
+          "leftValue": "={{ $json.Profissional.id }}",
+          "rightValue": "120",
+          "operator": {
+           "type": "string",
+           "operation": "equals",
+           "name": "filter.operator.equals"
+          }
+         }
+        ],
+        "combinator": "and"
+       },
+       "renameOutput": true,
+       "outputKey": "Consultas"
+      }
+     ]
+    },
+    "looseTypeValidation": true,
+    "options": {}
+   },
+   "type": "n8n-nodes-base.switch",
+   "typeVersion": 3.4,
+   "position": [
+    -304,
+    880
+   ],
+   "id": "bbbfa035-85a3-4058-8af5-1bb36d394bfc",
+   "name": "Agenda Taguatinga1"
+  },
+  {
+   "parameters": {
+    "conditions": {
+     "options": {
+      "caseSensitive": true,
+      "leftValue": "",
+      "typeValidation": "strict",
+      "version": 3
+     },
+     "conditions": [
+      {
+       "id": "00f3acc2-23b7-4e82-8588-8791bb514e3a",
+       "leftValue": "={{ $json.Profissional.id }}",
+       "rightValue": "113",
+       "operator": {
+        "type": "string",
+        "operation": "notEquals"
+       }
+      }
+     ],
+     "combinator": "and"
+    },
+    "options": {}
+   },
+   "type": "n8n-nodes-base.if",
+   "typeVersion": 2.3,
+   "position": [
+    -304,
+    576
+   ],
+   "id": "caa4e0a0-9075-481f-93e4-1092d1b36227",
+   "name": "É sessão?1"
+  },
+  {
+   "parameters": {
+    "jsCode": "const PREPS = [\"DE\",\"DA\",\"DO\",\"DAS\",\"DOS\",\"E\"];\nconst ORDINAIS = [\"1°\",\"2°\",\"3°\",\"4°\",\"5°\",\"6°\",\"7°\",\"8°\",\"9°\",\"10°\"];\nconst CAP_MULTI = 8;\nconst CAP_MONO = 2;\n\nconst norm = s => String(s ?? '')\n  .normalize('NFD').replace(/[\\u0300-\\u036f]/g, '')\n  .trim().toLowerCase();\n\nfunction nomeCurto(nome) {\n  const t = String(nome ?? '').trim().split(/\\s+/);\n  const primeiro = t[0];\n  const resto = t.slice(1);\n  if (!resto.length) return primeiro;\n  if (PREPS.includes(resto[0]) && resto[1]) return `${primeiro} ${resto[0]} ${resto[1]}`;\n  return `${primeiro} ${resto[0]}`;\n}\n\nconst hhmm = d => String(d.Agendamento?.horario ?? '').slice(0, 5);\nconst ativo = d => ![\"Desmarcado\", \"Desistiu\", \"Faltou\"].includes(d.Agendamento?.confirmado);\nconst ehAvaliacao = d => norm(d.Agendamento?.tipodeatendimento).includes('avaliacao');\n\n// nome curto + marcador de avaliação\nconst etiqueta = d => nomeCurto(d.Paciente?.nome) + (ehAvaliacao(d) ? ' (AVALIAÇÃO)' : '');\n\nconst dados = $input.all().flatMap(i =>\n  Array.isArray(i.json) ? i.json : (Array.isArray(i.json.data) ? i.json.data : [i.json])\n).filter(d => d && d.Agendamento);\n\nconst multi = dados.filter(d => String(d.Profissional?.id) === \"112\");\nconst mono  = dados.filter(d => String(d.Profissional?.id) === \"111\");\n\nconst multiAtivos = multi.filter(ativo);\nconst monoAtivos  = mono.filter(ativo);\nconst totalPacientes = multiAtivos.length + monoAtivos.length;\n\nconst dataISO = dados[0]?.Agendamento?.data || $now.plus({ days: 1 }).toFormat('yyyy-MM-dd');\nconst data = dataISO.slice(0, 10).split(\"-\").reverse().join(\"/\");\n\nlet texto = `*AGENDA DE AMANHÃ ${data}*\\n`;\n\n// ---------- SESSÕES MULTI ----------\nconst horariosMulti = [...new Set(multi.map(hhmm))].filter(Boolean).sort();\nhorariosMulti.forEach((h, idx) => {\n  const nomes = multiAtivos\n    .filter(d => hhmm(d) === h)\n    .map(etiqueta)\n    .sort((a, b) => a.localeCompare(b, \"pt-BR\"));\n\n  texto += `\\n*${ORDINAIS[idx] || `${idx + 1}°`} SESSÃO MULTI – ${h}h*\\n`;\n  for (let i = 0; i < CAP_MULTI; i++) {\n    texto += `${i + 1}. ${nomes[i] || \"VAGO\"}\\n`;\n  }\n});\n\n// ---------- MONOPLACES ----------\nconst horariosMono = [...new Set(mono.map(hhmm))].filter(Boolean).sort();\nconst grade = {};\nfor (let c = 1; c <= CAP_MONO; c++) grade[c] = {};\n\nhorariosMono.forEach(h => {\n  monoAtivos\n    .filter(d => hhmm(d) === h)\n    .sort((a, b) => String(a.Agendamento.horario).localeCompare(String(b.Agendamento.horario)))\n    .forEach((d, i) => {\n      if (i < CAP_MONO) grade[i + 1][h] = etiqueta(d);\n    });\n});\n\nfor (let c = 1; c <= CAP_MONO; c++) {\n  texto += `\\n*MONOPLACE ${c}*\\n`;\n  horariosMono.forEach(h => {\n    texto += `${h}h – ${grade[c][h] || \"VAGO\"}\\n`;\n  });\n}\n\ntexto += `\\n*TOTAL PREVISTO DE PACIENTES: ${totalPacientes}*`;\n\nreturn [{ json: { agenda: texto, total: totalPacientes } }];"
+   },
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    0,
+    560
+   ],
+   "id": "9b78f032-45c4-4f36-9e41-df42ba204873",
+   "name": "Mensagem Agenda do Dia Seguinte"
+  },
+  {
+   "parameters": {
+    "method": "POST",
+    "url": "https://apiwp-afiliados.cannlink.com.br/message/sendText/Madeiro",
+    "sendHeaders": false,
+    "sendBody": true,
+    "bodyParameters": {
+     "parameters": [
+      {
+       "name": "number",
+       "value": "556191523103-1530882330@g.us"
+      },
+      {
+       "name": "text",
+       "value": "={{ $json.agenda }}"
+      }
+     ]
+    },
+    "options": {},
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpHeaderAuth"
+   },
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.4,
+   "position": [
+    480,
+    560
+   ],
+   "id": "d88c8d62-0832-4bfc-975a-0e07bb5caeb2",
+   "name": "Enviar mensagem Grupo Asa Sul1",
+   "onError": "continueErrorOutput",
+   "credentials": {
+    "httpHeaderAuth": {
+     "id": "FaVy4E4519vzp2EO",
+     "name": "Evolution afiliados · instância Madeiro (Dr Jorge)"
+    }
+   }
+  },
+  {
+   "parameters": {
+    "amount": 1
+   },
+   "type": "n8n-nodes-base.wait",
+   "typeVersion": 1.1,
+   "position": [
+    256,
+    560
+   ],
+   "id": "70c48fa4-d781-4e29-9e2d-5f2ad052e41a",
+   "name": "Wait1",
+   "webhookId": "b1f77bca-f74e-430f-947f-2a8768e2097b"
+  },
+  {
+   "parameters": {
+    "method": "POST",
+    "url": "https://apiwp-afiliados.cannlink.com.br/message/sendText/Madeiro",
+    "sendHeaders": false,
+    "sendBody": true,
+    "bodyParameters": {
+     "parameters": [
+      {
+       "name": "number",
+       "value": "120363393827994218@g.us"
+      },
+      {
+       "name": "text",
+       "value": "={{ $json.agenda }}"
+      }
+     ]
+    },
+    "options": {},
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpHeaderAuth"
+   },
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.4,
+   "position": [
+    480,
+    864
+   ],
+   "id": "93762900-a802-472b-b019-2e2855f66853",
+   "name": "Enviar mensagem Grupo Taguatinga1",
+   "onError": "continueErrorOutput",
+   "credentials": {
+    "httpHeaderAuth": {
+     "id": "FaVy4E4519vzp2EO",
+     "name": "Evolution afiliados · instância Madeiro (Dr Jorge)"
+    }
+   }
+  },
+  {
+   "parameters": {
+    "jsCode": "const PREPS = [\"DE\",\"DA\",\"DO\",\"DAS\",\"DOS\",\"E\"];\nconst CAP_MONO = 4;\nconst SLOTS_DIA = 7;          // slots previstos por dia\nconst INTERVALO_MIN = 100;    // intervalo entre slots, em minutos\nconst INICIO_PADRAO = '07:30';\n\nconst norm = s => String(s ?? '')\n  .normalize('NFD').replace(/[\\u0300-\\u036f]/g, '')\n  .trim().toLowerCase();\n\nfunction nomeCurto(nome) {\n  const t = String(nome ?? '').trim().split(/\\s+/);\n  const primeiro = t[0];\n  const resto = t.slice(1);\n  if (!resto.length) return primeiro;\n  if (PREPS.includes(resto[0]) && resto[1]) return `${primeiro} ${resto[0]} ${resto[1]}`;\n  return `${primeiro} ${resto[0]}`;\n}\n\nconst hhmm = d => String(d.Agendamento?.horario ?? '').slice(0, 5);\nconst ativo = d => ![\"Desmarcado\", \"Desistiu\", \"Faltou\"].includes(d.Agendamento?.confirmado);\nconst ehAvaliacao = d => norm(d.Agendamento?.tipodeatendimento).includes('avaliacao');\nconst etiqueta = d => nomeCurto(d.Paciente?.nome) + (ehAvaliacao(d) ? ' (AVALIAÇÃO)' : '');\n\nconst paraMin = h => { const [a, b] = h.split(':').map(Number); return a * 60 + b; };\nconst paraHora = m => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;\n\nconst dados = $input.all().flatMap(i =>\n  Array.isArray(i.json) ? i.json : (Array.isArray(i.json.data) ? i.json.data : [i.json])\n).filter(d => d && d.Agendamento);\n\nconst mono = dados.filter(d => String(d.Profissional?.id) === \"121\");\nconst validos = mono.filter(ativo);\n\n// grade fixa, ancorada no primeiro horário do dia\nconst observados = [...new Set(mono.map(hhmm))].filter(Boolean).sort();\nconst inicio = paraMin(observados[0] || INICIO_PADRAO);\nconst gradeFixa = Array.from({ length: SLOTS_DIA },\n  (_, i) => paraHora(inicio + i * INTERVALO_MIN));\n\n// horário fora da grade prevista continua aparecendo\nconst horarios = [...new Set([...gradeFixa, ...observados])].sort();\n\nconst grade = {};\nfor (let c = 1; c <= CAP_MONO; c++) grade[c] = {};\n\nhorarios.forEach(h => {\n  validos\n    .filter(d => hhmm(d) === h)\n    .sort((a, b) => String(a.Agendamento.horario).localeCompare(String(b.Agendamento.horario)))\n    .forEach((d, i) => {\n      if (i < CAP_MONO) grade[i + 1][h] = etiqueta(d);\n    });\n});\n\nconst dataISO = dados[0]?.Agendamento?.data || $now.plus({ days: 1 }).toFormat('yyyy-MM-dd');\nconst data = dataISO.slice(0, 10).split(\"-\").reverse().join(\"/\");\n\nlet texto = `*AGENDA AMANHÃ ${data}*\\n`;\n\nfor (let c = 1; c <= CAP_MONO; c++) {\n  texto += `\\n*MONOPLACE ${c}*\\n`;\n  horarios.forEach(h => {\n    texto += `${h} h – ${grade[c][h] || \"VAGO\"}\\n`;\n  });\n}\n\ntexto += `\\n*TOTAL PACIENTES PREVISTO: ${validos.length}*`;\n\nreturn [{ json: { agenda: texto, total: validos.length } }];"
+   },
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    0,
+    864
+   ],
+   "id": "3a1fe4b1-1b4a-4f54-87ff-9dd92ef614c2",
+   "name": "Mensagem Agenda do Dia Seguinte1"
+  },
+  {
+   "parameters": {
+    "method": "POST",
+    "url": "https://api.igut.med.br/v2/consultas/buscar",
+    "sendHeaders": true,
+    "headerParameters": {
+     "parameters": [
+      {
+       "name": "Content-Type",
+       "value": "application/json"
+      }
+     ]
+    },
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "={\n  \"Agendamento.data\": \"{{ $now.toFormat('yyyy-MM-dd') }}\",\n  \"Agendamento.data_fim\": \"{{ $now.toFormat('yyyy-MM-dd') }}\"\n}",
+    "options": {
+     "response": {
+      "response": {
+       "responseFormat": "json"
+      }
+     }
+    },
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpCustomAuth"
+   },
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.4,
+   "position": [
+    -2048,
+    828
+   ],
+   "id": "9834fe97-c04e-4725-a39b-8ab5a9ff0e5b",
+   "name": "Agenda de hoje (para o horário)",
+   "alwaysOutputData": false,
+   "credentials": {
+    "httpCustomAuth": {
+     "id": "ZezjclTyK2soW4a8",
+     "name": "BMH · iGut (acesso)"
+    }
+   }
+  },
+  {
+   "id": "39f86f02-1240-4c28-9894-b997ce6785f7",
+   "name": "Quando terminam as sessões",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    -1888,
+    828
+   ],
+   "parameters": {
+    "jsCode": "// As mensagens do dia saem quando as sessões acabam, e não às 19h05 (pedido do Jorge, 09/10/2026): última sessão do dia\n// + 1h30 de sessão + 20 min para a equipe finalizar no iGut (consulta: + 40 min). Fica entre 18h30 e 21h30; sem agenda, 19h05.\nconst r = $input.first().json; const lista = Array.isArray(r?.data) ? r.data : [];\nconst z = $now.setZone('America/Sao_Paulo').startOf('day'), hoje = z.toISODate();\nconst NAO_VEIO = ['Faltou', 'Desmarcado', 'Desistiu'];\nlet fim = null;\nfor (const d of lista) {\n  if (String(d.Agendamento?.data || '').slice(0, 10) !== hoje || NAO_VEIO.includes(d.Agendamento?.confirmado)) continue;\n  const id = String(d.Profissional?.id), dur = ['111', '112', '121'].includes(id) ? 110 : ['113', '120'].includes(id) ? 40 : 0;\n  if (!dur) continue;\n  const [h, m] = String(d.Agendamento?.horario || '').split(':').map(Number); if (isNaN(h)) continue;\n  const t = z.plus({ hours: h, minutes: (m || 0) + dur }); if (!fim || t > fim) fim = t;\n}\nif (!fim) fim = z.plus({ hours: 19, minutes: 5 });\nfim = DateTime.max(z.plus({ hours: 18, minutes: 30 }), DateTime.min(fim, z.plus({ hours: 21, minutes: 30 })));\nreturn [{ json: { ate: fim.toISO(), quando: fim.toFormat('HH:mm') } }];\n"
+   }
+  },
+  {
+   "id": "067350bb-b3a1-41fb-ac16-8211d93694f2",
+   "name": "Espera o fim das sessões",
+   "type": "n8n-nodes-base.wait",
+   "typeVersion": 1.1,
+   "position": [
+    -1728,
+    828
+   ],
+   "webhookId": "ad701bfe-a945-4595-a1aa-39ef9102a69d",
+   "parameters": {
+    "resume": "specificTime",
+    "dateTime": "={{ $json.ate }}"
+   }
+  },
+  {
+   "parameters": {
+    "method": "POST",
+    "url": "https://api.igut.med.br/v2/consultas/buscar",
+    "sendHeaders": true,
+    "headerParameters": {
+     "parameters": [
+      {
+       "name": "Content-Type",
+       "value": "application/json"
+      }
+     ]
+    },
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "={\n  \"Agendamento.data\": \"{{ $now.minus({ days: 7 }).toFormat('yyyy-MM-dd') }}\",\n  \"Agendamento.data_fim\": \"{{ $now.minus({ days: 7 }).toFormat('yyyy-MM-dd') }}\"\n}",
+    "options": {
+     "response": {
+      "response": {
+       "responseFormat": "json"
+      }
+     }
+    },
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpCustomAuth"
+   },
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.4,
+   "position": [
+    -824,
+    -528
+   ],
+   "id": "f21393ef-e9e0-419e-b5b3-743701544124",
+   "name": "Agenda da semana passada",
+   "alwaysOutputData": true,
+   "credentials": {
+    "httpCustomAuth": {
+     "id": "ZezjclTyK2soW4a8",
+     "name": "BMH · iGut (acesso)"
+    }
+   },
+   "executeOnce": true,
+   "onError": "continueRegularOutput"
+  },
+  {
+   "id": "76f8c5af-a1af-5e5b-b740-7bafb6247bee",
+   "name": "Avisa envio que falhou · BMH ADM Asa Sul (agenda de hoje)",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    720,
+    84
+   ],
+   "parameters": {
+    "jsCode": "// Saída de erro do nó \"Enviar mensagem Grupo Asa Sul\" (01/11/2026): antes ela não levava a nada e a falha sumia.\n// Falha da instância (fechada, sem autorização, inexistente): todos os envios vão falhar, então o aviso diz\n// \"instância fora do ar\" e o nó depois do Telegram faz o fluxo terminar em erro (alerta de falha e BMH_falhas).\n// Falha só deste grupo: avisa e os outros grupos seguem (parar cancelaria os que ainda não saíram).\nconst e = $input.first().json.error || $input.first().json;\nconst motivo = String(e.message || e.description || JSON.stringify(e)).replace(/apikey[^,}\\s]*/gi, 'apikey=[removido]').slice(0, 300);\nconst instancia = /connection closed|not connected|\\bclose\\b|instance.*(not|does not) exist|não existe|unauthori[sz]ed|\\b401\\b|forbidden/i.test(motivo);\nconst t = '⚠️ BMH: ';\nreturn [{ json: { texto: instancia ? t + 'a instância Madeiro do WhatsApp está fora do ar, e a mensagem não foi para BMH ADM Asa Sul (agenda de hoje) nem vai para os outros grupos. Reconectar pelo QR no celular. (' + motivo + ')' : t + 'a mensagem não foi para o grupo BMH ADM Asa Sul (agenda de hoje): ' + motivo + '. Os outros grupos seguem.' } }];\n"
+   }
+  },
+  {
+   "id": "a5a97ded-6af5-5665-ae7d-13fcc1cdeca6",
+   "name": "Avisa envio que falhou · BMH ADM Taguatinga (agenda de hoje)",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    720,
+    436
+   ],
+   "parameters": {
+    "jsCode": "// Saída de erro do nó \"Enviar mensagem Grupo Taguatinga\" (01/11/2026): antes ela não levava a nada e a falha sumia.\n// Falha da instância (fechada, sem autorização, inexistente): todos os envios vão falhar, então o aviso diz\n// \"instância fora do ar\" e o nó depois do Telegram faz o fluxo terminar em erro (alerta de falha e BMH_falhas).\n// Falha só deste grupo: avisa e os outros grupos seguem (parar cancelaria os que ainda não saíram).\nconst e = $input.first().json.error || $input.first().json;\nconst motivo = String(e.message || e.description || JSON.stringify(e)).replace(/apikey[^,}\\s]*/gi, 'apikey=[removido]').slice(0, 300);\nconst instancia = /connection closed|not connected|\\bclose\\b|instance.*(not|does not) exist|não existe|unauthori[sz]ed|\\b401\\b|forbidden/i.test(motivo);\nconst t = '⚠️ BMH: ';\nreturn [{ json: { texto: instancia ? t + 'a instância Madeiro do WhatsApp está fora do ar, e a mensagem não foi para BMH ADM Taguatinga (agenda de hoje) nem vai para os outros grupos. Reconectar pelo QR no celular. (' + motivo + ')' : t + 'a mensagem não foi para o grupo BMH ADM Taguatinga (agenda de hoje): ' + motivo + '. Os outros grupos seguem.' } }];\n"
+   }
+  },
+  {
+   "id": "1e823e00-bcda-558a-8803-c81721c84b18",
+   "name": "Avisa envio que falhou · BMH ADM Asa Sul (agenda de amanhã)",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    720,
+    740
+   ],
+   "parameters": {
+    "jsCode": "// Saída de erro do nó \"Enviar mensagem Grupo Asa Sul1\" (01/11/2026): antes ela não levava a nada e a falha sumia.\n// Falha da instância (fechada, sem autorização, inexistente): todos os envios vão falhar, então o aviso diz\n// \"instância fora do ar\" e o nó depois do Telegram faz o fluxo terminar em erro (alerta de falha e BMH_falhas).\n// Falha só deste grupo: avisa e os outros grupos seguem (parar cancelaria os que ainda não saíram).\nconst e = $input.first().json.error || $input.first().json;\nconst motivo = String(e.message || e.description || JSON.stringify(e)).replace(/apikey[^,}\\s]*/gi, 'apikey=[removido]').slice(0, 300);\nconst instancia = /connection closed|not connected|\\bclose\\b|instance.*(not|does not) exist|não existe|unauthori[sz]ed|\\b401\\b|forbidden/i.test(motivo);\nconst t = '⚠️ BMH: ';\nreturn [{ json: { texto: instancia ? t + 'a instância Madeiro do WhatsApp está fora do ar, e a mensagem não foi para BMH ADM Asa Sul (agenda de amanhã) nem vai para os outros grupos. Reconectar pelo QR no celular. (' + motivo + ')' : t + 'a mensagem não foi para o grupo BMH ADM Asa Sul (agenda de amanhã): ' + motivo + '. Os outros grupos seguem.' } }];\n"
+   }
+  },
+  {
+   "id": "256d45e7-7e58-5d74-b02e-aaba10c52b43",
+   "name": "Avisa envio que falhou · BMH ADM Taguatinga (agenda de amanhã)",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    720,
+    1044
+   ],
+   "parameters": {
+    "jsCode": "// Saída de erro do nó \"Enviar mensagem Grupo Taguatinga1\" (01/11/2026): antes ela não levava a nada e a falha sumia.\n// Falha da instância (fechada, sem autorização, inexistente): todos os envios vão falhar, então o aviso diz\n// \"instância fora do ar\" e o nó depois do Telegram faz o fluxo terminar em erro (alerta de falha e BMH_falhas).\n// Falha só deste grupo: avisa e os outros grupos seguem (parar cancelaria os que ainda não saíram).\nconst e = $input.first().json.error || $input.first().json;\nconst motivo = String(e.message || e.description || JSON.stringify(e)).replace(/apikey[^,}\\s]*/gi, 'apikey=[removido]').slice(0, 300);\nconst instancia = /connection closed|not connected|\\bclose\\b|instance.*(not|does not) exist|não existe|unauthori[sz]ed|\\b401\\b|forbidden/i.test(motivo);\nconst t = '⚠️ BMH: ';\nreturn [{ json: { texto: instancia ? t + 'a instância Madeiro do WhatsApp está fora do ar, e a mensagem não foi para BMH ADM Taguatinga (agenda de amanhã) nem vai para os outros grupos. Reconectar pelo QR no celular. (' + motivo + ')' : t + 'a mensagem não foi para o grupo BMH ADM Taguatinga (agenda de amanhã): ' + motivo + '. Os outros grupos seguem.' } }];\n"
+   }
+  },
+  {
+   "id": "6bc9c818-a39d-5dcb-abfc-c7ba94104cd5",
+   "name": "Avisa envio que falhou · Diretoria (relatório do dia)",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    704,
+    -188
+   ],
+   "parameters": {
+    "jsCode": "// Saída de erro do nó \"Enviar mensagem Grupo Diretoria\" (01/11/2026): antes ela não levava a nada e a falha sumia.\n// Falha da instância (fechada, sem autorização, inexistente): todos os envios vão falhar, então o aviso diz\n// \"instância fora do ar\" e o nó depois do Telegram faz o fluxo terminar em erro (alerta de falha e BMH_falhas).\n// Falha só deste grupo: avisa e os outros grupos seguem (parar cancelaria os que ainda não saíram).\nconst e = $input.first().json.error || $input.first().json;\nconst motivo = String(e.message || e.description || JSON.stringify(e)).replace(/apikey[^,}\\s]*/gi, 'apikey=[removido]').slice(0, 300);\nconst instancia = /connection closed|not connected|\\bclose\\b|instance.*(not|does not) exist|não existe|unauthori[sz]ed|\\b401\\b|forbidden/i.test(motivo);\nconst t = '⚠️ BMH: ';\nreturn [{ json: { texto: instancia ? t + 'a instância Madeiro do WhatsApp está fora do ar, e a mensagem não foi para Diretoria (relatório do dia) nem vai para os outros grupos. Reconectar pelo QR no celular. (' + motivo + ')' : t + 'a mensagem não foi para o grupo Diretoria (relatório do dia): ' + motivo + '. Os outros grupos seguem.' } }];\n"
+   }
+  },
+  {
+   "id": "07206f32-012e-52be-b2f9-8146443be68d",
+   "name": "Telegram · envio que falhou",
+   "type": "n8n-nodes-base.telegram",
+   "typeVersion": 1.2,
+   "position": [
+    960,
+    -528
+   ],
+   "parameters": {
+    "chatId": "8708228589",
+    "text": "={{ String($json.texto || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') }}",
+    "additionalFields": {
+     "appendAttribution": false,
+     "parse_mode": "HTML"
+    }
+   },
+   "credentials": {
+    "telegramApi": {
+     "id": "SgQHWuJOuMWeVbPi",
+     "name": "BMH · Telegram (robô BMH alertas)"
+    }
+   },
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000
+  },
+  {
+   "id": "39a69500-650d-5421-816b-7925ce388595",
+   "name": "Instância fora do ar? Para em erro",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    1200,
+    -528
+   ],
+   "parameters": {
+    "jsCode": "// Depois do aviso: se a falha foi da instância, termina em erro (passa pelo alerta de falha e fica na BMH_falhas).\n// Se foi só de um grupo, segue sem erro para os outros grupos ainda saírem.\nconst t = String($input.first().json?.result?.text || '');\nif (t.includes('instância Madeiro do WhatsApp está fora do ar')) throw new Error('instância Madeiro fora do ar: a agenda e o relatório não saíram. ' + t.slice(t.lastIndexOf('(')).slice(0, 250));\nreturn [];\n"
+   }
+  },
+  {
+   "id": "d7eba095-7ce1-54b5-a6d1-db4174e46d90",
+   "name": "Vigia · marca que rodou",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    -2144,
+    1820
+   ],
+   "parameters": {
+    "jsCode": "return [{ json: { chave: 'producao_diaria', nome: \"Produção Diaria e Mensal BMH (agenda dos grupos)\", ultima_vez: $now.toISO(), max_horas: 26, avisado_em: '' } }];"
+   }
+  },
+  {
+   "id": "ab45d2da-9960-5f0a-9fa4-91ad1a9e273c",
+   "name": "Vigia · grava",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    -1904,
+    1820
+   ],
+   "parameters": {
+    "operation": "upsert",
+    "dataTableId": {
+     "__rl": true,
+     "value": "0kBTGpt8EjCjmR9t",
+     "mode": "id",
+     "cachedResultName": "BMH_vigia"
+    },
+    "filters": {
+     "conditions": [
+      {
+       "keyName": "chave",
+       "keyValue": "={{ $json.chave }}"
+      }
+     ]
+    },
+    "columns": {
+     "mappingMode": "defineBelow",
+     "value": {
+      "chave": "={{ $json.chave }}",
+      "nome": "={{ $json.nome }}",
+      "ultima_vez": "={{ $json.ultima_vez }}",
+      "max_horas": "={{ $json.max_horas }}",
+      "avisado_em": "={{ $json.avisado_em }}"
+     },
+     "matchingColumns": [],
+     "schema": [
+      {
+       "id": "chave",
+       "displayName": "chave",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "nome",
+       "displayName": "nome",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "ultima_vez",
+       "displayName": "ultima_vez",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "max_horas",
+       "displayName": "max_horas",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "number",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "avisado_em",
+       "displayName": "avisado_em",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      }
+     ]
+    },
+    "options": {}
+   }
+  }
+ ],
+ "connections": {
+  "Code in JavaScript": {
+   "main": [
+    [
+     {
+      "node": "Edit Fields",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Unidade": {
+   "main": [
+    [
+     {
+      "node": "É sessão?",
+      "type": "main",
+      "index": 0
+     }
+    ],
+    [
+     {
+      "node": "Agenda Taguatinga",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Agenda Taguatinga": {
+   "main": [
+    [
+     {
+      "node": "Mensagem Agenda do dia",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Buscar Agendamentos BMH": {
+   "main": [
+    [
+     {
+      "node": "Code in JavaScript",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "É sessão?": {
+   "main": [
+    [
+     {
+      "node": "Mensagem Agenda do Diaa",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Mensagem Agenda do Diaa": {
+   "main": [
+    [
+     {
+      "node": "Wait",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Mensagem Agenda do dia": {
+   "main": [
+    [
+     {
+      "node": "Enviar mensagem Grupo Taguatinga",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Code in JavaScript2": {
+   "main": [
+    []
+   ]
+  },
+  "Wait": {
+   "main": [
+    [
+     {
+      "node": "Enviar mensagem Grupo Asa Sul",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "1x mês final do mês": {
+   "main": [
+    [
+     {
+      "node": "Buscar Agendamentos BMH1",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Buscar Agendamentos BMH1": {
+   "main": [
+    [
+     {
+      "node": "Code in JavaScript1",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Code in JavaScript1": {
+   "main": [
+    [
+     {
+      "node": "Edit Fields1",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Edit Fields1": {
+   "main": [
+    [
+     {
+      "node": "Code in JavaScript3",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Code in JavaScript3": {
+   "main": [
+    [
+     {
+      "node": "Enviar mensagem Grupo Diretoria1",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Edit Fields": {
+   "main": [
+    [
+     {
+      "node": "Hoje?",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Code in JavaScript4": {
+   "main": [
+    [
+     {
+      "node": "Enviar mensagem Grupo Diretoria",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "BI": {
+   "main": [
+    [
+     {
+      "node": "Code in JavaScript5",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Code in JavaScript5": {
+   "main": [
+    [
+     {
+      "node": "Code in JavaScript6",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Hoje?": {
+   "main": [
+    [
+     {
+      "node": "Agenda da semana passada",
+      "type": "main",
+      "index": 0
+     },
+     {
+      "node": "Unidade",
+      "type": "main",
+      "index": 0
+     }
+    ],
+    [
+     {
+      "node": "Unidade1",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Agenda Taguatinga1": {
+   "main": [
+    [
+     {
+      "node": "Mensagem Agenda do Dia Seguinte1",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "É sessão?1": {
+   "main": [
+    [
+     {
+      "node": "Mensagem Agenda do Dia Seguinte",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Unidade1": {
+   "main": [
+    [
+     {
+      "node": "É sessão?1",
+      "type": "main",
+      "index": 0
+     }
+    ],
+    [
+     {
+      "node": "Agenda Taguatinga1",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Mensagem Agenda do Dia Seguinte": {
+   "main": [
+    [
+     {
+      "node": "Wait1",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Wait1": {
+   "main": [
+    [
+     {
+      "node": "Enviar mensagem Grupo Asa Sul1",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Mensagem Agenda do Dia Seguinte1": {
+   "main": [
+    [
+     {
+      "node": "Enviar mensagem Grupo Taguatinga1",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Todo dia às 17h": {
+   "main": [
+    [
+     {
+      "node": "Agenda de hoje (para o horário)",
+      "type": "main",
+      "index": 0
+     },
+     {
+      "node": "Vigia · marca que rodou",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Agenda de hoje (para o horário)": {
+   "main": [
+    [
+     {
+      "node": "Quando terminam as sessões",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Quando terminam as sessões": {
+   "main": [
+    [
+     {
+      "node": "Espera o fim das sessões",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Espera o fim das sessões": {
+   "main": [
+    [
+     {
+      "node": "Buscar Agendamentos BMH",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Agenda da semana passada": {
+   "main": [
+    [
+     {
+      "node": "Code in JavaScript4",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Enviar mensagem Grupo Asa Sul": {
+   "main": [
+    [],
+    [
+     {
+      "node": "Avisa envio que falhou · BMH ADM Asa Sul (agenda de hoje)",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Avisa envio que falhou · BMH ADM Asa Sul (agenda de hoje)": {
+   "main": [
+    [
+     {
+      "node": "Telegram · envio que falhou",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Enviar mensagem Grupo Taguatinga": {
+   "main": [
+    [],
+    [
+     {
+      "node": "Avisa envio que falhou · BMH ADM Taguatinga (agenda de hoje)",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Avisa envio que falhou · BMH ADM Taguatinga (agenda de hoje)": {
+   "main": [
+    [
+     {
+      "node": "Telegram · envio que falhou",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Enviar mensagem Grupo Asa Sul1": {
+   "main": [
+    [],
+    [
+     {
+      "node": "Avisa envio que falhou · BMH ADM Asa Sul (agenda de amanhã)",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Avisa envio que falhou · BMH ADM Asa Sul (agenda de amanhã)": {
+   "main": [
+    [
+     {
+      "node": "Telegram · envio que falhou",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Enviar mensagem Grupo Taguatinga1": {
+   "main": [
+    [],
+    [
+     {
+      "node": "Avisa envio que falhou · BMH ADM Taguatinga (agenda de amanhã)",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Avisa envio que falhou · BMH ADM Taguatinga (agenda de amanhã)": {
+   "main": [
+    [
+     {
+      "node": "Telegram · envio que falhou",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Enviar mensagem Grupo Diretoria": {
+   "main": [
+    [],
+    [
+     {
+      "node": "Avisa envio que falhou · Diretoria (relatório do dia)",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Avisa envio que falhou · Diretoria (relatório do dia)": {
+   "main": [
+    [
+     {
+      "node": "Telegram · envio que falhou",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Telegram · envio que falhou": {
+   "main": [
+    [
+     {
+      "node": "Instância fora do ar? Para em erro",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Vigia · marca que rodou": {
+   "main": [
+    [
+     {
+      "node": "Vigia · grava",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  }
+ },
+ "settings": {
+  "executionOrder": "v1",
+  "binaryMode": "separate",
+  "errorWorkflow": "7u3CuyjESsHmCtMW",
+  "saveDataSuccessExecution": "none",
+  "saveDataErrorExecution": "all",
+  "timezone": "America/Sao_Paulo"
+ }
+}
