@@ -56,11 +56,15 @@ function revisaoSemana(D, T, cfg) {
   const tetoM = num(cfg['meta_teto_mes_' + D.mes_ini.slice(0, 7)] || cfg.meta_teto_mes);
   const mGasto = soma(mS, 'gasto'), mConv = soma(mS, 'conversas'), mCliq = soma(mS, 'cliques_link'), mGastoA = soma(mA, 'gasto'), mConvA = soma(mA, 'conversas');
   const temConversa30 = soma(m30, 'conversas') >= 1;
+  // nada ligado: a foto mais recente da conta sem orçamento ligado e sem gasto no último dia da semana (07/11/2026: a C1 foi
+  // pausada em 06/11, e a frase "as campanhas ligadas são de engajamento" ficaria errada)
+  const nadaLigado = !!contaMeta && num(contaMeta.orcamento_ligado) === 0 && soma(meta.filter(r => r.dia === D.semana_fim), 'gasto') === 0;
   blocos.push({ titulo: 'Meta', texto: [
     `Semana: ${brl(mGasto)}${pct(mGasto, mGastoA)} · ${int(mConv)} ${Math.round(mConv) === 1 ? 'conversa' : 'conversas'}${cada(mGasto, mConv)} · ${int(mCliq)} cliques no link (semana anterior: ${brl(mGastoA)}, ${int(mConvA)} conversas)`,
     `Mês até ${dm(D.semana_fim)}: ${brl(soma(mM, 'gasto'))}${tetoM ? ' de ' + brl(tetoM) : ''}`,
-    contaMeta && num(contaMeta.verba_restante) > 0 ? `Verba da conta: ${brl(contaMeta.verba_restante)}${contaMeta.acaba_em ? ', até ' + dm(contaMeta.acaba_em) : ''} (foto de ${dm(contaMeta.dia)})` : '',
-    temConversa30 ? '' : 'As campanhas ligadas são de engajamento e não trazem conversa: a decisão sobre elas é a P3 da auditoria de 20/10, não da régua.',
+    nadaLigado ? `Nenhuma campanha do Meta ligada (foto de ${dm(contaMeta.dia)}).` : '',
+    !nadaLigado && contaMeta && num(contaMeta.verba_restante) > 0 ? `Verba da conta: ${brl(contaMeta.verba_restante)}${contaMeta.acaba_em ? ', até ' + dm(contaMeta.acaba_em) : ''} (foto de ${dm(contaMeta.dia)})` : '',
+    temConversa30 || nadaLigado ? '' : 'As campanhas ligadas são de engajamento e não trazem conversa: a decisão sobre elas é a P3 da auditoria de 20/10, não da régua.',
   ].filter(Boolean).join('\n') });
   if (temConversa30) {
     const porConj = {}; for (const r of mS) { const k = r.conjunto_id; (porConj[k] ||= { alvo: r.campanha + ' › ' + r.conjunto, alvo_id: k, gasto: 0, conversas: 0 }); porConj[k].gasto += num(r.gasto); porConj[k].conversas += num(r.conversas); }
