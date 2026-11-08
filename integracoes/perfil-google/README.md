@@ -109,3 +109,7 @@ projeto. Cota 0 (erro 429 com `quota_limit_value: "0"`) = não aprovado; 200 ou 
   tira só as que já viraram proposta; a rodada seguinte, 30 min depois, pega a mesma avaliação. Conferido em 31/10 pelo
   Gerente BMH. **Se repetir:** pôr nova tentativa na chamada do Google dentro do nó (ele é de código, então a tentativa
   vai no código ou nas opções do nó), numa cópia de homologação, e pedir pelo porteiro.
+- **08/11/2026, 18:07 (Brasília):** repetiu: execução 861771, 503 no mesmo nó (BMH_falhas, linha 9). A rodada das 20h07 marcou a
+  vigia, e nada se perdeu. Preparada a nova tentativa nas opções do nó "Avaliações do perfil" (3 vezes, 5 s entre elas; o nó só
+  lê): `scripts/n8n/monta-avaliacoes-tentativa.py` gera `bmh-avaliacoes-tentativa.json`, pedido 158 no porteiro, aplicado pelo
+  Mac com `python3 scripts/n8n/aplica-bmh-mac.py grava 158` depois do toque do Jorge.

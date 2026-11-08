@@ -1,0 +1,743 @@
+{
+ "name": "BMH · Perfil do Google · avaliações",
+ "nodes": [
+  {
+   "id": "1ea617df-5b5a-4967-9778-2477f1375f63",
+   "name": "A cada 30 min (7h–21h)",
+   "type": "n8n-nodes-base.scheduleTrigger",
+   "typeVersion": 1.2,
+   "position": [
+    0,
+    0
+   ],
+   "parameters": {
+    "rule": {
+     "interval": [
+      {
+       "field": "cronExpression",
+       "expression": "7,37 7-21 * * *"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "9d7e04d4-676c-44eb-a8d7-ec2bc54655c8",
+   "name": "Rodar agora",
+   "type": "n8n-nodes-base.webhook",
+   "typeVersion": 2,
+   "position": [
+    260,
+    0
+   ],
+   "parameters": {
+    "path": "bmh-perfil-avaliacoes-693566a0dd11",
+    "responseMode": "lastNode",
+    "options": {}
+   },
+   "webhookId": "603fcda4-8d6e-4541-80d0-9fce379bbffc"
+  },
+  {
+   "id": "5e3eca29-f58e-46ee-bfa0-2ddd37585b0a",
+   "name": "Google · renova o acesso",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    520,
+    0
+   ],
+   "parameters": {
+    "method": "POST",
+    "url": "https://oauth2.googleapis.com/token",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpCustomAuth",
+    "sendBody": true,
+    "contentType": "json",
+    "specifyBody": "json",
+    "jsonBody": "{}",
+    "options": {}
+   },
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000,
+   "credentials": {
+    "httpCustomAuth": {
+     "id": "Qewvtjz9JokCUvNy",
+     "name": "BMH · Google Ads (renovação do acesso)"
+    }
+   },
+   "executeOnce": true
+  },
+  {
+   "id": "eb03c06f-6085-4345-bddc-697eced985fe",
+   "name": "Avaliações do perfil",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    780,
+    0
+   ],
+   "parameters": {
+    "jsCode": "// Lê as avaliações dos dois perfis da BMH e devolve as que ainda não têm resposta (14/10/2026, modelo do fluxo da Nexo).\n// Só os perfis da BMH: a autorização do Jorge também enxerga Nexo e Cannlink, que nunca se mexem daqui.\n// Teste com ?modo=teste&simular=1: pega as 2 avaliações mais recentes (mesmo respondidas) só para ver a sugestão.\nconst CONTA = 'accounts/117754317451946679663';\nconst PERFIS = { 'Asa Sul': '15026912528968655315', Taguatinga: '6381458115148112648' };\nconst token = $('Google · renova o acesso').first().json.access_token;\nif (!token) throw new Error('sem acesso ao Perfil do Google (a renovação falhou)');\nlet q = {}; try { q = $('Rodar agora').first().json.query || {}; } catch (e) {}\nconst NOTA = { ONE: 1, TWO: 2, THREE: 3, FOUR: 4, FIVE: 5 };\nconst todas = [];\nfor (const [unidade, id] of Object.entries(PERFIS)) {\n  let pagina = '';\n  for (let i = 0; i < 30; i++) {\n    const r = await this.helpers.httpRequest({ url: `https://mybusiness.googleapis.com/v4/${CONTA}/locations/${id}/reviews?pageSize=50` + (pagina ? '&pageToken=' + pagina : ''),\n      headers: { Authorization: 'Bearer ' + token }, json: true, timeout: 60000 });\n    for (const x of r.reviews || []) todas.push({ ...x, unidade });\n    pagina = r.nextPageToken; if (!pagina) break;\n  }\n}\nconst limpa = (s) => String(s || '').replace(/\\(Translated by Google\\)[\\s\\S]*$/i, '').replace(/\\(Original\\)\\s*/i, '').trim();\nconst simular = q.modo === 'teste' && q.simular;\nconst base = simular ? [...todas].sort((a, b) => String(b.createTime).localeCompare(String(a.createTime))).slice(0, 2) : todas.filter((r) => !r.reviewReply);\nconst sem = base.map((r) => ({ review_id: r.reviewId, review_name: r.name, unidade: r.unidade, nota: NOTA[r.starRating] || 0, comentario: limpa(r.comment),\n  nome: String(r.reviewer?.displayName || '').trim(), avaliada_em: r.createTime }));\n// últimas respostas publicadas, sem o nome de quem avaliou (para a IA não repetir abertura nem frase)\nconst recentes = todas.filter((r) => r.reviewReply).sort((a, b) => String(b.reviewReply.updateTime).localeCompare(String(a.reviewReply.updateTime)))\n  .slice(0, 15).map((r) => String(r.reviewReply.comment || '').replace(String(r.reviewer?.displayName || '').split(' ')[0] || '§§', '[nome]'));\nreturn [{ json: { total: todas.length, sem_resposta: sem, recentes, teste: q.modo === 'teste' } }];\n"
+   },
+   "executeOnce": true,
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000
+  },
+  {
+   "id": "556ba6ca-d90e-4c9f-895a-826ace7a805e",
+   "name": "Já propostas",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    1040,
+    0
+   ],
+   "parameters": {
+    "operation": "get",
+    "dataTableId": {
+     "__rl": true,
+     "value": "meuAoXOYHo1lt0XQ",
+     "mode": "id",
+     "cachedResultName": "BMH_avaliacoes_google"
+    },
+    "returnAll": true
+   },
+   "alwaysOutputData": true,
+   "executeOnce": true
+  },
+  {
+   "id": "a24f0e22-2b84-4ff4-aac2-64749a06e951",
+   "name": "Novas",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    1300,
+    0
+   ],
+   "parameters": {
+    "jsCode": "// Tira as que já viraram proposta (qualquer situação) e limita a 5 por rodada, das mais antigas para as mais novas.\n// Regras da skill responder-avaliacoes, seção BMH (sigilo dobrado: quase todo paciente vem de cirurgia plástica).\nconst A = $('Avaliações do perfil').first().json;\nconst ja = new Set($('Já propostas').all().map((i) => String(i.json.chave || '')).filter(Boolean));\nconst novas = (A.sem_resposta || []).filter((r) => A.teste || !ja.has(r.review_id)).sort((a, b) => String(a.avaliada_em).localeCompare(String(b.avaliada_em))).slice(0, 5);\nif (!novas.length) return [];\nconst SISTEMA = `Você é a pessoa da recepção da BMH (Brasília Medicina Hiperbárica, unidades Asa Sul e Taguatinga) respondendo, no Google, a uma avaliação. Escreva como gente de verdade escreveria no celular: calorosa, simples, curta. Nada de texto de empresa.\n\nComo responder:\n- 1 ou 2 frases, no máximo umas 25 palavras.\n- Responda ao que a pessoa escreveu, de preferência com as palavras dela. Se ela citou um profissional ou a recepção, diga que o elogio vai chegar até ele ou ela (pode usar o nome do profissional que ela citou).\n- Avaliação sem texto: só um agradecimento curto e pessoal, sem acrescentar nada. Não invente o que a pessoa achou.\n- Avaliação com mais de um ano: resposta bem básica (agradecer pelo nome, no máximo meia frase a mais).\n- Use o primeiro nome como a pessoa escreveu, só arrumando maiúscula e acento trocado. Nunca acrescente acento que ela não usou. Se parecer apelido, usuário ou empresa, sem nome.\n- Emoji: no máximo um, e só às vezes. Nenhum em nota 4 com crítica nem em nota 3 ou menos.\n- Varie: não comece nem termine igual às respostas recentes listadas na mensagem.\n\nNunca escreva (soa robótico ou de propaganda, o Jorge recusou): \"fica feliz com a sua avaliação\", \"segue à disposição\", \"estamos à disposição\", \"hora marcada\", \"tudo no mesmo lugar\", \"estrutura\", \"na visita\", \"se sentiu bem atendida\", \"seu retorno\", \"atendimento humanizado\", \"excelência\", \"experiência\", \"nossa missão\", \"volte sempre\", convite com oferta. Sem travessão. Sem tom de spa ou de estética.\n\nRegras de clínica que nunca mudam:\n1. Sigilo: nunca repita, confirme ou comente cirurgia, cirurgião, recuperação, cicatrização, número de sessões, diagnóstico, exame, tratamento ou remédio, nem que um parente fez algo, mesmo que a pessoa conte. Não confirme que a pessoa é paciente.\n2. Nada de preço, promessa ou prazo. Não diga que algo já mudou.\n3. Nota 3 ou menos: não discuta em público. Agradeça o aviso, lamente e convide a falar com a coordenação pelo WhatsApp da clínica. Sem explicar o caso.\n4. Nota 4 com crítica: agradeça, reconheça o ponto e diga que ele foi levado à coordenação.\n5. Nunca cite outra clínica nem o cirurgião, mesmo que a avaliação cite.\n6. Pedido de resultado, receita ou orientação de saúde: só o caminho (\"é só chamar no WhatsApp da clínica que a recepção te orienta\").\n\nExemplos no tom certo:\n5 estrelas \"Equipe muito atenciosa, me senti segura\" → \"Obrigado, Mariana! Que bom que você se sentiu segura com a gente. 💙\"\n5 estrelas \"Fiz as sessões depois da minha lipo, recomendo\" → \"Muito obrigado pela recomendação, Carlos!\"\n5 estrelas \"O Dom foi um amor\" → \"Obrigado, Jessica! O Dom vai adorar saber. 😊\"\n5 estrelas sem texto → \"Obrigado pelas 5 estrelas, Paula!\"\n4 estrelas \"Bom, mas o horário atrasou\" → \"Obrigado por contar, Pedro. Pontualidade a gente leva a sério, e levamos isso à coordenação.\"\n2 estrelas \"Mudaram meu horário várias vezes\" → \"Lamentamos a dificuldade com os horários, Nélly, e agradecemos o aviso. Fale com a coordenação pelo WhatsApp da clínica para acertarmos isso juntos.\"\n\nResponda só JSON: {\"resposta\": \"...\", \"parece_falsa\": false}`;\nconst recentes = (A.recentes || []).join('\\n');\n// 4 ou 5 estrelas sem texto: frase curta pronta, sem IA, sem repetir as recentes nem as da mesma rodada\nconst FRASES = ['Obrigado pelas 5 estrelas, {n}!', '{n}, muito obrigado! 💙', 'Muito obrigado pela confiança, {n}!', 'Obrigado, {n}! A equipe agradece.',\n  'Nós que agradecemos, {n}! 😊', 'Obrigado pelas estrelas, {n}!', '{n}, obrigado pela confiança!', 'Obrigado pelo carinho, {n}!'];\nconst primeiro = (nome) => { const p = String(nome || '').trim().split(/\\s+/)[0] || ''; if (!/^[\\p{L}]{2,}$/u.test(p) || p.length > 14) return ''; return p.charAt(0).toUpperCase() + p.slice(1).toLowerCase(); };\nconst semNome = (f) => f.replace(/,? \\{n\\}/, '').replace(/^\\{n\\}, (\\p{L})/u, (m, c) => c.toUpperCase());\nconst usados = new Set(); const recTxt = (A.recentes || []).join(' | ');\nlet giro = Number($now.toFormat('mm'));\nconst pronta = (r) => { if (r.comentario || r.nota < 4) return '';\n  for (let t = 0; t < FRASES.length; t++) { const f = FRASES[(giro + t) % FRASES.length]; const cabeca = f.replace('{n}', '').trim().slice(0, 12);\n    if (usados.has(f) || recTxt.includes(cabeca)) continue;\n    usados.add(f); giro++; const p = primeiro(r.nome); let x = p ? f.replace('{n}', p) : semNome(f); if (r.nota === 4) x = x.replace('5 estrelas', 'estrelas'); return x; }\n  return 'Obrigado pela avaliação' + (primeiro(r.nome) ? ', ' + primeiro(r.nome) : '') + '!'; };\nconst umAno = $now.minus({ years: 1 }).toISO();\nreturn novas.map((r) => ({ json: { ...r, pronta: pronta(r), corpo: { model: 'gpt-5.5', response_format: { type: 'json_object' }, max_completion_tokens: 3000,\n  messages: [{ role: 'system', content: SISTEMA }, { role: 'user', content: `Respostas recentes (não repita):\\n${recentes || '(nenhuma)'}\\n\\nUnidade: ${r.unidade}\\nData: ${String(r.avaliada_em).slice(0, 10)}${r.avaliada_em < umAno ? ' (mais de um ano: resposta básica)' : ''}\\nNota: ${r.nota} estrela(s)\\nNome de quem avaliou: ${r.nome || '(sem nome)'}\\nTexto: ${r.comentario || '(sem texto)'}` }] } } }));\n"
+   },
+   "executeOnce": true
+  },
+  {
+   "id": "4d6b826a-e45a-4a72-adf2-b2f8ef008be6",
+   "name": "IA · escreve a resposta",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    1560,
+    0
+   ],
+   "parameters": {
+    "method": "POST",
+    "url": "https://api.openai.com/v1/chat/completions",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpHeaderAuth",
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "={{ JSON.stringify($json.corpo) }}",
+    "options": {
+     "timeout": 120000,
+     "batching": {
+      "batch": {
+       "batchSize": 1,
+       "batchInterval": 500
+      }
+     },
+     "response": {
+      "response": {
+       "neverError": true,
+       "responseFormat": "json"
+      }
+     }
+    }
+   },
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000,
+   "credentials": {
+    "httpHeaderAuth": {
+     "id": "BCQHYmA4sTMnylir",
+     "name": "BMH · OpenAI · transcrição de áudio"
+    }
+   }
+  },
+  {
+   "id": "768b5ebe-af78-4371-88c0-0c6cf9e8affa",
+   "name": "Confere a resposta",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    1820,
+    0
+   ],
+   "parameters": {
+    "jsCode": "// Confere a sugestão (tom e sigilo da BMH), monta a linha da tabela e o texto do Telegram. Na tabela vai só o código da\n// avaliação, a unidade, a nota, a data e a sugestão: sem nome nem texto de quem avaliou.\nconst html = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');\nconst base = $('Novas').all().map((i) => i.json);\n// código curto e fixo por avaliação (o botão do Telegram aceita no máximo 64 caracteres)\nconst cod = (s) => { let a = 5381, b = 52711; for (const ch of String(s)) { const c = ch.charCodeAt(0); a = ((a * 33) ^ c) >>> 0; b = ((b * 31) + c) >>> 0; } return a.toString(36) + b.toString(36).slice(0, 4); };\nconst PROIBIDO = /fica feliz com a sua avalia|à disposi|hora marcada|tudo no mesmo lugar|estrutura|na visita|bem atendid|seu retorno|humanizad|excel[êe]ncia|experi[êe]ncia|volte sempre/i;\nconst SIGILO = /cirurg|cirurgi[ãa]o|lipo|pl[áa]stica|sess[ãaõo]|recupera|cicatriz|p[óo]s[- ]?operat|tratamento|diagn[óo]st|rem[ée]dio/i;\nreturn $input.all().map((it, k) => {\n  const r = base[k]; let resp = '', falsa = false, erro = '';\n  try { const o = JSON.parse(it.json.choices[0].message.content); resp = String(o.resposta || '').trim(); falsa = !!o.parece_falsa; } catch (e) { erro = (it.json.error && it.json.error.message) || 'resposta da IA ilegível'; }\n  if (r.pronta) { resp = r.pronta; erro = ''; }\n  resp = resp.replace(/\\s*—\\s*/g, ', ');\n  const avisos = [PROIBIDO.test(resp) ? '⚠️ A sugestão usou uma expressão que você não gosta: ajuste antes de publicar.' : '',\n    SIGILO.test(resp) ? '⚠️ <b>A sugestão fala de cirurgia, sessão ou tratamento (sigilo): ajuste antes de publicar.</b>' : '',\n    r.nota <= 3 ? '⚠️ <b>Nota baixa: confira antes de publicar.</b>' : '', falsa ? '⚠️ <b>Pode ser avaliação falsa: confira antes.</b>' : ''].filter(Boolean);\n  const codigo = cod(r.review_id), agora = $now.toISO();\n  const texto = `${A_TESTE() ? '🧪 TESTE (nada é gravado nem publicado)\\n' : ''}<b>Avaliação nova no Google · ${html(r.unidade)}</b> ${'⭐'.repeat(Math.max(0, Math.min(5, r.nota)))}\\n${html(r.nome || 'sem nome')} · ${String(r.avaliada_em || '').slice(0, 10).split('-').reverse().join('/')}\\n<i>${html((r.comentario || '(sem texto)').slice(0, 700))}</i>${avisos.length ? '\\n' + avisos.join('\\n') : ''}\\n\\n<b>Resposta sugerida:</b>\\n${html(resp || '(não saiu: ' + erro + '. Responda a esta mensagem com o texto que quer publicar.)')}\\n\\n<i>Publicar como está, ignorar, ou responder a esta mensagem com outro texto (ele é publicado no lugar).</i>`;\n  return { json: { chave: r.review_id, codigo, review_name: r.review_name, unidade: r.unidade, estrelas: r.nota, avaliada_em: r.avaliada_em, sugestao: resp, status: 'proposta',\n    message_id: '', decidido_por: '', publicada: '', atualizado_em: agora, texto } };\n});\nfunction A_TESTE() { return !!$('Avaliações do perfil').first().json.teste; }\n"
+   }
+  },
+  {
+   "id": "71bd74f5-4b4b-4e3c-a26e-bbdd008f7797",
+   "name": "Só teste?",
+   "type": "n8n-nodes-base.if",
+   "typeVersion": 2.2,
+   "position": [
+    2080,
+    0
+   ],
+   "parameters": {
+    "conditions": {
+     "options": {
+      "caseSensitive": true,
+      "leftValue": "",
+      "typeValidation": "loose",
+      "version": 2
+     },
+     "combinator": "and",
+     "conditions": [
+      {
+       "id": "d2ea5cf2-a995-434c-8b13-5b9ecfa8df42",
+       "leftValue": "={{ $('Avaliações do perfil').first().json.teste }}",
+       "rightValue": "",
+       "operator": {
+        "type": "boolean",
+        "operation": "true",
+        "singleValue": true
+       }
+      }
+     ]
+    },
+    "options": {}
+   }
+  },
+  {
+   "id": "49764bcc-423f-4d15-81d3-353725df5507",
+   "name": "Telegram · teste",
+   "type": "n8n-nodes-base.telegram",
+   "typeVersion": 1.2,
+   "position": [
+    2340,
+    0
+   ],
+   "parameters": {
+    "chatId": "8708228589",
+    "text": "={{ $json.texto }}",
+    "additionalFields": {
+     "appendAttribution": false,
+     "parse_mode": "HTML"
+    }
+   },
+   "credentials": {
+    "telegramApi": {
+     "id": "SgQHWuJOuMWeVbPi",
+     "name": "BMH · Telegram (robô BMH alertas)"
+    }
+   },
+   "webhookId": "0a233cf2-46d6-4381-a538-1295b9a52db1"
+  },
+  {
+   "id": "a17eb2c0-139e-4b77-ba4f-a4e8b66c356e",
+   "name": "Telegram · sugestão",
+   "type": "n8n-nodes-base.telegram",
+   "typeVersion": 1.2,
+   "position": [
+    2600,
+    0
+   ],
+   "parameters": {
+    "chatId": "8708228589",
+    "text": "={{ $json.texto }}",
+    "additionalFields": {
+     "appendAttribution": false,
+     "parse_mode": "HTML"
+    },
+    "replyMarkup": "inlineKeyboard",
+    "inlineKeyboard": {
+     "rows": [
+      {
+       "row": {
+        "buttons": [
+         {
+          "text": "✅ Publicar",
+          "additionalFields": {
+           "callback_data": "=av:{{ $json.codigo }}:p"
+          }
+         },
+         {
+          "text": "⏭️ Ignorar",
+          "additionalFields": {
+           "callback_data": "=av:{{ $json.codigo }}:i"
+          }
+         }
+        ]
+       }
+      }
+     ]
+    }
+   },
+   "credentials": {
+    "telegramApi": {
+     "id": "SgQHWuJOuMWeVbPi",
+     "name": "BMH · Telegram (robô BMH alertas)"
+    }
+   },
+   "webhookId": "2d6b78d2-22b7-4d88-bd1c-b23e32b91d89"
+  },
+  {
+   "id": "7051108e-d2f5-4142-89ce-9b5337c96ed1",
+   "name": "Onde ficou a mensagem",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    2860,
+    0
+   ],
+   "parameters": {
+    "jsCode": "// Guarda em qual mensagem do Telegram está cada proposta (para editar depois e para aceitar o texto respondido).\nconst base = $('Confere a resposta').all().map((i) => i.json);\nreturn $input.all().map((it, k) => { const m = it.json.result || it.json; const { texto, ...linha } = base[k]; return { json: { ...linha, message_id: String(m.message_id || ''), atualizado_em: $now.toISO() } }; });\n"
+   }
+  },
+  {
+   "id": "c3e06ac8-b01c-4019-b3bf-098be3368801",
+   "name": "Grava a proposta",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    3120,
+    0
+   ],
+   "parameters": {
+    "operation": "upsert",
+    "dataTableId": {
+     "__rl": true,
+     "value": "meuAoXOYHo1lt0XQ",
+     "mode": "id",
+     "cachedResultName": "BMH_avaliacoes_google"
+    },
+    "filters": {
+     "conditions": [
+      {
+       "keyName": "chave",
+       "keyValue": "={{ $json.chave }}"
+      }
+     ]
+    },
+    "columns": {
+     "mappingMode": "defineBelow",
+     "value": {
+      "chave": "={{ $json.chave }}",
+      "codigo": "={{ $json.codigo }}",
+      "review_name": "={{ $json.review_name }}",
+      "unidade": "={{ $json.unidade }}",
+      "estrelas": "={{ $json.estrelas }}",
+      "avaliada_em": "={{ $json.avaliada_em }}",
+      "sugestao": "={{ $json.sugestao }}",
+      "status": "={{ $json.status }}",
+      "message_id": "={{ $json.message_id }}",
+      "decidido_por": "={{ $json.decidido_por }}",
+      "publicada": "={{ $json.publicada }}",
+      "atualizado_em": "={{ $json.atualizado_em }}"
+     },
+     "matchingColumns": [],
+     "schema": [
+      {
+       "id": "chave",
+       "displayName": "chave",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "codigo",
+       "displayName": "codigo",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "review_name",
+       "displayName": "review_name",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "unidade",
+       "displayName": "unidade",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "estrelas",
+       "displayName": "estrelas",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "number",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "avaliada_em",
+       "displayName": "avaliada_em",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "sugestao",
+       "displayName": "sugestao",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "status",
+       "displayName": "status",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "message_id",
+       "displayName": "message_id",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "decidido_por",
+       "displayName": "decidido_por",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "publicada",
+       "displayName": "publicada",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "atualizado_em",
+       "displayName": "atualizado_em",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      }
+     ]
+    },
+    "options": {}
+   }
+  },
+  {
+   "id": "beb1f559-9b45-4c6b-8f74-16e79d389bd5",
+   "name": "Sobre este fluxo",
+   "type": "n8n-nodes-base.stickyNote",
+   "typeVersion": 1,
+   "position": [
+    3380,
+    0
+   ],
+   "parameters": {
+    "content": "## BMH · Perfil do Google · avaliações\n**Traz:** avaliações sem resposta das duas fichas\n**Envia:** sugestão de resposta no Telegram\n**Limites:** nada é publicado sem o toque do Jorge; até 5 por rodada; não repete avaliação\n\nA cada 30 min, das 7h às 21h: avaliação sem resposta nos perfis Asa Sul e Taguatinga → sugestão (gpt-5.5, regras da skill responder-avaliacoes, seção BMH, com sigilo de cirurgia e sessão; 4 ou 5 estrelas sem texto usa frase curta pronta) → Telegram (robô BMH alertas) com Publicar / Ignorar; responder à mensagem com outro texto publica esse texto (fluxo BMH · Telegram · botões). Até 5 por rodada. Nada é publicado sem o toque do Jorge. Tabela BMH_avaliacoes_google (código, unidade, nota, data, sugestão, decisão; sem nome nem texto de quem avaliou). Teste: /webhook/bmh-perfil-avaliacoes-693566a0dd11?modo=teste&simular=1 (2 mais recentes, não grava nem publica). Código em integracoes/perfil-google/n8n/.",
+    "width": 600,
+    "height": 280
+   }
+  },
+  {
+   "id": "b4c8beb6-5e91-4a1a-91ca-e301db0e0c61",
+   "name": "Vigia · marca que rodou",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    260,
+    420
+   ],
+   "parameters": {
+    "jsCode": "return [{ json: { chave: 'avaliacoes', nome: \"BMH · Perfil do Google · avaliações\", ultima_vez: $now.toISO(), max_horas: 11, avisado_em: '' } }];"
+   }
+  },
+  {
+   "id": "9f4aa0f3-b8ac-4e7c-a3ce-a0fba2fbbb9a",
+   "name": "Vigia · grava",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    520,
+    420
+   ],
+   "parameters": {
+    "operation": "upsert",
+    "dataTableId": {
+     "__rl": true,
+     "value": "0kBTGpt8EjCjmR9t",
+     "mode": "id",
+     "cachedResultName": "BMH_vigia"
+    },
+    "filters": {
+     "conditions": [
+      {
+       "keyName": "chave",
+       "keyValue": "={{ $json.chave }}"
+      }
+     ]
+    },
+    "columns": {
+     "mappingMode": "defineBelow",
+     "value": {
+      "chave": "={{ $json.chave }}",
+      "nome": "={{ $json.nome }}",
+      "ultima_vez": "={{ $json.ultima_vez }}",
+      "max_horas": "={{ $json.max_horas }}",
+      "avisado_em": "={{ $json.avisado_em }}"
+     },
+     "matchingColumns": [],
+     "schema": [
+      {
+       "id": "chave",
+       "displayName": "chave",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "nome",
+       "displayName": "nome",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "ultima_vez",
+       "displayName": "ultima_vez",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "max_horas",
+       "displayName": "max_horas",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "number",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "avisado_em",
+       "displayName": "avisado_em",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      }
+     ]
+    },
+    "options": {}
+   },
+   "onError": "continueRegularOutput"
+  }
+ ],
+ "connections": {
+  "A cada 30 min (7h–21h)": {
+   "main": [
+    [
+     {
+      "node": "Google · renova o acesso",
+      "type": "main",
+      "index": 0
+     },
+     {
+      "node": "Vigia · marca que rodou",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Rodar agora": {
+   "main": [
+    [
+     {
+      "node": "Google · renova o acesso",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Google · renova o acesso": {
+   "main": [
+    [
+     {
+      "node": "Avaliações do perfil",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Avaliações do perfil": {
+   "main": [
+    [
+     {
+      "node": "Já propostas",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Já propostas": {
+   "main": [
+    [
+     {
+      "node": "Novas",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Novas": {
+   "main": [
+    [
+     {
+      "node": "IA · escreve a resposta",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "IA · escreve a resposta": {
+   "main": [
+    [
+     {
+      "node": "Confere a resposta",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Confere a resposta": {
+   "main": [
+    [
+     {
+      "node": "Só teste?",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Telegram · sugestão": {
+   "main": [
+    [
+     {
+      "node": "Onde ficou a mensagem",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Onde ficou a mensagem": {
+   "main": [
+    [
+     {
+      "node": "Grava a proposta",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Só teste?": {
+   "main": [
+    [
+     {
+      "node": "Telegram · teste",
+      "type": "main",
+      "index": 0
+     }
+    ],
+    [
+     {
+      "node": "Telegram · sugestão",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Vigia · marca que rodou": {
+   "main": [
+    [
+     {
+      "node": "Vigia · grava",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  }
+ },
+ "settings": {
+  "executionOrder": "v1",
+  "timezone": "America/Sao_Paulo",
+  "saveDataErrorExecution": "all",
+  "errorWorkflow": "7u3CuyjESsHmCtMW",
+  "saveDataSuccessExecution": "none",
+  "executionTimeout": 3600
+ }
+}

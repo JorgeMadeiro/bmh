@@ -8,12 +8,16 @@ grava nesses fluxos nem na BMH_config, e não tem a chave do Google Ads.
   116  chaves da BMH_config: meta_teto_mes_2026-11 = 60 e meta_teto_mes = 0
   132  seis negativas de frase na campanha [LEADS][PESQUISA] - BMH, inclusive "fibromialgia" (129, 130 e 131 estão em
        "revisar": não entram)
+  158  (08/11) nova tentativa no nó que lê as avaliações do Perfil do Google (yNozxi1jNwRbLhFR): só entra se o pedido for
+       nomeado no comando ("grava 158"), depois do toque do Jorge
 Cada fluxo só é gravado se ainda estiver na versão de que o arquivo partiu (updatedAt abaixo). Se mudou, aquele item fica de fora
-e os outros seguem. Antes de gravar, cópia em dados/n8n-copias/ (fora do git); depois, leitura de volta.
+e os outros seguem; se já está igual ao arquivo, aparece como "já gravado". Antes de gravar, cópia em dados/n8n-copias/ (fora do
+git); depois, leitura de volta. Os itens de 07/11 (117, 138, 136, 116 e 132) foram gravados nesse dia.
 
 Uso, na pasta da BMH (lê N8N_URL, N8N_API_KEY e as GOOGLE_ADS_* do .env):
   python3 scripts/n8n/aplica-bmh-mac.py            só confere, não grava nada
   python3 scripts/n8n/aplica-bmh-mac.py grava      grava o que estiver em ordem e manda a prévia do mensal ao Telegram do Jorge
+  python3 scripts/n8n/aplica-bmh-mac.py grava 158  idem, e também o pedido 158 (só depois do toque do Jorge nele)
   python3 scripts/n8n/aplica-bmh-mac.py reenvia    só depois de o Jorge conferir a prévia: manda o relatório de outubro ao grupo
                                                    da diretoria"""
 import datetime, json, os, subprocess, sys
@@ -25,7 +29,9 @@ os.chdir(RAIZ)
 ENV = dict(l.strip().split('=', 1) for l in open('.env', encoding='utf8') if '=' in l and not l.startswith('#'))
 U, H = ENV['N8N_URL'].rstrip('/'), {'X-N8N-API-KEY': ENV['N8N_API_KEY'], 'Content-Type': 'application/json'}
 MODO = sys.argv[1] if len(sys.argv) > 1 else 'confere'
-if MODO not in ('confere', 'grava', 'reenvia'): sys.exit('uso: aplica-bmh-mac.py [grava|reenvia]')
+if MODO not in ('confere', 'grava', 'reenvia'): sys.exit('uso: aplica-bmh-mac.py [grava [158]|reenvia]')
+NOMEADOS = set(sys.argv[2:])          # pedidos que só entram quando nomeados no comando
+SO_NOMEADO = {'158'}
 HOJE = datetime.date.today().isoformat()
 COPIAS = os.path.join('dados', 'n8n-copias'); os.makedirs(COPIAS, exist_ok=True)
 OK = ('executionOrder', 'saveDataErrorExecution', 'saveDataSuccessExecution', 'saveManualExecutions', 'saveExecutionProgress',
@@ -37,6 +43,7 @@ FLUXOS = [  # (pedido, id, updatedAt de que o arquivo partiu, arquivo)
     ('138', '0FskpyELgh7nBqF0', '2026-10-21T09:25:02.939Z', 'scripts/n8n/bmh-meta-numeros-dia.json'),
     ('138', 'UUYRg6GlEOlupbnW', '2026-10-21T00:59:35.660Z', 'scripts/n8n/bmh-resumo-manha-homologacao.json'),
     ('138', 'K4UckCbHkrqr8sc6', '2026-11-01T17:20:06.074Z', 'scripts/n8n/bmh-meta-guardiao.json'),
+    ('158', 'yNozxi1jNwRbLhFR', '2026-10-15T20:52:06.672Z', 'scripts/n8n/bmh-avaliacoes-tentativa.json'),
 ]
 RESUMO_PROD, RESUMO_PROD_UP = 'QGDceUjADbnNINb3', '2026-11-04T00:03:29.352Z'   # a cópia do 138 foi montada desta versão
 CONFIG = 'V4NRHS9mc1kvigix'
@@ -45,7 +52,8 @@ NEGATIVAS = ['estetica', 'estética', 'antes e depois', 'ozônio', 'caneta', 'fi
 CAMPANHA = '[LEADS][PESQUISA] - BMH'
 
 le = lambda i: requests.get(f'{U}/api/v1/workflows/{i}', headers=H, timeout=60).json()
-params = lambda nos: {x['name']: json.dumps(x['parameters'], sort_keys=True) for x in nos}
+# parâmetros e a nova tentativa do nó (o 158 muda só retryOnFail, maxTries e waitBetweenTries, que ficam fora de "parameters")
+params = lambda nos: {x['name']: json.dumps({k: x.get(k) for k in ('parameters', 'retryOnFail', 'maxTries', 'waitBetweenTries', 'onError')}, sort_keys=True) for x in nos}
 problemas = []
 
 
@@ -72,13 +80,17 @@ if MODO == 'reenvia':
     sys.exit(0)
 
 # ---------- 117 e 138: fluxos montados pelo Gerente BMH ----------
-print('== Fluxos (117, 138) ==')
+print('== Fluxos (117, 138, 158) ==')
 rp = le(RESUMO_PROD)
 if rp['updatedAt'] != RESUMO_PROD_UP:
     problemas.append(f'138: o resumo de produção ({RESUMO_PROD}) mudou ({rp["updatedAt"]}); a cópia UUYR fica de fora. Pedir ao Gerente BMH para remontar')
 for ped, i, up, arq in FLUXOS:
     atual = le(i); f = json.load(open(arq, encoding='utf8'))
-    em_ordem = atual['updatedAt'] == up and not (i == 'UUYRg6GlEOlupbnW' and rp['updatedAt'] != RESUMO_PROD_UP)
+    if params(atual['nodes']) == params(f['nodes']) and atual['connections'] == f['connections']:
+        print(f' {ped} {atual["name"]} | já gravado ({atual["updatedAt"]})'); continue
+    if ped in SO_NOMEADO and ped not in NOMEADOS:
+        print(f' {ped} {atual["name"]} | falta gravar; só entra com "grava {ped}", depois do toque do Jorge'); continue
+    em_ordem =atual['updatedAt'] == up and not (i == 'UUYRg6GlEOlupbnW' and rp['updatedAt'] != RESUMO_PROD_UP)
     print(f' {ped} {atual["name"]} | produção {atual["updatedAt"]} | {len(atual["nodes"])} para {len(f["nodes"])} nós |',
           'ok' if em_ordem else f'MUDOU (esperado {up}): fica de fora')
     if not em_ordem:
@@ -94,8 +106,12 @@ for ped, i, up, arq in FLUXOS:
 # ---------- 136: relatório mensal da diretoria ----------
 print('\n== Relatório mensal (136) ==')
 atual = le(MENSAL)
-print(f' {atual["name"]} | produção {atual["updatedAt"]} |', 'ok' if atual['updatedAt'] == MENSAL_UP else f'MUDOU (esperado {MENSAL_UP})')
-if atual['updatedAt'] != MENSAL_UP:
+por = {n['name']: n for n in atual['nodes']}
+ja_136 = 'apiwp-afiliados' in por.get('WhatsApp · grupo da diretoria', {}).get('parameters', {}).get('url', '') \
+    and 'TA.s) L.push' in por.get('Monta', {}).get('parameters', {}).get('jsCode', '')
+print(f' {atual["name"]} | produção {atual["updatedAt"]} |', 'já gravado' if ja_136 else 'ok' if atual['updatedAt'] == MENSAL_UP else f'MUDOU (esperado {MENSAL_UP})')
+if ja_136: pass
+elif atual['updatedAt'] != MENSAL_UP:
     problemas.append('136: o fluxo mudou desde a leitura do Gerente BMH; conferir o que mudou antes de remontar')
 else:
     s = subprocess.run([sys.executable, 'scripts/n8n/monta-mensal-conserto.py'], env={**os.environ, 'N8N_URL': U, 'N8N_API_KEY': ENV['N8N_API_KEY']},
