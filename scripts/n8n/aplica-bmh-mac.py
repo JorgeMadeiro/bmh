@@ -82,8 +82,6 @@ if MODO == 'reenvia':
 # ---------- 117 e 138: fluxos montados pelo Gerente BMH ----------
 print('== Fluxos (117, 138, 158) ==')
 rp = le(RESUMO_PROD)
-if rp['updatedAt'] != RESUMO_PROD_UP:
-    problemas.append(f'138: o resumo de produção ({RESUMO_PROD}) mudou ({rp["updatedAt"]}); a cópia UUYR fica de fora. Pedir ao Gerente BMH para remontar')
 for ped, i, up, arq in FLUXOS:
     atual = le(i); f = json.load(open(arq, encoding='utf8'))
     if params(atual['nodes']) == params(f['nodes']) and atual['connections'] == f['connections']:
@@ -95,6 +93,7 @@ for ped, i, up, arq in FLUXOS:
           'ok' if em_ordem else f'MUDOU (esperado {up}): fica de fora')
     if not em_ordem:
         if atual['updatedAt'] != up: problemas.append(f'{ped} {i}: mudou desde a montagem; nada gravado. Pedir ao Gerente BMH para remontar')
+        else: problemas.append(f'138: o resumo de produção ({RESUMO_PROD}) mudou ({rp["updatedAt"]}); a cópia UUYR fica de fora. Pedir ao Gerente BMH para remontar')
         continue
     if i == 'EkmBucG5LoEutBUa':
         esperando = requests.get(f'{U}/api/v1/executions', headers=H, params={'workflowId': i, 'status': 'waiting', 'limit': 5}, timeout=60).json().get('data', [])
