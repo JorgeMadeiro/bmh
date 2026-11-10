@@ -31,6 +31,25 @@
   do paciente (vem na API). Visitadora: falta a tabela médico → visitadora (secundário).
 - Execuções com sucesso do fluxo mensal e do fluxo de produção não ficam guardadas (têm dado de paciente); erro continua guardado.
 
+## Painel do faturamento (10/11/2026)
+
+- **Pedido do Jorge:** login para a equipe de faturamento sem valores, em número de sessões, sem a Operação e com as mesmas
+  subdivisões (unidade, convênio, período, lotes e pacientes).
+- **Página:** `/webhook/bmh-faturamento` (fluxo "BMH · Faturamento (painel)", `5mh4lPPJv17bEC7N`), credencial
+  "BMH · Painel do faturamento (login)" (`RVFzm3Lmx9LCg9Z9`); usuário e senha só no `.env` (`grep PAINEL_FATURAMENTO .env`).
+  É o mesmo `painel-diretoria.js` e o mesmo `lote-pacientes.js` no modo "faturamento" (`montar.js faturamento`).
+- **Sem R$ nem escondido:** o servidor monta os dados já em sessões; nenhum valor vai para a página nem para a lista de
+  pacientes (endereço e chave próprios, `lista_fat` em `BMH_diretoria_chave`).
+- **Como as sessões são contadas:** produzido = sessões do mês; a faturar, recebido, a receber e glosado vêm dos lotes
+  (`BMH_financeiro_detalhe`); faturado = recebido + a receber; particular = recebido. A glosa é parcial: a sessão glosada
+  também está em recebido ou a receber (conferido em 10/11/2026: 821 de 871 mês × unidade × convênio somam o total; nos
+  outros 50 a diferença é exatamente a glosa). % = sessões recebidas ÷ produzidas. Prazo de recebimento: média ponderada
+  pelas sessões pagas.
+- **Conferido em 10/11/2026 no endereço publicado:** sem login 401; login do faturamento 200, sem nenhum "R$" na tela,
+  nov/26 com 495 produzidas = 154 faturadas + 341 a faturar; lista de pacientes com nome, sessões, dias e médicos, sem
+  valor; chave errada 403; login do faturamento no painel da diretoria 401. O painel da diretoria não mudou (dados
+  idênticos na simulação; fluxo no n8n intocado).
+
 ## Painel da diretoria (09/10/2026)
 
 - **Página:** `/webhook/bmh-diretoria` (fluxo "BMH · Diretoria (painel)", `26y4Uo2WLAAqpK70`), login próprio da diretoria

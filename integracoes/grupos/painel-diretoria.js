@@ -3,9 +3,19 @@
 // paciente. Cores e letra do guia da BMH (identidade/design-guide.md).
 const linhas = (no) => { try { return $(no).all().map((i) => i.json).filter((r) => r && r.chave); } catch (e) { return []; } };
 const fin = linhas('Financeiro (tabela)'), op = linhas('Operação (tabela)'), det = linhas('Detalhes (tabela)'), prz = linhas('Prazo (tabela)');
+// painel do faturamento (Jorge, 10/11/2026): a mesma página em número de sessões, sem nenhum R$ (nem escondido no código da
+// página) e sem a Operação. O montador troca o marcador de modo, abaixo, por "diretoria" ou "faturamento"
+const MODO = '__MODO__', FAT = MODO === 'faturamento', CHAVE = FAT ? 'lista_fat' : 'lista';
+// sessões por situação, dos lotes. A glosa é parcial: a sessão glosada também está em recebido ou a receber (conferido em
+// 10/11/2026: 821 de 871 mês × unidade × convênio somam o total; nos outros 50 a diferença é exatamente a glosa)
+const sDet = {};
+if (FAT) for (const r of det) { const a = (sDet[r.mes + '|' + r.unidade + '|' + r.convenio] ||= { a_faturar: 0, recebido: 0, a_receber: 0, glosado: 0 }); if (r.situacao in a) a[r.situacao] += +r.sessoes || 0; }
+const finSessoes = (r) => { const s = +r.sessoes || 0; if (r.convenio === 'PARTICULAR') return [r.mes, r.unidade, r.convenio, s, s, s, 0, s, 0, 0];   // particular = recebido
+  const a = sDet[r.mes + '|' + r.unidade + '|' + r.convenio] || { a_faturar: 0, recebido: 0, a_receber: 0, glosado: 0 };
+  return [r.mes, r.unidade, r.convenio, s, s, a.recebido + a.a_receber, a.a_faturar, a.recebido, a.a_receber, a.glosado]; };   // mesmo formato do F: sessões e produzido
 const hoje = $now.setZone('America/Sao_Paulo');
 // financeiro compacto: [mes, unidade, convênio, sessões, produzido, faturado, a faturar, recebido, a receber, glosado]
-const F = fin.map((r) => [r.mes, r.unidade, r.convenio, +r.sessoes || 0, +r.produzido || 0, +r.faturado || 0, +r.a_faturar || 0, +r.recebido || 0, +r.a_receber || 0, +r.glosado || 0]);
+const F = FAT ? fin.map(finSessoes) : fin.map((r) => [r.mes, r.unidade, r.convenio, +r.sessoes || 0, +r.produzido || 0, +r.faturado || 0, +r.a_faturar || 0, +r.recebido || 0, +r.a_receber || 0, +r.glosado || 0]);
 // operação por mês e unidade: [mes, unidade, agendadas, atendidas, faltas, cobradas, lugares, avaliações agendadas, feitas, dias]
 const opM = {};
 for (const r of op) {
@@ -46,9 +56,13 @@ for (const r of opkc) {
 const KC = Object.values(kcM).filter((a) => a[4]);
 const atualizado = [...fin, ...op].map((r) => r.atualizado_em || '').sort().pop() || '';
 // detalhe por lote (só valor > 0): [mes, unidade, convênio, situação, lote, sessões, valor, dias]
-const X = det.filter((r) => +r.valor > 0.5).map((r) => [r.mes, r.unidade, r.convenio, r.situacao, r.lote, +r.sessoes || 0, Math.round(+r.valor), r.dias || '']);
+// no faturamento a 7ª posição também é sessões (nenhum valor vai para a página)
+const X = FAT ? det.filter((r) => +r.sessoes > 0).map((r) => [r.mes, r.unidade, r.convenio, r.situacao, r.lote, +r.sessoes, +r.sessoes, r.dias || ''])
+  : det.filter((r) => +r.valor > 0.5).map((r) => [r.mes, r.unidade, r.convenio, r.situacao, r.lote, +r.sessoes || 0, Math.round(+r.valor), r.dias || '']);
 // prazo de recebimento: [mes, unidade, convênio, valor pago, dias × valor]
-const PZ = prz.filter((r) => +r.valor_pago > 0).map((r) => [r.mes, r.unidade, r.convenio, Math.round(+r.valor_pago), +r.dias_x_valor || 0]);
+// no faturamento a média é ponderada pelas sessões pagas, não pelo valor: [mes, unidade, convênio, sessões pagas, sessões × dias]
+const PZ = FAT ? prz.filter((r) => +r.valor_pago > 0 && +r.sessoes_pagas > 0).map((r) => [r.mes, r.unidade, r.convenio, +r.sessoes_pagas, Math.round(+r.sessoes_pagas * (+r.dias_x_valor || 0) / +r.valor_pago)])
+  : prz.filter((r) => +r.valor_pago > 0).map((r) => [r.mes, r.unidade, r.convenio, Math.round(+r.valor_pago), +r.dias_x_valor || 0]);
 // atOp: a operação (ontem e hoje) é a última parte gravada na carga (o financeiro sai em ~1 min; os pacientes por lote, desde
 // 20/10/2026, só gravam o que mudou): o botão Atualizar só diz "pronto" quando ela for mais nova que o pedido (medido em 20/10/2026)
 // a carga grava a operação em duas tabelas (total e por convênio): "pronto" só quando as duas forem novas
@@ -69,13 +83,13 @@ const inicioU = inicioDe(op, (r) => r.unidade), inicioK = inicioDe(opk, (r) => r
 // senha numa consulta feita de dentro dela. A lista vem por um endereço próprio, sem senha, que só aceita esta chave; ela troca
 // todo dia (vale a de hoje e a de ontem) e só aparece para quem abriu o painel com login
 const aleatorio = () => { try { return crypto.randomUUID().replace(/-/g, ''); } catch (e) { return Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16)).join(''); } };
-const chaveAtual = linhas('Chave da lista (tabela)').find((r) => r.chave === 'lista') || {};
-const chaveLista = chaveAtual.dia === hoje.toISODate() && chaveAtual.token ? chaveAtual : { chave: 'lista', token: aleatorio(), anterior: chaveAtual.token || '', dia: hoje.toISODate() };
-const DADOS = { F, O, OC, OK, KC, X, lista: { caminho: '__CAMINHO_LISTA__', t: chaveLista.token }, PZ, inicioOp, inicioU, inicioK, hoje: hoje.toISODate(), atOp, ET, pedido, atualizado: atualizado ? DateTime.fromISO(atualizado).setZone('America/Sao_Paulo').toFormat("dd/LL 'às' HH:mm") : '—' };
+const chaveAtual = linhas('Chave da lista (tabela)').find((r) => r.chave === CHAVE) || {};
+const chaveLista = chaveAtual.dia === hoje.toISODate() && chaveAtual.token ? chaveAtual : { chave: CHAVE, token: aleatorio(), anterior: chaveAtual.token || '', dia: hoje.toISODate() };
+const DADOS = { fat: FAT, F, O: FAT ? [] : O, OC: FAT ? [] : OC, OK: FAT ? [] : OK, KC: FAT ? [] : KC, X, lista: { caminho: '__CAMINHO_LISTA__', t: chaveLista.token }, PZ, inicioOp, inicioU, inicioK, hoje: hoje.toISODate(), atOp, ET, pedido, atualizado: atualizado ? DateTime.fromISO(atualizado).setZone('America/Sao_Paulo').toFormat("dd/LL 'às' HH:mm") : '—' };
 const json = JSON.stringify(DADOS).replace(/</g, '\\u003c');
 
 const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>BMH · Diretoria</title><meta name="robots" content="noindex,nofollow">
+<title>BMH · ${FAT ? 'Faturamento' : 'Diretoria'}</title><meta name="robots" content="noindex,nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--marinho:#002375;--fundo-escuro:#00143F;--oxigenio:#34A9CF;--azul-texto:#1A6E93;--tinta:#142033;--sec:#4A5568;--fio:#DCE5EE;--nevoa:#EEF5FA;--bom:#1E7B4F;--ruim:#B4372E}
@@ -101,16 +115,16 @@ th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:
 #det .conv{display:flex;justify-content:space-between;font-weight:800;margin:14px 0 4px;padding-top:10px;border-top:1px solid var(--fio)}#det .lin{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:5px 0}#det .lin span:first-child{color:var(--sec)}#det .lin span:last-child{font-weight:700;white-space:nowrap}
 footer{color:var(--sec);font-size:12px;margin-top:24px;border-top:1px solid var(--fio);padding-top:12px}
 </style></head><body>
-<header><div><h1>BMH · Diretoria</h1><p id="atu"></p></div><button id="atualizar" type="button">Atualizar agora</button></header>
+<header><div><h1>BMH · ${FAT ? 'Faturamento' : 'Diretoria'}</h1><p id="atu"></p></div><button id="atualizar" type="button">Atualizar agora</button></header>
 <main>
 <div class="filtros"><div class="seg" id="uni"><button data-u="" class="on">Todas</button><button data-u="Asa Sul">Asa Sul</button><button data-u="Taguatinga">Taguatinga</button></div><select id="conv"></select><div class="periodo">De <select id="de"></select> até <select id="ate"></select></div></div>
-<h2>Financeiro da produção</h2><p class="s">R$ mil · * mês em andamento · toque num valor em azul para ver por lote</p><div class="tab"><table id="tFin"></table></div>
+<h2>${FAT ? 'Sessões da produção' : 'Financeiro da produção'}</h2><p class="s">${FAT ? 'Número de sessões' : 'R$ mil'} · * mês em andamento · toque num ${FAT ? 'número' : 'valor'} em azul para ver por lote</p><div class="tab"><table id="tFin"></table></div>
 <h2>A receber há mais de 90 dias</h2><ul class="lista" id="l90"></ul>
 <h2>A faturar atrasado</h2><ul class="lista" id="lFat"></ul>
 <h2>Prazo de recebimento</h2><p class="s">Dias, em média, da sessão até o convênio pagar (no período)</p><ul class="lista" id="lPrazo"></ul>
-<h2>Operação</h2><p class="s" id="sOp">* mês em andamento, até ontem · Var. ano: sessões contra o mesmo mês do ano anterior · Var. mês: contra o mês anterior · Dias: dias com atendimento</p><div class="tab"><table id="tOp"></table></div>
+${FAT ? '' : `<h2>Operação</h2><p class="s" id="sOp">* mês em andamento, até ontem · Var. ano: sessões contra o mesmo mês do ano anterior · Var. mês: contra o mês anterior · Dias: dias com atendimento</p><div class="tab"><table id="tOp"></table></div>`}
 <div id="det"><div class="caixa"><button class="fechar" aria-label="Fechar">×</button><h3 id="dTit"></h3><p class="sub" id="dSub"></p><div id="dCorpo"></div></div></div>
-<footer>Números do iGut, gravados toda noite. Produzido = faturado + a faturar; faturado = recebido + a receber + glosado; % recebido sem a glosa. Particular conta como recebido (cartão, D+1). Prazo: média ponderada pelo valor, só do que já foi pago (o que segue em aberto não entra). A receber: convênio não pagou ou falta baixa no iGut. Falta = faltou, desmarcou ou desistiu. "—": ainda não registrado no iGut (lote, pagamento e faltas desde nov/2024; avaliações desde mar/2024).</footer>
+<footer>${FAT ? 'Números do iGut, gravados toda noite, em sessões. Produzido = faturado + a faturar; faturado = recebido + a receber. Glosado = sessões com glosa, que também estão em recebido ou a receber (a glosa costuma ser parcial). % = sessões recebidas sobre as produzidas. Particular conta como recebido (cartão, D+1). Prazo: média ponderada pelas sessões pagas, só do que já foi pago. A receber: convênio não pagou ou falta baixa no iGut. &quot;—&quot;: ainda não registrado no iGut (lote e pagamento desde nov/2024).' : `Números do iGut, gravados toda noite. Produzido = faturado + a faturar; faturado = recebido + a receber + glosado; % recebido sem a glosa. Particular conta como recebido (cartão, D+1). Prazo: média ponderada pelo valor, só do que já foi pago (o que segue em aberto não entra). A receber: convênio não pagou ou falta baixa no iGut. Falta = faltou, desmarcou ou desistiu. "—": ainda não registrado no iGut (lote, pagamento e faltas desde nov/2024; avaliações desde mar/2024).`}</footer>
 </main>
 <script>
 const D = ${json};
@@ -119,8 +133,9 @@ const D = ${json};
 const CONTROLE = '2024-11', AVALIACOES = '2024-03';
 const MES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
 const nomeMes = m => MES[+m.slice(5,7)-1] + '/' + m.slice(2,4), mesLongo = m => ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'][+m.slice(5,7)-1] + ' de ' + m.slice(0,4);
-const mil = v => { const x = v/1000; return Math.abs(x) < 0.5 ? (v ? '<1' : '—') : Math.round(x).toLocaleString('pt-BR'); };
-const brl = v => 'R$ ' + Math.round(v).toLocaleString('pt-BR');   // valor exato, sem "mil" (Jorge, 20/10/2026); a tabela do financeiro segue em R$ mil
+const FAT = !!D.fat;   // faturamento: tudo em sessões
+const mil = v => FAT ? (v ? Math.round(v).toLocaleString('pt-BR') : '—') : (() => { const x = v/1000; return Math.abs(x) < 0.5 ? (v ? '<1' : '—') : Math.round(x).toLocaleString('pt-BR'); })();
+const brl = v => FAT ? Math.round(v).toLocaleString('pt-BR') + (Math.round(v) === 1 ? ' sessão' : ' sessões') : 'R$ ' + Math.round(v).toLocaleString('pt-BR');   // valor exato, sem "mil" (Jorge, 20/10/2026); a tabela do financeiro segue em R$ mil
 const pct = (a, b) => b ? Math.round(100*a/b) + '%' : '—';
 const el = (t, txt, cls) => { const e = document.createElement(t); if (txt != null) e.textContent = txt; if (cls) e.className = cls; return e; };
 let U = '', C = '', DE = '', ATE = '', PEND = false;
@@ -174,19 +189,19 @@ function abre(sit, meses, conv, rot) {
   const porConv = {}; for (const x of linhas) (porConv[x[2]] ||= []).push(x);
   const total = linhas.reduce((s, x) => s + x[6], 0), sessoes = linhas.reduce((s, x) => s + x[5], 0);
   document.getElementById('dTit').textContent = NOME_SIT[sit] + ' · ' + (conv || rot);
-  document.getElementById('dSub').textContent = [U || 'As duas unidades', conv || C || 'todos os convênios', brl(total) + ' em ' + sessoes.toLocaleString('pt-BR') + ' sessões'].join(' · ');
+  document.getElementById('dSub').textContent = [U || 'As duas unidades', conv || C || 'todos os convênios', (FAT ? brl(sessoes) : brl(total) + ' em ' + sessoes.toLocaleString('pt-BR') + ' sessões')].join(' · ');
   const corpo = document.getElementById('dCorpo'); corpo.replaceChildren();
   if (!linhas.length) corpo.append(el('p', 'Nada nessa situação.', 'sub'));
   Object.entries(porConv).sort((a, b) => b[1].reduce((s, x) => s + x[6], 0) - a[1].reduce((s, x) => s + x[6], 0)).forEach(([c, xs]) => {
     const h = el('div', null, 'conv'); h.append(el('span', c), el('span', brl(xs.reduce((s, x) => s + x[6], 0)))); corpo.append(h);
     xs.sort((a, b) => a[0] < b[0] ? 1 : a[0] > b[0] ? -1 : b[6] - a[6]).forEach(x => {
       const l = el('div', null, 'lin');
-      const desc = (x[4] !== '-' ? 'Lote ' + x[4] + ' · ' : '') + nomeMes(x[0]) + ' · ' + x[1] + ' · ' + x[5] + (x[5] === 1 ? ' sessão' : ' sessões') + (x[7] ? ' · ' + datas(x[7], x[0]) : '');
+      const desc = (x[4] !== '-' ? 'Lote ' + x[4] + ' · ' : '') + nomeMes(x[0]) + ' · ' + x[1] + (FAT ? '' : ' · ' + x[5] + (x[5] === 1 ? ' sessão' : ' sessões')) + (x[7] ? ' · ' + datas(x[7], x[0]) : '');
       const esq = el('span', desc);
       {   // 3º nível: pacientes do lote (ou do particular do mês), na própria janela, lidos da tabela gravada
         const a = el('span', ' · pacientes ›', 'cl'); a.onclick = () => pacientes({ mes: x[0], unidade: x[1], convenio: /^PARTICULAR/.test(x[2]) ? 'PARTICULAR' : x[2], situacao: x[3], lote: x[4] }); esq.append(a);
       }
-      l.append(esq, el('span', 'R$ ' + x[6].toLocaleString('pt-BR'))); corpo.append(l);
+      l.append(esq, el('span', FAT ? brl(x[6]) : 'R$ ' + x[6].toLocaleString('pt-BR'))); corpo.append(l);
     });
   });
   document.getElementById('det').classList.add('on'); document.body.style.overflow = 'hidden';
@@ -203,7 +218,7 @@ function pacientes(par) {
   tenta(0).then(d => {
     document.getElementById('dTit').textContent = d.titulo; document.getElementById('dSub').textContent = d.sub;
     if (!d.pacientes.length) { corpo.append(el('p', 'Nenhum paciente nessa situação (pode ter mudado desde a última atualização do painel).', 'sub')); return; }
-    d.pacientes.forEach(p => { const l = el('div', null, 'lin'); const e = el('span'); e.append(el('b', p.nome)); e.append(document.createElement('br'), document.createTextNode(p.sessoes + (p.sessoes === 1 ? ' sessão' : ' sessões') + ' · ' + p.dias + (p.medicos ? ' · ' + p.medicos : ''))); l.append(e, el('span', 'R$ ' + p.valor.toLocaleString('pt-BR'))); corpo.append(l); });
+    d.pacientes.forEach(p => { const l = el('div', null, 'lin'); const e = el('span'); e.append(el('b', p.nome)); e.append(document.createElement('br'), document.createTextNode((FAT ? '' : p.sessoes + (p.sessoes === 1 ? ' sessão' : ' sessões') + ' · ') + p.dias + (p.medicos ? ' · ' + p.medicos : ''))); l.append(e, el('span', FAT ? brl(p.sessoes) : 'R$ ' + p.valor.toLocaleString('pt-BR'))); corpo.append(l); });
     corpo.append(el('p', 'Dado de paciente: não encaminhar fora da equipe responsável.', 'sub'));
   }).catch(e => {
     document.getElementById('dSub').textContent = e.message === 'chave vencida' ? 'O painel ficou aberto desde ontem: recarregue a página e abra de novo.' : 'Não consegui abrir a lista (' + e.message + '). Tente de novo em instantes.';
@@ -221,11 +236,11 @@ function desenha() {
   const linhasMes = [];
   for (const m of meses) { const r = fin(m); if (!r.p || !noPeriodo(m)) continue;
     const tr = el('tr');
-    const ok = m >= CONTROLE; [nomeMes(m) + (m === mesAtual ? '*' : ''), mil(r.p), ok ? mil(r.f) : '—', ok ? mil(r.af) : '—', ok ? mil(r.r) : '—', ok ? pct(r.r, r.p - r.g) : '—', ok ? mil(r.ar) : '—', ok ? mil(r.g) : '—'].forEach((v, i) => tr.append(celula(v, ok ? SIT_COL[i] : null, [m], nomeMes(m)))); linhasMes.push(tr);
+    const ok = m >= CONTROLE; [nomeMes(m) + (m === mesAtual ? '*' : ''), mil(r.p), ok ? mil(r.f) : '—', ok ? mil(r.af) : '—', ok ? mil(r.r) : '—', ok ? pct(r.r, FAT ? r.p : r.p - r.g) : '—', ok ? mil(r.ar) : '—', ok ? mil(r.g) : '—'].forEach((v, i) => tr.append(celula(v, ok ? SIT_COL[i] : null, [m], nomeMes(m)))); linhasMes.push(tr);
     // antes de nov/2024 (CONTROLE) só o produzido aparece; o resto mostra "—" e não pode entrar no total (corrigido em
     // 20/10/2026: o período set/24 a set/25 somava R$ 240 mil de "a receber" de set e out/24 que a tela não mostrava)
     if (ult12.has(m)) { tot.p+=r.p; if (ok) { tot.pOk+=r.p; tot.f+=r.f; tot.af+=r.af; tot.r+=r.r; tot.ar+=r.ar; tot.g+=r.g; } } }
-  const mesesPer = [...ult12]; const tt = el('tr', null, 'tot'); ['Período', mil(tot.p), mil(tot.f), mil(tot.af), mil(tot.r), pct(tot.r, tot.pOk - tot.g), mil(tot.ar), mil(tot.g)].forEach((v, i) => tt.append(celula(v, SIT_COL[i], mesesPer, 'período'))); tf.append(tt, ...linhasMes);
+  const mesesPer = [...ult12]; const tt = el('tr', null, 'tot'); ['Período', mil(tot.p), mil(tot.f), mil(tot.af), mil(tot.r), pct(tot.r, FAT ? tot.pOk : tot.pOk - tot.g), mil(tot.ar), mil(tot.g)].forEach((v, i) => tt.append(celula(v, SIT_COL[i], mesesPer, 'período'))); tf.append(tt, ...linhasMes);
   // atenção: a receber há mais de 90 dias e a faturar atrasado, por convênio
   const corte = new Date(d0); corte.setDate(corte.getDate() - 90); const corteMes = corte.toISOString().slice(0, 7); corteMesG = corteMes;
   const soma = (filtro, idx, minimo = 1) => { const m = {}; for (const x of D.F) { if ((U && x[1] !== U) || (C && x[2] !== C) || !noPeriodo(x[0]) || !filtro(x[0]) || !x[idx]) continue; m[x[2]] = (m[x[2]] || 0) + x[idx]; } return Object.entries(m).filter(([, v]) => v >= minimo).sort((a, b) => b[1] - a[1]); };
@@ -244,6 +259,7 @@ function desenha() {
   if (!itp.length) ulp.append(el('li', 'Sem pagamento de convênio no período.', 'vazio'));
   itp.forEach(([c, a]) => { const li = el('li'); li.append(el('span', c), el('span', Math.round(a[1] / a[0]) + ' dias')); ulp.append(li); });
   if (tv) { const li = el('li'); li.append(el('span', 'Média geral'), el('span', Math.round(td / tv) + ' dias')); ulp.append(li); }
+  if (FAT) return;   // o faturamento não tem a Operação
   // operação
   const to = document.getElementById('tOp'); to.replaceChildren();
   // detalhe que antes ficava nos quadros do início (20/10/2026): variação contra o ano e o mês anteriores (só mês fechado: mês
@@ -314,4 +330,4 @@ sAte.onchange = () => { ATE = sAte.value; if (DE && ATE < DE) { DE = ATE; sDe.va
 
 desenha();
 </script></body></html>`;
-return [{ json: { html, chave: 'lista', token: chaveLista.token, anterior: chaveLista.anterior || '', dia: chaveLista.dia } }];
+return [{ json: { html, chave: CHAVE, token: chaveLista.token, anterior: chaveLista.anterior || '', dia: chaveLista.dia } }];

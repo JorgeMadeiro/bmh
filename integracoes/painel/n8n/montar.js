@@ -405,10 +405,14 @@ function fluxoNumeros() {
 // a lista de pacientes de um lote, consultada na hora no iGut. Mesmo endereço = o navegador reaproveita o login.
 function listaDiretoria() { IDS.diretoria ||= {}; return IDS.diretoria.lista ||= 'bmh-diretoria-lista-' + crypto.randomBytes(8).toString('hex'); }
 function botaoDiretoria() { IDS.diretoria ||= {}; return IDS.diretoria.atualiza ||= 'bmh-diretoria-atualiza-' + crypto.randomBytes(8).toString('hex'); }
-function fluxoPainelDiretoria() {
+function listaFaturamento() { IDS.diretoria ||= {}; return IDS.diretoria.lista_faturamento ||= 'bmh-faturamento-lista-' + crypto.randomBytes(8).toString('hex'); }
+// modo "faturamento" (Jorge, 10/11/2026): login próprio da equipe de faturamento, a mesma página em sessões, sem R$ e sem a
+// Operação; a lista de pacientes tem endereço e chave próprios (lista_fat) e sai sem valor. O botão Atualizar é o mesmo
+function fluxoPainelDiretoria(modo = 'diretoria') {
+  const FAT = modo === 'faturamento', CHAVE = FAT ? 'lista_fat' : 'lista';
   x = 0;
   const n = {
-    pag: no('Painel da diretoria', 'n8n-nodes-base.webhook', 2, { path: 'bmh-diretoria', authentication: 'basicAuth', responseMode: 'responseNode', options: {} }, { webhookId: crypto.randomUUID(), credentials: cred('httpBasicAuth', 'BMH · Painel da diretoria (login)') }),
+    pag: no(FAT ? 'Painel do faturamento' : 'Painel da diretoria', 'n8n-nodes-base.webhook', 2, { path: FAT ? 'bmh-faturamento' : 'bmh-diretoria', authentication: 'basicAuth', responseMode: 'responseNode', options: {} }, { webhookId: crypto.randomUUID(), credentials: cred('httpBasicAuth', FAT ? 'BMH · Painel do faturamento (login)' : 'BMH · Painel da diretoria (login)') }),
     ehAtualiza: se('É o botão Atualizar?', "={{ !!($json.query || {}).atualizar }}"),   // ?atualizar=1: pede a carga completa (20/10/2026)
     // trava para todos (20/10/2026): com uma carga pedida há menos de 15 min e ainda sem a última etapa gravada, não pede outra
     ultPed: le('Último pedido', 'BMH_diretoria_pedido'), opPed: le('Operação (pedido)', 'BMH_operacao_dia'),
@@ -422,27 +426,27 @@ function fluxoPainelDiretoria() {
     gravaPed: grava('Grava o pedido', 'BMH_diretoria_pedido'),
     pede: no('Pede a atualização', 'n8n-nodes-base.httpRequest', 4.2, { method: 'GET', url: process.env.N8N_URL.replace(/\/$/, '') + '/webhook/' + botaoDiretoria(), options: { timeout: 30000 } }, { retryOnFail: true, maxTries: 3, waitBetweenTries: 5000 }),
     // volta para o painel com a hora do pedido (do servidor): a página se recarrega até o financeiro gravado ser mais novo
-    respondePedido: no('Volta para o painel', 'n8n-nodes-base.respondToWebhook', 1.1, { respondWith: 'text', responseBody: "={{ '<!doctype html><meta charset=\"utf-8\"><meta name=\"robots\" content=\"noindex\"><script>location.replace(\"bmh-diretoria?pedido=' + $('Decide o pedido').first().json.pedido + '\")</script>' }}",
+    respondePedido: no('Volta para o painel', 'n8n-nodes-base.respondToWebhook', 1.1, { respondWith: 'text', responseBody: "={{ '<!doctype html><meta charset=\"utf-8\"><meta name=\"robots\" content=\"noindex\"><script>location.replace(\"" + (FAT ? 'bmh-faturamento' : 'bmh-diretoria') + "?pedido=' + $('Decide o pedido').first().json.pedido + '\")</script>' }}",
       options: { responseHeaders: { entries: [{ name: 'Content-Type', value: 'text/html; charset=utf-8' }, { name: 'Cache-Control', value: 'no-store' }] } } }),
     ehLista: se('É lista de pacientes?', "={{ !!($json.query || {}).situacao }}"),   // JSON (?formato=json) ou página dentro da janela (?embutido=1)
     // página
     fin: le('Financeiro (tabela)', 'BMH_financeiro_mes'), op: le('Operação (tabela)', 'BMH_operacao_dia'), det: le('Detalhes (tabela)', 'BMH_financeiro_detalhe'), prazo: le('Prazo (tabela)', 'BMH_prazo_recebimento'),
     pedTab: le('Pedido (tabela)', 'BMH_diretoria_pedido'), opcTab: le('Operação por convênio (tabela)', 'BMH_operacao_conv'), opkTab: le('Operação por câmara (tabela)', 'BMH_operacao_camara'), opkcTab: le('Operação por câmara e convênio (tabela)', 'BMH_operacao_camconv'),
     chaveTab: le('Chave da lista (tabela)', 'BMH_diretoria_chave'),
-    monta: no('Monta a página', 'n8n-nodes-base.code', 2, { jsCode: ler('../../grupos/painel-diretoria.js').replace('__CAMINHO_LISTA__', process.env.N8N_URL.replace(/\/$/, '') + '/webhook/' + listaDiretoria()) }, { executeOnce: true }),   // endereço completo: a página também abre pela Central (central.cannlink.com.br/paineis/...)
+    monta: no('Monta a página', 'n8n-nodes-base.code', 2, { jsCode: ler('../../grupos/painel-diretoria.js').replace('__MODO__', modo).replace('__CAMINHO_LISTA__', process.env.N8N_URL.replace(/\/$/, '') + '/webhook/' + (FAT ? listaFaturamento() : listaDiretoria())) }, { executeOnce: true }),   // endereço completo: a página também abre pela Central (central.cannlink.com.br/paineis/...)
     gravaChave: grava('Grava a chave da lista', 'BMH_diretoria_chave'),
     // lista de pacientes pelo endereço próprio (22/10/2026): sem senha do navegador (o Safari não a manda de dentro da página
     // isolada pelo n8n); só responde com a chave do dia que o painel entrega a quem entrou com login
-    wLista: no('Lista de pacientes (webhook)', 'n8n-nodes-base.webhook', 2, { path: listaDiretoria(), responseMode: 'responseNode', options: {} }, { webhookId: crypto.randomUUID() }),
+    wLista: no('Lista de pacientes (webhook)', 'n8n-nodes-base.webhook', 2, { path: FAT ? listaFaturamento() : listaDiretoria(), responseMode: 'responseNode', options: {} }, { webhookId: crypto.randomUUID() }),
     chavePed: le('Chave da lista (pedido)', 'BMH_diretoria_chave'),
-    confere: se('Chave certa?', "={{ (() => { const q = $('Lista de pacientes (webhook)').first().json.query || {}; const r = $('Chave da lista (pedido)').all().map((i) => i.json).find((x) => x && x.chave === 'lista') || {}; return !!q.t && (q.t === r.token || q.t === r.anterior); })() }}"),
+    confere: se('Chave certa?', "={{ (() => { const q = $('Lista de pacientes (webhook)').first().json.query || {}; const r = $('Chave da lista (pedido)').all().map((i) => i.json).find((x) => x && x.chave === '" + CHAVE + "') || {}; return !!q.t && (q.t === r.token || q.t === r.anterior); })() }}"),
     nega: no('Recusa (chave errada)', 'n8n-nodes-base.respondToWebhook', 1.1, { respondWith: 'json', responseBody: '={{ JSON.stringify({ erro: "chave" }) }}', options: { responseCode: 403, responseHeaders: { entries: [{ name: 'Access-Control-Allow-Origin', value: '*' }, { name: 'Cache-Control', value: 'no-store' }] } } }),
     entrega: no('Entrega a página', 'n8n-nodes-base.respondToWebhook', 1.1, { respondWith: 'text', responseBody: '={{ $json.html }}', options: { responseHeaders: { entries: [{ name: 'Content-Type', value: 'text/html; charset=utf-8' }, { name: 'Cache-Control', value: 'no-store' }, { name: 'X-Robots-Tag', value: 'noindex' }] } } }),
     // pacientes do lote (3º nível): lê a tabela gravada às 23h40 (abre na hora; funciona com o iGut fora do ar)
     pacTab: le('Pacientes do lote (tabela)', 'BMH_financeiro_paciente'), fimLista: le('Fim da última atualização', 'BMH_operacao_dia'),
-    lista: codigo('Lista os pacientes', '../../grupos/lote-pacientes.js'),
+    lista: no('Lista os pacientes', 'n8n-nodes-base.code', 2, { jsCode: ler('../../grupos/lote-pacientes.js').replace('__MODO__', modo) }),
     entregaLista: no('Entrega a lista', 'n8n-nodes-base.respondToWebhook', 1.1, { respondWith: 'text', responseBody: '={{ $json.corpo }}', options: { responseHeaders: { entries: [{ name: 'Content-Type', value: '={{ $json.tipo }}' }, { name: 'Cache-Control', value: 'no-store' }, { name: 'X-Robots-Tag', value: 'noindex' }, { name: 'Access-Control-Allow-Origin', value: '*' }] } } }),
-    nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Diretoria (painel)\n**Traz:** tabelas da diretoria\n**Envia:** o painel da diretoria, com login\n**Limites:** só lê; execução não guardada\n\nUm painel só, login da diretoria (credencial \"BMH · Painel da diretoria (login)\"; cópia no .env em PAINEL_DIRETORIA_*). Página: lê BMH_financeiro_mes, BMH_operacao_dia e BMH_financeiro_detalhe (gravadas às 23h40). ?formato=json&situacao=...: pacientes de um lote, lidos de BMH_financeiro_paciente (gravada às 23h40; nomes guardados por decisão do Jorge); o n8n não guarda a execução.', width: 560, height: 200 }),
+    nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: FAT ? '## BMH · Faturamento (painel)\n**Traz:** as tabelas da diretoria\n**Envia:** o painel do faturamento, com login próprio\n**Limites:** só lê; sem R$ e sem a Operação; execução não guardada\n\nMesma página da diretoria (painel-diretoria.js no modo faturamento): número de sessões no lugar de valores, com as mesmas subdivisões (unidade, convênio, período, lotes e pacientes). Login: credencial "BMH · Painel do faturamento (login)"; cópia no .env em PAINEL_FATURAMENTO_*. A lista de pacientes tem endereço e chave próprios (lista_fat) e sai sem valor.' : '## BMH · Diretoria (painel)\n**Traz:** tabelas da diretoria\n**Envia:** o painel da diretoria, com login\n**Limites:** só lê; execução não guardada\n\nUm painel só, login da diretoria (credencial \"BMH · Painel da diretoria (login)\"; cópia no .env em PAINEL_DIRETORIA_*). Página: lê BMH_financeiro_mes, BMH_operacao_dia e BMH_financeiro_detalhe (gravadas às 23h40). ?formato=json&situacao=...: pacientes de um lote, lidos de BMH_financeiro_paciente (gravada às 23h40; nomes guardados por decisão do Jorge); o n8n não guarda a execução.', width: 560, height: 200 }),
   };
   const cx = {}; liga(cx, n.pag.name, n.ehAtualiza.name);
   cx[n.ehAtualiza.name] = { main: [[{ node: n.ultPed.name, type: 'main', index: 0 }], [{ node: n.ehLista.name, type: 'main', index: 0 }]] };
@@ -453,7 +457,7 @@ function fluxoPainelDiretoria() {
   liga(cx, n.wLista.name, n.chavePed.name); liga(cx, n.chavePed.name, n.confere.name);
   cx[n.confere.name] = { main: [[{ node: n.pacTab.name, type: 'main', index: 0 }], [{ node: n.nega.name, type: 'main', index: 0 }]] };
   for (const [a, b] of [[n.fin, n.op], [n.op, n.det], [n.det, n.prazo], [n.prazo, n.pedTab], [n.pedTab, n.opcTab], [n.opcTab, n.opkTab], [n.opkTab, n.opkcTab], [n.opkcTab, n.chaveTab], [n.chaveTab, n.monta], [n.monta, n.gravaChave], [n.monta, n.entrega], [n.pacTab, n.fimLista], [n.fimLista, n.lista], [n.lista, n.entregaLista]]) liga(cx, a.name, b.name);
-  return { name: 'BMH · Diretoria (painel)', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none', saveDataErrorExecution: 'none' }) };   // tem nome de paciente: não guarda execução
+  return { name: FAT ? 'BMH · Faturamento (painel)' : 'BMH · Diretoria (painel)', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none', saveDataErrorExecution: 'none' }) };   // tem nome de paciente: não guarda execução
 }
 
 // ---------------- fluxo 13: plantões médicos · fechamento do mês ----------------
@@ -859,7 +863,7 @@ function fluxoAvaliacoes() {
   const tags = (await api('tags?limit=100', 'GET')).data || []; const tagBMH = tags.find((t) => t.name === 'BMH');
     const so = process.argv.slice(2);   // ex.: node montar.js pagina guardiao (só esses)
   // o alerta vem primeiro: os outros precisam do id dele (errorWorkflow)
-  const fluxos = { alerta: fluxoAlerta, grava: fluxoGrava, pagina: fluxoPagina, igut: fluxoIgut, guardiao: fluxoGuardiao, botoes: fluxoBotoes, resumo: fluxoResumo, medicao: fluxoMedicao, mensal: fluxoMensal, numeros: fluxoNumeros, diretoria: fluxoPainelDiretoria, plantoes: fluxoPlantoes, plantoesEmails: fluxoPlantoesEmails, avaliacoes: fluxoAvaliacoes, nota: fluxoNota, vigia: fluxoVigia, organico: fluxoSearchConsole, radar: fluxoRadar, confirmacao: fluxoConfirmacao, origem: fluxoOrigem, recebedor: fluxoRecebedor, conversoes: fluxoConversoes, cliques: fluxoCliques, envio: fluxoEnvioConversoes, conversas: fluxoOrigemConversas, celular: fluxoLembreteCelular };
+  const fluxos = { alerta: fluxoAlerta, grava: fluxoGrava, pagina: fluxoPagina, igut: fluxoIgut, guardiao: fluxoGuardiao, botoes: fluxoBotoes, resumo: fluxoResumo, medicao: fluxoMedicao, mensal: fluxoMensal, numeros: fluxoNumeros, diretoria: fluxoPainelDiretoria, faturamento: () => fluxoPainelDiretoria('faturamento'), plantoes: fluxoPlantoes, plantoesEmails: fluxoPlantoesEmails, avaliacoes: fluxoAvaliacoes, nota: fluxoNota, vigia: fluxoVigia, organico: fluxoSearchConsole, radar: fluxoRadar, confirmacao: fluxoConfirmacao, origem: fluxoOrigem, recebedor: fluxoRecebedor, conversoes: fluxoConversoes, cliques: fluxoCliques, envio: fluxoEnvioConversoes, conversas: fluxoOrigemConversas, celular: fluxoLembreteCelular };
   for (const [chave, monta] of Object.entries(fluxos).filter(([k]) => !so.length || so.includes(k))) {
     const f = comVigia(chave, monta());
     if (!/^BMH · /.test(f.name)) throw new Error('nome sem BMH');
