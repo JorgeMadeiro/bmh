@@ -200,7 +200,7 @@ function abre(sit, meses, conv, rot) {
     const h = el('div', null, 'conv'); h.append(el('span', c), el('span', brl(xs.reduce((s, x) => s + x[6], 0)))); corpo.append(h);
     xs.sort((a, b) => a[0] < b[0] ? 1 : a[0] > b[0] ? -1 : b[6] - a[6]).forEach(x => {
       const l = el('div', null, 'lin');
-      const desc = (x[4] !== '-' ? 'Lote ' + x[4] + ' · ' : '') + nomeMes(x[0]) + ' · ' + x[1] + (FAT ? '' : ' · ' + x[5] + (x[5] === 1 ? ' sessão' : ' sessões')) + (x[7] ? ' · ' + datas(x[7], x[0]) : '');
+      const desc = (x[4] !== '-' ? 'Lote ' + x[4] + ' · ' : '') + nomeMes(x[0]) + ' · ' + x[1] + (FAT ? '' : ' · ' + (x[5] ? x[5] + (x[5] === 1 ? ' sessão' : ' sessões') : 'consulta')) + (x[7] ? ' · ' + datas(x[7], x[0]) : '');
       const esq = el('span', desc);
       {   // 3º nível: pacientes do lote (ou do particular do mês), na própria janela, lidos da tabela gravada
         const a = el('span', ' · pacientes ›', 'cl'); a.onclick = () => pacientes({ mes: x[0], unidade: x[1], convenio: /^PARTICULAR/.test(x[2]) ? 'PARTICULAR' : x[2], situacao: x[3], lote: x[4] }); esq.append(a);
@@ -222,7 +222,7 @@ function pacientes(par) {
   tenta(0).then(d => {
     document.getElementById('dTit').textContent = d.titulo; document.getElementById('dSub').textContent = d.sub;
     if (!d.pacientes.length) { corpo.append(el('p', 'Nenhum paciente nessa situação (pode ter mudado desde a última atualização do painel).', 'sub')); return; }
-    d.pacientes.forEach(p => { const l = el('div', null, 'lin'); const e = el('span'); e.append(el('b', p.nome)); e.append(document.createElement('br'), document.createTextNode((FAT ? '' : p.sessoes + (p.sessoes === 1 ? ' sessão' : ' sessões') + ' · ') + p.dias + (p.medicos ? ' · ' + p.medicos : ''))); l.append(e, el('span', FAT ? brl(p.sessoes) : 'R$ ' + p.valor.toLocaleString('pt-BR'))); corpo.append(l); });
+    d.pacientes.forEach(p => { const l = el('div', null, 'lin'); const e = el('span'); e.append(el('b', p.nome)); e.append(document.createElement('br'), document.createTextNode((FAT ? '' : (p.sessoes ? p.sessoes + (p.sessoes === 1 ? ' sessão' : ' sessões') : 'consulta') + ' · ') + p.dias + (p.medicos ? ' · ' + p.medicos : ''))); l.append(e, el('span', FAT ? brl(p.sessoes) : 'R$ ' + p.valor.toLocaleString('pt-BR'))); corpo.append(l); });
     corpo.append(el('p', 'Dado de paciente: não encaminhar fora da equipe responsável.', 'sub'));
   }).catch(e => {
     document.getElementById('dSub').textContent = e.message === 'chave vencida' ? 'O painel ficou aberto desde ontem: recarregue a página e abra de novo.' : 'Não consegui abrir a lista (' + e.message + '). Tente de novo em instantes.';

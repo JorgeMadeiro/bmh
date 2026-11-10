@@ -49,9 +49,16 @@
   "VOUCHER - CORTESIA" (817 sessões no histórico, todas "a faturar" no iGut, R$ 400 de produção) conta no produzido e no
   recebido, como o particular, e nunca no a faturar nem nas listas de atrasado. A lista de pacientes dele abre pelo recebido
   (no iGut as linhas estão "a faturar"). O painel da diretoria não muda.
-- **Consulta:** a produção do iGut traz também a "Consulta Médica" cobrada (código 10101012, agenda CONSULTAS): 4 de 1.590
-  linhas em out/2026, todas pagas. As avaliações gratuitas (~170 por mês) não entram. "CONSULTAS", "MULTIPLACE" e "MONOPLACE"
-  ao lado do paciente são o campo médico solicitante preenchido com o nome da agenda no iGut (340 sessões sem CRM em out/2026).
+- **Só sessão conta como sessão (Jorge, 10/11/2026: "o a faturar está divergente"):** a produção do iGut traz também itens
+  da agenda CONSULTAS: consulta médica cobrada (código 10101012, ~R$ 89) e, com valor zero, retorno, telemedicina,
+  guia/relatório e avaliação sem custo. Eles contavam como "1 sessão" e apareciam no a faturar do faturamento (na diretoria
+  não, porque valem R$ 0). Desde 10/11/2026 `financeiro-monta.js`, `financeiro-detalhe.js` e `financeiro-paciente.js` só
+  contam sessão quando o tipo ou a descrição diz oxigenoterapia ou o item é de agenda de câmara (MULTIPLACE ou MONOPLACE);
+  o valor em R$ continua com tudo (a diretoria não muda). Conferido no iGut em fev/25, set/26 e out/26: a regra separa todos
+  os tipos; out/26 passou de 1.590 para 1.586 sessões, com R$ 668.761 igual. Histórico recarregado mês a mês
+  (`?so=financeiro&mes=`). Na diretoria, linha só de consulta aparece como "consulta" em vez de "0 sessões". As avaliações
+  gratuitas (~170 por mês) não vêm na produção do iGut. "CONSULTAS", "MULTIPLACE" e "MONOPLACE" ao lado do paciente são o
+  campo médico solicitante preenchido com o nome da agenda no iGut (340 sessões sem CRM em out/2026).
 - **Na Central (10/11/2026):** `/paineis/bmh-faturamento` (porteiro, segredo `central_painel_bmh_faturamento` criado pelo
   `subir.sh` a partir do `.env` da BMH); código em `Jorge_Claude_VsCode/scripts/central/`.
 - **Conferido em 10/11/2026 no endereço publicado:** sem login 401; login do faturamento 200, sem nenhum "R$" na tela,

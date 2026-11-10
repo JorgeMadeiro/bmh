@@ -6,6 +6,9 @@
 // a_faturar; glosa > 0 → também uma linha "glosado" com o valor da glosa.
 // Linha que existia e não aparece mais (lote que foi pago, por exemplo) volta zerada: o painel ignora valor zero.
 const n = (v) => Number(v) || 0, CONTROLE = '2024-11';
+// sessão = oxigenoterapia (tipo ou descrição) ou item lançado numa agenda de câmara (10/11/2026): consulta, retorno,
+// telemedicina, guia e avaliação da agenda CONSULTAS entram no valor, mas não contam como sessão
+const ehSessao = (x) => /oxigenoterapia/i.test(String(x.TIPO || '') + ' ' + String(x.descricao || '')) || /multiplace|monoplace/i.test(String(x.profissional || ''));
 const UNI = (s) => (/taguatinga/i.test(s || '') ? 'Taguatinga' : /l2 sul|asa sul/i.test(s || '') ? 'Asa Sul' : null);
 const meses = $('Meses').all().map((i) => i.json.mes), resp = $('BI do mês').all(), agora = $now.toISO();
 const nomeConv = {}; try { const j = $('Convênios').first().json; const l = Array.isArray(j?.data) ? j.data : Array.isArray(j?.data?.Convenio) ? j.data.Convenio : Array.isArray(j) ? j : [];
@@ -26,7 +29,7 @@ meses.forEach((mes, k) => {
     const soma = (situacao, valor, glosa) => {
       const chave = [mes, u, conv, situacao, lote || '-'].join('|');
       const r = (out[chave] ||= { chave, mes, unidade: u, convenio: conv, situacao, lote: lote || '-', sessoes: 0, valor: 0, glosa: 0, dias: new Set(), atualizado_em: agora });
-      r.sessoes++; r.valor += valor; r.glosa += glosa; if (dia) r.dias.add(Number(dia));
+      if (ehSessao(x)) r.sessoes++; r.valor += valor; r.glosa += glosa; if (dia) r.dias.add(Number(dia));
     };
     soma(sit, sit === 'a_faturar' ? v : v - g, sit === 'a_faturar' ? 0 : g);
     if (g > 0 && sit !== 'a_faturar') soma('glosado', g, g);
