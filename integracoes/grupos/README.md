@@ -45,6 +45,11 @@
   também está em recebido ou a receber (conferido em 10/11/2026: 821 de 871 mês × unidade × convênio somam o total; nos
   outros 50 a diferença é exatamente a glosa). % = sessões recebidas ÷ produzidas. Prazo de recebimento: média ponderada
   pelas sessões pagas.
+- **Voucher fora (Jorge, 10/11/2026: "não considerar a faturar os vouchers"):** o convênio "VOUCHER - CORTESIA" (817 sessões
+  no histórico, todas "a faturar", R$ 400 de produção) sai do painel do faturamento inteiro (colunas, listas, lotes e filtro),
+  para o produzido continuar = faturado + a faturar. O painel da diretoria não muda.
+- **Na Central (10/11/2026):** `/paineis/bmh-faturamento` (porteiro, segredo `central_painel_bmh_faturamento` criado pelo
+  `subir.sh` a partir do `.env` da BMH); código em `Jorge_Claude_VsCode/scripts/central/`.
 - **Conferido em 10/11/2026 no endereço publicado:** sem login 401; login do faturamento 200, sem nenhum "R$" na tela,
   nov/26 com 495 produzidas = 154 faturadas + 341 a faturar; lista de pacientes com nome, sessões, dias e médicos, sem
   valor; chave errada 403; login do faturamento no painel da diretoria 401. O painel da diretoria não mudou (dados
