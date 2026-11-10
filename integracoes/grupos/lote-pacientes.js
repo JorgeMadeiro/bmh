@@ -16,7 +16,9 @@ const NOME_SIT = { a_faturar: 'A faturar', a_receber: 'A receber', recebido: 'Re
 const datas = (d) => { const fim = '/' + String(q.mes).slice(5, 7) + '/' + String(q.mes).slice(2, 4), dd = (x) => String(x).padStart(2, '0') + fim; d = [...new Set(d)].sort((a, b) => a - b); const o = []; for (let i = 0; i < d.length; i++) { let j = i; while (j + 1 < d.length && d[j + 1] === d[j] + 1) j++; o.push(j > i + 1 ? dd(d[i]) + ' a ' + dd(d[j]) : j === i + 1 ? dd(d[i]) + ', ' + dd(d[j]) : dd(d[i])); i = j; } return o.join(', '); };
 const brl = (v) => 'R$ ' + Math.round(v).toLocaleString('pt-BR');
 // lê a tabela gravada às 23h40 (BMH_financeiro_paciente): abre na hora e funciona mesmo com o iGut fora do ar
-const linhasTab = $('Pacientes do lote (tabela)').all().map((i) => i.json).filter((r) => r && r.mes === q.mes && r.unidade === q.unidade && r.convenio === q.convenio && r.situacao === q.situacao && String(r.lote) === String(q.lote || '-') && (FAT ? n(r.sessoes) > 0 : n(r.valor) > 0));
+// no faturamento a cortesia (voucher) aparece como recebida, mas no iGut ela fica sem lote, "a faturar" (10/11/2026)
+const sitTab = FAT && q.situacao === 'recebido' && /voucher|cortesia/i.test(q.convenio || '') ? 'a_faturar' : q.situacao;
+const linhasTab = $('Pacientes do lote (tabela)').all().map((i) => i.json).filter((r) => r && r.mes === q.mes && r.unidade === q.unidade && r.convenio === q.convenio && r.situacao === sitTab && String(r.lote) === String(q.lote || '-') && (FAT ? n(r.sessoes) > 0 : n(r.valor) > 0));
 const pac = {};
 for (const r of linhasTab) {
   const p = (pac[r.paciente_id || r.paciente] ||= { nome: r.paciente, sessoes: 0, valor: 0, dias: [], medicos: new Set() });

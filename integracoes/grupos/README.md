@@ -45,9 +45,13 @@
   também está em recebido ou a receber (conferido em 10/11/2026: 821 de 871 mês × unidade × convênio somam o total; nos
   outros 50 a diferença é exatamente a glosa). % = sessões recebidas ÷ produzidas. Prazo de recebimento: média ponderada
   pelas sessões pagas.
-- **Voucher fora (Jorge, 10/11/2026: "não considerar a faturar os vouchers"):** o convênio "VOUCHER - CORTESIA" (817 sessões
-  no histórico, todas "a faturar", R$ 400 de produção) sai do painel do faturamento inteiro (colunas, listas, lotes e filtro),
-  para o produzido continuar = faturado + a faturar. O painel da diretoria não muda.
+- **Voucher e cortesia (Jorge, 10/11/2026: tirar só do a faturar, "no produzido e recebido ele entra"):** o convênio
+  "VOUCHER - CORTESIA" (817 sessões no histórico, todas "a faturar" no iGut, R$ 400 de produção) conta no produzido e no
+  recebido, como o particular, e nunca no a faturar nem nas listas de atrasado. A lista de pacientes dele abre pelo recebido
+  (no iGut as linhas estão "a faturar"). O painel da diretoria não muda.
+- **Consulta:** a produção do iGut traz também a "Consulta Médica" cobrada (código 10101012, agenda CONSULTAS): 4 de 1.590
+  linhas em out/2026, todas pagas. As avaliações gratuitas (~170 por mês) não entram. "CONSULTAS", "MULTIPLACE" e "MONOPLACE"
+  ao lado do paciente são o campo médico solicitante preenchido com o nome da agenda no iGut (340 sessões sem CRM em out/2026).
 - **Na Central (10/11/2026):** `/paineis/bmh-faturamento` (porteiro, segredo `central_painel_bmh_faturamento` criado pelo
   `subir.sh` a partir do `.env` da BMH); código em `Jorge_Claude_VsCode/scripts/central/`.
 - **Conferido em 10/11/2026 no endereço publicado:** sem login 401; login do faturamento 200, sem nenhum "R$" na tela,
