@@ -21,15 +21,15 @@ As 5 campanhas antigas (engajamento e seguidores) continuam pausadas.
 | Orçamento | **R$ 20 por dia** no conjunto (cerca de 30 dias com o que sobra no limite). Subir só com o "pode", no máximo 20% por dia |
 | Público | Distrito Federal, 25 a 65+ anos, todos os gêneros, sem interesse de saúde (a Meta restringe e o público amplo aprende melhor) |
 | Posicionamentos | automáticos (Facebook e Instagram) |
-| Criativos | 2 reels que já estão no Instagram da BMH, sem hashtag na legenda, os mesmos que a Triunfo usou como anúncio: "Avião sem piloto" (`18089634056567776`, 26/06/2026, instagram.com/reel/DaDb5xxxW1e, segurança e acompanhamento médico) e "Indicação correta" (`18150290680494142`, 02/06/2026, instagram.com/reel/DZF0hR6xPNY, avaliação antes de indicar) |
+| Criativo | **Padrão, sem verba a mais (regra de 12/11):** 1 conjunto de R$ 20 com o post "Presença médica" (instagram.com/p/DRhc0iyjVk3, 26/11/2025, nota 4,92, o mais forte do perfil em 12 meses, sem trava). Reservas, que entram como 2º anúncio no mesmo conjunto quando ele cansar: "Feridas e isquemia" (reel/DRRr6JnikZm, nota 2,7; tirar as hashtags da legenda antes), "Pós-operatório" (reel/DXPfXQ2EQ_4, nota 2,86; aviso de indicação, o Jorge decide), "Sair da câmara" (reel/DagxUivRtyb, nota 1,93) e "Avião sem piloto" (reel/DaDb5xxxW1e, nota 1,64; aviso do CFM por "eficaz"). Ranking completo em `saidas/estoque-criativos-2026-11.md`. Com o "pode" do Jorge, `cria teste` faz o teste de 3 (R$ 120 em 2 dias) |
 | Botão | Enviar mensagem pelo WhatsApp, para o número da recepção (o mesmo em coexistência com o Kommo) |
 
-**Travas conferidas nas legendas:** sem preço, sem antes e depois, sem depoimento, sem estética. Aviso do CFM: a legenda do
-"Avião sem piloto" diz "tratamento seguro, eficaz e personalizado"; "eficaz" é afirmação de resultado, de leve. Fica com o Jorge.
-**Falta ver nos vídeos:** se aparece paciente na câmara. Só entra com autorização por escrito (regra da pasta).
+**Travas conferidas na legenda do "Presença médica":** sem preço, sem antes e depois, sem depoimento, sem estética, sem promessa;
+cita as resoluções do CFM sobre médico presente na sessão. **Falta ver na foto:** se aparece paciente (só com autorização por escrito).
 
-Ficaram de fora: depoimento ("REELS 21 PACIENTE"), influenciadora ("REELS 10"), os de "acelerar a recuperação" (promessa e
-indicação fora da lista) e os com hashtag ("AD 03", "AD 04").
+Ficaram de fora: depoimento, caso de paciente, influenciadora, evento ou data, "acelerar a recuperação" (promessa e indicação fora
+da lista) e mergulho ("recuperação do mergulhador" não é indicação da lista). Os 2 reels da primeira versão deste plano ("Avião sem
+piloto" e "Indicação correta") foram trocados pelo ranking: "Indicação correta" está abaixo do normal do perfil (nota 0,97).
 
 ## Antes do "ativa"
 
@@ -53,7 +53,9 @@ indicação fora da lista) e os com hashtag ("AD 03", "AD 04").
 ## Como acompanhar (método de escala)
 
 - Decidir pela média de 7 dias, não pelo dia ruim. O guardião só propõe pausa com R$ 40 em 3 dias sem conversa.
-- Frequência: o guardião já avisa quando passa do limite (`meta_frequencia`). Ter o próximo criativo pronto antes de cansar.
+- Troca de criativo pelo custo por conversa (até o CRM medir agendamento), não pela frequência: a revisão de segunda marca
+  "criativo cansado" e aponta a reserva (`marketing/estoque-criativos/README.md`). Frequência a partir de 2,5 em 7 dias só acende a
+  atenção; o guardião avisa em 4.
 - Verba: sobe no máximo 20% por dia, sempre com o "pode".
 - **Resposta no WhatsApp:** conversa que espera não vira paciente. Hoje ninguém mede o tempo de resposta da recepção (entra com o
   Kommo). Na primeira semana, o Jorge olha por amostra.

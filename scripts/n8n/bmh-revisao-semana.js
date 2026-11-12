@@ -55,7 +55,7 @@ function revisaoSemana(D, T, cfg) {
   const mM = meta.filter(r => entre(r.dia, D.mes_ini, D.semana_fim)), m30 = meta.filter(r => entre(r.dia, D.d30, D.semana_fim));
   const tetoM = num(cfg['meta_teto_mes_' + D.mes_ini.slice(0, 7)] || cfg.meta_teto_mes);
   const mGasto = soma(mS, 'gasto'), mConv = soma(mS, 'conversas'), mCliq = soma(mS, 'cliques_link'), mGastoA = soma(mA, 'gasto'), mConvA = soma(mA, 'conversas');
-  const temConversa30 = soma(m30, 'conversas') >= 1;
+  const temConversa30 = soma(m30, 'conversas') >= 1, alertasM = [];
   // nada ligado: a foto mais recente da conta sem orçamento ligado e sem gasto no último dia da semana (07/11/2026: a C1 foi
   // pausada em 06/11, e a frase "as campanhas ligadas são de engajamento" ficaria errada)
   const nadaLigado = !!contaMeta && num(contaMeta.orcamento_ligado) === 0 && soma(meta.filter(r => r.dia === D.semana_fim), 'gasto') === 0;
@@ -76,7 +76,20 @@ function revisaoSemana(D, T, cfg) {
         acao: 'pausar', valor_antes: c.gasto.toFixed(2), valor_novo: '', gasto: c.gasto,
         motivo: c.conversas < 1 ? `${brl(c.gasto)} na semana sem nenhuma conversa` : `${brl(c.gasto / c.conversas)} por conversa, 3 vezes ou mais a média (${brl(mediaM)})` });
     }
+    // criativo cansado (Jorge, 12/11/2026, confirmando 25/10): troca-se pelo agendamento, não pela frequência; na BMH, até o CRM medir
+    // agendamento por anúncio, vale o custo por conversa. Cansado = custo por conversa da semana 30% ou mais acima das 3 semanas
+    // anteriores do mesmo anúncio, com 3 conversas ou mais em cada lado (menos que isso é ruído). Frequência alta com custo bom não troca.
+    const menos = n => { const x = new Date(D.semana_ini + 'T12:00:00Z'); x.setUTCDate(x.getUTCDate() - n); return x.toISOString().slice(0, 10); };
+    const base = meta.filter(r => entre(r.dia, menos(21), D.ant_fim)), porAd = {};
+    for (const [lado, rs] of [['s', mS], ['b', base]]) for (const r of rs) { if (!r.ad_id) continue; const a = (porAd[r.ad_id] ||= { nome: r.anuncio || r.ad_id, s: [0, 0], b: [0, 0] }); a[lado][0] += num(r.gasto); a[lado][1] += num(r.conversas); }
+    for (const a of Object.values(porAd)) {
+      if (a.s[1] < 3 || a.b[1] < 3) continue;
+      const cS = a.s[0] / a.s[1], cB = a.b[0] / a.b[1];
+      if (cS >= 1.3 * cB) alertasM.push(`• Criativo cansado: "${a.nome}" custa ${brl(cS)} por conversa na semana, contra ${brl(cB)} nas 3 semanas antes. `
+        + (cfg.meta_reserva ? `Reserva que entra (2º anúncio no mesmo conjunto): ${cfg.meta_reserva}.` : 'Sem reserva anotada (meta_reserva): ver o estoque de criativos.'));
+    }
   }
+  if (alertasM.length) blocos.push({ titulo: 'Criativos do Meta', texto: alertasM.join('\n') });
 
   // ---------- Guardiões na semana ----------
   const reg = (T.registro || []).filter(r => r && r.data && entre(r.data, D.semana_ini, D.semana_fim));
