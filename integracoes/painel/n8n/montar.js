@@ -44,6 +44,8 @@ const COLUNAS = {
   BMH_igut_dia: { chave: 's', dia: 's', unidade: 's', atendimentos: 'n', pacientes: 'n', valor: 'n' },
   BMH_financeiro_mes: { chave: 's', mes: 's', unidade: 's', convenio: 's', sessoes: 'n', produzido: 'n', faturado: 'n', a_faturar: 'n', recebido: 'n', a_receber: 'n', glosado: 'n', atualizado_em: 's' },
   BMH_financeiro_detalhe: { chave: 's', mes: 's', unidade: 's', convenio: 's', situacao: 's', lote: 's', sessoes: 'n', valor: 'n', glosa: 'n', dias: 's', atualizado_em: 's' },
+  BMH_dre_mensal: { chave: 's', mes: 's', grupo: 's', linha: 's', ordem: 'n', valor: 'n', fonte: 's', atualizado_em: 's' },
+  BMH_dre_conferidos: { chave: 's', marcado_em: 's' },
   BMH_financeiro_paciente: { chave: 's', mes: 's', unidade: 's', convenio: 's', situacao: 's', lote: 's', paciente_id: 's', paciente: 's', sessoes: 'n', valor: 'n', dias: 's', medicos: 's', atualizado_em: 's' },
   BMH_origem_conversas: Object.fromEntries(['chave', 'telefone_hash', 'primeira_msg_em', 'origem', 'como', 'clique_chave', 'pagina', 'gclid', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'ctwa_clid'].map((k) => [k, 's'])),   // origem de cada conversa nova, sem depender do Kommo (22/10/2026)
   BMH_cliques_site: Object.fromEntries(['chave', 'registrado_em', 'pagina', 'botao', 'mensagem_inicio', 'gclid', 'gbraid', 'wbraid', 'fbclid', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'entrada', 'referencia', 'lead_id', 'ligado_em'].map((k) => [k, 's'])),   // clique no WhatsApp do site com gclid e UTM (22/10/2026)
@@ -460,6 +462,73 @@ function fluxoPainelDiretoria(modo = 'diretoria') {
   return { name: FAT ? 'BMH · Faturamento (painel)' : 'BMH · Diretoria (painel)', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none', saveDataErrorExecution: 'none' }) };   // tem nome de paciente: não guarda execução
 }
 
+// ---------------- DRE da BMH (12/11/2026): atualiza do iGut + página, no molde da DRE da Nexo ----------------
+// Regras em integracoes/dre/regras.js, coladas no começo dos dois fluxos. Login = o da diretoria (decisão do Jorge, 12/11/2026).
+function dreAtualiza() { IDS.dre ||= {}; return IDS.dre.atualiza ||= 'bmh-dre-atualiza-' + crypto.randomBytes(8).toString('hex'); }
+function dreConferido() { IDS.dre ||= {}; return IDS.dre.conferido ||= 'bmh-dre-conferido-' + crypto.randomBytes(8).toString('hex'); }
+function dreChave() { IDS.dre ||= {}; return IDS.dre.chave ||= crypto.randomBytes(16).toString('hex'); }
+const comRegras = (arq) => ler('../../dre/regras.js') + '\n' + ler(arq);
+function fluxoDreAtualiza() {
+  x = 0;
+  const IGUT = cred('httpCustomAuth', 'BMH · iGut (acesso)');
+  const igut = (name, url, corpo) => no(name, 'n8n-nodes-base.httpRequest', 4.2, { method: 'POST', url, authentication: 'genericCredentialType', genericAuthType: 'httpCustomAuth',
+    sendBody: true, specifyBody: 'json', jsonBody: corpo, options: { timeout: 240000 } }, { credentials: IGUT, alwaysOutputData: true, onError: 'continueRegularOutput' });
+  const n = {
+    agenda_: no('Todo dia às 4h05', 'n8n-nodes-base.scheduleTrigger', 1.2, { rule: { interval: [{ field: 'cronExpression', expression: '5 4 * * *' }] } }),
+    manual: no('Chamada manual', 'n8n-nodes-base.webhook', 2, { httpMethod: 'GET', path: dreAtualiza(), responseMode: 'lastNode', options: {} }, { webhookId: crypto.randomUUID() }),
+    meses: codigo('Meses', '../../dre/meses.js'),
+    caixa: igut('Caixa do mês', 'https://api.igut.med.br/v2/receitasedespesas/financeiro', '={{ JSON.stringify({ "Lancamento.mes": $json.mes }) }}'),
+    prod: igut('Produção', 'https://api.igut.med.br/v2/businessintelligences/producao', "={{ JSON.stringify({ 'Agendamento.data': $('Meses').item.json.ini, 'Agendamento.data_fim': $('Meses').item.json.fim }) }}"),
+    jaClass: le('A classificar já gravado', 'BMH_dre_mensal'),
+    monta: no('Monta a DRE', 'n8n-nodes-base.code', 2, { jsCode: comRegras('../../dre/monta-dre.js') }, { executeOnce: true }),
+    grava: grava('Grava na BMH_dre_mensal', 'BMH_dre_mensal'),
+    resumo: no('Resumo', 'n8n-nodes-base.code', 2, { jsCode: ler('../../dre/resumo.js') }, { executeOnce: true }),
+    nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · DRE · atualiza do iGut\n**Traz:** caixa (receitasedespesas/financeiro) e produção (BI) do iGut\n**Envia:** linhas da DRE e do fluxo de caixa na BMH_dre_mensal\n**Limites:** não guarda execução (a produção traz nomes); só totais gravados\n\nTodo dia às 4h05 refaz o mês atual e os 3 anteriores. Manual: /webhook/<caminho em n8n-ids.json, dre.atualiza>?mes=AAAA-MM (um mês) ou ?rapido=1 (atual e anterior, usado pelo "Atualizar agora" da página). Regras em integracoes/dre/regras.js. Se o iGut falhar num mês, o mês não é gravado (não zera).', width: 560, height: 240 }),
+  };
+  const cx = {}; liga(cx, n.manual.name, n.meses.name);
+  for (const [a, b] of [[n.agenda_, n.meses], [n.meses, n.caixa], [n.caixa, n.prod], [n.prod, n.jaClass], [n.jaClass, n.monta], [n.monta, n.grava], [n.grava, n.resumo]]) liga(cx, a.name, b.name);
+  return { name: 'BMH · DRE · atualiza do iGut', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none' }) };
+}
+function fluxoDrePagina() {
+  x = 0;
+  const IGUT = cred('httpCustomAuth', 'BMH · iGut (acesso)');
+  const BASE = process.env.N8N_URL.replace(/\/$/, '');
+  const resp = (name, params) => no(name, 'n8n-nodes-base.respondToWebhook', 1.1, params);
+  const n = {
+    dre: no('DRE', 'n8n-nodes-base.webhook', 2, { path: 'bmh-dre', authentication: 'basicAuth', responseMode: 'responseNode', options: {} }, { webhookId: crypto.randomUUID(), credentials: cred('httpBasicAuth', 'BMH · Painel da diretoria (login)') }),
+    pediu: se('Pediu atualizar?', "={{ String(($json.query || {}).atualizar || '') === '1' }}"),
+    atualiza: no('Atualiza agora (iGut)', 'n8n-nodes-base.httpRequest', 4.2, { method: 'GET', url: BASE + '/webhook/' + dreAtualiza() + '?rapido=1', options: { timeout: 180000 } }, { alwaysOutputData: true, onError: 'continueRegularOutput', retryOnFail: false }),
+    tab: le('Lê a tabela', 'BMH_dre_mensal'),
+    conf: le('Lê conferidos', 'BMH_dre_conferidos'),
+    calc: no('Calcula a DRE', 'n8n-nodes-base.code', 2, { jsCode: ler('../../dre/calcula.js') }, { executeOnce: true }),
+    excel: no('Pede Excel?', 'n8n-nodes-base.if', 2.2, { conditions: { options: { caseSensitive: true, leftValue: '', typeValidation: 'loose', version: 2 }, combinator: 'and',
+      conditions: [{ id: crypto.randomUUID(), leftValue: '={{ $json.formato }}', rightValue: 'xlsx', operator: { type: 'string', operation: 'equals' } }] }, options: {} }),
+    planilha: codigo('Linhas da planilha', '../../dre/planilha.js'),
+    gera: no('Gera o Excel', 'n8n-nodes-base.convertToFile', 1.1, { operation: 'xlsx', options: { fileName: "={{ 'DRE-BMH-' + $('Calcula a DRE').first().json.ANO + '.xlsx' }}", sheetName: 'DRE' } }),
+    entExcel: resp('Entrega o Excel', { respondWith: 'binary', options: { responseHeaders: { entries: [{ name: 'Content-Disposition', value: "={{ 'attachment; filename=\"DRE-BMH-' + $('Calcula a DRE').first().json.ANO + '.xlsx\"' }}" }, { name: 'Cache-Control', value: 'no-store' }] } } }),
+    lanc: no('Aba lançamentos?', 'n8n-nodes-base.if', 2.2, { conditions: { options: { caseSensitive: true, leftValue: '', typeValidation: 'loose', version: 2 }, combinator: 'and',
+      conditions: [{ id: crypto.randomUUID(), leftValue: '={{ $json.aba }}', rightValue: 'lancamentos', operator: { type: 'string', operation: 'equals' } }] }, options: {} }),
+    mesesL: no('Meses dos lançamentos', 'n8n-nodes-base.code', 2, { jsCode: "// Um item por mês pedido na aba Lançamentos (um mês ou o ano inteiro).\nreturn $('Calcula a DRE').first().json.mesesLanc.map((mes) => ({ json: { mes } }));" }),
+    caixaL: no('Caixa do mês (iGut)', 'n8n-nodes-base.httpRequest', 4.2, { method: 'POST', url: 'https://api.igut.med.br/v2/receitasedespesas/financeiro', authentication: 'genericCredentialType', genericAuthType: 'httpCustomAuth',
+      sendBody: true, specifyBody: 'json', jsonBody: '={{ JSON.stringify({ "Lancamento.mes": $json.mes }) }}', options: { timeout: 120000 } }, { credentials: IGUT, onError: 'continueRegularOutput' }),
+    monta: no('Monta a página', 'n8n-nodes-base.code', 2, { jsCode: comRegras('../../dre/pagina.js').replace('__URL_CONFERIDO__', BASE + '/webhook/' + dreConferido()).replace('__CHAVE_CONFERIDO__', dreChave()) }, { executeOnce: true }),
+    entrega: resp('Entrega a página', { respondWith: 'text', responseBody: '={{ $json.html }}', options: { responseHeaders: { entries: [{ name: 'Content-Type', value: 'text/html; charset=utf-8' }, { name: 'Cache-Control', value: 'no-store' }, { name: 'X-Robots-Tag', value: 'noindex' }] } } }),
+    clique: no('Conferido (clique)', 'n8n-nodes-base.webhook', 2, { path: dreConferido(), httpMethod: 'POST', responseMode: 'lastNode', options: {} }, { webhookId: crypto.randomUUID() }),
+    marca: no('Marca ou desmarca', 'n8n-nodes-base.code', 2, { jsCode: ler('../../dre/marca.js').replace('__CHAVE_CONFERIDO__', dreChave()) }),
+    marcar: se('Marcar?', '={{ $json.marcar === true && !!$json.k }}'),
+    gConf: grava('Grava conferido', 'BMH_dre_conferidos'),
+    aConf: no('Apaga conferido', 'n8n-nodes-base.dataTable', 1.1, { operation: 'deleteRows', dataTableId: tabela('BMH_dre_conferidos'), matchType: 'allConditions', filters: { conditions: [{ keyName: 'chave', keyValue: "={{ $('Marca ou desmarca').first().json.k }}" }] } }, { alwaysOutputData: true }),
+    resposta: no('Resposta', 'n8n-nodes-base.code', 2, { jsCode: 'return [{ json: { ok: true } }];' }, { executeOnce: true }),
+    nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · DRE · página\n**Traz:** BMH_dre_mensal, BMH_dre_conferidos e, na aba Lançamentos, o caixa do iGut na hora\n**Envia:** a página da DRE (abas DRE, Fluxo de caixa, Lançamentos) e o Excel\n**Limites:** só lê, menos o "conferido"; não guarda execução\n\nPágina: /webhook/bmh-dre, login da diretoria (decisão do Jorge, 12/11/2026). ?ano=AAAA, ?aba=dfc|lancamentos, ?formato=xlsx, ?atualizar=1 (chama o fluxo de atualização com ?rapido=1). Conferido: POST com a chave interna da página. Regras em integracoes/dre/regras.js.', width: 560, height: 240 }),
+  };
+  const cx = {};
+  for (const [a, b] of [[n.dre, n.pediu], [n.atualiza, n.tab], [n.tab, n.conf], [n.conf, n.calc], [n.calc, n.excel], [n.planilha, n.gera], [n.gera, n.entExcel], [n.mesesL, n.caixaL], [n.caixaL, n.monta], [n.monta, n.entrega],
+    [n.clique, n.marca], [n.marca, n.marcar], [n.gConf, n.resposta], [n.aConf, n.resposta]]) liga(cx, a.name, b.name);
+  const dois = (a, sim, nao) => { cx[a.name] = { main: [[{ node: sim.name, type: 'main', index: 0 }], [{ node: nao.name, type: 'main', index: 0 }]] }; };
+  dois(n.pediu, n.atualiza, n.tab); dois(n.excel, n.planilha, n.lanc); dois(n.lanc, n.mesesL, n.monta); dois(n.marcar, n.gConf, n.aConf);
+  return { name: 'BMH · DRE · página', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none', saveDataErrorExecution: 'none' }) };
+}
+
 // ---------------- fluxo 13: plantões médicos · fechamento do mês ----------------
 const PLANILHA = 'https://sheets.googleapis.com/v4/spreadsheets/1E2DJykq0SAARKh9ci5MEtuCfDsXOzbPAlazjOFO5XKM';
 const SHEETS = () => cred('googleApi', 'BMH · Google (conta de serviço) · Planilha de plantões');
@@ -863,7 +932,7 @@ function fluxoAvaliacoes() {
   const tags = (await api('tags?limit=100', 'GET')).data || []; const tagBMH = tags.find((t) => t.name === 'BMH');
     const so = process.argv.slice(2);   // ex.: node montar.js pagina guardiao (só esses)
   // o alerta vem primeiro: os outros precisam do id dele (errorWorkflow)
-  const fluxos = { alerta: fluxoAlerta, grava: fluxoGrava, pagina: fluxoPagina, igut: fluxoIgut, guardiao: fluxoGuardiao, botoes: fluxoBotoes, resumo: fluxoResumo, medicao: fluxoMedicao, mensal: fluxoMensal, numeros: fluxoNumeros, diretoria: fluxoPainelDiretoria, faturamento: () => fluxoPainelDiretoria('faturamento'), plantoes: fluxoPlantoes, plantoesEmails: fluxoPlantoesEmails, avaliacoes: fluxoAvaliacoes, nota: fluxoNota, vigia: fluxoVigia, organico: fluxoSearchConsole, radar: fluxoRadar, confirmacao: fluxoConfirmacao, origem: fluxoOrigem, recebedor: fluxoRecebedor, conversoes: fluxoConversoes, cliques: fluxoCliques, envio: fluxoEnvioConversoes, conversas: fluxoOrigemConversas, celular: fluxoLembreteCelular };
+  const fluxos = { alerta: fluxoAlerta, grava: fluxoGrava, pagina: fluxoPagina, igut: fluxoIgut, guardiao: fluxoGuardiao, botoes: fluxoBotoes, resumo: fluxoResumo, medicao: fluxoMedicao, mensal: fluxoMensal, numeros: fluxoNumeros, diretoria: fluxoPainelDiretoria, faturamento: () => fluxoPainelDiretoria('faturamento'), dre: fluxoDreAtualiza, drePagina: fluxoDrePagina, plantoes: fluxoPlantoes, plantoesEmails: fluxoPlantoesEmails, avaliacoes: fluxoAvaliacoes, nota: fluxoNota, vigia: fluxoVigia, organico: fluxoSearchConsole, radar: fluxoRadar, confirmacao: fluxoConfirmacao, origem: fluxoOrigem, recebedor: fluxoRecebedor, conversoes: fluxoConversoes, cliques: fluxoCliques, envio: fluxoEnvioConversoes, conversas: fluxoOrigemConversas, celular: fluxoLembreteCelular };
   for (const [chave, monta] of Object.entries(fluxos).filter(([k]) => !so.length || so.includes(k))) {
     const f = comVigia(chave, monta());
     if (!/^BMH · /.test(f.name)) throw new Error('nome sem BMH');
