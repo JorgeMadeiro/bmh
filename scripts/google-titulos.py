@@ -24,7 +24,8 @@ os.chdir(RAIZ)
 ENV = dict(l.strip().split('=', 1) for l in open('.env', encoding='utf8') if '=' in l and not l.startswith('#'))
 MODO = sys.argv[1] if len(sys.argv) > 1 else 'confere'
 VERSAO = sys.argv[2] if len(sys.argv) > 2 else ''
-if MODO == 'grava' and VERSAO not in ('com', 'sem'): sys.exit('diga a versão que o Jorge aprovou: grava sem  ou  grava com')
+if MODO == 'grava' and VERSAO not in ('com', 'sem', 'ambos'): sys.exit('diga a versão que o Jorge aprovou: grava sem, grava com ou grava ambos')
+# ambos (o Jorge, 12/11: "pode" testar as duas): o anúncio atual fica com a versão sem "acelerar" e nasce um 2º anúncio no grupo com a versão com
 CID = ENV.get('GOOGLE_ADS_CUSTOMER_ID', '').replace('-', '')
 if CID != '5066798424': sys.exit(f'GOOGLE_ADS_CUSTOMER_ID do .env não é a conta da BMH ({CID!r})')
 
@@ -41,7 +42,7 @@ SOLTOS = {'Câmara hiperbárica · Brasília': ['Médico Presente em Cada Sessã
           'Asa Sul': ['Hiperbárica Perto da Asa Norte', 'SGAS 613, L2 Sul', 'Médico Presente em Cada Sessão', 'Todos os Dias, das 7h às 19h',
                       'Agende Sua Avaliação Médica']}
 titulos = lambda g, v: FIXO_1[g] + CONV + CICATRIZ + VERSOES[v] + SOLTOS[g]
-TITULOS = {g: titulos(g, VERSAO or 'sem') for g in FIXO_1}
+TITULOS = {g: titulos(g, 'com' if VERSAO == 'com' else 'sem') for g in FIXO_1}
 for g in FIXO_1:
     for v in VERSOES:
         ts = titulos(g, v); assert len(ts) == 15 and len(set(ts)) == 15 and all(len(t) <= 30 for t in ts), (g, v)
@@ -79,7 +80,8 @@ for x in sorted(gaql("SELECT ad_group.name, ad_group_criterion.keyword.text, ad_
 # anúncios responsivos ligados dos dois grupos
 nomes = ', '.join("'" + g.replace("'", "\\'") + "'" for g in TITULOS)
 ads = gaql("SELECT ad_group.name, campaign.name, ad_group_ad.ad.id, ad_group_ad.ad_strength, ad_group_ad.ad.responsive_search_ad.headlines, "
-           f"ad_group_ad.ad.responsive_search_ad.descriptions FROM ad_group_ad WHERE ad_group.name IN ({nomes}) AND ad_group_ad.status = 'ENABLED' "
+           f"ad_group_ad.ad.responsive_search_ad.descriptions, ad_group_ad.ad.responsive_search_ad.path1, ad_group_ad.ad.responsive_search_ad.path2, "
+           f"ad_group_ad.ad.final_urls, ad_group.resource_name FROM ad_group_ad WHERE ad_group.name IN ({nomes}) AND ad_group_ad.status = 'ENABLED' "
            "AND ad_group_ad.ad.type = 'RESPONSIVE_SEARCH_AD' AND campaign.status = 'ENABLED' AND ad_group.status = 'ENABLED'")
 print(f'\n== {len(ads)} anúncios responsivos ligados nos grupos {list(TITULOS)} ==')
 achados = {x['adGroup']['name'] for x in ads}
@@ -111,4 +113,17 @@ for x in depois:
     g, hs = x['adGroup']['name'], x['adGroupAd']['ad']['responsiveSearchAd']['headlines']
     ok = sorted(h['text'] for h in hs) == sorted(TITULOS[g])
     print(f' lido de volta: {g} | {len(hs)} títulos | iguais aos novos: {ok} | força {x["adGroupAd"].get("adStrength")} (pode ficar PENDING) | aprovação {x["adGroupAd"].get("policySummary", {}).get("approvalStatus")}')
+if VERSAO == 'ambos':
+    for x in ads:
+        g, a = x['adGroup']['name'], x['adGroupAd']['ad']; rsa = a['responsiveSearchAd']
+        novo = {'adGroup': x['adGroup']['resourceName'], 'status': 'ENABLED', 'ad': {'finalUrls': a['finalUrls'], 'responsiveSearchAd': {
+                'headlines': [{'text': t, **({'pinnedField': fixo(g, t)} if fixo(g, t) else {})} for t in titulos(g, 'com')],
+                'descriptions': [{k: d[k] for k in ('text', 'pinnedField') if k in d} for d in rsa.get('descriptions', [])],
+                **({'path1': rsa['path1']} if rsa.get('path1') else {}), **({'path2': rsa['path2']} if rsa.get('path2') else {})}}}
+        r = requests.post(f'{URL}/adGroupAds:mutate', headers=G, data=json.dumps({'operations': [{'create': novo}]}), timeout=60)
+        print(f' {g} | 2º anúncio (com "acelerar"):', r.json()['results'][0]['resourceName'] if r.ok else f'RECUSADO {r.status_code} {r.text[:400]}')
+    for x in gaql(f"SELECT ad_group.name, ad_group_ad.ad.id, ad_group_ad.status, ad_group_ad.policy_summary.approval_status, ad_group_ad.ad.responsive_search_ad.headlines "
+                  f"FROM ad_group_ad WHERE ad_group.name IN ({nomes}) AND ad_group_ad.status = 'ENABLED' AND campaign.status = 'ENABLED'"):
+        hs = [h['text'] for h in x['adGroupAd']['ad']['responsiveSearchAd']['headlines']]
+        print(f' lido de volta: {x["adGroup"]["name"]} | anúncio {x["adGroupAd"]["ad"]["id"]} | versão', 'com' if 'Acelere a Cicatrização' in hs else 'sem', '| aprovação', x['adGroupAd'].get('policySummary', {}).get('approvalStatus'))
 print('Uma semana depois: comparar CTR e custo por contato dos dois grupos com a semana de antes (Gerente BMH).')
