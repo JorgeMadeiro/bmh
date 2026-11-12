@@ -11,7 +11,8 @@ Travas (CLAUDE.md da pasta): sem preço, sem antes e depois, sem depoimento, sem
 UHMS/CFM, sem hashtag. O script MARCA o que achar na legenda; paciente no vídeo ou na foto ele não vê: o Jorge confere pelo link.
 
 Uso: python3 scripts/estoque-criativos.py [meses=12]   (VPS pelo cofre; no Mac, com META_ADS_TOKEN no .env)
-Sai em saidas/estoque-criativos-AAAA-MM.md e dados/meta/estoque-criativos-AAAA-MM.json."""
+Sai em saidas/estoque-criativos-AAAA-MM-DD.md e dados/meta/estoque-criativos-AAAA-MM-DD.json, um arquivo por rodada: nunca reescreve
+o de outra rodada (12/11/2026: a conferência escrita no arquivo do mês se perderia no dia 25). Rodou duas vezes no mesmo dia: -2, -3."""
 import datetime, json, os, re, statistics, sys
 import urllib.request, urllib.parse
 
@@ -89,7 +90,9 @@ for f in ('reel', 'feed'):
     for p in g: p['nota'] = round(p['m']['total_interactions'] / mi, 2); p['nota_alcance'] = round(p['m'].get('reach', 0) / ma, 2)
     print(f'{f}: {len(g)} posts | mediana {mi} interações, {ma} de alcance')
 
-MES = HOJE.strftime('%Y-%m')
+DIA, n = HOJE.isoformat(), 1
+while os.path.exists(f'saidas/estoque-criativos-{DIA}{"" if n == 1 else "-" + str(n)}.md'): n += 1
+MES = DIA + ('' if n == 1 else f'-{n}')   # nome da rodada
 os.makedirs('dados/meta', exist_ok=True)
 json.dump([{k: p.get(k) for k in ('id', 'timestamp', 'formato', 'tema', 'nota', 'nota_alcance', 'm', 'travas', 'ja_anuncio', 'permalink', 'like_count')} for p in posts],
           open(f'dados/meta/estoque-criativos-{MES}.json', 'w', encoding='utf8'), ensure_ascii=False, indent=1)

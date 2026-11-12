@@ -26,13 +26,13 @@ item 4). Vale para Nexo e BMH; aqui está o jeito da BMH.
 
 | Onde | Serviço | Criativo no ar | Reservas |
 |---|---|---|---|
-| Meta, campanha de mensagem (`scripts/meta-campanha-mensagens.py`, ainda não criada) | BMH, câmara hiperbárica (geral) | "Presença médica" (p/DRhc0iyjVk3), quando ligar | ver `saidas/estoque-criativos-AAAA-MM.md` |
+| Meta, campanha de mensagem (`scripts/meta-campanha-mensagens.py`, ainda não criada) | BMH, câmara hiperbárica (geral) | "Presença médica" (p/DRhc0iyjVk3), quando ligar | ver o `saidas/estoque-criativos-AAAA-MM-DD.md` mais recente |
 
 O Google Ads é de pesquisa, com anúncio de texto: não entra no estoque de criativos.
 
 ## Dia 25
 
-1. `python3 scripts/estoque-criativos.py` (VPS pelo cofre, ou Mac com `META_ADS_TOKEN`). Sai `saidas/estoque-criativos-AAAA-MM.md`:
+1. `python3 scripts/estoque-criativos.py` (VPS pelo cofre, ou Mac com `META_ADS_TOKEN`). Sai `saidas/estoque-criativos-AAAA-MM-DD.md` (um por rodada; a conferência da rotina vai no fim desse arquivo):
    cada post dos últimos 12 meses com nota contra a mediana do mesmo formato, tema, travas da legenda e se já foi anúncio.
 2. Contar as reservas aptas por serviço anunciado (nota 1,5 ou mais, sem trava que bloqueia). Duas ou mais: estoque cheio, nada a fazer.
    O criativo no ar só sai se estiver cansado pelo critério do item 4 (custo por conversa), nunca só pela frequência.
