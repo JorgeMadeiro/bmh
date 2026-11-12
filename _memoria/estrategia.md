@@ -57,3 +57,8 @@ Terça — Asa Sul. Quinta — Taguatinga.
   versão 9, sem o Analytics e o Clarity da agência. A partir daí, qualquer alteração de terceiro no Google Ads ou na
   Meta é estranha, e os guardiões avisam.
 
+
+## Decisões de 12/11/2026
+
+- **Abriu ou parou uma especialidade ou serviço: na mesma semana, atualizar o Google e o Meta** (palavras-chave, grupos,
+  negativas), junto com o site e o atendimento (regra do Jorge para todas as marcas, no livro da Central).
