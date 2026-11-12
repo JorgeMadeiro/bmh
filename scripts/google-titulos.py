@@ -1,13 +1,20 @@
-"""Títulos novos nos anúncios de pesquisa da BMH (pedido do Jorge de 12/11/2026, livro da Central commit daad21a: "pode ajustar").
+"""Títulos novos nos anúncios de pesquisa da BMH (Jorge, 12/11/2026, livro da Central: "pode ajustar", e a correção do mesmo dia).
 As duas palavras-chave que mais gastam ("hiperbárica" e "câmara hiperbárica") têm nota 5 com CTR esperado abaixo da média; o anúncio do
 grupo "Câmara hiperbárica · Brasília" está com força "média" e o do "Concorrentes" com força "fraca". Troca só os TÍTULOS dos anúncios
-responsivos ligados desses dois grupos (as descrições ficam): 15 títulos, 3 deles fixos na 1ª posição, todos com a palavra buscada.
-Regras da pasta: sem preço, sem promessa, indicação só da lista UHMS e CFM, nenhuma marca de concorrente (o Google restringe marca de
-terceiro no texto), CFM como aviso ("Clínica pioneira" ficou de fora por isso). Convênios fixos na 2ª posição (Jorge, 12/11).
+responsivos ligados de 3 grupos (as descrições ficam): Câmara hiperbárica · Brasília, Concorrentes e Asa Sul. 15 títulos cada.
+- 1ª posição fixa: a palavra buscada ("hiperbárica"; no Asa Sul, a unidade). Sem grupo novo para a Asa Norte: no Asa Sul entra, solto,
+  "Hiperbárica Perto da Asa Norte" (honesto: a unidade é a da L2 Sul, perto).
+- 2ª posição fixa: CONVÊNIOS ("Atendemos 50 Convênios", "Consulte Seu Convênio"; a página da unidade diz "50 convênios atendidos").
+- Ângulo: o paciente chega querendo MELHORAR e ACELERAR A CICATRIZAÇÃO (pós-operatório de plástica, capilar e parecidos).
+  Duas versões, para o Jorge escolher (CFM é aviso: "acelerar" pode soar como promessa):
+    sem: "Oxigênio para a Cicatrização" e "Apoio à Cicatrização"
+    com: "Acelere a Cicatrização" e "Cicatrização Mais Rápida"
+  Aviso também de indicação: pós-operatório em geral não está na lista UHMS e CFM (retalho e enxerto comprometidos estão); o Jorge decide.
+Sem preço e sem marca de concorrente (o Google restringe marca de terceiro no texto).
 
-Uso, na pasta da BMH (lê as GOOGLE_ADS_* do .env, como o aplica-bmh-mac.py):
-  python3 scripts/google-titulos.py          confere: nota das palavras, anúncios atuais (títulos, força) e os títulos novos, lado a lado
-  python3 scripts/google-titulos.py grava    guarda a cópia de antes em dados/google-ads-copias/ e troca os títulos; lê de volta
+Uso, na pasta da BMH (lê as GOOGLE_ADS_* do .env):
+  python3 scripts/google-titulos.py               confere: nota das palavras, anúncios atuais (títulos, força) e os novos, nas duas versões
+  python3 scripts/google-titulos.py grava sem     (ou "grava com") guarda a cópia de antes em dados/google-ads-copias/, troca os títulos e lê de volta
 Voltar atrás: regravar os títulos da cópia de antes (mesmo comando de mutate, com os textos antigos)."""
 import datetime, json, os, sys
 import requests
@@ -16,24 +23,29 @@ RAIZ = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), 
 os.chdir(RAIZ)
 ENV = dict(l.strip().split('=', 1) for l in open('.env', encoding='utf8') if '=' in l and not l.startswith('#'))
 MODO = sys.argv[1] if len(sys.argv) > 1 else 'confere'
+VERSAO = sys.argv[2] if len(sys.argv) > 2 else ''
+if MODO == 'grava' and VERSAO not in ('com', 'sem'): sys.exit('diga a versão que o Jorge aprovou: grava sem  ou  grava com')
 CID = ENV.get('GOOGLE_ADS_CUSTOMER_ID', '').replace('-', '')
 if CID != '5066798424': sys.exit(f'GOOGLE_ADS_CUSTOMER_ID do .env não é a conta da BMH ({CID!r})')
 
-FIXOS = ['Câmara Hiperbárica em Brasília', 'Hiperbárica em Brasília', 'Medicina Hiperbárica Brasília']
-TITULOS = {
-    'Câmara hiperbárica · Brasília': FIXOS + ['Médico Presente em Cada Sessão', 'Unidades Asa Sul e Taguatinga', 'Agende Sua Avaliação Médica',
-        'Mais de 20 Anos em Brasília', 'Normas do CFM e da SBMH', 'Atendemos 50 Convênios', 'Feridas que Não Cicatrizam', 'Retalhos e Enxertos',
-        'Lesões por Radioterapia', 'Pé Diabético e Osteomielite', 'Consulte Seu Convênio', 'Avaliação Antes do Tratamento'],
-    'Concorrentes': ['Câmara Hiperbárica em Brasília', 'Medicina Hiperbárica Brasília', 'Oxigenoterapia Hiperbárica DF', 'Médico Presente em Cada Sessão',
-        'Mais de 20 Anos em Brasília', 'Unidades Asa Sul e Taguatinga', 'Normas do CFM e da SBMH', 'Equipe Médica e Enfermagem', 'Consulte Seu Convênio',
-        'Agende Sua Avaliação Médica', 'Atendemos 50 Convênios', 'Avaliação Antes do Tratamento', 'Feridas que Não Cicatrizam', 'Retalhos e Enxertos',
-        'Lesões por Radioterapia'],
-}
-FIXO_1 = {'Câmara hiperbárica · Brasília': set(FIXOS), 'Concorrentes': {'Câmara Hiperbárica em Brasília', 'Medicina Hiperbárica Brasília', 'Oxigenoterapia Hiperbárica DF'}}
-# convênios na 2ª posição (Jorge, 12/11/2026: "os convênios são um grande diferencial"; a página da unidade diz "50 convênios atendidos")
-FIXO_2 = {'Atendemos 50 Convênios', 'Consulte Seu Convênio'}
-for g, ts in TITULOS.items():
-    assert len(ts) == 15 and len(set(ts)) == 15 and all(len(t) <= 30 for t in ts), g
+CONV = ['Atendemos 50 Convênios', 'Consulte Seu Convênio']                       # 2ª posição
+CICATRIZ = ['Cicatrização no Pós-Operatório', 'Pós-Operatório de Plástica', 'Pós-Cirúrgico e Capilar']
+VERSOES = {'sem': ['Oxigênio para a Cicatrização', 'Apoio à Cicatrização'], 'com': ['Acelere a Cicatrização', 'Cicatrização Mais Rápida']}
+FIXO_1 = {'Câmara hiperbárica · Brasília': ['Câmara Hiperbárica em Brasília', 'Hiperbárica em Brasília', 'Medicina Hiperbárica Brasília'],
+          'Concorrentes': ['Câmara Hiperbárica em Brasília', 'Medicina Hiperbárica Brasília', 'Oxigenoterapia Hiperbárica DF'],
+          'Asa Sul': ['Hiperbárica na Asa Sul', 'Câmara Hiperbárica Asa Sul', 'Unidade Asa Sul, na L2 Sul']}
+SOLTOS = {'Câmara hiperbárica · Brasília': ['Médico Presente em Cada Sessão', 'Unidades Asa Sul e Taguatinga', 'Feridas que Não Cicatrizam',
+                                            'Agende Sua Avaliação Médica', 'Mais de 20 Anos em Brasília'],
+          'Concorrentes': ['Médico Presente em Cada Sessão', 'Mais de 20 Anos em Brasília', 'Unidades Asa Sul e Taguatinga', 'Normas do CFM e da SBMH',
+                           'Agende Sua Avaliação Médica'],
+          'Asa Sul': ['Hiperbárica Perto da Asa Norte', 'SGAS 613, L2 Sul', 'Médico Presente em Cada Sessão', 'Todos os Dias, das 7h às 19h',
+                      'Agende Sua Avaliação Médica']}
+titulos = lambda g, v: FIXO_1[g] + CONV + CICATRIZ + VERSOES[v] + SOLTOS[g]
+TITULOS = {g: titulos(g, VERSAO or 'sem') for g in FIXO_1}
+for g in FIXO_1:
+    for v in VERSOES:
+        ts = titulos(g, v); assert len(ts) == 15 and len(set(ts)) == 15 and all(len(t) <= 30 for t in ts), (g, v)
+fixo = lambda g, t: 'HEADLINE_1' if t in FIXO_1[g] else 'HEADLINE_2' if t in CONV else None
 
 d = json.load(open(ENV['GOOGLE_ADS_OAUTH_CLIENTE'], encoding='utf8')); cli = d.get('installed') or d.get('web')
 t = requests.post('https://oauth2.googleapis.com/token', data={'client_id': cli['client_id'], 'client_secret': cli['client_secret'],
@@ -78,16 +90,18 @@ for x in ads:
     antes = a['responsiveSearchAd'].get('headlines', [])
     print(f'\n {x["campaign"]["name"]} › {g} | anúncio {a["id"]} | força {x["adGroupAd"].get("adStrength")}')
     print('   antes:', ' · '.join(h['text'] + (' [1º]' if h.get('pinnedField') == 'HEADLINE_1' else '') for h in antes))
-    print('   novos:', ' · '.join(t + (' [1º]' if t in FIXO_1[g] else ' [2º]' if t in FIXO_2 else '') for t in TITULOS[g]))
-if MODO != 'grava': sys.exit('\nconferido. Para trocar: python3 scripts/google-titulos.py grava')
+    for v in VERSOES:
+        print(f'   novos ({v} "acelerar"):', ' · '.join(t + {'HEADLINE_1': ' [1º]', 'HEADLINE_2': ' [2º]'}.get(fixo(g, t), '') for t in titulos(g, v)))
+if MODO != 'grava': sys.exit('\nconferido. Para trocar, com a versão que o Jorge aprovar: python3 scripts/google-titulos.py grava sem  (ou grava com)')
 
 os.makedirs(os.path.join('dados', 'google-ads-copias'), exist_ok=True)
 copia = os.path.join('dados', 'google-ads-copias', f'{datetime.date.today().isoformat()}-titulos-antes.json')
+print(f'versão gravada: {VERSAO} "acelerar"')
 json.dump(ads, open(copia, 'w', encoding='utf8'), ensure_ascii=False, indent=1)
 print('\ncópia de antes em', copia)
 for x in ads:
     g, a = x['adGroup']['name'], x['adGroupAd']['ad']
-    novos = [{'text': t, **({'pinnedField': 'HEADLINE_1'} if t in FIXO_1[g] else {'pinnedField': 'HEADLINE_2'} if t in FIXO_2 else {})} for t in TITULOS[g]]
+    novos = [{'text': t, **({'pinnedField': fixo(g, t)} if fixo(g, t) else {})} for t in TITULOS[g]]
     r = requests.post(f'{URL}/ads:mutate', headers=G, data=json.dumps({'operations': [{'update': {'resourceName': f'customers/{CID}/ads/{a["id"]}',
                       'responsiveSearchAd': {'headlines': novos}}, 'updateMask': 'responsive_search_ad.headlines'}]}), timeout=60)
     print(f' {g} | anúncio {a["id"]}:', 'trocado' if r.ok else f'RECUSADO {r.status_code} {r.text[:300]}')
