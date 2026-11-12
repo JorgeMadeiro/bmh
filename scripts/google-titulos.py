@@ -3,7 +3,7 @@ As duas palavras-chave que mais gastam ("hiperbárica" e "câmara hiperbárica")
 grupo "Câmara hiperbárica · Brasília" está com força "média" e o do "Concorrentes" com força "fraca". Troca só os TÍTULOS dos anúncios
 responsivos ligados desses dois grupos (as descrições ficam): 15 títulos, 3 deles fixos na 1ª posição, todos com a palavra buscada.
 Regras da pasta: sem preço, sem promessa, indicação só da lista UHMS e CFM, nenhuma marca de concorrente (o Google restringe marca de
-terceiro no texto), CFM como aviso ("Clínica pioneira" ficou de fora por isso).
+terceiro no texto), CFM como aviso ("Clínica pioneira" ficou de fora por isso). Convênios fixos na 2ª posição (Jorge, 12/11).
 
 Uso, na pasta da BMH (lê as GOOGLE_ADS_* do .env, como o aplica-bmh-mac.py):
   python3 scripts/google-titulos.py          confere: nota das palavras, anúncios atuais (títulos, força) e os títulos novos, lado a lado
@@ -22,14 +22,16 @@ if CID != '5066798424': sys.exit(f'GOOGLE_ADS_CUSTOMER_ID do .env não é a cont
 FIXOS = ['Câmara Hiperbárica em Brasília', 'Hiperbárica em Brasília', 'Medicina Hiperbárica Brasília']
 TITULOS = {
     'Câmara hiperbárica · Brasília': FIXOS + ['Médico Presente em Cada Sessão', 'Unidades Asa Sul e Taguatinga', 'Agende Sua Avaliação Médica',
-        'Mais de 20 Anos em Brasília', 'Normas do CFM e da SBMH', 'Fale Conosco pelo WhatsApp', 'Feridas que Não Cicatrizam', 'Retalhos e Enxertos',
-        'Lesões por Radioterapia', 'Pé Diabético e Osteomielite', 'Equipe Médica e Enfermagem', 'Avaliação Antes do Tratamento'],
+        'Mais de 20 Anos em Brasília', 'Normas do CFM e da SBMH', 'Atendemos 50 Convênios', 'Feridas que Não Cicatrizam', 'Retalhos e Enxertos',
+        'Lesões por Radioterapia', 'Pé Diabético e Osteomielite', 'Consulte Seu Convênio', 'Avaliação Antes do Tratamento'],
     'Concorrentes': ['Câmara Hiperbárica em Brasília', 'Medicina Hiperbárica Brasília', 'Oxigenoterapia Hiperbárica DF', 'Médico Presente em Cada Sessão',
-        'Mais de 20 Anos em Brasília', 'Unidades Asa Sul e Taguatinga', 'Normas do CFM e da SBMH', 'Equipe Médica e Enfermagem', 'Protocolos de Segurança',
-        'Agende Sua Avaliação Médica', 'Fale Conosco pelo WhatsApp', 'Avaliação Antes do Tratamento', 'Feridas que Não Cicatrizam', 'Retalhos e Enxertos',
+        'Mais de 20 Anos em Brasília', 'Unidades Asa Sul e Taguatinga', 'Normas do CFM e da SBMH', 'Equipe Médica e Enfermagem', 'Consulte Seu Convênio',
+        'Agende Sua Avaliação Médica', 'Atendemos 50 Convênios', 'Avaliação Antes do Tratamento', 'Feridas que Não Cicatrizam', 'Retalhos e Enxertos',
         'Lesões por Radioterapia'],
 }
 FIXO_1 = {'Câmara hiperbárica · Brasília': set(FIXOS), 'Concorrentes': {'Câmara Hiperbárica em Brasília', 'Medicina Hiperbárica Brasília', 'Oxigenoterapia Hiperbárica DF'}}
+# convênios na 2ª posição (Jorge, 12/11/2026: "os convênios são um grande diferencial"; a página da unidade diz "50 convênios atendidos")
+FIXO_2 = {'Atendemos 50 Convênios', 'Consulte Seu Convênio'}
 for g, ts in TITULOS.items():
     assert len(ts) == 15 and len(set(ts)) == 15 and all(len(t) <= 30 for t in ts), g
 
@@ -76,7 +78,7 @@ for x in ads:
     antes = a['responsiveSearchAd'].get('headlines', [])
     print(f'\n {x["campaign"]["name"]} › {g} | anúncio {a["id"]} | força {x["adGroupAd"].get("adStrength")}')
     print('   antes:', ' · '.join(h['text'] + (' [1º]' if h.get('pinnedField') == 'HEADLINE_1' else '') for h in antes))
-    print('   novos:', ' · '.join(t + (' [1º]' if t in FIXO_1[g] else '') for t in TITULOS[g]))
+    print('   novos:', ' · '.join(t + (' [1º]' if t in FIXO_1[g] else ' [2º]' if t in FIXO_2 else '') for t in TITULOS[g]))
 if MODO != 'grava': sys.exit('\nconferido. Para trocar: python3 scripts/google-titulos.py grava')
 
 os.makedirs(os.path.join('dados', 'google-ads-copias'), exist_ok=True)
@@ -85,7 +87,7 @@ json.dump(ads, open(copia, 'w', encoding='utf8'), ensure_ascii=False, indent=1)
 print('\ncópia de antes em', copia)
 for x in ads:
     g, a = x['adGroup']['name'], x['adGroupAd']['ad']
-    novos = [{'text': t, **({'pinnedField': 'HEADLINE_1'} if t in FIXO_1[g] else {})} for t in TITULOS[g]]
+    novos = [{'text': t, **({'pinnedField': 'HEADLINE_1'} if t in FIXO_1[g] else {'pinnedField': 'HEADLINE_2'} if t in FIXO_2 else {})} for t in TITULOS[g]]
     r = requests.post(f'{URL}/ads:mutate', headers=G, data=json.dumps({'operations': [{'update': {'resourceName': f'customers/{CID}/ads/{a["id"]}',
                       'responsiveSearchAd': {'headlines': novos}}, 'updateMask': 'responsive_search_ad.headlines'}]}), timeout=60)
     print(f' {g} | anúncio {a["id"]}:', 'trocado' if r.ok else f'RECUSADO {r.status_code} {r.text[:300]}')
