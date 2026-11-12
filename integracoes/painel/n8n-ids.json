@@ -13,7 +13,8 @@
   "BMH · Painel da diretoria (login)": "k6Pl3BeEQY0FqgAf",
   "BMH · Google (conta de serviço) · Planilha de plantões": "E42Jp1xYUO9zrwNK",
   "BMH · Evolution · instância BMH Recepção": "GYuNAwU2LuHEWwav",
-  "BMH · OpenAI · transcrição de áudio": "BCQHYmA4sTMnylir"
+  "BMH · OpenAI · transcrição de áudio": "BCQHYmA4sTMnylir",
+  "BMH · Painel do faturamento (login)": "RVFzm3Lmx9LCg9Z9"
  },
  "tabelas": {
   "BMH_config": "V4NRHS9mc1kvigix",
@@ -80,7 +81,8 @@
   "cliques": "RPhtJXgsrcEHVAD9",
   "envio": "JPeyXTZTqTgq5Unz",
   "conversas": "3XdFaCRJ2qbvdRHE",
-  "celular": "y15BzNHpuNDUyL93"
+  "celular": "y15BzNHpuNDUyL93",
+  "faturamento": "5mh4lPPJv17bEC7N"
  },
  "whatsapp": {
   "caminho": "bmh-whatsapp-daeff8542cee5cef6c6a8832",
@@ -91,7 +93,8 @@
  },
  "diretoria": {
   "atualiza": "bmh-diretoria-atualiza-a75690890abbc2a3",
-  "lista": "bmh-diretoria-lista-16b46c238eb57708"
+  "lista": "bmh-diretoria-lista-16b46c238eb57708",
+  "lista_faturamento": "bmh-faturamento-lista-e82ea2d37d3074b8"
  },
  "agenda": {
   "confirmacao": "bmh-agenda-confirmacao-fd9ae869dd12"

@@ -4,6 +4,9 @@
 //   Particular: faturado e recebido no ato (cartão, D+1). Convênio: pago → recebido (menos glosa); em lote e não pago →
 //   a receber (menos glosa); sem lote → a faturar. Só totais: nenhum dado de paciente sai deste nó.
 const n = (v) => Number(v) || 0;
+// sessão = oxigenoterapia (tipo ou descrição) ou item lançado numa agenda de câmara (10/11/2026): consulta, retorno,
+// telemedicina, guia e avaliação da agenda CONSULTAS entram no valor, mas não contam como sessão
+const ehSessao = (x) => /oxigenoterapia/i.test(String(x.TIPO || '') + ' ' + String(x.descricao || '')) || /multiplace|monoplace/i.test(String(x.profissional || ''));
 const UNI = (s) => (/taguatinga/i.test(s || '') ? 'Taguatinga' : /l2 sul|asa sul/i.test(s || '') ? 'Asa Sul' : null);
 const meses = $('Meses').all().map((i) => i.json.mes), resp = $('BI do mês').all(), agora = $now.toISO();
 // sessão sem nome de convênio no BI (raro: 9 em 3 anos): tenta pelo código do convênio na lista do iGut
@@ -21,7 +24,7 @@ meses.forEach((mes, k) => {
     const particular = /particular/i.test(nomeBruto), conv = particular ? 'PARTICULAR' : nomeBruto || 'Sem convênio no iGut';
     const v = n(x.totalproduzido), g = particular ? 0 : n(x.total_glosa);
     const r = (out[mes + '|' + u + '|' + conv] ||= { chave: mes + '|' + u + '|' + conv, mes, unidade: u, convenio: conv, sessoes: 0, produzido: 0, faturado: 0, a_faturar: 0, recebido: 0, a_receber: 0, glosado: 0, atualizado_em: agora });
-    r.sessoes++; r.produzido += v;
+    if (ehSessao(x)) r.sessoes++; r.produzido += v;
     if (particular) { r.faturado += v; r.recebido += v; }
     else if (x.pago === 'S') { r.faturado += v; r.recebido += v - g; r.glosado += g; }
     else if (x.lote) { r.faturado += v; r.a_receber += v - g; r.glosado += g; }

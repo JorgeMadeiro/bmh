@@ -31,6 +31,41 @@
   do paciente (vem na API). Visitadora: falta a tabela médico → visitadora (secundário).
 - Execuções com sucesso do fluxo mensal e do fluxo de produção não ficam guardadas (têm dado de paciente); erro continua guardado.
 
+## Painel do faturamento (10/11/2026)
+
+- **Pedido do Jorge:** login para a equipe de faturamento sem valores, em número de sessões, sem a Operação e com as mesmas
+  subdivisões (unidade, convênio, período, lotes e pacientes).
+- **Página:** `/webhook/bmh-faturamento` (fluxo "BMH · Faturamento (painel)", `5mh4lPPJv17bEC7N`), credencial
+  "BMH · Painel do faturamento (login)" (`RVFzm3Lmx9LCg9Z9`); usuário e senha só no `.env` (`grep PAINEL_FATURAMENTO .env`).
+  É o mesmo `painel-diretoria.js` e o mesmo `lote-pacientes.js` no modo "faturamento" (`montar.js faturamento`).
+- **Sem R$ nem escondido:** o servidor monta os dados já em sessões; nenhum valor vai para a página nem para a lista de
+  pacientes (endereço e chave próprios, `lista_fat` em `BMH_diretoria_chave`).
+- **Como as sessões são contadas:** produzido = sessões do mês; a faturar, recebido, a receber e glosado vêm dos lotes
+  (`BMH_financeiro_detalhe`); faturado = recebido + a receber; particular = recebido. A glosa é parcial: a sessão glosada
+  também está em recebido ou a receber (conferido em 10/11/2026: 821 de 871 mês × unidade × convênio somam o total; nos
+  outros 50 a diferença é exatamente a glosa). % = sessões recebidas ÷ produzidas. Prazo de recebimento: média ponderada
+  pelas sessões pagas.
+- **Voucher e cortesia (Jorge, 10/11/2026: tirar só do a faturar, "no produzido e recebido ele entra"):** o convênio
+  "VOUCHER - CORTESIA" (817 sessões no histórico, todas "a faturar" no iGut, R$ 400 de produção) conta no produzido e no
+  recebido, como o particular, e nunca no a faturar nem nas listas de atrasado. A lista de pacientes dele abre pelo recebido
+  (no iGut as linhas estão "a faturar"). O painel da diretoria não muda.
+- **Só sessão conta como sessão (Jorge, 10/11/2026: "o a faturar está divergente"):** a produção do iGut traz também itens
+  da agenda CONSULTAS: consulta médica cobrada (código 10101012, ~R$ 89) e, com valor zero, retorno, telemedicina,
+  guia/relatório e avaliação sem custo. Eles contavam como "1 sessão" e apareciam no a faturar do faturamento (na diretoria
+  não, porque valem R$ 0). Desde 10/11/2026 `financeiro-monta.js`, `financeiro-detalhe.js` e `financeiro-paciente.js` só
+  contam sessão quando o tipo ou a descrição diz oxigenoterapia ou o item é de agenda de câmara (MULTIPLACE ou MONOPLACE);
+  o valor em R$ continua com tudo (a diretoria não muda). Conferido no iGut em fev/25, set/26 e out/26: a regra separa todos
+  os tipos; out/26 passou de 1.590 para 1.586 sessões, com R$ 668.761 igual. Histórico recarregado mês a mês
+  (`?so=financeiro&mes=`). Na diretoria, linha só de consulta aparece como "consulta" em vez de "0 sessões". As avaliações
+  gratuitas (~170 por mês) não vêm na produção do iGut. "CONSULTAS", "MULTIPLACE" e "MONOPLACE" ao lado do paciente são o
+  campo médico solicitante preenchido com o nome da agenda no iGut (340 sessões sem CRM em out/2026).
+- **Na Central (10/11/2026):** `/paineis/bmh-faturamento` (porteiro, segredo `central_painel_bmh_faturamento` criado pelo
+  `subir.sh` a partir do `.env` da BMH); código em `Jorge_Claude_VsCode/scripts/central/`.
+- **Conferido em 10/11/2026 no endereço publicado:** sem login 401; login do faturamento 200, sem nenhum "R$" na tela,
+  nov/26 com 495 produzidas = 154 faturadas + 341 a faturar; lista de pacientes com nome, sessões, dias e médicos, sem
+  valor; chave errada 403; login do faturamento no painel da diretoria 401. O painel da diretoria não mudou (dados
+  idênticos na simulação; fluxo no n8n intocado).
+
 ## Painel da diretoria (09/10/2026)
 
 - **Página:** `/webhook/bmh-diretoria` (fluxo "BMH · Diretoria (painel)", `26y4Uo2WLAAqpK70`), login próprio da diretoria

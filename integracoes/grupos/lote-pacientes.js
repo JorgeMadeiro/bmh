@@ -3,8 +3,10 @@
 // de cópia se o iGut cair. Antes consultava o iGut na hora: nome de paciente não fica em tabela nem no histórico do n8n (execução com sucesso não é salva).
 // Parâmetros: mes=AAAA-MM, unidade, convenio, situacao (a_faturar | a_receber | recebido | glosado), lote (ou "-").
 // vem pelo endereço da lista (com a chave do dia, desde 22/10/2026) ou pelo do painel (com login)
+// painel do faturamento (10/11/2026): o montador troca o marcador de modo, abaixo; lá a lista sai só com sessões, sem nenhum valor
+const MODO = '__MODO__', FAT = MODO === 'faturamento';
 let q = {}; try { q = $('Lista de pacientes (webhook)').first().json.query || {}; } catch (e) {}
-if (!q.mes) { try { q = $('Painel da diretoria').first().json.query || {}; } catch (e) {} }
+if (!q.mes) { try { q = $(FAT ? 'Painel do faturamento' : 'Painel da diretoria').first().json.query || {}; } catch (e) {} }
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const n = (v) => Number(v) || 0;
 const MES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
@@ -14,7 +16,9 @@ const NOME_SIT = { a_faturar: 'A faturar', a_receber: 'A receber', recebido: 'Re
 const datas = (d) => { const fim = '/' + String(q.mes).slice(5, 7) + '/' + String(q.mes).slice(2, 4), dd = (x) => String(x).padStart(2, '0') + fim; d = [...new Set(d)].sort((a, b) => a - b); const o = []; for (let i = 0; i < d.length; i++) { let j = i; while (j + 1 < d.length && d[j + 1] === d[j] + 1) j++; o.push(j > i + 1 ? dd(d[i]) + ' a ' + dd(d[j]) : j === i + 1 ? dd(d[i]) + ', ' + dd(d[j]) : dd(d[i])); i = j; } return o.join(', '); };
 const brl = (v) => 'R$ ' + Math.round(v).toLocaleString('pt-BR');
 // lê a tabela gravada às 23h40 (BMH_financeiro_paciente): abre na hora e funciona mesmo com o iGut fora do ar
-const linhasTab = $('Pacientes do lote (tabela)').all().map((i) => i.json).filter((r) => r && r.mes === q.mes && r.unidade === q.unidade && r.convenio === q.convenio && r.situacao === q.situacao && String(r.lote) === String(q.lote || '-') && n(r.valor) > 0);
+// no faturamento a cortesia (voucher) aparece como recebida, mas no iGut ela fica sem lote, "a faturar" (10/11/2026)
+const sitTab = FAT && q.situacao === 'recebido' && /voucher|cortesia/i.test(q.convenio || '') ? 'a_faturar' : q.situacao;
+const linhasTab = $('Pacientes do lote (tabela)').all().map((i) => i.json).filter((r) => r && r.mes === q.mes && r.unidade === q.unidade && r.convenio === q.convenio && r.situacao === sitTab && String(r.lote) === String(q.lote || '-') && (FAT ? n(r.sessoes) > 0 : n(r.valor) > 0));
 const pac = {};
 for (const r of linhasTab) {
   const p = (pac[r.paciente_id || r.paciente] ||= { nome: r.paciente, sessoes: 0, valor: 0, dias: [], medicos: new Set() });
@@ -27,10 +31,10 @@ let atualizado = ''; try { atualizado = $('Fim da última atualização').all().
 const ps = Object.values(pac).sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
 const total = ps.reduce((s, p) => s + p.valor, 0), sessoes = ps.reduce((s, p) => s + p.sessoes, 0);
 const titulo = `${NOME_SIT[q.situacao] || ''} · ${q.lote && q.lote !== '-' ? 'Lote ' + q.lote + ' · ' : ''}${q.convenio === 'PARTICULAR' ? 'Particular (cartão)' : q.convenio || ''}`;
-const sub = `${nomeMes(q.mes)} · ${q.unidade} · ${ps.length} ${ps.length === 1 ? 'paciente' : 'pacientes'} · ${sessoes} sessões · ${brl(total)}${atualizado ? ' · dados de ' + DateTime.fromISO(atualizado).setZone('America/Sao_Paulo').toFormat('dd/LL HH:mm') : ''}`;
+const sub = `${nomeMes(q.mes)} · ${q.unidade} · ${ps.length} ${ps.length === 1 ? 'paciente' : 'pacientes'} · ${sessoes} sessões${FAT ? '' : ' · ' + brl(total)}${atualizado ? ' · dados de ' + DateTime.fromISO(atualizado).setZone('America/Sao_Paulo').toFormat('dd/LL HH:mm') : ''}`;
 // texto para copiar e mandar à equipe (WhatsApp)
-const texto = [`*${titulo}*`, sub, '', ...ps.map((p) => `• ${p.nome} — ${p.sessoes} ${p.sessoes === 1 ? 'sessão' : 'sessões'} (${datas(p.dias)}) — ${brl(p.valor)}`)].join('\n');
-const linhas = ps.map((p) => `<li><div><b>${esc(p.nome)}</b><span>${p.sessoes} ${p.sessoes === 1 ? 'sessão' : 'sessões'} · ${esc(datas(p.dias))}${p.medicos.size ? ' · ' + esc([...p.medicos].join(', ')) : ''}</span></div><strong>${brl(p.valor)}</strong></li>`).join('');
+const texto = [`*${titulo}*`, sub, '', ...ps.map((p) => `• ${p.nome} — ${p.sessoes} ${p.sessoes === 1 ? 'sessão' : 'sessões'} (${datas(p.dias)})${FAT ? '' : ' — ' + brl(p.valor)}`)].join('\n');
+const linhas = ps.map((p) => `<li><div><b>${esc(p.nome)}</b><span>${p.sessoes ? p.sessoes + (p.sessoes === 1 ? ' sessão' : ' sessões') : 'consulta'} · ${esc(datas(p.dias))}${p.medicos.size ? ' · ' + esc([...p.medicos].join(', ')) : ''}</span></div>${FAT ? '' : `<strong>${brl(p.valor)}</strong>`}</li>`).join('');
 const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>BMH · Lote</title><meta name="robots" content="noindex,nofollow">
 <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>*{box-sizing:border-box}body{margin:0;background:#fff;color:#142033;font:15px/1.45 'Libre Franklin',system-ui,sans-serif}header{background:#00143F;color:#fff;padding:12px 16px}header h1{margin:0;font-size:18px;font-weight:800}header p{margin:4px 0 0;color:#C9D6E6;font-size:13px}
@@ -42,5 +46,5 @@ ${ps.length ? '<ul>' + linhas + '</ul>' : '<p>Nenhum paciente nessa situação (
 <p class="aviso">Dado de paciente: não encaminhar fora da equipe responsável.</p></main>
 </body></html>`;
 // o painel pede em JSON (?formato=json) e mostra dentro da própria janela de detalhe
-const dados = { titulo, sub, texto, pacientes: ps.map((p) => ({ nome: p.nome, sessoes: p.sessoes, dias: datas(p.dias), medicos: [...p.medicos].join(', '), valor: Math.round(p.valor) })) };
+const dados = { titulo, sub, texto, pacientes: ps.map((p) => ({ nome: p.nome, sessoes: p.sessoes, dias: datas(p.dias), medicos: [...p.medicos].join(', '), ...(FAT ? {} : { valor: Math.round(p.valor) }) })) };
 return [{ json: q.formato === 'json' ? { corpo: JSON.stringify(dados), tipo: 'application/json; charset=utf-8' } : { corpo: html, tipo: 'text/html; charset=utf-8' } }];
