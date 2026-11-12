@@ -71,3 +71,22 @@ Paciente no vídeo ou na foto o script não vê: conferir pelo link antes de usa
 | não | não | 0,65 | 0,4 | reel | 25/08/26 | caso de paciente | Alguns casos realmente nos marcam. Esse foi um deles. A evol | https://www.instagram.com/reel/DceyPQkxJZN/ |
 | não | não | 0,04 | 0,1 | reel | 19/08/26 | nenhuma |  | https://www.instagram.com/reel/DcNB0qmRTJf/ |
 
+
+## Conferência da rotina (12/11/2026, rodada automática da VPS)
+
+Serviço anunciado: BMH, câmara hiperbárica (geral), Meta, campanha de mensagem (ainda não criada). Criativo previsto: "Presença médica"
+(p/DRhc0iyjVk3, nota 4,92). Sem campanha no ar, não há custo por conversa para julgar cansaço.
+
+Reservas aptas no tema "Como funciona e segurança" (nota 1,5 ou mais, sem trava que bloqueia), fora o criativo previsto: **6**.
+
+| Nota | Formato | Aviso | Link |
+|---|---|---|---|
+| 3,23 | feed | promessa (aviso do CFM) | https://www.instagram.com/p/DRPGp7BDQ01/ |
+| 2,54 | feed | nenhum | https://www.instagram.com/p/DShgFqNjsvn/ |
+| 2,38 | feed | nenhum | https://www.instagram.com/p/DZNQnHzReO_/ |
+| 1,93 | reel | nenhum (reserva já anotada no script da campanha, "Sair da câmara") | https://www.instagram.com/reel/DagxUivRtyb/ |
+| 1,77 | feed | pós-op genérico (indicação fora da lista?) | https://www.instagram.com/p/DX_rFUbEYRj/ |
+| 1,64 | reel | promessa (aviso do CFM); já foi anúncio ("Avião sem piloto") | https://www.instagram.com/reel/DaDb5xxxW1e/ |
+
+**Estoque cheio** (mínimo de 2 a 4): nada a repor, nenhum roteiro novo. Nenhuma reserva nova entrou em uso; paciente no vídeo
+ou na foto continua a conferir pelo link quando alguma for usada.
