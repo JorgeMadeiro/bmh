@@ -23,6 +23,10 @@ if 'META_BASE' not in os.environ:
 CONTA, PAGINA, IG = 'act_327952129944258', '622093514556929', '17841408031661983'
 NOME = 'BMH · Mensagens WhatsApp · nov/2026'
 DIARIO_CENTAVOS = 2000                       # R$ 20 por dia
+# Público (Jorge, 12/11/2026): o maior perfil de paciente vem de cirurgia plástica, capilar e parecidos. Chega-se a ele pelo criativo,
+# pela idade, pelo gênero e pela região, NUNCA por interesse de estética ou de condição de saúde (regra da casa e da Meta).
+# Idade e gênero: confirmar com o Jorge antes do "cria". GENEROS vazio = todos (o capilar traz homens); [2] = só mulheres.
+IDADE_MIN, IDADE_MAX, GENEROS = 25, 65, []
 # Estoque de criativos (saidas/estoque-criativos-2026-11.md; regra do Jorge de 12/11, ajustada no mesmo dia). Padrão, sem verba a
 # mais: 1 conjunto de R$ 20 com o 1º post da lista; os outros ficam de reserva e entram, quando ele cansar, como 2º anúncio no MESMO
 # conjunto. "cria teste": 1 conjunto de R$ 20 por post (3 candidatos, 2 dias, R$ 120), só com o "pode" do Jorge. Troque aqui antes do
@@ -96,8 +100,10 @@ try:
         cj = valida_e_cria(f'{CONTA}/adsets', name=f'{NOME} · {"teste · " if TESTE else ""}{nome}', campaign_id=ids['campanha'], status='ACTIVE',
             daily_budget=DIARIO_CENTAVOS, billing_event='IMPRESSIONS', optimization_goal='CONVERSATIONS', destination_type='WHATSAPP',
             bid_strategy='LOWEST_COST_WITHOUT_CAP', promoted_object={'page_id': PAGINA},
-            targeting={'geo_locations': {'regions': [{'key': df['key']}]}, 'age_min': 25, 'age_max': 65,
-                       'targeting_automation': {'advantage_audience': 1}})
+            targeting={'geo_locations': {'regions': [{'key': df['key']}]}, 'age_min': IDADE_MIN, 'age_max': IDADE_MAX,
+                       **({'genders': GENEROS} if GENEROS else {}),
+                       # com o público automático (Advantage+) ligado, idade máxima e gênero viram só sugestão: fixou, desliga
+                       'targeting_automation': {'advantage_audience': 0 if (GENEROS or IDADE_MAX < 65) else 1}})
         cr = valida_e_cria(f'{CONTA}/adcreatives', name=f'{NOME} · {nome}', object_id=PAGINA, instagram_user_id=IG,
                            source_instagram_media_id=mid, call_to_action={'type': 'WHATSAPP_MESSAGE', 'value': {'app_destination': 'WHATSAPP'}})
         ad = valida_e_cria(f'{CONTA}/ads', name=f'{NOME} · {nome}', adset_id=cj, creative={'creative_id': cr}, status='ACTIVE')
