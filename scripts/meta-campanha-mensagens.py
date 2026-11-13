@@ -110,44 +110,6 @@ try:
         ids['testes'][nome] = {'post': mid, 'conjunto': cj, 'criativo': cr, 'anuncio': ad}
         print(f'teste "{nome}": conjunto {cj} (ligado dentro da campanha pausada), anúncio {ad}')
 except RuntimeError as e:
-    df = None; print('região: busca recusada', str(e)[:120])
-print('região:', f'Distrito Federal, chave {df["key"]}' if df else 'NÃO ACHEI a chave do Distrito Federal')
-if MODO == 'confere':
-    sys.exit('\nconferido. Criar pausada: python3 scripts/meta-campanha-mensagens.py cria')
-
-# ---------- ativa (só com o Aprovar do Jorge) ----------
-if MODO == 'ativa':
-    ids = json.load(open(IDS, encoding='utf8'))
-    antes = chama('GET', ids['campanha'], fields='name,status,effective_status')
-    print('antes:', antes['name'], antes['status'], antes['effective_status'])
-    chama('POST', ids['campanha'], status='ACTIVE')
-    d = chama('GET', ids['campanha'], fields='name,status,effective_status')
-    print('depois:', d['name'], d['status'], d['effective_status'], '| para pausar: no Gerenciador, ou POST status=PAUSED na mesma campanha')
-    sys.exit(0)
-
-# ---------- cria (pausada) ----------
-if os.path.exists(IDS): sys.exit(f'já existe {IDS}: a campanha já foi criada; conferir no Gerenciador antes de criar outra')
-if not df: sys.exit('sem a chave do Distrito Federal: nada criado')
-if not zap: print('ATENÇÃO: a página não mostra o WhatsApp; a validação da Meta vai dizer se dá para criar')
-ids = {}
-try:
-    ids['campanha'] = valida_e_cria(f'{CONTA}/campaigns', name=NOME, objective='OUTCOME_ENGAGEMENT', status='PAUSED',
-                                    special_ad_categories=[], is_adset_budget_sharing_enabled=False)
-    print('campanha criada PAUSADA:', ids['campanha'])
-    ids['conjunto'] = valida_e_cria(f'{CONTA}/adsets', name=NOME + ' · DF', campaign_id=ids['campanha'], status='ACTIVE',
-        daily_budget=DIARIO_CENTAVOS, billing_event='IMPRESSIONS', optimization_goal='CONVERSATIONS', destination_type='WHATSAPP',
-        bid_strategy='LOWEST_COST_WITHOUT_CAP', promoted_object={'page_id': PAGINA},
-        targeting={'geo_locations': {'regions': [{'key': df['key']}]}, 'age_min': 25, 'age_max': 65,
-                   'targeting_automation': {'advantage_audience': 1}})
-    print('conjunto criado (ligado dentro da campanha pausada):', ids['conjunto'])
-    ids['anuncios'] = {}
-    for nome, mid in POSTS.items():
-        cr = valida_e_cria(f'{CONTA}/adcreatives', name=f'{NOME} · {nome}', object_id=PAGINA, instagram_user_id=IG,
-                           source_instagram_media_id=mid, call_to_action={'type': 'WHATSAPP_MESSAGE', 'value': {'app_destination': 'WHATSAPP', 'link': 'https://api.whatsapp.com/send'}})
-        ad = valida_e_cria(f'{CONTA}/ads', name=f'{NOME} · {nome}', adset_id=ids['conjunto'], creative={'creative_id': cr}, status='ACTIVE')
-        ids['anuncios'][nome] = {'criativo': cr, 'anuncio': ad}
-        print(f'anúncio "{nome}" criado: {ad} (criativo {cr})')
-except RuntimeError as e:
     print('PAROU:', e)
 finally:
     if ids:
