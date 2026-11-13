@@ -69,7 +69,7 @@ for nome, mid in POSTS.items():
     print(f'post "{nome}": {m.get("media_product_type")} {m.get("media_type")} de {str(m.get("timestamp"))[:10]} | ver o vídeo (paciente na câmara só com autorização): {m.get("permalink")}')
 try:
     geo = chama('GET', 'search', type='adgeolocation', location_types=['region'], q='Distrito Federal', country_code='BR').get('data', [])
-    df = next((g for g in geo if g.get('name') == 'Distrito Federal' and g.get('country_code') == 'BR'), None)
+    df = next((g for g in geo if g.get('name') in ('Distrito Federal', 'Federal District') and g.get('country_code') == 'BR'), None)   # a Meta devolve o nome em inglês (chave 444), 12/11
 except RuntimeError as e:
     df = None; print('região: busca recusada', str(e)[:120])
 print('região:', f'Distrito Federal, chave {df["key"]}' if df else 'NÃO ACHEI a chave do Distrito Federal')
@@ -105,7 +105,7 @@ try:
                        # com o público automático (Advantage+) ligado, idade máxima e gênero viram só sugestão: fixou, desliga
                        'targeting_automation': {'advantage_audience': 0 if (GENEROS or IDADE_MAX < 65) else 1}})
         cr = valida_e_cria(f'{CONTA}/adcreatives', name=f'{NOME} · {nome}', object_id=PAGINA, instagram_user_id=IG,
-                           source_instagram_media_id=mid, call_to_action={'type': 'WHATSAPP_MESSAGE', 'value': {'app_destination': 'WHATSAPP'}})
+                           source_instagram_media_id=mid, call_to_action={'type': 'WHATSAPP_MESSAGE', 'value': {'app_destination': 'WHATSAPP', 'link': 'https://api.whatsapp.com/send'}})
         ad = valida_e_cria(f'{CONTA}/ads', name=f'{NOME} · {nome}', adset_id=cj, creative={'creative_id': cr}, status='ACTIVE')
         ids['testes'][nome] = {'post': mid, 'conjunto': cj, 'criativo': cr, 'anuncio': ad}
         print(f'teste "{nome}": conjunto {cj} (ligado dentro da campanha pausada), anúncio {ad}')
@@ -143,7 +143,7 @@ try:
     ids['anuncios'] = {}
     for nome, mid in POSTS.items():
         cr = valida_e_cria(f'{CONTA}/adcreatives', name=f'{NOME} · {nome}', object_id=PAGINA, instagram_user_id=IG,
-                           source_instagram_media_id=mid, call_to_action={'type': 'WHATSAPP_MESSAGE', 'value': {'app_destination': 'WHATSAPP'}})
+                           source_instagram_media_id=mid, call_to_action={'type': 'WHATSAPP_MESSAGE', 'value': {'app_destination': 'WHATSAPP', 'link': 'https://api.whatsapp.com/send'}})
         ad = valida_e_cria(f'{CONTA}/ads', name=f'{NOME} · {nome}', adset_id=ids['conjunto'], creative={'creative_id': cr}, status='ACTIVE')
         ids['anuncios'][nome] = {'criativo': cr, 'anuncio': ad}
         print(f'anúncio "{nome}" criado: {ad} (criativo {cr})')
