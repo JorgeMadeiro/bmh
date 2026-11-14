@@ -48,5 +48,13 @@ try {
   const mud = await busca(`SELECT change_event.change_date_time, change_event.user_email, change_event.change_resource_type, change_event.resource_change_operation FROM change_event WHERE change_event.change_date_time >= '${Q.ontem} 00:00:00' AND change_event.change_date_time < '${Q.hoje} 00:00:00' ORDER BY change_event.change_date_time DESC LIMIT 200`);
   const deFora = {}; for (const x of mud) { const e = x.changeEvent.userEmail || '(sem e-mail)'; if (e === DONO) continue; deFora[e] = (deFora[e] || 0) + 1; }
   for (const [e, n] of Object.entries(deFora)) add({ regra: 'alteracao_de_fora', alvo: e, acao: 'avisar', detalhe: `${e} fez ${n} ${n === 1 ? 'alteração' : 'alterações'} na conta ontem` });
+  // (5) gasto zero (14/11/2026, pedido do Jorge depois de o Meta da Nexo ficar 2 dias sem exibição sem aviso; o Google da
+  // Nexo já ficou 10 dias parado em setembro): campanha ligada, servindo ou suspensa (pagamento), com orçamento, começada antes
+  // de ontem 12h, sem nenhuma exibição ontem. Vai em mensagem própria no Telegram.
+  const ligadas = await busca(`SELECT campaign.resource_name, campaign.name, campaign.serving_status, campaign.start_date_time, campaign_budget.amount_micros FROM campaign WHERE campaign.status = 'ENABLED' AND campaign.experiment_type = 'BASE' AND campaign.serving_status IN ('SERVING', 'SUSPENDED')`);
+  const viu = new Set((await busca(`SELECT campaign.resource_name, metrics.impressions FROM campaign WHERE segments.date = '${Q.ontem}' AND campaign.status = 'ENABLED' AND metrics.impressions > 0`)).map(x => x.campaign.resourceName));
+  for (const c of ligadas) if (!viu.has(c.campaign.resourceName) && Number((c.campaignBudget || {}).amountMicros || 0) > 0 && String(c.campaign.startDateTime || '') < Q.ontem + ' 12:00:00')
+    add({ regra: 'gasto_zero', tipo: 'campanha', alvo_id: c.campaign.resourceName, alvo: c.campaign.name, acao: 'avisar',
+      detalhe: `a campanha "${c.campaign.name}" está ligada e não teve nenhuma exibição ontem` + (c.campaign.servingStatus === 'SUSPENDED' ? ' (o Google marca como suspensa: pagamento ou saldo)' : ' (pagamento, anúncio reprovado, lance ou palavra sem busca)') });
 } catch (e) { add({ regra: 'erro', acao: 'avisar', detalhe: 'Google Ads não respondeu: ' + String(e.message).slice(0, 200) }); }
 return acoes.map(json => ({ json }));

@@ -4,8 +4,8 @@
   "conta": "act_327952129944258",
   "leituras": [
     { "no": "Meta · conta", "chave": "conta", "caminho": "{conta}", "consulta": { "fields": "account_status,disable_reason,spend_cap,amount_spent,balance,is_prepay_account,funding_source_details" } },
-    { "no": "Meta · campanhas", "chave": "campanhas", "caminho": "{conta}/campaigns", "consulta": { "fields": "id,name,effective_status,daily_budget", "limit": "200" } },
-    { "no": "Meta · conjuntos", "chave": "conjuntos", "caminho": "{conta}/adsets", "consulta": { "fields": "id,name,campaign_id,effective_status,daily_budget,optimization_goal,destination_type,created_time", "limit": "200" } },
+    { "no": "Meta · campanhas", "chave": "campanhas", "caminho": "{conta}/campaigns", "consulta": { "fields": "id,name,effective_status,daily_budget,start_time,stop_time", "limit": "200" } },
+    { "no": "Meta · conjuntos", "chave": "conjuntos", "caminho": "{conta}/adsets", "consulta": { "fields": "id,name,campaign_id,effective_status,daily_budget,optimization_goal,destination_type,created_time,start_time,end_time", "limit": "200" } },
     { "no": "Meta · anúncios", "chave": "anuncios", "caminho": "{conta}/ads", "consulta": { "fields": "id,name,adset_id,effective_status", "limit": "500" } },
     { "no": "Meta · ontem por conjunto", "chave": "ontemConj", "caminho": "{conta}/insights", "consulta": { "level": "adset", "date_preset": "yesterday", "fields": "adset_id,adset_name,spend,impressions", "limit": "200" } },
     { "no": "Meta · 3 dias por conjunto", "chave": "tresConj", "caminho": "{conta}/insights", "consulta": { "level": "adset", "date_preset": "last_3d", "fields": "adset_id,spend,actions", "limit": "200" } },

@@ -113,9 +113,9 @@ nota = no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, {'width': 1100, 'h
     "**Limites:** só simulação, não aplica nada e não tem botão; nenhuma pausa proposta deixa a conta sem anúncio antes de "
     "`meta_no_ar_ate` (regra do Jorge, 20/10/2026: a conta não para até 31/10); nunca sobe verba.\n\n"
     "Regras: verba da conta (o menor entre limite e saldo livre, pela média de 7 dias) com menos de `meta_dias_aviso` (5) dias ou acabando "
-    "antes de `meta_no_ar_ate`; conta fora do ar; conjunto ligado sem exibição ontem; frequência acima de `meta_freq_max` (4) em 7 dias; "
+    "antes de `meta_no_ar_ate`; conta fora do ar; conjunto ligado desde antes de ontem 12h sem exibição ontem (em mensagem própria); frequência acima de `meta_freq_max` (4) em 7 dias; "
     "anúncio reprovado ou com problema; alteração de quem não está em `meta_alteracoes_da_casa`; conjunto de mensagem com "
-    "`meta_limite_sem_conversa` (R$ 40) em 3 dias sem conversa; teto `meta_teto_mes` (ou `meta_teto_mes_AAAA-MM`). Frequência e anúncio "
+    "`meta_limite_sem_conversa` (R$ 40) em 3 dias sem conversa; teto `meta_teto_mes` (ou `meta_teto_mes_AAAA-MM`), com cada orçamento contado só nos dias em que roda (início e fim). Frequência e anúncio "
     "com problema só voltam depois de 7 dias.\n\n"
     "As regras moram em `BMH_Claude_VSL/scripts/n8n/bmh-meta-guardiao-decide.js` e se testam com `testa-guardiao-meta.js` (dados de "
     f"hoje, pelo cofre). Manual: `/webhook/{WEBHOOK}?teste=1`. Método: `Central_Claude/frentes/metodo-meta-ads.md`.")})

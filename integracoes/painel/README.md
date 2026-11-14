@@ -36,6 +36,17 @@
   terceiro é estranha). Modo por regra em BMH_config (`guardiao_modo_teto`, `guardiao_modo_pausa`: simulacao |
   real); **começou em simulação em 08/10/2026**; **regra do teto em modo real desde 08/10/2026** ("pode ligar o guardião do teto"), regra de pausa segue em simulação (com botão no Telegram) por 2 semanas. Registro em BMH_guardiao_registro; o painel mostra os 3 últimos dias.
   Teste: `/webhook/bmh-guardiao?teste=1` (não grava nem aplica; manda no Telegram marcado como TESTE, sem botões).
+- **14/11/2026 ("pode" do Jorge), alarme de gasto zero nos dois guardiões**, depois de o Meta da Nexo ficar 2 dias sem
+  exibição sem ninguém ver:
+  - **Google** (`guardiao-decide.js`, regra `gasto_zero`): campanha ligada, servindo ou suspensa, com orçamento, começada
+    antes de ontem 12h e sem nenhuma exibição ontem → aviso em **mensagem própria** ("🚨 BMH Google · sem exibição ontem").
+    Antes não existia.
+  - **Meta** (`scripts/n8n/bmh-meta-guardiao-decide.js`, `meta_gasto_zero`): vale para conjunto criado e com início antes de
+    ontem 12h (antes, só para criado antes de ontem: 1 dia inteiro de folga), sem fim antes de ontem; também em mensagem própria.
+  - **Meta, teto:** cada orçamento conta só os dias do mês em que roda (início e fim do conjunto ou da campanha). Antes,
+    teste com data de fim e campanha que começa depois eram projetados no mês inteiro (na Nexo isso cortou tudo pela metade).
+    O guardião do Meta da BMH segue em simulação: só propõe.
+  - Google e Meta já eram guardiões separados na BMH: um nunca mexe no outro. Cópia de antes em `dados/backup-n8n/20261114-1359-*`.
 
 ## Telegram, robô "BMH alertas" (@Bmh_alertas_bot), 08/10/2026
 

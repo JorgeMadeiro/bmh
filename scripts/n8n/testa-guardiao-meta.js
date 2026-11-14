@@ -43,6 +43,5 @@ const troca = s => s.replace(/\{(\w+)\}/g, (_, k) => Q[k]);
   console.log(`hoje ${Q.hoje} | cfg ${JSON.stringify(cfg)}\n`);
   if (!acoes.length) console.log('nenhum aviso nem proposta: o guardião ficaria calado');
   for (const a of acoes) console.log(`[${a.regra}] ${a.acao}${a.resultado === 'nao_proposto' ? ' (pausa barrada pela continuidade)' : ''} · ${a.alvo}\n   ${a.detalhe}`);
-  const [m] = montaMensagem(Q, acoes);
-  if (m) console.log('\n--- Telegram ---\n' + m.texto);
+  for (const m of montaMensagem(Q, acoes)) console.log('\n--- Telegram ---\n' + m.texto);
 })().catch(e => { console.error('Erro: ' + e.message); process.exit(1); });

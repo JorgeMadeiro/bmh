@@ -32,6 +32,9 @@ function decideMeta(E) {
   const maisDias = (d, n) => { const x = new Date(d + 'T12:00:00Z'); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); };
   const lista = r => (r && Array.isArray(r.data)) ? r.data : [];
   const acoesDe = a => Object.fromEntries((a || []).map(x => [x.action_type, num(x.value)]));
+  // horário da Meta ("2026-11-12T22:34:17-0300") em milissegundos, e o dia em Brasília (antes = o último dia antes do fim)
+  const msDe = s => s ? Date.parse(String(s).replace(/([+-]\d\d)(\d\d)$/, '$1:$2')) : NaN;
+  const diaSP = (s, antes) => { const t = msDe(s); return Number.isNaN(t) ? '' : new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date(t - (antes ? 1 : 0))); };
 
   const out = [];
   const add = a => out.push({ hoje: E.hoje, teste: !!E.teste, plataforma: 'meta', tipo: '', alvo_id: '', alvo: '', valor_antes: '', valor_novo: '',
@@ -70,10 +73,16 @@ function decideMeta(E) {
     }
   }
 
-  // (3) gasto zero: conjunto ligado, de campanha ligada, criado antes de ontem, sem nenhuma exibição ontem
+  // (3) gasto zero: conjunto ligado, de campanha ligada, que já devia rodar desde ontem 12h (criado e com início antes disso,
+  // sem fim antes de ontem) e não teve nenhuma exibição ontem. Até 14/11/2026 só valia para criado antes de ontem (1 dia
+  // inteiro de folga); na Nexo, conjuntos ficaram 2 dias sem exibição antes de alguém ver. Vai em mensagem própria.
   const impOntem = Object.fromEntries(lista(E.ontemConj).map(x => [x.adset_id, num(x.impressions)]));
-  for (const c of ativos) if (campAtiva.has(c.campaign_id) && String(c.created_time).slice(0, 10) < E.ontem && !impOntem[c.id])
-    add({ regra: 'meta_gasto_zero', tipo: 'conjunto', alvo_id: c.id, alvo: c.name, acao: 'avisar', detalhe: `o conjunto "${c.name}" está ligado e não teve nenhuma exibição ontem (saldo, limite, reprovação ou público).` });
+  const corte = msDe(E.ontem + 'T12:00:00-0300'), comecoOntem = msDe(E.ontem + 'T00:00:00-0300');
+  for (const c of ativos) {
+    const ini = Math.max(msDe(c.created_time) || 0, msDe(c.start_time) || 0), fim = msDe(c.end_time);
+    if (campAtiva.has(c.campaign_id) && ini < corte && !(fim <= comecoOntem) && !impOntem[c.id])
+      add({ regra: 'meta_gasto_zero', tipo: 'conjunto', alvo_id: c.id, alvo: c.name, acao: 'avisar', detalhe: `o conjunto "${c.name}" está ligado e não teve nenhuma exibição ontem (formato do anúncio, saldo, limite, reprovação ou público).` });
+  }
 
   // (4) frequência alta em 7 dias, só de conjunto que continua ligado (o pausado não pede criativo novo)
   const ligados = new Set(ativos.filter(c => campAtiva.has(c.campaign_id)).map(c => c.id));
@@ -100,17 +109,27 @@ function decideMeta(E) {
     add({ regra: 'meta_sem_conversa_3_dias', tipo: 'conjunto', alvo_id: c.id, alvo: c.name, acao: 'pausar', valor_antes: t.gasto.toFixed(2),
       detalhe: `${brl(t.gasto)} em 3 dias sem nenhuma conversa iniciada.` }); }
 
-  // (8) teto do mês: gasto até ontem + orçamentos ligados × dias que faltam (com hoje)
+  // (8) teto do mês: gasto até ontem + cada orçamento ligado × os dias do mês em que ele roda, de hoje (ou do início dele) até
+  // o fim do mês (ou o fim dele). Até 14/11/2026 todo orçamento valia o mês inteiro; na Nexo, testes com data de fim e campanha
+  // que só começa depois foram projetados no mês todo e o guardião cortou todos os orçamentos pela metade.
   if (TETO !== null && !Number.isNaN(TETO)) {
+    const fimMes = E.hoje.slice(0, 8) + String(E.dias_mes).padStart(2, '0');
+    const diasDe = o => {
+      const ini = [E.hoje, diaSP(o.inicio)].filter(Boolean).sort().pop();
+      const fim = [fimMes, diaSP(o.fim, true)].filter(Boolean).sort()[0];
+      return fim < ini ? 0 : Math.round((Date.parse(fim) - Date.parse(ini)) / 864e5) + 1;
+    };
+    for (const o of orc) o.dias = diasDe(o);
+    const resto = orc.reduce((s, o) => s + o.valor * o.dias, 0);
     // a conta para sozinha quando a verba (limite ou saldo) acaba: a projeção nunca passa do que ainda há para gastar
-    const G = E.dia > 1 ? num(E.mes) : 0, proj = G + Math.min(B * E.restantes, verba === null ? Infinity : Math.max(0, verba));
+    const G = E.dia > 1 ? num(E.mes) : 0, proj = G + Math.min(resto, verba === null ? Infinity : Math.max(0, verba));
     if (G >= TETO) for (const o of orc)
       add({ regra: 'meta_teto', tipo: o.tipo, alvo_id: o.id, alvo: o.nome, acao: 'pausar', valor_antes: G.toFixed(2), detalhe: `o mês já gastou ${brl(G)} no Meta; o teto é ${brl(TETO)}.` });
-    else if (B > 0 && proj > TETO * 1.02) {
-      const alvoTotal = Math.max(PISO * orc.length, (TETO - G) / E.restantes);
-      for (const o of orc) { const novo = Math.max(PISO, Math.floor(o.valor * alvoTotal / B * 100) / 100); if (novo >= o.valor) continue;
+    else if (resto > 0 && proj > TETO * 1.02) {
+      const fator = Math.max(0, TETO - G) / resto;
+      for (const o of orc) { if (!o.dias) continue; const novo = Math.max(PISO, Math.floor(o.valor * fator * 100) / 100); if (novo >= o.valor) continue;
         add({ regra: 'meta_teto', tipo: 'orcamento_' + o.tipo, alvo_id: o.id, alvo: o.nome, acao: 'orcamento', valor_antes: o.valor.toFixed(2), valor_novo: novo.toFixed(2),
-          detalhe: `com ${brl(B)}/dia o mês fecharia em ${brl(proj)}, acima do teto de ${brl(TETO)}: de ${brl(o.valor)} para ${brl(novo)}/dia.` }); }
+          detalhe: `com os orçamentos ligados (${brl(B)}/dia, cada um só nos dias em que roda) o mês fecharia em ${brl(proj)}, acima do teto de ${brl(TETO)}: de ${brl(o.valor)} para ${brl(novo)}/dia.` }); }
     }
   }
 
@@ -149,8 +168,8 @@ function verbaDaConta(E) {
   const campanhas = lista(E.campanhas), conjuntos = lista(E.conjuntos);
   const campAtiva = new Set(campanhas.filter(c => c.effective_status === 'ACTIVE').map(c => c.id));
   const orc = [];
-  for (const c of campanhas) if (c.effective_status === 'ACTIVE' && num(c.daily_budget)) orc.push({ tipo: 'campanha', id: c.id, nome: c.name, valor: num(c.daily_budget) / 100 });
-  for (const c of conjuntos) if (c.effective_status === 'ACTIVE' && campAtiva.has(c.campaign_id) && num(c.daily_budget)) orc.push({ tipo: 'conjunto', id: c.id, nome: c.name, valor: num(c.daily_budget) / 100 });
+  for (const c of campanhas) if (c.effective_status === 'ACTIVE' && num(c.daily_budget)) orc.push({ tipo: 'campanha', id: c.id, nome: c.name, valor: num(c.daily_budget) / 100, inicio: c.start_time, fim: c.stop_time });
+  for (const c of conjuntos) if (c.effective_status === 'ACTIVE' && campAtiva.has(c.campaign_id) && num(c.daily_budget)) orc.push({ tipo: 'conjunto', id: c.id, nome: c.name, valor: num(c.daily_budget) / 100, inicio: c.start_time, fim: c.end_time });
   const B = orc.reduce((s, o) => s + o.valor, 0);
   const ritmo = B > 0 ? B : lista(E.dias7).reduce((s, d) => s + num(d.spend), 0) / 7;
   const limite = conta.spend_cap && num(conta.spend_cap) > 0 ? (num(conta.spend_cap) - num(conta.amount_spent)) / 100 : null;
@@ -183,21 +202,33 @@ function falhaDeLeitura(acoes, total) {
   return `guardião Meta: ${erros.length} de ${total} leituras da Meta falharam (credencial "BMH · Meta Instagram (token)"?). Primeira: ` +
     String(erros[0].detalhe).slice(0, 250);
 }
-// Uma mensagem só no Telegram (robô BMH alertas), sem botões: nesta versão nada se aplica, nem pelo toque.
+// Telegram (robô BMH alertas), sem botões: nesta versão nada se aplica, nem pelo toque. Conjunto sem exibição vai numa
+// mensagem própria, antes das outras (14/11/2026: no meio do resumo, passava sem ninguém ver); o resto, numa mensagem só.
 function montaMensagem(Q, acoes) {
   if (!acoes.length) return [];
   const dm = d => d.slice(8, 10) + '/' + d.slice(5, 7);
-  const avisos = acoes.filter(a => a.acao === 'avisar'), propostas = acoes.filter(a => a.acao !== 'avisar');
-  let t = (Q.teste ? '🧪 TESTE: nada foi gravado\n' : '') + '🛡️ Guardião Meta BMH · ' + dm(Q.hoje) + ' (homologação, simulação)\n';
-  if (avisos.length) t += '\n' + avisos.map(a => '• ' + a.detalhe).join('\n') + '\n';
-  if (propostas.length) t += '\nO que eu proporia (nada foi mudado):\n' + propostas.map(a => '• ' + (a.acao === 'pausar' ? `pausar "${a.alvo}": ` : `orçamento de "${a.alvo}": `) + a.detalhe).join('\n') + '\n';
+  const selo = Q.teste ? '🧪 TESTE: nada foi gravado\n' : '';
   // Limpeza antes do Telegram (21/10/2026, depois da 1ª execução recusada): tira caractere de controle e emoji partido,
   // esconde token que venha num erro da Meta, nunca manda vazio e corta em linha inteira antes de 3.500 caracteres.
-  t = t.replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, '')
-    .replace(/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g, '')
-    .replace(/(access_token|token)=[^&\s"']+/gi, '$1=[removido]').trim();
-  if (t.length > 3500) t = t.slice(0, t.lastIndexOf('\n', 3500) > 0 ? t.lastIndexOf('\n', 3500) : 3500) + '\n(...)';
-  return [{ texto: t || 'Guardião Meta BMH: mensagem vazia (ver a execução no n8n).' }];
+  const limpa = t => {
+    t = t.replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, '')
+      .replace(/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g, '')
+      .replace(/(access_token|token)=[^&\s"']+/gi, '$1=[removido]').trim();
+    if (t.length > 3500) t = t.slice(0, t.lastIndexOf('\n', 3500) > 0 ? t.lastIndexOf('\n', 3500) : 3500) + '\n(...)';
+    return { texto: t || 'Guardião Meta BMH: mensagem vazia (ver a execução no n8n).' };
+  };
+  const msgs = [];
+  const zero = acoes.filter(a => a.regra === 'meta_gasto_zero'), resto = acoes.filter(a => a.regra !== 'meta_gasto_zero');
+  if (zero.length) msgs.push(limpa(selo + '🚨 BMH Meta · sem exibição ontem (' + dm(Q.hoje) + ')\n\n' + zero.map(a => '• ' + a.detalhe).join('\n') +
+    '\n\nConferir a conta hoje: conjunto parado não traz paciente.'));
+  if (resto.length) {
+    const avisos = resto.filter(a => a.acao === 'avisar'), propostas = resto.filter(a => a.acao !== 'avisar');
+    let t = selo + '🛡️ Guardião Meta BMH · ' + dm(Q.hoje) + ' (homologação, simulação)\n';
+    if (avisos.length) t += '\n' + avisos.map(a => '• ' + a.detalhe).join('\n') + '\n';
+    if (propostas.length) t += '\nO que eu proporia (nada foi mudado):\n' + propostas.map(a => '• ' + (a.acao === 'pausar' ? `pausar "${a.alvo}": ` : `orçamento de "${a.alvo}": `) + a.detalhe).join('\n') + '\n';
+    msgs.push(limpa(t));
+  }
+  return msgs;
 }
 // FIM-DA-FUNCAO (o montador corta daqui para baixo ao embutir no n8n)
 if (typeof module !== 'undefined') module.exports = { decideMeta, montaEntrada, montaMensagem, falhaDeLeitura, verbaDaConta };

@@ -8,7 +8,11 @@ const brl = v => 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigi
 const dm = d => d.slice(8, 10) + '/' + d.slice(5, 7);
 const selo = Q.teste ? '🧪 TESTE: nada foi gravado nem aplicado\n' : '';
 const out = [];
-const avisos = acoes.filter(a => a.acao === 'avisar');
+// Campanha sem exibição vai numa mensagem própria, antes das outras (14/11/2026: no meio do resumo, passava sem ninguém ver)
+const zero = acoes.filter(a => a.regra === 'gasto_zero');
+if (zero.length) out.push({ texto: selo + '🚨 BMH Google · sem exibição ontem (' + dm(Q.hoje) + ')\n\n' + zero.map(a => '• ' + a.detalhe).join('\n') +
+  '\n\nConferir a conta hoje: campanha parada não traz paciente.', botoes: false, id: '' });
+const avisos = acoes.filter(a => a.acao === 'avisar' && a.regra !== 'gasto_zero');
 if (avisos.length) out.push({ texto: selo + '🛡️ Guardião BMH · ' + dm(Q.hoje) + '\n\n' + avisos.map(a => '• ' + a.detalhe).join('\n'), botoes: false, id: '' });
 for (const a of acoes.filter(a => a.acao !== 'avisar')) {
   const oQue = a.acao === 'pausar' ? `Pausar ${a.tipo === 'grupo' ? 'o grupo' : 'a campanha'} "${a.alvo}"`
