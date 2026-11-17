@@ -248,3 +248,25 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
 - Kommo, anúncio com UTM: https://support.kommo.com/docs/track-whatsapp-ad-campaigns-with-utms
 - Meta, preços: https://developers.facebook.com/docs/whatsapp/pricing
 - Meta, conversões de mensagens: https://developers.facebook.com/docs/marketing-api/conversions-api/business-messaging
+
+## 6. Montado em 17/11/2026 (conta bmh.kommo.com, id 37193891)
+
+- **Token:** integração privada "BMH · n8n e Claude", token de longa duração até 17/11/2031, no `.env` (`KOMMO_BMH_TOKEN`,
+  1.150 caracteres: o `read` comum do Terminal trava acima de ~1.000; gravar com `stty -icanon`).
+- **Três funis** (decisão do Jorge, 17/11/2026), montados por `scripts/kommo/montar.js --real --limpar`, ids em `ids.json`:
+  - **Triagem e conversão** (principal, recebe todo contato do número único): Novo contato › Em conversa › Orçamento
+    enviado (só particular) › Follow-up (recebeu orçamento ou informação e não agendou). Ganho = avaliação agendada.
+  - **Asa Sul** e **Taguatinga**: Avaliação agendada › Avaliou · pedido a enviar (o médico finaliza e entrega o relatório;
+    a recepção pede ao convênio) › Aguardando convênio (tarefa de cobrança em 3 dias úteis) › Em tratamento. Ganho =
+    concluiu. O particular vai de "Avaliou" direto para "Em tratamento". A avaliação é gratuita.
+  - **Passagem:** ganho na triagem e lead novo no funil da unidade, mesmo contato, levando origem e cirurgião.
+  - Retorno de paciente antigo entra pela triagem (etiqueta "retorno"); troca de unidade no meio é rara: a recepção move.
+  - Nomes de ganho e perda (etapas de sistema) só pela tela.
+- **Modelo do Kommo apagado** (funil, 12 campos e 4 motivos de exemplo), com o ok do Jorge.
+- **Webhook "Mensagem recebida"** cadastrado na tela (fica na conta, não na integração) para o fluxo "BMH · Kommo ·
+  origem do lead", ainda em ensaio.
+- **Salesbot "Envia mensagem"** (id 15128): manda o texto do campo "Mensagem para enviar" (627592), como o "Envia Mensagem
+  IA" da Nexa.
+- **App da BMH assinado** na conta de WhatsApp (coexistência já ligada): o recebedor oficial grava mensagens do paciente e
+  da equipe pelo celular desde 17/11/2026, 10h30.
+- **Um usuário** nos 13 dias restantes do teste; depois decide.
