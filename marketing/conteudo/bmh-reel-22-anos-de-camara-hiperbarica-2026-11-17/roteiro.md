@@ -28,7 +28,7 @@
 | Corpo 2 | | "Médico na unidade em todas as sessões. Em todas." |
 | Loop | | "E quem define o seu tratamento?" |
 | Corpo 3 | | "Uma direção médica com pós-graduação em medicina hiperbárica, responsável pelos protocolos das duas unidades." |
-| CTA | | "Conhece alguém que vai fazer cirurgia plástica? Manda este vídeo." |
+| CTA | | "Conhece alguém que precisa de câmara hiperbárica? Manda este vídeo." |
 
 ## Legenda
 
@@ -38,7 +38,7 @@ Em 2004 abria a primeira clínica particular de oxigenoterapia hiperbárica de B
 
 Hoje a maior parte dos nossos pacientes chega pelo cirurgião plástico, no pós-operatório. Atendemos na Asa Sul e em Taguatinga.
 
-Conhece alguém que vai fazer cirurgia plástica? Manda este vídeo.
+Conhece alguém que precisa de câmara hiperbárica? Manda este vídeo.
 
 Este conteúdo é informativo e não substitui uma avaliação médica.
 
