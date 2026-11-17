@@ -75,7 +75,7 @@ async function main() {
   const funis = (await api('leads/pipelines'))?._embedded?.pipelines || [];
   let funil = funis.find((f) => f.name === FUNIL.nome);
   if (!funil) {
-    const r = await api('leads/pipelines', 'POST', [{ name: FUNIL.nome, sort: 10, is_main: true, _embedded: { statuses: FUNIL.etapas.map((name, i) => ({ name, sort: (i + 1) * 10 })) } }]);
+    const r = await api('leads/pipelines', 'POST', [{ name: FUNIL.nome, sort: 10, is_main: true, is_unsorted_on: true, _embedded: { statuses: FUNIL.etapas.map((name, i) => ({ name, sort: (i + 1) * 10 })) } }]);
     funil = r._embedded.pipelines[0]; console.log('funil criado:', funil.id);
   } else console.log('funil já existia:', funil.id);
   const etapas = (await api(`leads/pipelines/${funil.id}/statuses`))?._embedded?.statuses || [];
