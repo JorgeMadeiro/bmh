@@ -2,12 +2,11 @@
  "funil": 14783287,
  "etapas": {
   "Incoming leads": 114235343,
-  "Novo contato": 114235347,
-  "Em conversa": 114235351,
+  "Em qualificação": 114235347,
   "Orçamento enviado": 114235355,
   "Follow-up": 114235359,
-  "Closed - won": 142,
-  "Closed - lost": 143
+  "Avaliação Agendada": 142,
+  "Perdido": 143
  },
  "campos": {
   "origem": 626668,
@@ -34,12 +33,11 @@
    "nome": "Triagem e conversão",
    "etapas": {
     "Incoming leads": 114235343,
-    "Novo contato": 114235347,
-    "Em conversa": 114235351,
+    "Em qualificação": 114235347,
     "Orçamento enviado": 114235355,
     "Follow-up": 114235359,
-    "Closed - won": 142,
-    "Closed - lost": 143
+    "Avaliação Agendada": 142,
+    "Perdido": 143
    }
   },
   "asa_sul": {

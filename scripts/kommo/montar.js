@@ -27,7 +27,7 @@ const FRASES = JSON.parse(fs.readFileSync(path.join(RAIZ, 'integracoes', 'origem
 // ao convênio" são a mesma etapa (o particular passa direto para Em tratamento).
 const UNIDADE = ['Avaliação agendada', 'Avaliou · pedido a enviar', 'Aguardando convênio', 'Em tratamento'];
 const FUNIS = [
-  { chave: 'triagem', nome: 'Triagem e conversão', antigo: 'Atendimento BMH', principal: true, etapas: ['Novo contato', 'Em conversa', 'Orçamento enviado', 'Follow-up'] },
+  { chave: 'triagem', nome: 'Triagem e conversão', antigo: 'Atendimento BMH', principal: true, etapas: ['Em qualificação', 'Orçamento enviado', 'Follow-up'] },
   { chave: 'asa_sul', nome: 'Asa Sul', etapas: UNIDADE },
   { chave: 'taguatinga', nome: 'Taguatinga', etapas: UNIDADE },
 ];
@@ -48,7 +48,7 @@ const CAMPOS = [
   { chave: 'id_igut', nome: 'Código do iGut', tipo: 'text' },
 ];
 const ETIQUETAS = ['anúncio meta', 'google', 'site', 'cirurgião', 'instagram dr jorge', 'instagram bmh', 'fora do horário', 'não é oportunidade', 'confirmado'];
-const MOTIVOS = ['Convênio não cobre', 'Preço', 'Sem indicação médica', 'Sumiu', 'Só dúvida / agora não', 'Escolheu outro lugar', 'Fora do perfil'];
+const MOTIVOS = ['Convênio não cobre', 'Preço', 'Sem indicação médica', 'Sumiu', 'Só dúvida / agora não', 'Escolheu outro lugar', 'Fora do perfil', 'Interrompeu o tratamento'];
 
 // ---------- API ----------
 const { KOMMO_BMH_DOMINIO: DOM, KOMMO_BMH_TOKEN: TOKEN } = process.env;

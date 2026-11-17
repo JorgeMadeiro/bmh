@@ -254,7 +254,7 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
 - **Token:** integração privada "BMH · n8n e Claude", token de longa duração até 17/11/2031, no `.env` (`KOMMO_BMH_TOKEN`,
   1.150 caracteres: o `read` comum do Terminal trava acima de ~1.000; gravar com `stty -icanon`).
 - **Três funis** (decisão do Jorge, 17/11/2026), montados por `scripts/kommo/montar.js --real --limpar`, ids em `ids.json`:
-  - **Triagem e conversão** (principal, recebe todo contato do número único): Novo contato › Em conversa › Orçamento
+  - **Triagem e conversão** (principal, recebe todo contato do número único): Em qualificação › Orçamento
     enviado (só particular) › Follow-up (recebeu orçamento ou informação e não agendou). Ganho = avaliação agendada.
   - **Asa Sul** e **Taguatinga**: Avaliação agendada › Avaliou · pedido a enviar (o médico finaliza e entrega o relatório;
     a recepção pede ao convênio) › Aguardando convênio (tarefa de cobrança em 3 dias úteis) › Em tratamento. Ganho =
@@ -270,3 +270,7 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
 - **App da BMH assinado** na conta de WhatsApp (coexistência já ligada): o recebedor oficial grava mensagens do paciente e
   da equipe pelo celular desde 17/11/2026, 10h30.
 - **Um usuário** nos 13 dias restantes do teste; depois decide.
+- **Reavaliação** (5 a 10 sessões, depois reavalia): se precisar de mais e for convênio, a recepção volta o lead para
+  "Avaliou · pedido a enviar" › Aguardando convênio › Em tratamento; só a alta é ganho (Concluiu). Manual: no iGut a
+  reavaliação aparece quase sempre como retorno, que também acontece por intercorrência no meio do tratamento.
+- **Motivo de perda novo:** "Interrompeu o tratamento" (criado pelo Jorge na tela, 17/11/2026).
