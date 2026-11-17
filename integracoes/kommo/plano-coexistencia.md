@@ -294,3 +294,10 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
   contato nasce quando conversa). A configuração do Kommo leva alguns minutos depois de conectar.
 - **Fluxo de origem:** ganhou o PATCH no lead (credencial n8n "BMH · Kommo (token)", `xpwKz2vMUxgqhNBo`, lote de 5 por
   segundo), ainda em ensaio até a primeira mensagem real cair certa.
+- **Passagem da triagem para a unidade** (17/11/2026): fluxo "BMH · Kommo · passagem para a unidade" (`YSJaUQMQffVcfmra`,
+  a cada 30 min das 7h às 19h; código em `integracoes/kommo/passagem-avaliacoes.js` e `passagem-decide.js`; tabela
+  `BMH_passagens`, sem nome nem celular). Avaliação marcada no iGut (agendas 113 e 120, próximos 14 dias) → contato do Kommo
+  pelo celular (DDD + 8 últimos dígitos) → no modo real cria o lead na unidade ("Avaliação agendada", copiando origem,
+  UTMs, cirurgião, pagamento, convênio, tipo de caso e etiquetas) e depois marca o da triagem como ganho. Retorno, troca de
+  unidade e quem marcou sem conversar no WhatsApp ficam só registrados. Modo `passagem_modo` (ensaio | real). Ensaio de
+  17/11, 18h50: 31 avaliações até 28/11, todas "sem contato no Kommo" (o Kommo ainda vazio).

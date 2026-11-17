@@ -54,6 +54,7 @@ const COLUNAS = {
   BMH_cliques_site: Object.fromEntries(['chave', 'registrado_em', 'pagina', 'botao', 'mensagem_inicio', 'gclid', 'gbraid', 'wbraid', 'fbclid', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'entrada', 'referencia', 'lead_id', 'ligado_em'].map((k) => [k, 's'])),   // clique no WhatsApp do site com gclid e UTM (22/10/2026)
   BMH_conversoes: Object.fromEntries(['chave', 'evento', 'dia', 'paciente_id', 'unidade', 'telefone_hash', 'telefone_hash_sem9', 'telefone_hash_google', 'email_hash', 'enviado_meta', 'enviado_google', 'modo', 'criado_em'].map((k) => [k, 's'])),   // avaliou e iniciou pelo iGut, em código (22/10/2026)
   BMH_whatsapp_meta: Object.fromEntries(['chave', 'momento', 'dia', 'telefone_hash', 'direcao', 'aparelho', 'tipo', 'texto', 'respondendo', 'apagar_em', 'origem', 'anuncio_id', 'ctwa_clid', 'referral_tipo'].map((k) => [k, 's'])),   // recebedor oficial da Meta (22/10/2026): telefone só em código, texto mascarado, 1 mês
+  BMH_passagens: Object.fromEntries(['chave', 'paciente_id', 'unidade', 'avaliacao_dia', 'avaliacao_hora', 'telefone_hash', 'contato_id', 'lead_triagem', 'lead_unidade', 'acao', 'modo', 'status', 'detalhe', 'atualizado_em'].map((k) => [k, 's'])),   // passagem da triagem para a unidade (17/11/2026), sem nome nem celular
   BMH_origem_leads: Object.fromEntries(['chave', 'lead_id', 'contato_id', 'frase', 'origem', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'cirurgiao_indicou', 'acao', 'modo', 'recebida_em'].map((k) => [k, 's'])),   // origem do lead pelo Kommo (22/10/2026)
   BMH_confirmacoes: Object.fromEntries(['chave', 'dia', 'paciente_id', 'unidade', 'hora', 'tipo', 'agendamentos', 'telefone_hash', 'wamid', 'resposta', 'respondido_em', 'modo', 'status', 'criado_em'].map((k) => [k, 's'])),   // confirmação da véspera (22/10/2026)
   BMH_diretoria_chave: { chave: 's', token: 's', anterior: 's', dia: 's' },   // chave do dia da lista de pacientes (22/10/2026)
@@ -672,6 +673,48 @@ function fluxoOrigem() {
   return { name: 'BMH · Kommo · origem do lead', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none' }) };
 }
 
+// ---------------- passagem da triagem para a unidade (17/11/2026): avaliação marcada no iGut → lead no funil da unidade ----------------
+// A cada 30 min, das 7h às 19h: avaliações dos próximos 14 dias no iGut → casa com o contato do Kommo pelo celular → no modo
+// real cria o lead na unidade (etapa "Avaliação agendada", copiando origem e cirurgião) e marca o da triagem como ganho.
+// Lê os leads dos três funis e os contatos deles (5 por segundo, lição da Nexo). Registra em BMH_passagens, sem nome nem celular.
+function fluxoPassagem() {
+  x = 0;
+  const IGUT = cred('httpCustomAuth', 'BMH · iGut (acesso)'), KOMMO = cred('httpHeaderAuth', 'BMH · Kommo (token)');
+  const K = { authentication: 'genericCredentialType', genericAuthType: 'httpHeaderAuth' };
+  const LOTE = { batching: { batch: { batchSize: 5, batchInterval: 1000 } } };
+  IDS.kommo ||= {}; IDS.kommo.passagem ||= 'bmh-kommo-passagem-' + crypto.randomBytes(6).toString('hex');
+  const n = {
+    agenda: no('A cada 30 min (7h às 19h)', 'n8n-nodes-base.scheduleTrigger', 1.2, { rule: { interval: [{ field: 'cronExpression', expression: '11,41 7-19 * * *' }] } }),
+    manual: no('Rodar agora', 'n8n-nodes-base.webhook', 2, { path: IDS.kommo.passagem, responseMode: 'lastNode', options: {} }, { webhookId: crypto.randomUUID() }),
+    janela: no('Janela', 'n8n-nodes-base.code', 2, { jsCode: "// de hoje até 14 dias à frente\nconst h = $now.setZone('America/Sao_Paulo');\nreturn [{ json: { ini: h.toISODate(), fim: h.plus({ days: 14 }).toISODate() } }];" }, { executeOnce: true }),
+    config: le('Config', 'BMH_config'),
+    feitas: le('Já feitas', 'BMH_passagens'),
+    ag: no('Agenda', 'n8n-nodes-base.httpRequest', 4.2, { method: 'POST', url: 'https://api.igut.med.br/v2/consultas/buscar', authentication: 'genericCredentialType', genericAuthType: 'httpCustomAuth',
+      sendBody: true, specifyBody: 'json', jsonBody: "={{ JSON.stringify({ 'Agendamento.data': $('Janela').first().json.ini, 'Agendamento.data_fim': $('Janela').first().json.fim }) }}", options: { timeout: 180000 } },
+      { credentials: IGUT, executeOnce: true }),
+    av: no('Avaliações novas', 'n8n-nodes-base.code', 2, { jsCode: ler('../../kommo/passagem-avaliacoes.js').replace('/*__SHA256__*/', ler('../../comum/sha256.js')) }, { executeOnce: true }),
+    leads: no('Leads no Kommo', 'n8n-nodes-base.httpRequest', 4.2, { method: 'GET', url: 'https://bmh.kommo.com/api/v4/leads', ...K, sendQuery: true, specifyQuery: 'keypair',
+      queryParameters: { parameters: [{ name: 'with', value: 'contacts' }, { name: 'limit', value: '250' }, { name: 'filter[pipeline_id][0]', value: '14783287' }, { name: 'filter[pipeline_id][1]', value: '14783519' }, { name: 'filter[pipeline_id][2]', value: '14783523' }] },
+      options: { pagination: { pagination: { parameters: { parameters: [{ type: 'qs', name: 'page', value: '={{ $pageCount + 1 }}' }] }, paginationCompleteWhen: 'receiveSpecificStatusCodes', statusCodesWhenComplete: '204', limitPagesFetched: true, maxRequests: 40, requestInterval: 300 } } } },
+      { credentials: KOMMO, executeOnce: true }),
+    quais: no('Contatos a buscar', 'n8n-nodes-base.code', 2, { jsCode: "// ids dos contatos dos leads, em lotes de 200 (cabe na URL); sem nenhum, um lote vazio para o passo seguinte rodar\nconst ids = new Set(); for (const p of $('Leads no Kommo').all()) for (const l of (p.json?._embedded?.leads || [])) for (const c of (l._embedded?.contacts || [])) ids.add(c.id);\nconst t = [...ids], out = []; for (let i = 0; i < t.length; i += 200) out.push({ json: { qs: t.slice(i, i + 200).map((id) => 'filter[id][]=' + id).join('&') } });\nreturn out.length ? out : [{ json: { qs: 'filter[id][]=0' } }];" }, { executeOnce: true }),
+    contatos: no('Contatos no Kommo', 'n8n-nodes-base.httpRequest', 4.2, { method: 'GET', url: "={{ 'https://bmh.kommo.com/api/v4/contacts?limit=250&' + $json.qs }}", ...K, options: LOTE }, { credentials: KOMMO, alwaysOutputData: true }),
+    decide: no('Decide a passagem', 'n8n-nodes-base.code', 2, { jsCode: ler('../../kommo/passagem-decide.js') }, { executeOnce: true }),
+    real: no('Só no modo real', 'n8n-nodes-base.code', 2, { jsCode: "return $('Decide a passagem').all().filter((i) => i.json.modo === 'real' && i.json.acao === 'passar').map((i) => ({ json: i.json }));" }),
+    cria: no('Cria o lead na unidade', 'n8n-nodes-base.httpRequest', 4.2, { method: 'POST', url: 'https://bmh.kommo.com/api/v4/leads', ...K, sendBody: true, specifyBody: 'json', jsonBody: '={{ JSON.stringify([$json.novo]) }}', options: LOTE }, { credentials: KOMMO }),
+    ganha: no('Ganha na triagem', 'n8n-nodes-base.httpRequest', 4.2, { method: 'PATCH', url: 'https://bmh.kommo.com/api/v4/leads', ...K, sendBody: true, specifyBody: 'json', jsonBody: "={{ JSON.stringify([$('Só no modo real').item.json.ganha]) }}", options: LOTE }, { credentials: KOMMO }),
+    feito: no('Marca como feito', 'n8n-nodes-base.code', 2, { jsCode: "// um item por passagem feita: o id do lead novo vem da criação (mesma ordem dos itens)\nconst cria = $('Cria o lead na unidade').all();\nreturn $('Só no modo real').all().map((i, k) => { const { novo, ganha, ...r } = i.json; return { json: { ...r, lead_unidade: String(cria[k]?.json?._embedded?.leads?.[0]?.id || ''), status: 'feito', atualizado_em: $now.toISO() } }; });" }, { executeOnce: true }),
+    gravaFeito: grava('Grava a passagem feita', 'BMH_passagens'),
+    grava: grava('Grava a decisão', 'BMH_passagens'),
+    resumo: no('Resumo', 'n8n-nodes-base.code', 2, { jsCode: "// só contagens (é o que o \"Rodar agora\" devolve)\nconst it = $('Decide a passagem').all().map((i) => i.json), c = {}; for (const r of it) c[r.acao] = (c[r.acao] || 0) + 1;\nreturn [{ json: { modo: it[0]?.modo || '-', avaliacoes: it.length, ...c } }];" }, { executeOnce: true }),
+    nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Kommo · passagem para a unidade\n**Traz:** avaliações dos próximos 14 dias no iGut (agendas 113 Asa Sul e 120 Taguatinga) e os leads e contatos dos três funis do Kommo\n**Envia:** no modo real, cria o lead no funil da unidade (Avaliação agendada, com origem, cirurgião e convênio copiados) e marca o da triagem como ganho\n**Limites:** casa pelo celular (DDD + 8 últimos dígitos); retorno, troca de unidade e quem marcou sem conversar ficam só registrados (a recepção resolve); 5 chamadas por segundo ao Kommo; BMH_passagens sem nome nem celular\n\nModo na chave `passagem_modo` de BMH_config (ensaio | real). Teste: /webhook/' + IDS.kommo.passagem, width: 620, height: 260 }),
+  };
+  const cx = {};
+  liga(cx, n.agenda.name, n.janela.name); liga(cx, n.manual.name, n.janela.name);
+  for (const [a, b] of [[n.janela, n.config], [n.config, n.feitas], [n.feitas, n.ag], [n.ag, n.av], [n.av, n.leads], [n.leads, n.quais], [n.quais, n.contatos], [n.contatos, n.decide], [n.decide, n.real], [n.decide, n.grava], [n.grava, n.resumo], [n.real, n.cria], [n.cria, n.ganha], [n.ganha, n.feito], [n.feito, n.gravaFeito]]) liga(cx, a.name, b.name);
+  return { name: 'BMH · Kommo · passagem para a unidade', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none' }) };
+}
+
 // ---------------- recebedor oficial da Meta (22/10/2026): o app da BMH assina o WhatsApp da recepção (coexistência) ----------------
 // Substitui a observação pela Evolution (que não entra no número: 4 aparelhos já conectados). GET = a verificação que a Meta faz
 // ao assinar (devolve o hub.challenge); POST = cada mensagem do paciente, eco do que a equipe mandou pelo celular e status do
@@ -943,7 +986,7 @@ function fluxoAvaliacoes() {
   const tags = (await api('tags?limit=100', 'GET')).data || []; const tagBMH = tags.find((t) => t.name === 'BMH');
     const so = process.argv.slice(2);   // ex.: node montar.js pagina guardiao (só esses)
   // o alerta vem primeiro: os outros precisam do id dele (errorWorkflow)
-  const fluxos = { alerta: fluxoAlerta, grava: fluxoGrava, pagina: fluxoPagina, igut: fluxoIgut, guardiao: fluxoGuardiao, botoes: fluxoBotoes, resumo: fluxoResumo, medicao: fluxoMedicao, mensal: fluxoMensal, numeros: fluxoNumeros, diretoria: fluxoPainelDiretoria, faturamento: () => fluxoPainelDiretoria('faturamento'), dre: fluxoDreAtualiza, drePagina: fluxoDrePagina, plantoes: fluxoPlantoes, plantoesEmails: fluxoPlantoesEmails, avaliacoes: fluxoAvaliacoes, nota: fluxoNota, vigia: fluxoVigia, organico: fluxoSearchConsole, radar: fluxoRadar, confirmacao: fluxoConfirmacao, origem: fluxoOrigem, recebedor: fluxoRecebedor, conversoes: fluxoConversoes, cliques: fluxoCliques, envio: fluxoEnvioConversoes, conversas: fluxoOrigemConversas, celular: fluxoLembreteCelular };
+  const fluxos = { alerta: fluxoAlerta, grava: fluxoGrava, pagina: fluxoPagina, igut: fluxoIgut, guardiao: fluxoGuardiao, botoes: fluxoBotoes, resumo: fluxoResumo, medicao: fluxoMedicao, mensal: fluxoMensal, numeros: fluxoNumeros, diretoria: fluxoPainelDiretoria, faturamento: () => fluxoPainelDiretoria('faturamento'), dre: fluxoDreAtualiza, drePagina: fluxoDrePagina, plantoes: fluxoPlantoes, plantoesEmails: fluxoPlantoesEmails, avaliacoes: fluxoAvaliacoes, nota: fluxoNota, vigia: fluxoVigia, organico: fluxoSearchConsole, radar: fluxoRadar, confirmacao: fluxoConfirmacao, origem: fluxoOrigem, passagem: fluxoPassagem, recebedor: fluxoRecebedor, conversoes: fluxoConversoes, cliques: fluxoCliques, envio: fluxoEnvioConversoes, conversas: fluxoOrigemConversas, celular: fluxoLembreteCelular };
   for (const [chave, monta] of Object.entries(fluxos).filter(([k]) => !so.length || so.includes(k))) {
     const f = comVigia(chave, monta());
     if (!/^BMH · /.test(f.name)) throw new Error('nome sem BMH');
