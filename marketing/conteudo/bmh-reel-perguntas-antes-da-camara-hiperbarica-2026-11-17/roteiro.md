@@ -25,7 +25,7 @@
 | Corpo 1 | tela: **1. TEM MÉDICO NA SESSÃO?** | "Primeira: tem médico na unidade durante a sessão? Médico responsável é uma coisa. Médico ali, na sessão, é outra." |
 | Loop | | "A segunda quase ninguém faz." |
 | Corpo 2 | tela: **2. QUEM AVALIA SE EU POSSO?** | "Segunda: quem avalia se eu posso fazer? Antes da primeira sessão, um médico confere se há contraindicação." ⚕ |
-| Loop | | "E a terceira é a que mais gera dúvida." |
+| Loop | | "E a terceira é para quem está no pós-operatório." |
 | Corpo 3 | tela: **3. QUANTAS SESSÕES, E POR QUÊ?** | "Terceira: quantas sessões, e por quê? Depende da resposta do tecido, e o médico tem que te explicar." |
 | CTA | | "Na BMH, tem médico em todas as sessões. Manda para quem vai começar a câmara." |
 
