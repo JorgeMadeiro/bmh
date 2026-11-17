@@ -3,7 +3,7 @@
 **Origem:** roteiro da Kamila (Atendja), recebido em 17/11/2026, reescrito no formato da casa (8 passos do método O Primeiro Take).
 **Intenção:** autoridade. **Palavra-chave:** câmara hiperbárica em Brasília.
 **Quem fala:** Dr. Jorge como diretor médico, ou a voz da clínica. Sempre "nós" e "a BMH", nunca "eu".
-**Duração:** 35 a 45 s. **Gravar:** na unidade, com a câmara ao fundo (sem paciente no quadro).
+**Duração:** 25 a 30 s (versão enxuta de 17/11). **Gravar:** na unidade, com a câmara ao fundo (sem paciente no quadro).
 
 ## O que mudou do original
 - Nome corrigido: **Brasília Medicina Hiperbárica** (o original dizia "Médica").
@@ -21,13 +21,13 @@
 
 | Passo | Tela | Fala |
 |---|---|---|
-| Gancho | escrito: **22 ANOS DE CÂMARA HIPERBÁRICA EM BRASÍLIA** | "Em 2004, abria a primeira clínica particular de câmara hiperbárica de Brasília." |
-| Promessa | | "Ser o primeiro é chegar antes. Mas 22 anos pedem mais do que isso, e a gente te mostra o quê." |
-| Corpo 1 | | "De lá para cá, a medicina hiperbárica mudou: protocolos, indicações e a forma de acompanhar cada paciente. E a BMH mudou junto." |
-| Loop | | "Mas uma coisa nunca mudou." |
+| Gancho | escrito: **22 ANOS DE CÂMARA HIPERBÁRICA EM BRASÍLIA** | "Em 22 anos de câmara hiperbárica em Brasília, quase tudo mudou. Menos uma coisa." |
+| Promessa | | "Já te conto qual." |
+| Corpo 1 | | "Em 2004, a BMH abriu como a primeira clínica particular de câmara hiperbárica de Brasília. Hoje, a maioria dos pacientes chega no pós-operatório de cirurgia plástica." |
+| Loop | | "Os protocolos mudaram. As indicações também. Mas..." |
 | Corpo 2 | | "Médico na unidade em todas as sessões. Em todas." |
 | Loop | | "E quem define o seu tratamento?" |
-| Corpo 3 | | "Uma direção médica com pós-graduação em medicina hiperbárica, que responde pelos protocolos das duas unidades, Asa Sul e Taguatinga. Ser pioneiro é abrir caminho. Continuar merecendo a confiança é o trabalho de cada sessão." |
+| Corpo 3 | | "Uma direção médica com pós-graduação em medicina hiperbárica, responsável pelos protocolos das duas unidades." |
 | CTA | | "Conhece alguém que vai fazer cirurgia plástica? Manda este vídeo." |
 
 ## Legenda
@@ -60,6 +60,7 @@ BMH · Brasília Medicina Hiperbárica · Responsáveis técnicos: Dr. Hélio Iv
 - Sem comparação com concorrente, sem promessa, sem "urgência", sem "plantonista", sem UHMS (peça para paciente), sem travessão e sem hashtag.
 
 ## PARA CONFIRMAR (Jorge)
+0. **"Menos uma coisa" (gancho):** afirma médico em todas as sessões desde 2004. Se não foi sempre assim, trocar por "22 anos de câmara hiperbárica em Brasília, e uma regra que hoje não abre exceção".
 1. **Assinatura da legenda com os dois responsáveis técnicos:** a BMH ainda não tem padrão de assinatura no Instagram. Esta é a proposta.
 2. **"Protocolos de segurança nacionais e internacionais"** (do original): quais são? Se forem SBMH e UHMS, dá para voltar ao texto (sem citar UHMS em peça para paciente, então "diretrizes nacionais e internacionais").
 3. **"Médicos especializados" / "capacitados na área"** (do original): vale para os médicos que acompanham as sessões, ou só para a direção? Hoje o texto fala só da direção.
