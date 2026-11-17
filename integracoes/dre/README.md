@@ -56,3 +56,10 @@
 - Gravado pelo fluxo "BMH · DRE · atualiza do iGut" (nó `particular-forma.js`) na `BMH_particular_forma`
   (`JirKt7WQq5MsB4CZ`, `chave` = `mes|unidade|forma`), mesma rotina das 4h05; histórico desde jan/2024. Lido pela página da
   diretoria (não vai para o painel do faturamento, que não leva R$).
+- **Ordem fixa na tela** (Jorge, 17/11/2026): Dinheiro, PIX, Débito, Crédito 1x (o "à vista" gravado) a 12x; débito em conta,
+  transferência, crédito sem número de parcelas e outras no fim.
+- **Por que só o pago no caixa** (conferido em 17/11/2026, decisão do Jorge: "só o pago no caixa"): a API do iGut não liga o
+  pagamento à sessão. O lançamento do caixa vem sem favorecido, e `lancamento_origem` e `lancamento_fatura` não batem com
+  `agendamento_id`, `id` nem `paciente_id` do BI, nem com nenhum campo de `consultas/buscar` (2.203 agendamentos de out/2026);
+  os outros 17 endpoints da documentação não tratam de pagamento. Por isso Produzido e Faturado não se dividem por forma.
+  Ex.: nov/2026 até o dia 17, R$ 69 mil produzidos e R$ 21 mil pagos (sessões de pacotes pagos antes).
