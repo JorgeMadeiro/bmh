@@ -253,8 +253,11 @@ function desenha() {
   const seta = (tr, chave, ms, destino) => { if (D.fat || C !== 'PARTICULAR') return; const fs = formasDe(ms); if (!fs.length) return;
     const td = tr.firstChild; td.classList.add('abre'); if (abertosF.has(chave)) td.classList.add('aberto'); td.onclick = () => { abertosF.has(chave) ? abertosF.delete(chave) : abertosF.add(chave); desenha(); };
     if (!abertosF.has(chave)) return; const tot = fs.reduce((a, f) => a + f[1], 0);
-    for (const [f, v, n] of fs) { const st = el('tr', null, 'sub'); [f + ' · ' + n + (n === 1 ? ' pagamento' : ' pagamentos'), '', '', '', mil(v), pct(v, tot), '', ''].forEach(c => st.append(el('td', c))); destino.push(st); }
-    const st = el('tr', null, 'sub'); [(ms.length > 1 ? 'Pago no caixa no período' : 'Pago no caixa no mês'), '', '', '', mil(tot), '100%', '', ''].forEach(c => st.append(el('td', c))); st.style.fontWeight = '700'; destino.push(st); };
+    // formas numa linha corrida, fora das colunas (Jorge, 17/11/2026: o "21" embaixo de Recebido parecia outro recebido do mês)
+    const linha = (txt, extra) => { const st = el('tr', null, 'sub'), td = el('td'); td.colSpan = 8; td.style.whiteSpace = 'normal'; const caixa = el('div'); caixa.style.maxWidth = 'min(600px, calc(100vw - 72px))'; caixa.append(txt); if (extra) caixa.append(extra); td.append(caixa); st.append(td); destino.push(st); return td; };
+    const per = ms.length > 1 ? 'no período' : 'no mês', nota = el('div', 'Pacote comprado ' + per + ' entra aqui; sessão feita ' + per + ' com pacote pago antes, não. Por isso não bate com o recebido da produção.'); nota.style.cssText = 'font-weight:400;font-size:11px;margin-top:2px';
+    const cab = linha('Entrou no caixa ' + (ms.length > 1 ? 'no período' : 'em ' + nomeMes(ms[0])) + ': R$ ' + Math.round(tot).toLocaleString('pt-BR'), nota); cab.style.fontWeight = '700'; cab.style.color = 'var(--tinta)';
+    for (const [f, v, n] of fs) linha(f + ' · ' + n + (n === 1 ? ' pagamento' : ' pagamentos') + ' · R$ ' + Math.round(v).toLocaleString('pt-BR') + ' · ' + pct(v, tot)); };
   for (const m of meses) { const r = fin(m); if (!r.p || !noPeriodo(m)) continue;
     const tr = el('tr');
     const ok = m >= CONTROLE; [nomeMes(m) + (m === mesAtual ? '*' : ''), mil(r.p), ok ? mil(r.f) : '—', ok ? mil(r.af) : '—', ok ? mil(r.r) : '—', ok ? pct(r.r, FAT ? r.p : r.p - r.g) : '—', ok ? mil(r.ar) : '—', ok ? mil(r.g) : '—'].forEach((v, i) => tr.append(celula(v, ok ? SIT_COL[i] : null, [m], nomeMes(m)))); linhasMes.push(tr); seta(tr, m, [m], linhasMes);
