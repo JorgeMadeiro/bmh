@@ -242,9 +242,14 @@ function desenha() {
   const ult12 = new Set(meses.filter(m => noPeriodo(m)));   // total = todos os meses do período escolhido, com o mês em andamento (Jorge, 20/10/2026)
   const linhasMes = [];
   // seta do mês com o filtro PARTICULAR (17/11/2026): pago no caixa do iGut no mês, por forma de pagamento
-  const PFORMA = ['Crédito à vista', ...Array.from({ length: 9 }, (_, i) => 'Crédito ' + (i + 2) + 'x'), 'Crédito parcelado', 'Débito', 'Débito em conta', 'PIX', 'Transferência', 'Dinheiro', 'Outras'];
-  const formasDe = ms => { const s = {}; for (const x of (D.PF || [])) { if (!ms.includes(x[0]) || (U && x[1] !== U)) continue; const a = (s[x[2]] ||= [0, 0]); a[0] += x[3]; a[1] += x[4]; } const ord = f => { const i = PFORMA.indexOf(f); if (i >= 0) return i; const n = Number((f.match(/(\d+)x$/) || [])[1]); return n ? 9.5 + n / 100 : 99; };   // parcela fora do costume (11x, 12x) logo depois do 10x
-    return Object.keys(s).sort((a, b) => ord(a) - ord(b)).map(f => [f, ...s[f]]); };
+  // ordem fixa (Jorge, 17/11/2026): Dinheiro, PIX, Débito, Crédito 1x a 12x (e acima, com o número real); as raras no fim.
+  // Sem barra invertida aqui: este código fica dentro do HTML montado com crase e a barra some (o 12x caía no fim da lista)
+  const nomeF = f => f === 'Crédito à vista' ? 'Crédito 1x' : f;
+  const ordF = f => { f = nomeF(f); const i = ['Dinheiro', 'PIX', 'Débito'].indexOf(f); if (i >= 0) return i;
+    if (f.startsWith('Crédito ') && f.endsWith('x')) { const n = parseInt(f.slice(8), 10); if (n > 0) return 2 + n; }
+    const j = ['Crédito parcelado', 'Débito em conta', 'Transferência', 'Outras'].indexOf(f); return 1000 + (j < 0 ? 9 : j); };
+  const formasDe = ms => { const s = {}; for (const x of (D.PF || [])) { if (!ms.includes(x[0]) || (U && x[1] !== U)) continue; const a = (s[x[2]] ||= [0, 0]); a[0] += x[3]; a[1] += x[4]; }
+    return Object.keys(s).sort((a, b) => ordF(a) - ordF(b)).map(f => [nomeF(f), ...s[f]]); };
   const seta = (tr, chave, ms, destino) => { if (D.fat || C !== 'PARTICULAR') return; const fs = formasDe(ms); if (!fs.length) return;
     const td = tr.firstChild; td.classList.add('abre'); if (abertosF.has(chave)) td.classList.add('aberto'); td.onclick = () => { abertosF.has(chave) ? abertosF.delete(chave) : abertosF.add(chave); desenha(); };
     if (!abertosF.has(chave)) return; const tot = fs.reduce((a, f) => a + f[1], 0);
