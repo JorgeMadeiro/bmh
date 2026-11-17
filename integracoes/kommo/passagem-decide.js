@@ -16,6 +16,12 @@ const FUNIL = { triagem: 14783287, 'Asa Sul': 14783519, Taguatinga: 14783523 };
 const ETAPA = { 'Asa Sul': 114237079, Taguatinga: 114237099 };
 const UNIDADE = { campo: 626676, 'Asa Sul': 463116, Taguatinga: 463118 }, ID_IGUT = 626684;
 const COPIAR = [626668, 624514, 624510, 624512, 624508, 624516, 624524, 624526, 626670, 626672, 626674, 626678, 626680, 626682];
+// particular, convênio e retorno (17/11/2026): convênio pela agenda do iGut ("PARTICULAR" = particular; cortesia e voucher
+// ficam em branco); retorno = já teve sessão com valor antes deste mês (BMH_financeiro_paciente, desde nov/2024)
+const PAG = { campo: 626678, Particular: 463120, 'Convênio': 463122 }, CONVENIO = 626680;
+const mesAtual = $now.setZone('America/Sao_Paulo').toFormat('yyyy-MM'), jaFez = new Set();
+for (const i of $('Histórico de pacientes').all()) { const r = i.json || {}; if (r.paciente_id && r.mes < mesAtual && Number(r.valor) > 0) jaFez.add(String(r.paciente_id)); }
+const pagamento = (c) => { const n = String(c || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); return !n || /cortesia|voucher/.test(n) ? '' : /particular/.test(n) ? 'Particular' : 'Convênio'; };
 const chaveFone = (s) => { let d = String(s || '').replace(/\D/g, ''); if (d.startsWith('55') && d.length >= 12) d = d.slice(2); return d.length >= 10 ? d.slice(0, 2) + d.slice(-8) : ''; };
 const porFone = {};
 for (const c of Object.values(contatos)) for (const f of (c.custom_fields_values || []).filter((f) => f.field_code === 'PHONE'))
@@ -35,11 +41,18 @@ for (const a of AV) {
     contato_id: String(tri?.contato || naUnidade?.contato || ids[0] || ''), lead_triagem: String(tri?.l.id || ''), lead_unidade: String(naUnidade?.l.id || ''),
     acao, modo, status: acao !== 'passar' ? 'nada a fazer' : modo === 'real' ? 'a fazer' : 'ensaio', detalhe: ids.length > 1 ? ids.length + ' contatos com o mesmo celular' : '', atualizado_em: agora };
   if (acao === 'passar') {
-    const campos = [...copia(tri.l).filter((f) => f.field_id !== UNIDADE.campo), { field_id: UNIDADE.campo, values: [{ enum_id: UNIDADE[a.unidade] }] }, { field_id: ID_IGUT, values: [{ value: a.pid }] }];
+    const pg = pagamento(a.convenio), retorno = jaFez.has(a.pid);
+    const doIgut = [{ field_id: UNIDADE.campo, values: [{ enum_id: UNIDADE[a.unidade] }] }, { field_id: ID_IGUT, values: [{ value: a.pid }] },
+      ...(pg ? [{ field_id: PAG.campo, values: [{ enum_id: PAG[pg] }] }] : []), ...(pg === 'Convênio' ? [{ field_id: CONVENIO, values: [{ value: a.convenio }] }] : [])];
+    const novas = [pg === 'Particular' ? 'particular' : pg === 'Convênio' ? 'convênio' : '', retorno ? 'retorno' : ''].filter(Boolean).map((name) => ({ name }));
+    const ids_ = new Set(doIgut.map((f) => f.field_id));
+    const campos = [...copia(tri.l).filter((f) => !ids_.has(f.field_id)), ...doIgut];
+    r.detalhe = [pg || 'sem pagamento na agenda', retorno ? 'retorno' : '', r.detalhe].filter(Boolean).join(' · ');
     r.novo = { name: tri.l.name || 'Avaliação ' + a.unidade, pipeline_id: FUNIL[a.unidade], status_id: ETAPA[a.unidade], custom_fields_values: campos,
-      _embedded: { contacts: [{ id: tri.contato }], tags: (tri.l._embedded?.tags || []).map((t) => ({ id: t.id })) } };
-    r.ganha = { id: tri.l.id, pipeline_id: FUNIL.triagem, status_id: 142, custom_fields_values: [{ field_id: UNIDADE.campo, values: [{ enum_id: UNIDADE[a.unidade] }] }, { field_id: ID_IGUT, values: [{ value: a.pid }] }] };
+      _embedded: { contacts: [{ id: tri.contato }], tags: [...(tri.l._embedded?.tags || []).map((t) => ({ id: t.id })), ...novas] } };
+    r.ganha = { id: tri.l.id, pipeline_id: FUNIL.triagem, status_id: 142, custom_fields_values: doIgut };
   }
+  if (acao !== 'passar') r.detalhe = [pagamento(a.convenio) || 'sem pagamento na agenda', jaFez.has(a.pid) ? 'retorno' : '', r.detalhe].filter(Boolean).join(' · ');
   out.push({ json: r });
 }
 return out;

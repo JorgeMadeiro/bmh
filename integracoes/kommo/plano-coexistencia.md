@@ -301,3 +301,15 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
   UTMs, cirurgião, pagamento, convênio, tipo de caso e etiquetas) e depois marca o da triagem como ganho. Retorno, troca de
   unidade e quem marcou sem conversar no WhatsApp ficam só registrados. Modo `passagem_modo` (ensaio | real). Ensaio de
   17/11, 18h50: 31 avaliações até 28/11, todas "sem contato no Kommo" (o Kommo ainda vazio).
+- **Particular, convênio e retorno** (17/11/2026, na passagem): convênio pela agenda do iGut ("PARTICULAR" = Particular;
+  cortesia e voucher em branco; o resto = Convênio, com o nome no campo "Convênio"); retorno = já teve sessão com valor antes
+  do mês (BMH_financeiro_paciente, desde nov/2024); etiquetas "particular", "convênio" e "retorno" no lead da unidade.
+  Ensaio de 17/11: 21 convênio, 3 convênio com retorno, 5 particular, 2 em branco.
+- **Conversão "agendou"** (17/11/2026): a passagem grava em `BMH_conversoes` a avaliação marcada na primeira vez que a vê
+  (chave `agendou|paciente|dia da avaliação`, só as novas, telefone e e-mail em código; código em
+  `integracoes/kommo/passagem-agendou.js`). **Ainda não é enviada:** o `envio-monta.js` só manda avaliou e iniciou. Para
+  ligar: criar no Google Ads a conversão secundária "BMH · Agendou avaliação (iGut)" e pôr `agendou` em ACOES e META
+  (na Meta, o evento padrão `Schedule`), com o ok do Jorge. As 31 da primeira rodada (17/11) foram marcadas antes e estão
+  com o dia 17/11: não enviar essas.
+- **BMH_config:** `kommo_campos` com `mensagem_enviar` (627592) e `kommo_bot_envia_mensagem` = 15128 (17/11/2026, por fluxo
+  temporário, porque a API pública do n8n não altera linha).

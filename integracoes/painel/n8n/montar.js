@@ -689,10 +689,14 @@ function fluxoPassagem() {
     janela: no('Janela', 'n8n-nodes-base.code', 2, { jsCode: "// de hoje até 14 dias à frente\nconst h = $now.setZone('America/Sao_Paulo');\nreturn [{ json: { ini: h.toISODate(), fim: h.plus({ days: 14 }).toISODate() } }];" }, { executeOnce: true }),
     config: le('Config', 'BMH_config'),
     feitas: le('Já feitas', 'BMH_passagens'),
+    hist: le('Histórico de pacientes', 'BMH_financeiro_paciente'),
     ag: no('Agenda', 'n8n-nodes-base.httpRequest', 4.2, { method: 'POST', url: 'https://api.igut.med.br/v2/consultas/buscar', authentication: 'genericCredentialType', genericAuthType: 'httpCustomAuth',
       sendBody: true, specifyBody: 'json', jsonBody: "={{ JSON.stringify({ 'Agendamento.data': $('Janela').first().json.ini, 'Agendamento.data_fim': $('Janela').first().json.fim }) }}", options: { timeout: 180000 } },
       { credentials: IGUT, executeOnce: true }),
     av: no('Avaliações novas', 'n8n-nodes-base.code', 2, { jsCode: ler('../../kommo/passagem-avaliacoes.js').replace('/*__SHA256__*/', ler('../../comum/sha256.js')) }, { executeOnce: true }),
+    convTab: le('Conversões (tabela)', 'BMH_conversoes'),
+    agendou: codigo('Agendou (conversões novas)', '../../kommo/passagem-agendou.js', { executeOnce: true }),
+    gravaConv: grava('Grava o agendou', 'BMH_conversoes'),
     leads: no('Leads no Kommo', 'n8n-nodes-base.httpRequest', 4.2, { method: 'GET', url: 'https://bmh.kommo.com/api/v4/leads', ...K, sendQuery: true, specifyQuery: 'keypair',
       queryParameters: { parameters: [{ name: 'with', value: 'contacts' }, { name: 'limit', value: '250' }, { name: 'filter[pipeline_id][0]', value: '14783287' }, { name: 'filter[pipeline_id][1]', value: '14783519' }, { name: 'filter[pipeline_id][2]', value: '14783523' }] },
       options: { pagination: { pagination: { parameters: { parameters: [{ type: 'qs', name: 'page', value: '={{ $pageCount + 1 }}' }] }, paginationCompleteWhen: 'receiveSpecificStatusCodes', statusCodesWhenComplete: '204', limitPagesFetched: true, maxRequests: 40, requestInterval: 300 } } } },
@@ -707,11 +711,11 @@ function fluxoPassagem() {
     gravaFeito: grava('Grava a passagem feita', 'BMH_passagens'),
     grava: grava('Grava a decisão', 'BMH_passagens'),
     resumo: no('Resumo', 'n8n-nodes-base.code', 2, { jsCode: "// só contagens (é o que o \"Rodar agora\" devolve)\nconst it = $('Decide a passagem').all().map((i) => i.json), c = {}; for (const r of it) c[r.acao] = (c[r.acao] || 0) + 1;\nreturn [{ json: { modo: it[0]?.modo || '-', avaliacoes: it.length, ...c } }];" }, { executeOnce: true }),
-    nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Kommo · passagem para a unidade\n**Traz:** avaliações dos próximos 14 dias no iGut (agendas 113 Asa Sul e 120 Taguatinga) e os leads e contatos dos três funis do Kommo\n**Envia:** no modo real, cria o lead no funil da unidade (Avaliação agendada, com origem, cirurgião e convênio copiados) e marca o da triagem como ganho\n**Limites:** casa pelo celular (DDD + 8 últimos dígitos); retorno, troca de unidade e quem marcou sem conversar ficam só registrados (a recepção resolve); 5 chamadas por segundo ao Kommo; BMH_passagens sem nome nem celular\n\nModo na chave `passagem_modo` de BMH_config (ensaio | real). Teste: /webhook/' + IDS.kommo.passagem, width: 620, height: 260 }),
+    nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Kommo · passagem para a unidade\n**Traz:** avaliações dos próximos 14 dias no iGut (agendas 113 Asa Sul e 120 Taguatinga) e os leads e contatos dos três funis do Kommo\n**Envia:** no modo real, cria o lead no funil da unidade (Avaliação agendada, com origem, cirurgião e convênio copiados) e marca o da triagem como ganho; preenche particular ou convênio e o convênio pela agenda, e a etiqueta retorno (já teve sessão antes, BMH_financeiro_paciente); grava a conversão agendou em BMH_conversoes (só as novas)\n**Limites:** casa pelo celular (DDD + 8 últimos dígitos); retorno, troca de unidade e quem marcou sem conversar ficam só registrados (a recepção resolve); 5 chamadas por segundo ao Kommo; BMH_passagens sem nome nem celular\n\nModo na chave `passagem_modo` de BMH_config (ensaio | real). Teste: /webhook/' + IDS.kommo.passagem, width: 620, height: 260 }),
   };
   const cx = {};
   liga(cx, n.agenda.name, n.janela.name); liga(cx, n.manual.name, n.janela.name);
-  for (const [a, b] of [[n.janela, n.config], [n.config, n.feitas], [n.feitas, n.ag], [n.ag, n.av], [n.av, n.leads], [n.leads, n.quais], [n.quais, n.contatos], [n.contatos, n.decide], [n.decide, n.real], [n.decide, n.grava], [n.grava, n.resumo], [n.real, n.cria], [n.cria, n.ganha], [n.ganha, n.feito], [n.feito, n.gravaFeito]]) liga(cx, a.name, b.name);
+  for (const [a, b] of [[n.janela, n.config], [n.config, n.feitas], [n.feitas, n.hist], [n.hist, n.ag], [n.ag, n.av], [n.av, n.leads], [n.leads, n.quais], [n.quais, n.contatos], [n.contatos, n.decide], [n.decide, n.real], [n.av, n.convTab], [n.convTab, n.agendou], [n.agendou, n.gravaConv], [n.decide, n.grava], [n.grava, n.resumo], [n.real, n.cria], [n.cria, n.ganha], [n.ganha, n.feito], [n.feito, n.gravaFeito]]) liga(cx, a.name, b.name);
   return { name: 'BMH · Kommo · passagem para a unidade', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none' }) };
 }
 

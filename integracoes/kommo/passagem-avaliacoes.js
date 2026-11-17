@@ -3,7 +3,7 @@
 // consulta da unidade (113 Asa Sul, 120 Taguatinga) com tipo de atendimento "avaliação", como na confirmação da véspera.
 // Fica de fora: falta já marcada, horário bloqueado, sem paciente, celular inválido e a avaliação que já virou passagem
 // no modo real (status "feito" em BMH_passagens). O celular só segue no item para casar com o contato do Kommo; na tabela
-// fica em código (sha256).
+// fica em código (sha256). O convênio da avaliação segue para os campos "Particular ou convênio" e "Convênio" do lead.
 /*__SHA256__*/
 const AGENDAS = { 113: 'Asa Sul', 120: 'Taguatinga' };
 const NAO_VEIO = ['faltou', 'desmarcado', 'desistiu'];
@@ -22,7 +22,11 @@ for (const x of lista) {
   if (!norm(x.Agendamento?.tipodeatendimento).includes('avaliac')) continue;
   const pid = x.Paciente?.id, fone = celular(x.Paciente?.celular); if (!pid || !fone) continue;
   const hora = String(x.Agendamento?.horario || '').slice(0, 5), atual = porPaciente[pid];
-  if (!atual || dia + hora < atual.dia + atual.hora) porPaciente[pid] = { pid: String(pid), unidade, dia, hora, fone, agendamento: String(x.Agendamento?.id || '') };
+  if (!atual || dia + hora < atual.dia + atual.hora) porPaciente[pid] = { pid: String(pid), unidade, dia, hora, fone, agendamento: String(x.Agendamento?.id || ''), convenio: String(x.Convenio?.nome || '').replace(/\s+/g, ' ').trim() };
 }
-return Object.values(porPaciente).map((p) => ({ chave: p.pid + '|' + p.dia, ...p, telefone_hash: sha256(p.fone) }))
+// para a conversão "agendou" (mesmo formato do eventos-igut.js): telefone com e sem o 9 (Meta), com "+" (Google), e-mail
+const sem9 = (f) => f.slice(0, 4) + f.slice(5);
+const emailDe = {}; for (const x of lista) { const e = String(x.Paciente?.email || '').trim().toLowerCase(); if (x.Paciente?.id && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)) emailDe[x.Paciente.id] = e; }
+return Object.values(porPaciente).map((p) => ({ chave: p.pid + '|' + p.dia, ...p, telefone_hash: sha256(p.fone),
+  conv: { telefone_hash_sem9: sha256(sem9(p.fone)), telefone_hash_google: sha256('+' + p.fone), email_hash: emailDe[p.pid] ? sha256(emailDe[p.pid]) : '' } }))
   .filter((p) => !feitas.has(p.chave)).map((json) => ({ json }));
