@@ -274,3 +274,23 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
   "Avaliou · pedido a enviar" › Aguardando convênio › Em tratamento; só a alta é ganho (Concluiu). Manual: no iGut a
   reavaliação aparece quase sempre como retorno, que também acontece por intercorrência no meio do tratamento.
 - **Motivo de perda novo:** "Interrompeu o tratamento" (criado pelo Jorge na tela, 17/11/2026).
+
+## 7. WhatsApp conectado no Kommo (17/11/2026, 18h20)
+
+- **O que travava:** na conexão, a Meta mostrava o número como "Não qualificado: este número não pode ser compartilhado
+  com este app", nas opções "Aplicativo WhatsApp Business" e "WhatsApp". A causa real só apareceu ao digitar o número:
+  **"Seu número está vinculado aos eventos automáticos"** (erro 3441106). As **listas automáticas** do app
+  (Ferramentas comerciais › Listas) tinham feito a Meta criar sozinha a conta de mensagens 198826156641686, tipo
+  "Aplicativo WhatsApp Business", no portfólio da BMH, sem parceiro nenhum. Por isso o número já estava na API em
+  22/10 sem app assinado.
+- **O que resolveu:** desligar as listas automáticas no celular da Asa Sul e conectar de novo pela opção do app no Kommo.
+  Mensagem de saudação, ausência e respostas rápidas não têm nada a ver com isso.
+- **Conferido pela API às 18h26:** o número ficou na **mesma** conta (198826156641686), em coexistência; dois apps
+  assinados (Kommo 1022173854571346 e BMH 1104609048722893); modelo `confirmacao_sessao_v1` aprovado; o recebedor
+  oficial seguiu gravando (teste do Jorge às 18h27).
+- **Cuidado:** a tela de conexão que pede SMS ou ligação é o cadastro só na API e pode tirar o número do app do celular.
+  O caminho da coexistência pede QR ou confirmação no celular.
+- **No Kommo:** fonte "Brasília Medicina Hiperbárica" no funil Triagem e conversão; "Importar contatos" desligado (o
+  contato nasce quando conversa). A configuração do Kommo leva alguns minutos depois de conectar.
+- **Fluxo de origem:** ganhou o PATCH no lead (credencial n8n "BMH · Kommo (token)", `xpwKz2vMUxgqhNBo`, lote de 5 por
+  segundo), ainda em ensaio até a primeira mensagem real cair certa.

@@ -661,9 +661,14 @@ function fluxoOrigem() {
     le_: no('Lê a origem', 'n8n-nodes-base.code', 2, { jsCode: ler('../../origem/origem-kommo.js').replace('__FRASES__', frases) }, { executeOnce: true }),
     registro: no('Monta o registro', 'n8n-nodes-base.code', 2, { jsCode: "// uma linha por mensagem com frase ou com lead, sem o texto (só a origem); a chave não repete a mesma mensagem\nreturn $input.all().filter((i) => i.json.lead_id || i.json.frase).map((i) => ({ json: { ...i.json, chave: [i.json.conversa_id || '-', i.json.lead_id || i.json.contato_id || '-', i.json.recebida_em || '-'].join('|'), lead_id: String(i.json.lead_id || ''), contato_id: String(i.json.contato_id || ''), recebida_em: i.json.recebida_em ? new Date(i.json.recebida_em * 1000).toISOString() : '' } }));" }),
     grava: grava('Grava a origem', 'BMH_origem_leads'),
-    nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Kommo · origem do lead\n**Traz:** o webhook de conta do Kommo (mensagem recebida)\n**Envia:** hoje nada ao Kommo (ensaio); grava a origem em BMH_origem_leads\n**Limites:** sem o texto da mensagem; só lead (mensagem de contato é ignorada); frase pela lista única integracoes/origem/frases.json\n\nModo na chave `origem_modo` (ensaio | real). Na virada: registrar este endereço no webhook de conta do Kommo e acrescentar o PATCH no lead (credencial BMH · Kommo, 5 por segundo).', width: 620, height: 220 }),
+    // 17/11/2026: o PATCH no lead, só no modo real e só com frase achada (campos de origem + etiqueta), 5 por segundo
+    real: no('Só no modo real', 'n8n-nodes-base.code', 2, { jsCode: "return $('Lê a origem').all().filter((i) => i.json.modo === 'real' && i.json.patch).map((i) => ({ json: { lead_id: i.json.lead_id, patch: i.json.patch } }));" }),
+    patch: no('Grava no lead (Kommo)', 'n8n-nodes-base.httpRequest', 4.2, { method: 'PATCH', url: 'https://bmh.kommo.com/api/v4/leads', authentication: 'genericCredentialType', genericAuthType: 'httpHeaderAuth',
+      sendBody: true, specifyBody: 'json', jsonBody: '={{ JSON.stringify($json.patch) }}', options: { batching: { batch: { batchSize: 5, batchInterval: 1000 } } } },
+      { credentials: cred('httpHeaderAuth', 'BMH · Kommo (token)') }),
+    nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Kommo · origem do lead\n**Traz:** o webhook de conta do Kommo (mensagem recebida, cadastrado na tela do Kommo em 17/11/2026)\n**Envia:** no modo real, os campos de origem e a etiqueta no lead (PATCH, credencial BMH · Kommo (token), 5 por segundo); grava a origem em BMH_origem_leads\n**Limites:** sem o texto da mensagem; só lead (mensagem de contato é ignorada); só grava quando acha a frase pronta (lista única integracoes/origem/frases.json)\n\nModo na chave `origem_modo` (ensaio | real).', width: 620, height: 220 }),
   };
-  const cx = {}; for (const [a, b] of [[n.recebe, n.config], [n.config, n.le_], [n.le_, n.registro], [n.registro, n.grava]]) liga(cx, a.name, b.name);
+  const cx = {}; for (const [a, b] of [[n.recebe, n.config], [n.config, n.le_], [n.le_, n.registro], [n.registro, n.grava], [n.le_, n.real], [n.real, n.patch]]) liga(cx, a.name, b.name);
   return { name: 'BMH · Kommo · origem do lead', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none' }) };
 }
 
