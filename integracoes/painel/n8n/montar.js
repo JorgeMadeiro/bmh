@@ -435,7 +435,7 @@ function fluxoPainelDiretoria(modo = 'diretoria') {
     // página
     fin: le('Financeiro (tabela)', 'BMH_financeiro_mes'), op: le('Operação (tabela)', 'BMH_operacao_dia'), det: le('Detalhes (tabela)', 'BMH_financeiro_detalhe'), prazo: le('Prazo (tabela)', 'BMH_prazo_recebimento'),
     pedTab: le('Pedido (tabela)', 'BMH_diretoria_pedido'), opcTab: le('Operação por convênio (tabela)', 'BMH_operacao_conv'), opkTab: le('Operação por câmara (tabela)', 'BMH_operacao_camara'), opkcTab: le('Operação por câmara e convênio (tabela)', 'BMH_operacao_camconv'),
-    chaveTab: le('Chave da lista (tabela)', 'BMH_diretoria_chave'), formaTab: le('Particular por forma (tabela)', 'BMH_particular_forma'),
+    chaveTab: le('Chave da lista (tabela)', 'BMH_diretoria_chave'),
     monta: no('Monta a página', 'n8n-nodes-base.code', 2, { jsCode: ler('../../grupos/painel-diretoria.js').replace('__MODO__', modo).replace('__CAMINHO_LISTA__', process.env.N8N_URL.replace(/\/$/, '') + '/webhook/' + (FAT ? listaFaturamento() : listaDiretoria())) }, { executeOnce: true }),   // endereço completo: a página também abre pela Central (central.cannlink.com.br/paineis/...)
     gravaChave: grava('Grava a chave da lista', 'BMH_diretoria_chave'),
     // lista de pacientes pelo endereço próprio (22/10/2026): sem senha do navegador (o Safari não a manda de dentro da página
@@ -459,7 +459,7 @@ function fluxoPainelDiretoria(modo = 'diretoria') {
   cx[n.ehLista.name] = { main: [[{ node: n.pacTab.name, type: 'main', index: 0 }], [{ node: n.fin.name, type: 'main', index: 0 }]] };
   liga(cx, n.wLista.name, n.chavePed.name); liga(cx, n.chavePed.name, n.confere.name);
   cx[n.confere.name] = { main: [[{ node: n.pacTab.name, type: 'main', index: 0 }], [{ node: n.nega.name, type: 'main', index: 0 }]] };
-  for (const [a, b] of [[n.fin, n.op], [n.op, n.det], [n.det, n.prazo], [n.prazo, n.pedTab], [n.pedTab, n.opcTab], [n.opcTab, n.opkTab], [n.opkTab, n.opkcTab], [n.opkcTab, n.chaveTab], [n.chaveTab, n.formaTab], [n.formaTab, n.monta], [n.monta, n.gravaChave], [n.monta, n.entrega], [n.pacTab, n.fimLista], [n.fimLista, n.lista], [n.lista, n.entregaLista]]) liga(cx, a.name, b.name);
+  for (const [a, b] of [[n.fin, n.op], [n.op, n.det], [n.det, n.prazo], [n.prazo, n.pedTab], [n.pedTab, n.opcTab], [n.opcTab, n.opkTab], [n.opkTab, n.opkcTab], [n.opkcTab, n.chaveTab], [n.chaveTab, n.monta], [n.monta, n.gravaChave], [n.monta, n.entrega], [n.pacTab, n.fimLista], [n.fimLista, n.lista], [n.lista, n.entregaLista]]) liga(cx, a.name, b.name);
   return { name: FAT ? 'BMH · Faturamento (painel)' : 'BMH · Diretoria (painel)', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none', saveDataErrorExecution: 'none' }) };   // tem nome de paciente: não guarda execução
 }
 

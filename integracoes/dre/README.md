@@ -63,3 +63,6 @@
   `agendamento_id`, `id` nem `paciente_id` do BI, nem com nenhum campo de `consultas/buscar` (2.203 agendamentos de out/2026);
   os outros 17 endpoints da documentação não tratam de pagamento. Por isso Produzido e Faturado não se dividem por forma.
   Ex.: nov/2026 até o dia 17, R$ 69 mil produzidos e R$ 21 mil pagos (sessões de pacotes pagos antes).
+- **17/11/2026, a seta saiu do painel** (Jorge: "ficou ruim, melhor solicitar a liberação ao iGut"): o pago no caixa não bate com a
+  produção do mês e confundia. O painel voltou a como era; a `BMH_particular_forma` continua sendo gravada toda noite pela DRE,
+  pronta para quando o iGut liberar a ligação pagamento × sessão. Pedido ao iGut: `saidas/igut-solicitacao-forma-pagamento-por-sessao-2026-11-17.md`.

@@ -169,5 +169,7 @@
   lote); no detalhe do recebido, "PARTICULAR (cartão)" ganhou "pacientes ›". Conferido: soma dos particulares = recebido
   particular do resumo em todos os 46 meses × unidade; convênio segue igual ao detalhe nos 2.147 lotes.
 
-- **Particular por forma de pagamento (17/11/2026):** com o filtro PARTICULAR, a seta do mês no Financeiro abre o pago no
-  caixa do iGut por forma (crédito à vista, 2x a 10x, débito, PIX, dinheiro...). Dados e regra em `integracoes/dre/README.md`.
+- **Particular por forma de pagamento (17/11/2026):** a seta foi testada e retirada no mesmo dia (o pago no caixa não bate com a
+  produção). Espera o iGut ligar pagamento × sessão na API; ver `integracoes/dre/README.md`.
+- **Particular conta como recebido no ato** (`financeiro-monta.js`): todo particular produzido entra em faturado e recebido, sem
+  olhar o campo `pago` do BI (out/2026: 301 sessões com `pago=S`, 6 sem marcação, R$ 2.200).
