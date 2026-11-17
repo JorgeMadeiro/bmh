@@ -26,9 +26,9 @@
 | Corpo 1 | | "Em 2004, a BMH abriu como a primeira clínica particular de câmara hiperbárica de Brasília. Hoje, a maioria dos pacientes chega no pós-operatório de cirurgia plástica." |
 | Loop | | "Os protocolos mudaram. As indicações também. Mas..." |
 | Corpo 2 | | "Médico na unidade em todas as sessões. Em todas." |
-| Loop | | "E quem define o seu tratamento?" |
-| Corpo 3 | | "Uma direção médica com pós-graduação em medicina hiperbárica, responsável pelos protocolos das duas unidades." |
-| CTA | | "Conhece alguém que precisa de câmara hiperbárica? Manda este vídeo." |
+| Loop | | "E não é detalhe." |
+| Corpo 3 | | "Câmara hiperbárica é tratamento médico. Do começo ao fim da sessão, tem que ter um médico por perto." |
+| CTA | | "Manda para quem precisa saber disso." |
 
 ## Legenda
 
@@ -38,7 +38,7 @@ Em 2004 abria a primeira clínica particular de oxigenoterapia hiperbárica de B
 
 Hoje a maior parte dos nossos pacientes chega pelo cirurgião plástico, no pós-operatório. Atendemos na Asa Sul e em Taguatinga.
 
-Conhece alguém que precisa de câmara hiperbárica? Manda este vídeo.
+Manda para quem precisa saber disso.
 
 Este conteúdo é informativo e não substitui uma avaliação médica.
 
