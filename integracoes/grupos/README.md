@@ -171,5 +171,9 @@
 
 - **Particular por forma de pagamento (17/11/2026):** a seta foi testada e retirada no mesmo dia (o pago no caixa não bate com a
   produção). Espera o iGut ligar pagamento × sessão na API; ver `integracoes/dre/README.md`.
-- **Particular conta como recebido no ato** (`financeiro-monta.js`): todo particular produzido entra em faturado e recebido, sem
-  olhar o campo `pago` do BI (out/2026: 301 sessões com `pago=S`, 6 sem marcação, R$ 2.200).
+- **Particular: recebido só com a marca de pago do iGut** (Jorge, 17/11/2026). Sessão particular com `pago=S` no BI = recebido;
+  sem a marca = a receber, numa linha "PARTICULAR (sem lote)" do detalhe, com a lista de pacientes. A recepção dá baixa uns
+  7 a 10 dias depois, então o mês corrente mostra a receber alto (nov/2026 no dia 17: 130 de 200 sessões). Vale desde jan/2025
+  (`PART_DESDE` no `montar.js`): antes a recepção não marcava (nov/2024 90% sem a marca, dez/2024 25%, depois 0 a 4%), e até
+  dez/2024 o particular segue como recebido no ato. Mesmo critério em `financeiro-monta.js`, `financeiro-detalhe.js` e
+  `financeiro-paciente.js`; no painel do faturamento, em sessões.

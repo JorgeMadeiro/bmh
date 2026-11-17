@@ -13,7 +13,9 @@ const CORTESIA = (c) => /voucher|cortesia/i.test(c || ''), FORA = (r) => FAT && 
 // 10/11/2026: 821 de 871 mês × unidade × convênio somam o total; nos outros 50 a diferença é exatamente a glosa)
 const sDet = {};
 if (FAT) for (const r of det) { if (FORA(r)) continue; const a = (sDet[r.mes + '|' + r.unidade + '|' + r.convenio] ||= { a_faturar: 0, recebido: 0, a_receber: 0, glosado: 0 }); if (r.situacao in a) a[r.situacao] += +r.sessoes || 0; }
-const finSessoes = (r) => { const s = +r.sessoes || 0; if (r.convenio === 'PARTICULAR' || CORTESIA(r.convenio)) return [r.mes, r.unidade, r.convenio, s, s, s, 0, s, 0, 0];   // particular e cortesia = recebido
+// sessões particulares que o iGut ainda não marcou como pagas (17/11/2026): vêm do detalhe, linha "a_receber" sem lote
+const arP = {}; for (const r of det) if (r.convenio === 'PARTICULAR' && r.situacao === 'a_receber') arP[r.mes + '|' + r.unidade] = (arP[r.mes + '|' + r.unidade] || 0) + (+r.sessoes || 0);
+const finSessoes = (r) => { const s = +r.sessoes || 0, ar = r.convenio === 'PARTICULAR' ? arP[r.mes + '|' + r.unidade] || 0 : 0; if (r.convenio === 'PARTICULAR' || CORTESIA(r.convenio)) return [r.mes, r.unidade, r.convenio, s, s, s, 0, s - ar, ar, 0];   // particular: pago no iGut = recebido, sem a marca = a receber (17/11/2026); cortesia = recebido
   const a = sDet[r.mes + '|' + r.unidade + '|' + r.convenio] || { a_faturar: 0, recebido: 0, a_receber: 0, glosado: 0 };
   return [r.mes, r.unidade, r.convenio, s, s, a.recebido + a.a_receber, a.a_faturar, a.recebido, a.a_receber, a.glosado]; };   // mesmo formato do F: sessões e produzido
 const hoje = $now.setZone('America/Sao_Paulo');
@@ -88,7 +90,7 @@ const inicioU = inicioDe(op, (r) => r.unidade), inicioK = inicioDe(opk, (r) => r
 const aleatorio = () => { try { return crypto.randomUUID().replace(/-/g, ''); } catch (e) { return Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16)).join(''); } };
 const chaveAtual = linhas('Chave da lista (tabela)').find((r) => r.chave === CHAVE) || {};
 const chaveLista = chaveAtual.dia === hoje.toISODate() && chaveAtual.token ? chaveAtual : { chave: CHAVE, token: aleatorio(), anterior: chaveAtual.token || '', dia: hoje.toISODate() };
-const DADOS = { fat: FAT, F, O: FAT ? [] : O, OC: FAT ? [] : OC, OK: FAT ? [] : OK, KC: FAT ? [] : KC, X, lista: { caminho: '__CAMINHO_LISTA__', t: chaveLista.token }, PZ, inicioOp, inicioU, inicioK, hoje: hoje.toISODate(), atOp, ET, pedido, atualizado: atualizado ? DateTime.fromISO(atualizado).setZone('America/Sao_Paulo').toFormat("dd/LL 'às' HH:mm") : '—' };
+const DADOS = { fat: FAT, F, arP, O: FAT ? [] : O, OC: FAT ? [] : OC, OK: FAT ? [] : OK, KC: FAT ? [] : KC, X, lista: { caminho: '__CAMINHO_LISTA__', t: chaveLista.token }, PZ, inicioOp, inicioU, inicioK, hoje: hoje.toISODate(), atOp, ET, pedido, atualizado: atualizado ? DateTime.fromISO(atualizado).setZone('America/Sao_Paulo').toFormat("dd/LL 'às' HH:mm") : '—' };
 const json = JSON.stringify(DADOS).replace(/</g, '\\u003c');
 
 const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -127,7 +129,7 @@ footer{color:var(--sec);font-size:12px;margin-top:24px;border-top:1px solid var(
 <h2>Prazo de recebimento</h2><p class="s">Dias, em média, da sessão até o convênio pagar (no período)</p><ul class="lista" id="lPrazo"></ul>
 ${FAT ? '' : `<h2>Operação</h2><p class="s" id="sOp">* mês em andamento, até ontem · Var. ano: sessões contra o mesmo mês do ano anterior · Var. mês: contra o mês anterior · Dias: dias com atendimento</p><div class="tab"><table id="tOp"></table></div>`}
 <div id="det"><div class="caixa"><button class="fechar" aria-label="Fechar">×</button><h3 id="dTit"></h3><p class="sub" id="dSub"></p><div id="dCorpo"></div></div></div>
-<footer>${FAT ? 'Números do iGut, gravados toda noite, em sessões. Produzido = faturado + a faturar; faturado = recebido + a receber. Glosado = sessões com glosa, que também estão em recebido ou a receber (a glosa costuma ser parcial). % = sessões recebidas sobre as produzidas. Particular conta como recebido (cartão, D+1). Voucher (cortesia) conta no produzido e no recebido, nunca no a faturar: não se fatura. Prazo: média ponderada pelas sessões pagas, só do que já foi pago. A receber: convênio não pagou ou falta baixa no iGut. &quot;—&quot;: ainda não registrado no iGut (lote e pagamento desde nov/2024).' : `Números do iGut, gravados toda noite. Produzido = faturado + a faturar; faturado = recebido + a receber + glosado; % recebido sem a glosa. Particular conta como recebido (cartão, D+1). Prazo: média ponderada pelo valor, só do que já foi pago (o que segue em aberto não entra). A receber: convênio não pagou ou falta baixa no iGut. Falta = faltou, desmarcou ou desistiu. "—": ainda não registrado no iGut (lote, pagamento e faltas desde nov/2024; avaliações desde mar/2024).`}</footer>
+<footer>${FAT ? 'Números do iGut, gravados toda noite, em sessões. Produzido = faturado + a faturar; faturado = recebido + a receber. Glosado = sessões com glosa, que também estão em recebido ou a receber (a glosa costuma ser parcial). % = sessões recebidas sobre as produzidas. Particular: recebido quando o iGut marca a sessão como paga; sem a marca fica em a receber (a recepção dá baixa uns dias depois). Voucher (cortesia) conta no produzido e no recebido, nunca no a faturar: não se fatura. Prazo: média ponderada pelas sessões pagas, só do que já foi pago. A receber: convênio não pagou ou falta baixa no iGut. &quot;—&quot;: ainda não registrado no iGut (lote e pagamento desde nov/2024).' : `Números do iGut, gravados toda noite. Produzido = faturado + a faturar; faturado = recebido + a receber + glosado; % recebido sem a glosa. Particular: recebido quando o iGut marca a sessão como paga; sem a marca fica em a receber (a recepção dá baixa uns dias depois). Prazo: média ponderada pelo valor, só do que já foi pago (o que segue em aberto não entra). A receber: convênio não pagou ou falta baixa no iGut. Falta = faltou, desmarcou ou desistiu. "—": ainda não registrado no iGut (lote, pagamento e faltas desde nov/2024; avaliações desde mar/2024).`}</footer>
 </main>
 <script>
 const D = ${json};
@@ -185,11 +187,11 @@ let ultimo = null;
 function abre(sit, meses, conv, rot) {
   ultimo = [sit, meses, conv, rot];
   const ms = new Set(meses), alvoConv = conv || C;
-  // o particular não tem lote: entra no "recebido" como uma linha por mês e unidade (cartão, D+1)
-  // no faturamento, a cortesia (voucher) também entra no recebido sem lote (10/11/2026)
+  // o particular não tem lote: entra no "recebido" como uma linha por mês e unidade (o que o iGut marcou como pago); o que
+  // falta marcar vem do detalhe, no a receber (17/11/2026). No faturamento, a cortesia (voucher) também entra no recebido
   const part = sit !== 'recebido' ? [] : D.F.filter(x => (x[2] === 'PARTICULAR' || (FAT && /voucher|cortesia/i.test(x[2]))) && x[7] > 0.5 && x[0] >= CONTROLE)   // antes de nov/2024 não há lista de pacientes (nem entra no total)
-    .map(x => [x[0], x[1], x[2] === 'PARTICULAR' ? 'PARTICULAR (cartão)' : x[2], 'recebido', '-', x[3], Math.round(x[7]), '']);
-  const linhas = [...D.X, ...part].filter(x => x[3] === sit && ms.has(x[0]) && (!U || x[1] === U) && (!alvoConv || x[2] === alvoConv || (alvoConv === 'PARTICULAR' && x[2] === 'PARTICULAR (cartão)')));
+    .map(x => [x[0], x[1], x[2] === 'PARTICULAR' ? 'PARTICULAR (sem lote)' : x[2], 'recebido', '-', x[2] === 'PARTICULAR' ? x[3] - (D.arP[x[0] + '|' + x[1]] || 0) : x[3], Math.round(x[7]), '']);
+  const linhas = [...D.X, ...part].filter(x => x[3] === sit && ms.has(x[0]) && (!U || x[1] === U) && (!alvoConv || x[2] === alvoConv || (alvoConv === 'PARTICULAR' && x[2] === 'PARTICULAR (sem lote)')));
   const porConv = {}; for (const x of linhas) (porConv[x[2]] ||= []).push(x);
   const total = linhas.reduce((s, x) => s + x[6], 0), sessoes = linhas.reduce((s, x) => s + x[5], 0);
   document.getElementById('dTit').textContent = NOME_SIT[sit] + ' · ' + (conv || rot);

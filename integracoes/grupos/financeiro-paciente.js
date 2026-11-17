@@ -1,7 +1,7 @@
 // Pacientes por lote (3º nível do painel da diretoria). Guardado no n8n por decisão do Jorge (09/10/2026: "pode guardar o
 // nome dos pacientes no n8n"), para a lista abrir na hora e servir de cópia de segurança se o iGut cair. Mínimo
 // necessário: nome, sessões, dias, médico solicitante e valor (sem CPF, telefone, endereço). Convênio e particular (o
-// particular entra como "recebido", sem lote: cartão, D+1; pedido do Jorge, 09/10/2026), desde nov/2024.
+// particular entra sem lote, no recebido se o iGut marcou pago e no a receber se não (17/11/2026)), desde nov/2024.
 // Mesma regra de situação do detalhe por lote (recebido, a_receber, a_faturar e glosado). Linha que deixa de existir no
 // mês refeito volta zerada (o painel ignora valor zero).
 const n = (v) => Number(v) || 0, CONTROLE = '2024-11';
@@ -24,7 +24,8 @@ meses.forEach((mes, k) => {
     const conv = /particular/i.test(convBruto) ? 'PARTICULAR' : convBruto;
     const particular = /particular/i.test(conv);
     const v = n(x.totalproduzido), g = particular ? 0 : n(x.total_glosa), lote = particular ? '-' : x.lote ? String(x.lote).trim() : '-';
-    const sit = particular || x.pago === 'S' ? 'recebido' : lote !== '-' ? 'a_receber' : 'a_faturar';
+    // particular: recebido só com a marca de pago do iGut (17/11/2026), igual ao financeiro-monta.js
+    const sit = x.pago === 'S' || (particular && mes < '__PART_DESDE__') ? 'recebido' : particular || lote !== '-' ? 'a_receber' : 'a_faturar';
     const pid = String(x.paciente_id || x.paciente || '?'), dia = Number(String(x.data || '').slice(8, 10));
     const soma = (situacao, valor) => {
       const chave = [mes, u, conv, situacao, lote, pid].join('|');

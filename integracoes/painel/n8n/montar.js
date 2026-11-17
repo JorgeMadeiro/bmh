@@ -33,7 +33,9 @@ let x = 0; const pos = (col, lin) => [col * 260, lin * 180];
 // linha, disparo de outro fluxo) passa retryOnFail: false, porque repetir depois de um tempo esgotado pode duplicar.
 const REDE = { retryOnFail: true, maxTries: 3, waitBetweenTries: 5000 };
 const no = (name, type, typeVersion, parameters, extra = {}) => ({ id: crypto.randomUUID(), name, type, typeVersion, position: pos(x++, 0), parameters, ...(type === 'n8n-nodes-base.httpRequest' ? REDE : {}), ...extra });
-const codigo = (name, arq, extra = {}) => no(name, 'n8n-nodes-base.code', 2, { jsCode: ler(arq) }, extra);
+// particular: recebido só com a marca de pago do iGut a partir deste mês (antes a recepção não marcava), 17/11/2026
+const PART_DESDE = '2025-01';   // medido em 17/11/2026: nov/24 90% sem a marca, dez/24 25%, de jan/25 em diante 0 a 4%
+const codigo = (name, arq, extra = {}) => no(name, 'n8n-nodes-base.code', 2, { jsCode: ler(arq).split('__PART_DESDE__').join(PART_DESDE) }, extra);
 const tabela = (nome) => ({ __rl: true, value: T[nome], mode: 'id', cachedResultName: nome });
 const COLUNAS = {
   BMH_google_anuncios_dia: { chave: 's', dia: 's', ad_id: 's', campanha: 's', grupo: 's', gasto: 'n', impressoes: 'n', cliques: 'n', contatos: 'n', ligacoes: 'n', atualizado_em: 's' },

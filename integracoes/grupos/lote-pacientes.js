@@ -30,7 +30,7 @@ for (const r of linhasTab) {
 let atualizado = ''; try { atualizado = $('Fim da última atualização').all().map((i) => (i.json && i.json.atualizado_em) || '').sort().pop(); } catch (e) {}
 const ps = Object.values(pac).sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
 const total = ps.reduce((s, p) => s + p.valor, 0), sessoes = ps.reduce((s, p) => s + p.sessoes, 0);
-const titulo = `${NOME_SIT[q.situacao] || ''} · ${q.lote && q.lote !== '-' ? 'Lote ' + q.lote + ' · ' : ''}${q.convenio === 'PARTICULAR' ? 'Particular (cartão)' : q.convenio || ''}`;
+const titulo = `${NOME_SIT[q.situacao] || ''} · ${q.lote && q.lote !== '-' ? 'Lote ' + q.lote + ' · ' : ''}${q.convenio === 'PARTICULAR' ? 'Particular' : q.convenio || ''}`;
 const sub = `${nomeMes(q.mes)} · ${q.unidade} · ${ps.length} ${ps.length === 1 ? 'paciente' : 'pacientes'} · ${sessoes} sessões${FAT ? '' : ' · ' + brl(total)}${atualizado ? ' · dados de ' + DateTime.fromISO(atualizado).setZone('America/Sao_Paulo').toFormat('dd/LL HH:mm') : ''}`;
 // texto para copiar e mandar à equipe (WhatsApp)
 const texto = [`*${titulo}*`, sub, '', ...ps.map((p) => `• ${p.nome} — ${p.sessoes} ${p.sessoes === 1 ? 'sessão' : 'sessões'} (${datas(p.dias)})${FAT ? '' : ' — ' + brl(p.valor)}`)].join('\n');
