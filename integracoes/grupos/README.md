@@ -168,3 +168,6 @@
 - **Particular também (09/10/2026):** `BMH_financeiro_paciente` guarda os pacientes particulares (situação "recebido", sem
   lote); no detalhe do recebido, "PARTICULAR (cartão)" ganhou "pacientes ›". Conferido: soma dos particulares = recebido
   particular do resumo em todos os 46 meses × unidade; convênio segue igual ao detalhe nos 2.147 lotes.
+
+- **Particular por forma de pagamento (17/11/2026):** com o filtro PARTICULAR, a seta do mês no Financeiro abre o pago no
+  caixa do iGut por forma (crédito à vista, 2x a 10x, débito, PIX, dinheiro...). Dados e regra em `integracoes/dre/README.md`.

@@ -44,3 +44,15 @@
   de costume; linha 40% e R$ 1.500 acima da média; "A classificar" do mês. A regra da Nexo de "2 favorecidos no aluguel"
   não vale (a BMH tem duas unidades e vários contratos). Marcar como conferido: fica riscado e some às 23h59.
 - Nenhum dado de paciente é gravado; os dois fluxos não guardam execução.
+
+## Particular por forma de pagamento (17/11/2026)
+
+- Pedido do Jorge: no painel da diretoria, "Financeiro da produção", com o filtro **PARTICULAR**, cada mês (e o "Período") ganha a
+  seta ▸ com o pago no caixa do iGut no mês por forma: crédito à vista, 2x a 10x (a BMH parcela até 10x; acima disso entra
+  com o número real, "Crédito 12x"), débito, débito em conta, PIX, transferência, dinheiro e "Outras" (forma nova nunca some).
+- Fonte: `receitasedespesas/financeiro`, campo `lancamento_forma` (o BI da produção não traz a forma). Só recebimento sem
+  categoria (paciente); cada lançamento é um pagamento com o valor inteiro. O total é o pago no mês: pacote pago num mês é
+  usado nos seguintes, então pode diferir do produzido (out/2026: R$ 110.960 no caixa, R$ 105.840 produzidos).
+- Gravado pelo fluxo "BMH · DRE · atualiza do iGut" (nó `particular-forma.js`) na `BMH_particular_forma`
+  (`JirKt7WQq5MsB4CZ`, `chave` = `mes|unidade|forma`), mesma rotina das 4h05; histórico desde jan/2024. Lido pela página da
+  diretoria (não vai para o painel do faturamento, que não leva R$).

@@ -44,6 +44,7 @@ const COLUNAS = {
   BMH_igut_dia: { chave: 's', dia: 's', unidade: 's', atendimentos: 'n', pacientes: 'n', valor: 'n' },
   BMH_financeiro_mes: { chave: 's', mes: 's', unidade: 's', convenio: 's', sessoes: 'n', produzido: 'n', faturado: 'n', a_faturar: 'n', recebido: 'n', a_receber: 'n', glosado: 'n', atualizado_em: 's' },
   BMH_financeiro_detalhe: { chave: 's', mes: 's', unidade: 's', convenio: 's', situacao: 's', lote: 's', sessoes: 'n', valor: 'n', glosa: 'n', dias: 's', atualizado_em: 's' },
+  BMH_particular_forma: { chave: 's', mes: 's', unidade: 's', forma: 's', valor: 'n', pagamentos: 'n', atualizado_em: 's' },
   BMH_dre_mensal: { chave: 's', mes: 's', grupo: 's', linha: 's', ordem: 'n', valor: 'n', fonte: 's', atualizado_em: 's' },
   BMH_dre_conferidos: { chave: 's', marcado_em: 's' },
   BMH_financeiro_paciente: { chave: 's', mes: 's', unidade: 's', convenio: 's', situacao: 's', lote: 's', paciente_id: 's', paciente: 's', sessoes: 'n', valor: 'n', dias: 's', medicos: 's', atualizado_em: 's' },
@@ -434,7 +435,7 @@ function fluxoPainelDiretoria(modo = 'diretoria') {
     // página
     fin: le('Financeiro (tabela)', 'BMH_financeiro_mes'), op: le('Operação (tabela)', 'BMH_operacao_dia'), det: le('Detalhes (tabela)', 'BMH_financeiro_detalhe'), prazo: le('Prazo (tabela)', 'BMH_prazo_recebimento'),
     pedTab: le('Pedido (tabela)', 'BMH_diretoria_pedido'), opcTab: le('Operação por convênio (tabela)', 'BMH_operacao_conv'), opkTab: le('Operação por câmara (tabela)', 'BMH_operacao_camara'), opkcTab: le('Operação por câmara e convênio (tabela)', 'BMH_operacao_camconv'),
-    chaveTab: le('Chave da lista (tabela)', 'BMH_diretoria_chave'),
+    chaveTab: le('Chave da lista (tabela)', 'BMH_diretoria_chave'), formaTab: le('Particular por forma (tabela)', 'BMH_particular_forma'),
     monta: no('Monta a página', 'n8n-nodes-base.code', 2, { jsCode: ler('../../grupos/painel-diretoria.js').replace('__MODO__', modo).replace('__CAMINHO_LISTA__', process.env.N8N_URL.replace(/\/$/, '') + '/webhook/' + (FAT ? listaFaturamento() : listaDiretoria())) }, { executeOnce: true }),   // endereço completo: a página também abre pela Central (central.cannlink.com.br/paineis/...)
     gravaChave: grava('Grava a chave da lista', 'BMH_diretoria_chave'),
     // lista de pacientes pelo endereço próprio (22/10/2026): sem senha do navegador (o Safari não a manda de dentro da página
@@ -458,7 +459,7 @@ function fluxoPainelDiretoria(modo = 'diretoria') {
   cx[n.ehLista.name] = { main: [[{ node: n.pacTab.name, type: 'main', index: 0 }], [{ node: n.fin.name, type: 'main', index: 0 }]] };
   liga(cx, n.wLista.name, n.chavePed.name); liga(cx, n.chavePed.name, n.confere.name);
   cx[n.confere.name] = { main: [[{ node: n.pacTab.name, type: 'main', index: 0 }], [{ node: n.nega.name, type: 'main', index: 0 }]] };
-  for (const [a, b] of [[n.fin, n.op], [n.op, n.det], [n.det, n.prazo], [n.prazo, n.pedTab], [n.pedTab, n.opcTab], [n.opcTab, n.opkTab], [n.opkTab, n.opkcTab], [n.opkcTab, n.chaveTab], [n.chaveTab, n.monta], [n.monta, n.gravaChave], [n.monta, n.entrega], [n.pacTab, n.fimLista], [n.fimLista, n.lista], [n.lista, n.entregaLista]]) liga(cx, a.name, b.name);
+  for (const [a, b] of [[n.fin, n.op], [n.op, n.det], [n.det, n.prazo], [n.prazo, n.pedTab], [n.pedTab, n.opcTab], [n.opcTab, n.opkTab], [n.opkTab, n.opkcTab], [n.opkcTab, n.chaveTab], [n.chaveTab, n.formaTab], [n.formaTab, n.monta], [n.monta, n.gravaChave], [n.monta, n.entrega], [n.pacTab, n.fimLista], [n.fimLista, n.lista], [n.lista, n.entregaLista]]) liga(cx, a.name, b.name);
   return { name: FAT ? 'BMH · Faturamento (painel)' : 'BMH · Diretoria (painel)', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none', saveDataErrorExecution: 'none' }) };   // tem nome de paciente: não guarda execução
 }
 
@@ -483,10 +484,13 @@ function fluxoDreAtualiza() {
     monta: no('Monta a DRE', 'n8n-nodes-base.code', 2, { jsCode: comRegras('../../dre/monta-dre.js') }, { executeOnce: true }),
     grava: grava('Grava na BMH_dre_mensal', 'BMH_dre_mensal'),
     resumo: no('Resumo', 'n8n-nodes-base.code', 2, { jsCode: ler('../../dre/resumo.js') }, { executeOnce: true }),
+    // particular por forma de pagamento (17/11/2026): a seta do mês no Financeiro do painel da diretoria, filtro PARTICULAR
+    forma: no('Particular por forma de pagamento', 'n8n-nodes-base.code', 2, { jsCode: ler('../../dre/particular-forma.js') }, { executeOnce: true }),
+    gravaForma: grava('Grava na BMH_particular_forma', 'BMH_particular_forma'),
     nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · DRE · atualiza do iGut\n**Traz:** caixa (receitasedespesas/financeiro) e produção (BI) do iGut\n**Envia:** linhas da DRE e do fluxo de caixa na BMH_dre_mensal\n**Limites:** não guarda execução (a produção traz nomes); só totais gravados\n\nTodo dia às 4h05 refaz o mês atual e os 3 anteriores. Manual: /webhook/<caminho em n8n-ids.json, dre.atualiza>?mes=AAAA-MM (um mês) ou ?rapido=1 (atual e anterior, usado pelo "Atualizar agora" da página). Regras em integracoes/dre/regras.js. Se o iGut falhar num mês, o mês não é gravado (não zera).', width: 560, height: 240 }),
   };
   const cx = {}; liga(cx, n.manual.name, n.meses.name);
-  for (const [a, b] of [[n.agenda_, n.meses], [n.meses, n.caixa], [n.caixa, n.prod], [n.prod, n.jaClass], [n.jaClass, n.monta], [n.monta, n.grava], [n.grava, n.resumo]]) liga(cx, a.name, b.name);
+  for (const [a, b] of [[n.agenda_, n.meses], [n.meses, n.caixa], [n.caixa, n.prod], [n.prod, n.jaClass], [n.jaClass, n.monta], [n.monta, n.grava], [n.grava, n.resumo], [n.jaClass, n.forma], [n.forma, n.gravaForma]]) liga(cx, a.name, b.name);
   return { name: 'BMH · DRE · atualiza do iGut', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none' }) };
 }
 function fluxoDrePagina() {
