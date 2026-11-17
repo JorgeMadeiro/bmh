@@ -318,3 +318,12 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
   na Meta, no `envio-monta.js` (fluxo de envio das 8h17, modo real). As 31 da primeira rodada ficam de fora (gravadas antes
   das 19h15 de 17/11). Teste com `?modo=teste&antigos=1`: o Google respondeu "Resource not found" no destino novo, a mesma
   demora de propagação de outubro (umas horas). O que não vai fica para o dia seguinte (até 55 dias), sem perder evento.
+- **Confirmação da sessão de amanhã, regras novas** (17/11/2026, pedido do Jorge; não existe outra confirmação automática):
+  fluxo "BMH · Agenda · confirmação da véspera" (`j9fKHps4n9xGDGL8`) a cada 15 min, das 7h às 21h, só para quem está
+  "Nao Confirmado" no iGut: sessão amanhã de quem teve sessão hoje → 2 h depois do início da sessão de hoje; sem sessão hoje
+  (primeira, faltou ou pulou) → 24 h antes; avaliação marcada antes de hoje → 24 h antes; avaliação marcada hoje para amanhã
+  → não manda (o dia em que foi marcada = primeira vez que a passagem a viu, `agendou` em BMH_conversoes). Envio entre 7h e
+  21h; quem a recepção confirma sai da fila. Teste com `?agora=AAAA-MM-DDTHH:MM`. Ensaio de 17/11, 19h35, para 18/11:
+  38 já confirmadas pela recepção, 15 receberiam, 8 avaliações marcadas hoje (não recebem). **Em ensaio** até o Jorge
+  mandar ligar (`confirmacao_modo = real`). O modelo diz "Sua sessão": para avaliação, um modelo próprio precisa de nova
+  aprovação da Meta.
