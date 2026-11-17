@@ -2,7 +2,8 @@
 //   - telefone só em código (SHA-256 do número com DDI, sem "+", como a Nexo faz): liga a conversa ao Kommo e ao iGut sem
 //     guardar o número;
 //   - texto com CPF, telefone e e-mail mascarados, guardado 1 mês (decisão do Jorge, 22/10/2026), só para a leitura do
-//     atendimento; áudio fica sem texto nesta fase (sem transcrição);
+//     atendimento; desde 17/11/2026 a limpeza dessas linhas está desligada até o SDR ficar 100% pronto (apagar_em segue com
+//     1 mês, para a limpeza voltar ao normal quando for religada); áudio fica sem texto nesta fase (sem transcrição);
 //   - origem pela lista ÚNICA integracoes/origem/frases.json (injetada pelo montar.js), só na mensagem do paciente;
 //   - código do anúncio de clique para WhatsApp (ctwa_clid) e id do anúncio, que o Kommo não repassa.
 const FRASES = /*__FRASES__*/[];

@@ -327,3 +327,6 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
   38 já confirmadas pela recepção, 15 receberiam, 8 avaliações marcadas hoje (não recebem). **Em ensaio** até o Jorge
   mandar ligar (`confirmacao_modo = real`). O modelo diz "Sua sessão": para avaliação, um modelo próprio precisa de nova
   aprovação da Meta.
+- **Guarda das conversas (17/11/2026, decisão do Jorge):** as mensagens do recebedor oficial (`BMH_whatsapp_meta`, texto
+  mascarado) ficam guardadas até analisarmos e implantarmos 100% o SDR, no lugar de 1 mês. Passo "Apaga as vencidas
+  (Meta)" do fluxo de limpeza desligado; religar quando o SDR estiver pronto.
