@@ -25,8 +25,8 @@
 | Corpo 1 | tela: **1. TEM MÉDICO DURANTE A SESSÃO?** | "Primeira: tem médico na unidade durante a sessão? Ter um médico responsável pelo serviço é uma coisa. Ter um médico ali, durante toda a sessão, é outra." |
 | Loop | | "A segunda quase ninguém lembra de fazer." |
 | Corpo 2 | tela: **2. QUEM AVALIA SE EU POSSO FAZER?** | "Segunda: quem avalia se você pode fazer? A câmara é tratamento médico, e antes da primeira sessão um médico confere a sua saúde e se existe alguma contraindicação." ⚕ |
-| Loop | | "E a terceira é para quem está no pós-operatório." |
-| Corpo 3 | tela: **3. MEU CIRURGIÃO VAI SABER?** | "Terceira: o seu cirurgião vai receber notícias do tratamento? No pós-operatório, a câmara faz parte de um cuidado que ele começou. Na BMH, as três respostas são sim, há 22 anos." ⚕ |
+| Loop | | "E a terceira é a que mais gera dúvida." |
+| Corpo 3 | tela: **3. QUANTAS SESSÕES, E POR QUÊ?** | "Terceira: quantas sessões eu vou precisar, e por quê? O tratamento é feito em série, e o número é decidido caso a caso, pela resposta do tecido. Você tem que sair da avaliação sabendo o porquê. Na BMH, há 22 anos, tem médico na unidade em todas as sessões." |
 | CTA | | "Manda para quem está no pós-operatório e vai começar a câmara." |
 
 ## Legenda
@@ -37,9 +37,9 @@ Antes da primeira sessão de oxigenoterapia hiperbárica, vale perguntar:
 
 1. Tem médico na unidade durante a sessão?
 2. Quem avalia se eu posso fazer, antes da primeira sessão?
-3. O meu cirurgião vai receber notícias do tratamento?
+3. Quantas sessões eu vou precisar, e por quê?
 
-A câmara hiperbárica é tratamento médico. Na BMH, há médico na unidade em todas as sessões, desde 2004, na primeira clínica particular de oxigenoterapia hiperbárica de Brasília. Atendemos na Asa Sul e em Taguatinga.
+A câmara hiperbárica é tratamento médico, feito em série, e o número de sessões é decidido caso a caso, pela resposta do tecido. Na BMH, há médico na unidade em todas as sessões, desde 2004, na primeira clínica particular de oxigenoterapia hiperbárica de Brasília. Atendemos na Asa Sul e em Taguatinga.
 
 Manda para quem está no pós-operatório e vai começar a câmara.
 
@@ -64,6 +64,5 @@ BMH · Brasília Medicina Hiperbárica · Responsáveis técnicos: Dr. Hélio Iv
 
 ## PARA CONFIRMAR (Jorge) · ⚕ precisa do sim dele antes de gravar
 1. ⚕ **Avaliação médica antes da primeira sessão:** a BMH faz em todos os pacientes? Se não for em todos, o Corpo 2 muda.
-2. ⚕ **Retorno ao cirurgião:** a BMH manda notícias do tratamento ao cirurgião que indicou? Se não, o Corpo 3 vira outra pergunta (sugestão: "quantas sessões e por quê?", que conversa com o reel das 10 sessões).
-3. **"Na BMH, as três respostas são sim"** só fica se 1 e 2 forem sim.
-4. **Assinatura da legenda com os dois responsáveis técnicos**, igual à do reel dos 22 anos.
+2. **Corpo 3 trocado pelo Jorge em 17/11:** saiu "o seu cirurgião vai receber notícias?"; entrou "quantas sessões e por quê?" (série, caso a caso, pela resposta do tecido, o mesmo fato validado no reel das 10 sessões da marca pessoal). Saiu também "as três respostas são sim".
+3. **Assinatura da legenda com os dois responsáveis técnicos**, igual à do reel dos 22 anos.
