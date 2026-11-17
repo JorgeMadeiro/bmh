@@ -313,3 +313,8 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
   com o dia 17/11: não enviar essas.
 - **BMH_config:** `kommo_campos` com `mensagem_enviar` (627592) e `kommo_bot_envia_mensagem` = 15128 (17/11/2026, por fluxo
   temporário, porque a API pública do n8n não altera linha).
+- **Envio do "agendou" ligado** (17/11/2026, 19h30, ok do Jorge): conversão secundária no Google Ads "BMH · Agendou
+  avaliação (iGut)" `7907222094` (UPLOAD_CLICKS, BOOK_APPOINTMENT, fora do lance e da coluna Conversões) e evento `Schedule`
+  na Meta, no `envio-monta.js` (fluxo de envio das 8h17, modo real). As 31 da primeira rodada ficam de fora (gravadas antes
+  das 19h15 de 17/11). Teste com `?modo=teste&antigos=1`: o Google respondeu "Resource not found" no destino novo, a mesma
+  demora de propagação de outubro (umas horas). O que não vai fica para o dia seguinte (até 55 dias), sem perder evento.
