@@ -28,3 +28,5 @@ Fila de Espera.
   pagos). Hipótese a confirmar com o Jorge: com lote = faturado, sem lote = a faturar.
 - **Avaliações (09/10):** observação do agendamento vazia em todas; médico solicitante vazio nas avaliações (preenchido
   em 49 de 125 agendamentos do dia); bairro e cidade do paciente vêm na maioria.
+
+- **19/11/2026, resposta do iGut ao pedido de 17/11:** fase 1 traz paciente, dedução e líquido no `financeiro` e forma de pagamento e líquido por procedimento na `producao` (sem data); sessões do pacote só na fase 2. Contorno para hoje: `lancamento_origem` = `agendamento_id`. Resumo em `Nexo_Claude_VSL/integracoes/igut/nota-igut-financeiro-v1-2026-11-17.md`.
