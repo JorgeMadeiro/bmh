@@ -10,7 +10,7 @@ const cfg = {}; try { for (const i of $('Config da resposta').all()) if (i.json 
 const modo = ['real', 'espelho'].includes(cfg.confirmacao_modo) ? cfg.confirmacao_modo : 'ensaio';   // espelho: registra o que faria, sem iGut nem Kommo
 const hoje = $now.setZone('America/Sao_Paulo').toISODate(), amanha = $now.setZone('America/Sao_Paulo').plus({ days: 1 }).toISODate();
 const conf = $('Confirmações (tabela)').all().map((i) => i.json).filter((r) => r && r.chave);
-// depois do "Confirmo", recado com o horário de chegada e o mapa da unidade (19/11/2026, Jorge: "5 a 10 minutos antes"). Texto
+// depois do "Confirmo", recado com o horário de chegada e o mapa da unidade (19/11/2026, Jorge: chegar com 20 a 30 min de antecedência; embarque de 5 a 10 min antes). Texto
 // livre: o toque no botão abre a janela de 24 h. Vai para quem tocou (no espelho é o telefone de teste); em ensaio, não vai.
 const MAPA = { 'Asa Sul': 'https://maps.google.com/maps?cid=16188707182465812117', Taguatinga: 'https://maps.google.com/maps?cid=14287440431353597253' };
 const prep = $('Prepara a mensagem').all().map((i) => i.json);
@@ -23,7 +23,7 @@ for (const [k, i] of $('Monta a linha').all().entries()) {
   if (!c) continue;   // resposta sem confirmação conhecida: a recepção vê no WhatsApp
   const fone = String(prep[k]?.telefone || '').replace(/\D/g, '');
   const responder = modo !== 'ensaio' && resp === 'confirmou' && c.resposta !== 'confirmou' && fone   // um recado só, mesmo se tocar duas vezes
-    ? { telefone: fone, texto: `Confirmado, obrigado! Chegue de 5 a 10 minutos antes do horário. Como chegar à BMH ${c.unidade}: ${MAPA[c.unidade] || MAPA['Asa Sul']}` } : null;
+    ? { telefone: fone, texto: `Confirmado, obrigado! Chegue com 20 a 30 minutos de antecedência: o embarque na câmara é de 5 a 10 minutos antes do horário marcado. Como chegar à BMH ${c.unidade}: ${MAPA[c.unidade] || MAPA['Asa Sul']}` } : null;
   out.push({ json: { ...c, responder, resposta: resp, respondido_em: m.momento, status: (modo === 'espelho' ? 'espelho: ' : '') + (resp === 'confirmou' ? (modo === 'real' ? 'confirmando no iGut' : 'confirmaria no iGut') : (modo === 'real' ? 'pediu para remarcar: desmarcada no iGut' : 'desmarcaria e levaria para Remarcar')), confirmar_igut: modo === 'real' && resp === 'confirmou', desmarcar_igut: modo === 'real' && resp === 'pediu para remarcar', agendamento_lista: String(c.agendamentos || '').split(',').filter(Boolean) } });
 }
 return out;
