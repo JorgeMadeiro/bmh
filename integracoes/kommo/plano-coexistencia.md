@@ -427,3 +427,6 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
   no Google da unidade; podia ser melhor → pede detalhes e, no real, tarefa no Kommo para a recepção (sem aviso no Telegram
   por enquanto); o link vai 18 a 23 h depois (o Google não aceita pedir só a quem gostou). Modo `nps_modo`: ensaio hoje;
   depois espelho (telefone de teste) e real, com o "pode" do Jorge.
+- **NPS aprovado e em espelho** (19/11/2026): a Meta aprovou `nps_sessoes_v1` como utilidade às 10h50. Espelho ligado às 10h53
+  com limite de 5 (`nps_espelho_limite`, "pode ligar o espelho com 5"): 5 mensagens ao número de teste (8ª, 23ª, 6ª, 5ª e 10ª
+  sessão); o resto fica "espelho: fora do limite de teste", que não sai no espelho e continua livre para o real.

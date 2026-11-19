@@ -19,7 +19,7 @@ const lista = $('Agenda de ontem e hoje').first().json.data;
 if (!Array.isArray(lista)) throw new Error('o iGut não devolveu a agenda de ' + ontem + ' e ' + hoje);
 const ja = {}; for (const i of $('NPS (tabela)').all()) { const r = i.json || {}; if (r.chave) ja[r.chave] = r.status || ''; }
 // linha que ainda pode ser regravada: ensaio e aguardando; a do espelho continua livre para o real (o paciente não recebeu)
-const livre = (s) => !s || /^ensaio|^aguardando/.test(s) || (modo === 'real' && /^espelho/.test(s));
+const livre = (s) => !s || /^ensaio|^aguardando/.test(s) || (modo === 'real' && /^espelho/.test(s));   // "espelho: fora do limite" também fica para o real
 const DIAS = 10, mesDe = (d) => d.slice(0, 7), meses = new Set([0, 1, 2].map((k) => DateTime.fromISO(hoje).minus({ months: k }).toFormat('yyyy-MM')));
 const dias = {};   // paciente|unidade → conjunto de dias com sessão
 for (const i of $('Histórico de pacientes').all()) { const r = i.json || {}; if (!r.paciente_id || !meses.has(r.mes) || !(Number(r.sessoes) > 0) || !AG_UN(r.unidade)) continue;
@@ -36,6 +36,9 @@ for (const x of lista) {
 }
 const nomeProprio = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : '';
 const fora = { menos_de_5: 0, ja_recebeu: 0, sem_celular: 0 }, out = [];
+// espelho com limite (19/11/2026, "pode ligar o espelho com 5"): passado o limite, a linha fica "espelho: fora do limite de
+// teste", que não sai de novo no espelho e continua livre para o real
+const LIMITE = Number(cfg.nps_espelho_limite) || 0; let noEspelho = Object.values(ja).filter((x) => /^espelho: enviada/.test(x)).length;
 for (const [k, s] of Object.entries(ultima)) {
   if (!livre(ja[k])) { fora.ja_recebeu++; continue; }
   // sequência atual: anda para trás a partir da última sessão enquanto a pausa for de até 10 dias
@@ -48,7 +51,8 @@ for (const [k, s] of Object.entries(ultima)) {
   if (quando.hour >= 20 || quando.toISODate() > s.d) quando = nove(DateTime.fromISO(s.d).plus({ days: 1 }).toISODate());   // terminou tarde: dia seguinte às 9h
   if (quando.hour < 9) quando = quando.set({ hour: 9, minute: 0 });
   const vence = agora >= quando, hh = quando.toFormat('HH:mm');
-  const status = !vence ? 'aguardando ' + hh : modo === 'ensaio' ? 'ensaio: enviaria (' + seq.length + 'ª sessão)' : 'a enviar';
+  let status = !vence ? 'aguardando ' + hh : modo === 'ensaio' ? 'ensaio: enviaria (' + seq.length + 'ª sessão)' : 'a enviar';
+  if (status === 'a enviar' && modo === 'espelho' && LIMITE) { if (noEspelho >= LIMITE) status = 'espelho: fora do limite de teste'; else noEspelho++; }
   out.push({ json: { chave: k, paciente_id: s.pid, unidade: s.u, sessao: String(seq.length), dia_sessao: s.d, telefone_hash: sha256(s.fone), wamid: '', resposta: '', respondido_em: '', link_enviado_em: '',
     modo, status, criado_em: agora.toISO(), fora: JSON.stringify(fora),
     ...(status === 'a enviar' ? { envio: { telefone: modo === 'espelho' ? TESTE : s.fone, params: [nomeProprio(s.nome), s.u] } } : {}) } });
