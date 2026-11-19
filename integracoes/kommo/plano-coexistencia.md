@@ -451,3 +451,5 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
   começar ontem (as avaliações novas continuam contando de hoje). Primeiro giro (12h14): 3 leads da Asa Sul foram para
   Avaliou. Obs.: a trava de ensaio anunciada não entrou (o script de edição parou numa conferência) e o fluxo foi publicado já
   em real; mantido assim por estar dentro do que o Jorge autorizou.
+- **Modelo da avaliação reenviado** (19/11/2026, 12h20, pedido do Jorge): `confirmacao_avaliacao_v1` ficou mais de 3 h em análise;
+  foi apagado e reenviado como `confirmacao_avaliacao_v2`, mesmo texto. A confirmação já usa o nome novo.

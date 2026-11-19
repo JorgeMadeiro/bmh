@@ -10,7 +10,7 @@
 // mensagem por paciente por dia (o primeiro horário de amanhã). Horário de envio entre 7h e 21h. Não regrava a linha de
 // quem já recebeu (status diferente de ensaio e aguardando): a resposta "Confirmo" ou "Preciso remarcar" depende dela.
 // Modo (chave `confirmacao_modo` em BMH_config): "ensaio" (padrão) só grava a lista; "real" também manda a mensagem pela
-// API oficial do WhatsApp da recepção (modelos confirmacao_sessao_v2, com a câmara, e confirmacao_avaliacao_v1). Nome e celular só saem no modo real, para o envio;
+// API oficial do WhatsApp da recepção (modelos confirmacao_sessao_v2, com a câmara, e confirmacao_avaliacao_v2). Nome e celular só saem no modo real, para o envio;
 // na tabela fica o código do paciente, a unidade, o horário, os agendamentos de amanhã e o telefone em código.
 /*__SHA256__*/
 // câmara (19/11/2026): Asa Sul tem monoplace (111) e multiplace (112); Taguatinga só monoplace (121). Vai no modelo de sessão
@@ -22,7 +22,7 @@ const cfg = {}; try { for (const i of $('Config').all()) if (i.json && i.json.ch
 // mensagem vai só para o telefone de teste (confirmacao_telefone_teste em BMH_config), e a resposta não mexe no iGut nem no Kommo
 const modo = ['real', 'espelho'].includes(cfg.confirmacao_modo) ? cfg.confirmacao_modo : 'ensaio', TESTE = String(cfg.confirmacao_telefone_teste || '').replace(/\D/g, '');
 if (modo === 'espelho' && TESTE.length < 12) throw new Error('modo espelho sem confirmacao_telefone_teste em BMH_config');
-const avaliacaoLigada = cfg.confirmacao_avaliacao === 'ligada';   // só depois de a Meta aprovar confirmacao_avaliacao_v1
+const avaliacaoLigada = cfg.confirmacao_avaliacao === 'ligada';   // só depois de a Meta aprovar confirmacao_avaliacao_v2 (a v1 travou na análise e foi apagada em 19/11/2026)
 const { hoje, dia, agora: agoraISO } = $('Amanhã').first().json;   // dia = amanhã; agora pode vir simulado (?agora=) no teste
 const Z = 'America/Sao_Paulo', agora = DateTime.fromISO(agoraISO, { zone: Z });
 const lista = $('Agenda de hoje e amanhã').first().json.data;
@@ -75,6 +75,6 @@ return out.map(({ chave, p, regra, quando, status }) => ({ json: {
   regra, envia_em: hh(quando), fora_hoje: JSON.stringify(fora),
   // só para o envio (modo real e vencido); não vai para a tabela
   // modelos aprovados pela Meta (19/11/2026): sessão v2 com a câmara e a unidade; avaliação v1 com a unidade
-  ...(status === 'a enviar' ? { envio: { telefone: modo === 'espelho' ? TESTE : p.fone, modelo: p.tipo === 'avaliação' ? 'confirmacao_avaliacao_v1' : 'confirmacao_sessao_v2',
+  ...(status === 'a enviar' ? { envio: { telefone: modo === 'espelho' ? TESTE : p.fone, modelo: p.tipo === 'avaliação' ? 'confirmacao_avaliacao_v2' : 'confirmacao_sessao_v2',
     params: p.tipo === 'avaliação' ? [nomeProprio(p.nome), p.unidade, diaTexto, p.hora.replace(':', 'h')] : [nomeProprio(p.nome), p.camara || 'hiperbárica', p.unidade, diaTexto, p.hora.replace(':', 'h')] } } : {}),
 } }));
