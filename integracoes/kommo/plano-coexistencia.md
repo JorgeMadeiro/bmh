@@ -453,3 +453,5 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
   em real; mantido assim por estar dentro do que o Jorge autorizou.
 - **Modelo da avaliação reenviado** (19/11/2026, 12h20, pedido do Jorge): `confirmacao_avaliacao_v1` ficou mais de 3 h em análise;
   foi apagado e reenviado como `confirmacao_avaliacao_v2`, mesmo texto. A confirmação já usa o nome novo.
+- **Modelo da avaliação aprovado** (19/11/2026, 12h37, `confirmacao_avaliacao_v2`, utilidade). Avaliações ligadas no espelho da
+  confirmação (`confirmacao_avaliacao = ligada`): 2 mensagens de avaliação ao número de teste na primeira rodada, 1 aguardando.
