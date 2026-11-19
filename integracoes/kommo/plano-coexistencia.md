@@ -387,3 +387,7 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
   `integracoes/agenda/remarcar-lead.js` e o fim de `integracoes/kommo/passagem-decide.js`. **Testado** no lead do Jorge com
   nós copiados e entradas simuladas (ida para Remarcar e volta para Em tratamento, com as notas); o desmarcar no iGut não
   foi testado (mexeria em agenda real). Liga junto com a confirmação (`confirmacao_modo = real`).
+- **Desmarcar no iGut testado** (19/11/2026, pedido do Jorge): agendamento de teste 608274 (paciente de teste 4770 "TESTE
+  FATURA", hoje 18h, multiplace Asa Sul, particular) criado por `callcenters/agendar`; os nós "Um por agendamento
+  (desmarca)" e "iGut · desmarca", copiados do recebedor, mudaram de "Nao Confirmado" para "Desmarcado" (conferido pela busca).
+  O agendamento de teste fica na agenda como desmarcado.
