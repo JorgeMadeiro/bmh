@@ -1,0 +1,1506 @@
+{
+ "nome": "BMH · Kommo · passagem para a unidade",
+ "parte_de": "2026-11-19T10:11:38.685Z",
+ "nodes": [
+  {
+   "id": "3b206a10-f3fc-4164-a8ed-1b90c1f29740",
+   "name": "A cada 30 min (7h às 19h)",
+   "type": "n8n-nodes-base.scheduleTrigger",
+   "typeVersion": 1.2,
+   "position": [
+    0,
+    0
+   ],
+   "parameters": {
+    "rule": {
+     "interval": [
+      {
+       "field": "cronExpression",
+       "expression": "11,41 7-19 * * *"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "b2ff9239-ff91-4a65-b8bc-d543a9691471",
+   "name": "Rodar agora",
+   "type": "n8n-nodes-base.webhook",
+   "typeVersion": 2,
+   "position": [
+    260,
+    0
+   ],
+   "parameters": {
+    "path": "bmh-kommo-passagem-47fcfbe786ca",
+    "responseMode": "lastNode",
+    "options": {}
+   },
+   "webhookId": "2ad284f3-a84c-4749-90b4-f0cd1871459a"
+  },
+  {
+   "id": "20e8efca-291f-4d58-8803-2dd69b254cca",
+   "name": "Janela",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    520,
+    0
+   ],
+   "parameters": {
+    "jsCode": "// de hoje até 14 dias à frente\nconst h = $now.setZone('America/Sao_Paulo');\nreturn [{ json: { ini: h.toISODate(), fim: h.plus({ days: 14 }).toISODate() } }];"
+   },
+   "executeOnce": true
+  },
+  {
+   "id": "ffe1548d-c832-49db-bb57-098b6f48c2d5",
+   "name": "Config",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    780,
+    0
+   ],
+   "parameters": {
+    "operation": "get",
+    "dataTableId": {
+     "__rl": true,
+     "value": "V4NRHS9mc1kvigix",
+     "mode": "id",
+     "cachedResultName": "BMH_config"
+    },
+    "returnAll": true
+   },
+   "alwaysOutputData": true,
+   "executeOnce": true
+  },
+  {
+   "id": "d28afd15-8036-4813-b27a-629819a706bd",
+   "name": "Já feitas",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    1040,
+    0
+   ],
+   "parameters": {
+    "operation": "get",
+    "dataTableId": {
+     "__rl": true,
+     "value": "W42mHjSf6OpvXomF",
+     "mode": "id",
+     "cachedResultName": "BMH_passagens"
+    },
+    "returnAll": true
+   },
+   "alwaysOutputData": true,
+   "executeOnce": true
+  },
+  {
+   "id": "08e14032-62a8-4a81-9bb5-5a200740f999",
+   "name": "Histórico de pacientes",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    1300,
+    0
+   ],
+   "parameters": {
+    "operation": "get",
+    "dataTableId": {
+     "__rl": true,
+     "value": "eqyIECPToIvxDhcm",
+     "mode": "id",
+     "cachedResultName": "BMH_financeiro_paciente"
+    },
+    "returnAll": true
+   },
+   "alwaysOutputData": true,
+   "executeOnce": true
+  },
+  {
+   "id": "5dcf1b91-67e9-48ed-bdc7-a2ab6d1e5bd7",
+   "name": "Agenda",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    1560,
+    0
+   ],
+   "parameters": {
+    "method": "POST",
+    "url": "https://api.igut.med.br/v2/consultas/buscar",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpCustomAuth",
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "={{ JSON.stringify({ 'Agendamento.data': $('Janela').first().json.ini, 'Agendamento.data_fim': $('Janela').first().json.fim }) }}",
+    "options": {
+     "timeout": 180000
+    }
+   },
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000,
+   "credentials": {
+    "httpCustomAuth": {
+     "id": "ZezjclTyK2soW4a8",
+     "name": "BMH · iGut (acesso)"
+    }
+   },
+   "executeOnce": true
+  },
+  {
+   "id": "a18505a3-ce00-454b-94b1-56f7102f3b47",
+   "name": "Avaliações novas",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    1820,
+    0
+   ],
+   "parameters": {
+    "jsCode": "// Passagem da triagem para a unidade (17/11/2026, decisão do Jorge: \"ganho na triagem + lead novo no funil da unidade\").\n// Passo 1: as avaliações marcadas no iGut de hoje até a janela (14 dias), uma por paciente (a primeira). Avaliação = agenda de\n// consulta da unidade (113 Asa Sul, 120 Taguatinga) com tipo de atendimento \"avaliação\", como na confirmação da véspera.\n// Fica de fora: falta já marcada, horário bloqueado, sem paciente, celular inválido e a avaliação que já virou passagem\n// no modo real (status \"feito\" em BMH_passagens). O celular só segue no item para casar com o contato do Kommo; na tabela\n// fica em código (sha256). O convênio da avaliação segue para os campos \"Particular ou convênio\" e \"Convênio\" do lead.\n// SHA-256 em JavaScript puro (22/10/2026): o nó de código do n8n não garante o módulo crypto. Injetado no código dos nós pelo\n// montar.js no lugar de /*__SHA256__*/. Conferido contra o crypto do Node em whatsapp/testa-monta-meta.js.\nconst sha256 = (s) => { const K = [0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];\n  const b = Array.from(unescape(encodeURIComponent(s)), (c) => c.charCodeAt(0)), l = b.length * 8; b.push(0x80); while (b.length % 64 !== 56) b.push(0);\n  for (let i = 7; i >= 0; i--) b.push(i > 3 ? 0 : (l >>> (i * 8)) & 0xff);\n  let H = [0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19]; const r = (x, n) => (x >>> n) | (x << (32 - n));\n  for (let o = 0; o < b.length; o += 64) { const w = []; for (let i = 0; i < 64; i++) w[i] = i < 16 ? (b[o + 4 * i] << 24) | (b[o + 4 * i + 1] << 16) | (b[o + 4 * i + 2] << 8) | b[o + 4 * i + 3] : (((r(w[i - 2], 17) ^ r(w[i - 2], 19) ^ (w[i - 2] >>> 10)) + w[i - 7] + (r(w[i - 15], 7) ^ r(w[i - 15], 18) ^ (w[i - 15] >>> 3)) + w[i - 16]) | 0);\n    let [a, bb, c, d, e, f, g, h] = H;\n    for (let i = 0; i < 64; i++) { const t1 = (h + (r(e, 6) ^ r(e, 11) ^ r(e, 25)) + ((e & f) ^ (~e & g)) + K[i] + w[i]) | 0, t2 = ((r(a, 2) ^ r(a, 13) ^ r(a, 22)) + ((a & bb) ^ (a & c) ^ (bb & c))) | 0; h = g; g = f; f = e; e = (d + t1) | 0; d = c; c = bb; bb = a; a = (t1 + t2) | 0; }\n    H = H.map((v, i) => (v + [a, bb, c, d, e, f, g, h][i]) | 0); }\n  return H.map((v) => (v >>> 0).toString(16).padStart(8, '0')).join(''); };\n\nconst AGENDAS = { 113: 'Asa Sul', 120: 'Taguatinga' };\nconst NAO_VEIO = ['faltou', 'desmarcado', 'desistiu'];\nconst norm = (s) => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').trim().toLowerCase();\nconst { ini } = $('Janela').first().json;\nconst lista = $('Agenda').first().json.data;\nif (!Array.isArray(lista)) throw new Error('o iGut não devolveu a agenda das avaliações');   // vira alerta: a passagem não pode parar calada\nconst feitas = new Set($('Já feitas').all().map((i) => i.json).filter((r) => r && r.status === 'feito').map((r) => r.chave));\nconst celular = (s) => { let d = String(s || '').replace(/\\D/g, ''); if (d.startsWith('55') && d.length >= 12) d = d.slice(2); if (d.length === 10 && /[6-9]/.test(d[2])) d = d.slice(0, 2) + '9' + d.slice(2); return d.length === 11 ? '55' + d : ''; };\nconst porPaciente = {};\nfor (const x of lista) {\n  const unidade = AGENDAS[Number(x.Profissional?.id)]; if (!unidade) continue;\n  const dia = String(x.Agendamento?.data || '').slice(0, 10); if (dia < ini) continue;\n  if (String(x.Agendamento?.bloqueado || '') === '1' || x.Agendamento?.bloqueado === true) continue;\n  if (NAO_VEIO.includes(norm(x.Agendamento?.confirmado))) continue;\n  if (!norm(x.Agendamento?.tipodeatendimento).includes('avaliac')) continue;\n  const pid = x.Paciente?.id, fone = celular(x.Paciente?.celular); if (!pid || !fone) continue;\n  const hora = String(x.Agendamento?.horario || '').slice(0, 5), atual = porPaciente[pid];\n  if (!atual || dia + hora < atual.dia + atual.hora) porPaciente[pid] = { pid: String(pid), unidade, dia, hora, fone, agendamento: String(x.Agendamento?.id || ''), convenio: String(x.Convenio?.nome || '').replace(/\\s+/g, ' ').trim() };\n}\n// para a conversão \"agendou\" (mesmo formato do eventos-igut.js): telefone com e sem o 9 (Meta), com \"+\" (Google), e-mail\nconst sem9 = (f) => f.slice(0, 4) + f.slice(5);\nconst emailDe = {}; for (const x of lista) { const e = String(x.Paciente?.email || '').trim().toLowerCase(); if (x.Paciente?.id && /^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/.test(e)) emailDe[x.Paciente.id] = e; }\n// nome completo (iniciais maiúsculas, \"da/de/do\" em minúsculas) para o contato e o lead do Kommo (18/11/2026, como na Nexo)\nconst MIN = ['da', 'de', 'do', 'das', 'dos', 'e'], nomeDe = {};\nfor (const x of lista) if (x.Paciente?.id && x.Paciente?.nome) nomeDe[x.Paciente.id] = String(x.Paciente.nome).toLowerCase().replace(/\\s+/g, ' ').trim().split(' ').map((w, i) => (i && MIN.includes(w) ? w : w.charAt(0).toUpperCase() + w.slice(1))).join(' ');\n// CPF e nascimento para o contato do Kommo (18/11/2026, decisão do Jorge: \"igual à Nexo, com CPF\"); só seguem no item, não vão para tabela\nconst cpfDe = {}, nascDe = {};\nfor (const x of lista) { const id = x.Paciente?.id; if (!id) continue; const c = String(x.Paciente.cpf || '').replace(/\\D/g, ''); if (c.length === 11) cpfDe[id] = c;\n  const m = /^(\\d{2})\\/(\\d{2})\\/(\\d{4})$/.exec(String(x.Paciente.datadenascimento || '').trim()); if (m && Number(m[3]) > 1900) nascDe[id] = Math.round(DateTime.fromISO(`${m[3]}-${m[2]}-${m[1]}`, { zone: 'America/Sao_Paulo' }).toSeconds()); }\nreturn Object.values(porPaciente).map((p) => ({ chave: p.pid + '|' + p.dia, ...p, telefone_hash: sha256(p.fone), nome: nomeDe[p.pid] || '', email: emailDe[p.pid] || '', cpf: cpfDe[p.pid] || '', nasc: nascDe[p.pid] || null,\n  conv: { telefone_hash_sem9: sha256(sem9(p.fone)), telefone_hash_google: sha256('+' + p.fone), email_hash: emailDe[p.pid] ? sha256(emailDe[p.pid]) : '' } }))\n  .filter((p) => !feitas.has(p.chave)).map((json) => ({ json }));\n"
+   },
+   "executeOnce": true
+  },
+  {
+   "id": "347a5833-573f-4b72-8299-b3ca5a272b72",
+   "name": "Conversões (tabela)",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    2080,
+    0
+   ],
+   "parameters": {
+    "operation": "get",
+    "dataTableId": {
+     "__rl": true,
+     "value": "LJ2AJwr4fPw9igHq",
+     "mode": "id",
+     "cachedResultName": "BMH_conversoes"
+    },
+    "returnAll": true
+   },
+   "alwaysOutputData": true,
+   "executeOnce": true
+  },
+  {
+   "id": "0b721767-8903-4557-9828-7277116aa687",
+   "name": "Agendou (conversões novas)",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    2340,
+    0
+   ],
+   "parameters": {
+    "jsCode": "// Conversão \"agendou\" (17/11/2026, pedido do Jorge): a avaliação marcada no iGut, vista pela passagem a cada 30 min, com ou\n// sem conversa no Kommo (pega também quem marcou por telefone). Uma por paciente por avaliação (chave agendou|paciente|dia da\n// avaliação); só grava o que ainda não está em BMH_conversoes (regravar apagaria a marca de enviado). O dia do evento é o\n// dia em que a passagem viu a avaliação pela primeira vez. Telefone e e-mail só em código. O envio à Meta e ao Google só\n// manda os eventos da lista dele (envio-monta.js): o \"agendou\" entra lá quando existir a conversão secundária no Google.\nconst ja = new Set($('Conversões (tabela)').all().map((i) => i.json && i.json.chave).filter(Boolean));\nconst hoje = $now.setZone('America/Sao_Paulo').toISODate(), agora = $now.toISO();\nreturn $('Avaliações novas').all().map((i) => i.json).map((a) => ({ chave: 'agendou|' + a.pid + '|' + a.dia, evento: 'agendou', dia: hoje, paciente_id: a.pid, unidade: a.unidade,\n  telefone_hash: a.telefone_hash, telefone_hash_sem9: a.conv.telefone_hash_sem9, telefone_hash_google: a.conv.telefone_hash_google, email_hash: a.conv.email_hash,\n  enviado_meta: '', enviado_google: '', modo: 'ensaio', criado_em: agora })).filter((r) => !ja.has(r.chave)).map((json) => ({ json }));\n"
+   },
+   "executeOnce": true
+  },
+  {
+   "id": "4d151334-607c-49c5-b96e-352aaafb05ac",
+   "name": "Grava o agendou",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    2600,
+    0
+   ],
+   "parameters": {
+    "operation": "upsert",
+    "dataTableId": {
+     "__rl": true,
+     "value": "LJ2AJwr4fPw9igHq",
+     "mode": "id",
+     "cachedResultName": "BMH_conversoes"
+    },
+    "filters": {
+     "conditions": [
+      {
+       "keyName": "chave",
+       "keyValue": "={{ $json.chave }}"
+      }
+     ]
+    },
+    "columns": {
+     "mappingMode": "defineBelow",
+     "value": {
+      "chave": "={{ $json.chave }}",
+      "evento": "={{ $json.evento }}",
+      "dia": "={{ $json.dia }}",
+      "paciente_id": "={{ $json.paciente_id }}",
+      "unidade": "={{ $json.unidade }}",
+      "telefone_hash": "={{ $json.telefone_hash }}",
+      "telefone_hash_sem9": "={{ $json.telefone_hash_sem9 }}",
+      "telefone_hash_google": "={{ $json.telefone_hash_google }}",
+      "email_hash": "={{ $json.email_hash }}",
+      "enviado_meta": "={{ $json.enviado_meta }}",
+      "enviado_google": "={{ $json.enviado_google }}",
+      "modo": "={{ $json.modo }}",
+      "criado_em": "={{ $json.criado_em }}"
+     },
+     "matchingColumns": [],
+     "schema": [
+      {
+       "id": "chave",
+       "displayName": "chave",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "evento",
+       "displayName": "evento",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "dia",
+       "displayName": "dia",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "paciente_id",
+       "displayName": "paciente_id",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "unidade",
+       "displayName": "unidade",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "telefone_hash",
+       "displayName": "telefone_hash",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "telefone_hash_sem9",
+       "displayName": "telefone_hash_sem9",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "telefone_hash_google",
+       "displayName": "telefone_hash_google",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "email_hash",
+       "displayName": "email_hash",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "enviado_meta",
+       "displayName": "enviado_meta",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "enviado_google",
+       "displayName": "enviado_google",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "modo",
+       "displayName": "modo",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "criado_em",
+       "displayName": "criado_em",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      }
+     ]
+    },
+    "options": {}
+   }
+  },
+  {
+   "id": "f892224d-2523-442b-b754-5142a3bae249",
+   "name": "Leads no Kommo (páginas)",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    2860,
+    0
+   ],
+   "parameters": {
+    "method": "GET",
+    "url": "https://bmh.kommo.com/api/v4/leads",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpHeaderAuth",
+    "sendQuery": true,
+    "specifyQuery": "keypair",
+    "queryParameters": {
+     "parameters": [
+      {
+       "name": "with",
+       "value": "contacts"
+      },
+      {
+       "name": "limit",
+       "value": "250"
+      },
+      {
+       "name": "filter[pipeline_id][0]",
+       "value": "14783287"
+      },
+      {
+       "name": "filter[pipeline_id][1]",
+       "value": "14783519"
+      },
+      {
+       "name": "filter[pipeline_id][2]",
+       "value": "14783523"
+      }
+     ]
+    },
+    "options": {
+     "pagination": {
+      "pagination": {
+       "parameters": {
+        "parameters": [
+         {
+          "type": "qs",
+          "name": "page",
+          "value": "={{ $pageCount + 1 }}"
+         }
+        ]
+       },
+       "paginationCompleteWhen": "receiveSpecificStatusCodes",
+       "statusCodesWhenComplete": "204",
+       "limitPagesFetched": true,
+       "maxRequests": 40,
+       "requestInterval": 300
+      }
+     },
+     "response": {
+      "response": {
+       "responseFormat": "file",
+       "outputPropertyName": "data"
+      }
+     }
+    }
+   },
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000,
+   "credentials": {
+    "httpHeaderAuth": {
+     "id": "xpwKz2vMUxgqhNBo",
+     "name": "BMH · Kommo (token)"
+    }
+   },
+   "executeOnce": true
+  },
+  {
+   "id": "6aba41d2-9660-410c-b5cd-8740a871c886",
+   "name": "Contatos a buscar",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    3120,
+    0
+   ],
+   "parameters": {
+    "jsCode": "// ids dos contatos dos leads, em lotes de 200 (cabe na URL); sem nenhum, um lote vazio para o passo seguinte rodar\nconst corpo = (j) => { if (j && j._embedded) return j; try { return j && typeof j.data === 'string' && j.data ? JSON.parse(j.data) : {}; } catch (e) { return {}; } };\nconst ids = new Set(); for (const p of $('Leads no Kommo').all()) for (const l of (corpo(p.json)._embedded?.leads || [])) for (const c of (l._embedded?.contacts || [])) ids.add(c.id);\nconst t = [...ids], out = []; for (let i = 0; i < t.length; i += 200) out.push({ json: { qs: t.slice(i, i + 200).map((id) => 'filter[id][]=' + id).join('&') } });\nreturn out.length ? out : [{ json: { qs: 'filter[id][]=0' } }];"
+   },
+   "executeOnce": true
+  },
+  {
+   "id": "97828d50-633f-4b59-b010-cdc1839228d0",
+   "name": "Contatos no Kommo",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    3380,
+    0
+   ],
+   "parameters": {
+    "method": "GET",
+    "url": "={{ 'https://bmh.kommo.com/api/v4/contacts?limit=250&' + $json.qs }}",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpHeaderAuth",
+    "options": {
+     "batching": {
+      "batch": {
+       "batchSize": 5,
+       "batchInterval": 1000
+      }
+     }
+    }
+   },
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000,
+   "credentials": {
+    "httpHeaderAuth": {
+     "id": "xpwKz2vMUxgqhNBo",
+     "name": "BMH · Kommo (token)"
+    }
+   },
+   "alwaysOutputData": true
+  },
+  {
+   "id": "3f6e2a7d-4c0c-4766-8309-10243bedcc71",
+   "name": "Decide a passagem",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    3640,
+    0
+   ],
+   "parameters": {
+    "jsCode": "// Passagem da triagem para a unidade (17/11/2026). Passo 2: casa cada avaliação com o contato do Kommo pelo celular\n// (DDD + 8 últimos dígitos, para não depender do 9 a mais) e decide:\n//   - \"passar\": tem lead aberto no funil Triagem e nenhum aberto no funil da unidade → cria o lead na unidade, etapa\n//     \"Avaliação agendada\" (copiando origem, UTMs, cirurgião, pagamento, convênio, tipo de caso e etiquetas) e depois\n//     marca o da triagem como ganho (nessa ordem: se o segundo passo falhar, o próximo giro vê o lead da unidade e não\n//     repete; o contrário deixaria a triagem fechada sem lead na unidade);\n//   - \"já no funil da unidade\", \"sem lead aberto na triagem\" (retorno, troca de unidade: a recepção resolve) e\n//     \"sem contato no Kommo\" (marcou por telefone, sem conversa no WhatsApp): só registra.\n// Modo na chave `passagem_modo` de BMH_config: \"ensaio\" (padrão) só registra o que faria; \"real\" também grava no Kommo.\nconst cfg = {}; try { for (const i of $('Config').all()) if (i.json && i.json.chave) cfg[i.json.chave] = i.json.valor; } catch (e) {}\nconst modo = cfg.passagem_modo === 'real' ? 'real' : 'ensaio', agora = $now.toISO();\nconst AV = $('Avaliações novas').all().map((i) => i.json);\n// o Kommo responde hal+json: a leitura chega como texto em \"data\" (204 sem corpo = vazio)\nconst corpo = (j) => { if (j && j._embedded) return j; try { return j && typeof j.data === 'string' && j.data ? JSON.parse(j.data) : {}; } catch (e) { return {}; } };\nconst leads = []; for (const p of $('Leads no Kommo').all()) leads.push(...(corpo(p.json)._embedded?.leads || []));\nconst contatos = {}; for (const p of $('Contatos no Kommo').all()) for (const c of (corpo(p.json)._embedded?.contacts || [])) contatos[c.id] = c;\nconst FUNIL = { triagem: 14783287, 'Asa Sul': 14783519, Taguatinga: 14783523 };\nconst ETAPA = { 'Asa Sul': 114237079, Taguatinga: 114237099 };\nconst UNIDADE = { campo: 626676, 'Asa Sul': 463116, Taguatinga: 463118 }, ID_IGUT = 626684;\nconst COPIAR = [626668, 624514, 624510, 624512, 624508, 624516, 624524, 624526, 626670, 626672, 626674, 626678, 626680, 626682];\n// particular, convênio e retorno (17/11/2026): convênio pela agenda do iGut (\"PARTICULAR\" = particular; cortesia e voucher\n// ficam em branco); retorno = já teve sessão com valor antes deste mês (BMH_financeiro_paciente, desde nov/2024)\nconst PAG = { campo: 626678, Particular: 463120, 'Convênio': 463122 }, CONVENIO = 626680;\nconst mesAtual = $now.setZone('America/Sao_Paulo').toFormat('yyyy-MM'), jaFez = new Set();\nfor (const i of $('Histórico de pacientes').all()) { const r = i.json || {}; if (r.paciente_id && r.mes < mesAtual && Number(r.valor) > 0) jaFez.add(String(r.paciente_id)); }\nconst pagamento = (c) => { const n = String(c || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase(); return !n || /cortesia|voucher/.test(n) ? '' : /particular/.test(n) ? 'Particular' : 'Convênio'; };\nconst chaveFone = (s) => { let d = String(s || '').replace(/\\D/g, ''); if (d.startsWith('55') && d.length >= 12) d = d.slice(2); return d.length >= 10 ? d.slice(0, 2) + d.slice(-8) : ''; };\nconst porFone = {};\nfor (const c of Object.values(contatos)) for (const f of (c.custom_fields_values || []).filter((f) => f.field_code === 'PHONE'))\n  for (const v of f.values || []) { const k = chaveFone(v.value); if (k) (porFone[k] ||= new Set()).add(c.id); }\nconst leadsDo = {}; for (const l of leads) for (const c of (l._embedded?.contacts || [])) (leadsDo[c.id] ||= []).push(l);\nconst aberto = (l) => l.status_id !== 142 && l.status_id !== 143;\nconst copia = (l) => (l.custom_fields_values || []).filter((f) => COPIAR.includes(f.field_id))\n  .map((f) => ({ field_id: f.field_id, values: (f.values || []).map((v) => (v.enum_id ? { enum_id: v.enum_id } : { value: v.value })) }));\nconst out = [];\nfor (const a of AV) {\n  const ids = [...(porFone[chaveFone(a.fone)] || [])];\n  const doContato = ids.flatMap((id) => (leadsDo[id] || []).map((l) => ({ l, contato: id })));\n  const naUnidade = doContato.find((x) => x.l.pipeline_id === FUNIL[a.unidade] && aberto(x.l));\n  const tri = doContato.filter((x) => x.l.pipeline_id === FUNIL.triagem && aberto(x.l)).sort((p, q) => q.l.updated_at - p.l.updated_at)[0];\n  const acao = !ids.length ? 'sem contato no Kommo' : naUnidade ? 'já no funil da unidade' : !tri ? 'sem lead aberto na triagem' : 'passar';\n  const r = { chave: a.chave, paciente_id: a.pid, unidade: a.unidade, avaliacao_dia: a.dia, avaliacao_hora: a.hora, telefone_hash: a.telefone_hash,\n    contato_id: String(tri?.contato || naUnidade?.contato || ids[0] || ''), lead_triagem: String(tri?.l.id || ''), lead_unidade: String(naUnidade?.l.id || ''),\n    acao, modo, status: acao !== 'passar' ? 'nada a fazer' : modo === 'real' ? 'a fazer' : 'ensaio', detalhe: ids.length > 1 ? ids.length + ' contatos com o mesmo celular' : '', atualizado_em: agora };\n  if (acao === 'passar') {\n    const pg = pagamento(a.convenio), retorno = jaFez.has(a.pid);\n    const doIgut = [{ field_id: UNIDADE.campo, values: [{ enum_id: UNIDADE[a.unidade] }] }, { field_id: ID_IGUT, values: [{ value: a.pid }] },\n      ...(pg ? [{ field_id: PAG.campo, values: [{ enum_id: PAG[pg] }] }] : []), ...(pg === 'Convênio' ? [{ field_id: CONVENIO, values: [{ value: a.convenio }] }] : [])];\n    const novas = [pg === 'Particular' ? 'particular' : pg === 'Convênio' ? 'convênio' : '', retorno ? 'retorno' : ''].filter(Boolean).map((name) => ({ name }));\n    const ids_ = new Set(doIgut.map((f) => f.field_id));\n    const campos = [...copia(tri.l).filter((f) => !ids_.has(f.field_id)), ...doIgut];\n    r.detalhe = [pg || 'sem pagamento na agenda', retorno ? 'retorno' : '', r.detalhe].filter(Boolean).join(' · ');\n    // contato com nome completo, código do iGut, e-mail, CPF e nascimento (só se vazios), como na Nexo; nunca em contato de OUTRO paciente\n    const c = contatos[tri.contato] || {}, cod = String((c.custom_fields_values || []).find((f) => f.field_id === 662778)?.values?.[0]?.value || '');\n    if (cod && cod !== a.pid) r.detalhe = [r.detalhe, 'contato com outro código do iGut: nome não trocado'].filter(Boolean).join(' · ');\n    else if (a.nome) { const tem = (id) => (c.custom_fields_values || []).some((f) => f.field_id === id);   // e-mail 624502, CPF 663106, nascimento 663108: só se vazios\n      r.contato_patch = { id: tri.contato, name: a.nome, custom_fields_values: [{ field_id: 662778, values: [{ value: a.pid }] },\n        ...(a.email && !tem(624502) ? [{ field_id: 624502, values: [{ value: a.email, enum_code: 'WORK' }] }] : []),\n        ...(a.cpf && !tem(663106) ? [{ field_id: 663106, values: [{ value: a.cpf }] }] : []),\n        ...(a.nasc && !tem(663108) ? [{ field_id: 663108, values: [{ value: a.nasc }] }] : [])] }; }\n    r.novo = { name: a.nome || tri.l.name || 'Avaliação ' + a.unidade, pipeline_id: FUNIL[a.unidade], status_id: ETAPA[a.unidade], custom_fields_values: campos,\n      _embedded: { contacts: [{ id: tri.contato }], tags: [...(tri.l._embedded?.tags || []).map((t) => ({ id: t.id })), ...novas] } };\n    r.ganha = { id: tri.l.id, pipeline_id: FUNIL.triagem, status_id: 142, custom_fields_values: doIgut };\n  }\n  if (acao !== 'passar') r.detalhe = [pagamento(a.convenio) || 'sem pagamento na agenda', jaFez.has(a.pid) ? 'retorno' : '', r.detalhe].filter(Boolean).join(' · ');\n  out.push({ json: r });\n}\n// Volta da etapa \"Remarcar\" (19/11/2026): lead que pediu para remarcar pela confirmação volta sozinho quando o novo horário\n// entra no iGut (próximos 14 dias, sem falta nem bloqueio): avaliação → \"Avaliação agendada\"; sessão → \"Em tratamento\".\nconst REM = { 114327279: 'Asa Sul', 114327283: 'Taguatinga' }, VOLTA = { 'Asa Sul': { avaliacao: 114237079, sessao: 114237091 }, Taguatinga: { avaliacao: 114237099, sessao: 114237111 } };\nconst AG = { 111: ['Asa Sul', 'sessao'], 112: ['Asa Sul', 'sessao'], 121: ['Taguatinga', 'sessao'], 113: ['Asa Sul', 'avaliacao'], 120: ['Taguatinga', 'avaliacao'] };\nconst semAc = (x) => String(x ?? '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').trim().toLowerCase();\nconst hojeV = $now.setZone('America/Sao_Paulo').toISODate(), proximo = {};\nfor (const x of ($('Agenda').first().json.data || [])) { const a = AG[Number(x.Profissional?.id)], pid = String(x.Paciente?.id || ''), d = String(x.Agendamento?.data || '').slice(0, 10);\n  if (!a || !pid || d < hojeV || String(x.Agendamento?.bloqueado || '') === '1' || ['faltou', 'desmarcado', 'desistiu'].includes(semAc(x.Agendamento?.confirmado))) continue;\n  if (a[1] === 'avaliacao' && !semAc(x.Agendamento?.tipodeatendimento).includes('avaliac')) continue;\n  const h = String(x.Agendamento?.horario || '').slice(0, 5); if (!proximo[pid] || d + h < proximo[pid].d + proximo[pid].h) proximo[pid] = { d, h, u: a[0], t: a[1] }; }\nfor (const l of leads) { const u = REM[l.status_id]; if (!u) continue;\n  const pid = String((l.custom_fields_values || []).find((f) => f.field_id === ID_IGUT)?.values?.[0]?.value || ''), p = proximo[pid]; if (!p) continue;\n  const alvo = VOLTA[u][p.t], [, mm, dd] = p.d.split('-');\n  out.push({ json: { chave: 'volta|' + l.id + '|' + p.d, paciente_id: pid, unidade: u, avaliacao_dia: p.d, avaliacao_hora: p.h, contato_id: '', lead_triagem: '', lead_unidade: String(l.id), acao: 'voltar de Remarcar', modo,\n    status: modo === 'real' ? 'a fazer' : 'ensaio', detalhe: p.t === 'avaliacao' ? 'avaliação' : 'sessão', atualizado_em: agora, telefone_hash: '',\n    volta: { id: l.id, pipeline_id: l.pipeline_id, status_id: alvo }, nota_volta: { entity_id: l.id, note_type: 'common', params: { text: `Remarcado no iGut: ${p.t === 'avaliacao' ? 'avaliação' : 'sessão'} em ${dd}/${mm} às ${p.h}. O lead voltou sozinho da etapa Remarcar.` } } } }); }\nreturn out;\n"
+   },
+   "executeOnce": true
+  },
+  {
+   "id": "b98fedb2-e600-4ce3-ac37-0ceb0fbdeb77",
+   "name": "Só no modo real",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    3900,
+    0
+   ],
+   "parameters": {
+    "jsCode": "return $('Decide a passagem').all().filter((i) => i.json.modo === 'real' && i.json.acao === 'passar').map((i) => ({ json: i.json }));"
+   }
+  },
+  {
+   "id": "ae27b806-616f-4246-b388-c1a17eea032a",
+   "name": "Cria o lead na unidade",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    4160,
+    0
+   ],
+   "parameters": {
+    "method": "POST",
+    "url": "https://bmh.kommo.com/api/v4/leads",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpHeaderAuth",
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "={{ JSON.stringify([$json.novo]) }}",
+    "options": {
+     "batching": {
+      "batch": {
+       "batchSize": 5,
+       "batchInterval": 1000
+      }
+     },
+     "response": {
+      "response": {
+       "responseFormat": "json"
+      }
+     }
+    }
+   },
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000,
+   "credentials": {
+    "httpHeaderAuth": {
+     "id": "xpwKz2vMUxgqhNBo",
+     "name": "BMH · Kommo (token)"
+    }
+   }
+  },
+  {
+   "id": "8e06b27e-9c33-45df-913f-77bb0cf956f8",
+   "name": "Ganha na triagem",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    4420,
+    0
+   ],
+   "parameters": {
+    "method": "PATCH",
+    "url": "https://bmh.kommo.com/api/v4/leads",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpHeaderAuth",
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "={{ JSON.stringify([$('Só no modo real').item.json.ganha]) }}",
+    "options": {
+     "batching": {
+      "batch": {
+       "batchSize": 5,
+       "batchInterval": 1000
+      }
+     },
+     "response": {
+      "response": {
+       "responseFormat": "json"
+      }
+     }
+    }
+   },
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000,
+   "credentials": {
+    "httpHeaderAuth": {
+     "id": "xpwKz2vMUxgqhNBo",
+     "name": "BMH · Kommo (token)"
+    }
+   }
+  },
+  {
+   "id": "2f355444-4101-41ca-811e-d31fcd2da5c1",
+   "name": "Marca como feito",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    4680,
+    0
+   ],
+   "parameters": {
+    "jsCode": "// um item por passagem feita: o id do lead novo vem da criação (mesma ordem dos itens)\nconst cria = $('Cria o lead na unidade').all();\nreturn $('Só no modo real').all().map((i, k) => { const { novo, ganha, contato_patch, ...r } = i.json; return { json: { ...r, lead_unidade: String(cria[k]?.json?._embedded?.leads?.[0]?.id || ''), status: 'feito', atualizado_em: $now.toISO() } }; });"
+   },
+   "executeOnce": true
+  },
+  {
+   "id": "366f0a45-0733-4772-81b8-56291e169f9f",
+   "name": "Grava a passagem feita",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    4940,
+    0
+   ],
+   "parameters": {
+    "operation": "upsert",
+    "dataTableId": {
+     "__rl": true,
+     "value": "W42mHjSf6OpvXomF",
+     "mode": "id",
+     "cachedResultName": "BMH_passagens"
+    },
+    "filters": {
+     "conditions": [
+      {
+       "keyName": "chave",
+       "keyValue": "={{ $json.chave }}"
+      }
+     ]
+    },
+    "columns": {
+     "mappingMode": "defineBelow",
+     "value": {
+      "chave": "={{ $json.chave }}",
+      "paciente_id": "={{ $json.paciente_id }}",
+      "unidade": "={{ $json.unidade }}",
+      "avaliacao_dia": "={{ $json.avaliacao_dia }}",
+      "avaliacao_hora": "={{ $json.avaliacao_hora }}",
+      "telefone_hash": "={{ $json.telefone_hash }}",
+      "contato_id": "={{ $json.contato_id }}",
+      "lead_triagem": "={{ $json.lead_triagem }}",
+      "lead_unidade": "={{ $json.lead_unidade }}",
+      "acao": "={{ $json.acao }}",
+      "modo": "={{ $json.modo }}",
+      "status": "={{ $json.status }}",
+      "detalhe": "={{ $json.detalhe }}",
+      "atualizado_em": "={{ $json.atualizado_em }}"
+     },
+     "matchingColumns": [],
+     "schema": [
+      {
+       "id": "chave",
+       "displayName": "chave",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "paciente_id",
+       "displayName": "paciente_id",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "unidade",
+       "displayName": "unidade",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "avaliacao_dia",
+       "displayName": "avaliacao_dia",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "avaliacao_hora",
+       "displayName": "avaliacao_hora",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "telefone_hash",
+       "displayName": "telefone_hash",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "contato_id",
+       "displayName": "contato_id",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "lead_triagem",
+       "displayName": "lead_triagem",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "lead_unidade",
+       "displayName": "lead_unidade",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "acao",
+       "displayName": "acao",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "modo",
+       "displayName": "modo",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "status",
+       "displayName": "status",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "detalhe",
+       "displayName": "detalhe",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "atualizado_em",
+       "displayName": "atualizado_em",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      }
+     ]
+    },
+    "options": {}
+   }
+  },
+  {
+   "id": "cac713ca-be1c-4d43-8fe0-ca230c4e43c3",
+   "name": "Contatos a atualizar",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    5200,
+    0
+   ],
+   "parameters": {
+    "jsCode": "return $('Só no modo real').all().filter((i) => i.json.contato_patch).map((i) => ({ json: { contato: i.json.contato_patch } }));"
+   },
+   "executeOnce": true
+  },
+  {
+   "id": "fe95d48a-8af3-4969-a2a9-d2c4cfe9c378",
+   "name": "Atualiza o contato",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    5460,
+    0
+   ],
+   "parameters": {
+    "method": "PATCH",
+    "url": "https://bmh.kommo.com/api/v4/contacts",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpHeaderAuth",
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "={{ JSON.stringify([$json.contato]) }}",
+    "options": {
+     "batching": {
+      "batch": {
+       "batchSize": 5,
+       "batchInterval": 1000
+      }
+     },
+     "response": {
+      "response": {
+       "responseFormat": "json"
+      }
+     }
+    }
+   },
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000,
+   "credentials": {
+    "httpHeaderAuth": {
+     "id": "xpwKz2vMUxgqhNBo",
+     "name": "BMH · Kommo (token)"
+    }
+   }
+  },
+  {
+   "id": "a965a739-67cb-4054-83a1-db45fe879a24",
+   "name": "Voltas de Remarcar (modo real)",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    5720,
+    0
+   ],
+   "parameters": {
+    "jsCode": "return $('Decide a passagem').all().filter((i) => i.json.acao === 'voltar de Remarcar' && i.json.status === 'a fazer');"
+   },
+   "executeOnce": true
+  },
+  {
+   "id": "b84321e1-a1d3-4436-9134-772e33a95ac4",
+   "name": "Devolve à etapa",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    5980,
+    0
+   ],
+   "parameters": {
+    "method": "PATCH",
+    "url": "https://bmh.kommo.com/api/v4/leads",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpHeaderAuth",
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "={{ JSON.stringify([$json.volta]) }}",
+    "options": {
+     "batching": {
+      "batch": {
+       "batchSize": 5,
+       "batchInterval": 1000
+      }
+     },
+     "response": {
+      "response": {
+       "responseFormat": "json"
+      }
+     }
+    }
+   },
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000,
+   "credentials": {
+    "httpHeaderAuth": {
+     "id": "xpwKz2vMUxgqhNBo",
+     "name": "BMH · Kommo (token)"
+    }
+   }
+  },
+  {
+   "id": "967ebcdf-ea5b-4b77-9af4-096d45c61fae",
+   "name": "Nota da volta",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    6240,
+    0
+   ],
+   "parameters": {
+    "method": "POST",
+    "url": "https://bmh.kommo.com/api/v4/leads/notes",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpHeaderAuth",
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "={{ JSON.stringify([$('Voltas de Remarcar (modo real)').item.json.nota_volta]) }}",
+    "options": {
+     "batching": {
+      "batch": {
+       "batchSize": 5,
+       "batchInterval": 1000
+      }
+     },
+     "response": {
+      "response": {
+       "responseFormat": "json"
+      }
+     }
+    }
+   },
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000,
+   "credentials": {
+    "httpHeaderAuth": {
+     "id": "xpwKz2vMUxgqhNBo",
+     "name": "BMH · Kommo (token)"
+    }
+   }
+  },
+  {
+   "id": "ca42e447-6bc0-4ee8-bef7-7acb1c03e723",
+   "name": "Decisões sem envio",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    6500,
+    0
+   ],
+   "parameters": {
+    "jsCode": "return $('Decide a passagem').all().filter((i) => i.json.status !== 'a fazer');"
+   },
+   "executeOnce": true
+  },
+  {
+   "id": "3a6406c0-11ef-45d8-bd21-39958c3f663f",
+   "name": "Grava a decisão",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    6760,
+    0
+   ],
+   "parameters": {
+    "operation": "upsert",
+    "dataTableId": {
+     "__rl": true,
+     "value": "W42mHjSf6OpvXomF",
+     "mode": "id",
+     "cachedResultName": "BMH_passagens"
+    },
+    "filters": {
+     "conditions": [
+      {
+       "keyName": "chave",
+       "keyValue": "={{ $json.chave }}"
+      }
+     ]
+    },
+    "columns": {
+     "mappingMode": "defineBelow",
+     "value": {
+      "chave": "={{ $json.chave }}",
+      "paciente_id": "={{ $json.paciente_id }}",
+      "unidade": "={{ $json.unidade }}",
+      "avaliacao_dia": "={{ $json.avaliacao_dia }}",
+      "avaliacao_hora": "={{ $json.avaliacao_hora }}",
+      "telefone_hash": "={{ $json.telefone_hash }}",
+      "contato_id": "={{ $json.contato_id }}",
+      "lead_triagem": "={{ $json.lead_triagem }}",
+      "lead_unidade": "={{ $json.lead_unidade }}",
+      "acao": "={{ $json.acao }}",
+      "modo": "={{ $json.modo }}",
+      "status": "={{ $json.status }}",
+      "detalhe": "={{ $json.detalhe }}",
+      "atualizado_em": "={{ $json.atualizado_em }}"
+     },
+     "matchingColumns": [],
+     "schema": [
+      {
+       "id": "chave",
+       "displayName": "chave",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "paciente_id",
+       "displayName": "paciente_id",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "unidade",
+       "displayName": "unidade",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "avaliacao_dia",
+       "displayName": "avaliacao_dia",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "avaliacao_hora",
+       "displayName": "avaliacao_hora",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "telefone_hash",
+       "displayName": "telefone_hash",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "contato_id",
+       "displayName": "contato_id",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "lead_triagem",
+       "displayName": "lead_triagem",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "lead_unidade",
+       "displayName": "lead_unidade",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "acao",
+       "displayName": "acao",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "modo",
+       "displayName": "modo",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "status",
+       "displayName": "status",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "detalhe",
+       "displayName": "detalhe",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "atualizado_em",
+       "displayName": "atualizado_em",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      }
+     ]
+    },
+    "options": {}
+   }
+  },
+  {
+   "id": "c115d2bb-f7af-42cb-b97d-02db4fa1cbf2",
+   "name": "Resumo",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    7020,
+    0
+   ],
+   "parameters": {
+    "jsCode": "// só contagens (é o que o \"Rodar agora\" devolve)\nconst it = $('Decide a passagem').all().map((i) => i.json), c = {}; for (const r of it) c[r.acao] = (c[r.acao] || 0) + 1;\nreturn [{ json: { modo: it[0]?.modo || '-', avaliacoes: it.length, ...c } }];"
+   },
+   "executeOnce": true
+  },
+  {
+   "id": "3c30a6db-b12f-408e-83df-c02357d62e55",
+   "name": "Sobre este fluxo",
+   "type": "n8n-nodes-base.stickyNote",
+   "typeVersion": 1,
+   "position": [
+    7280,
+    0
+   ],
+   "parameters": {
+    "content": "## BMH · Kommo · passagem para a unidade\n**Traz:** avaliações dos próximos 14 dias no iGut (agendas 113 Asa Sul e 120 Taguatinga) e os leads e contatos dos três funis do Kommo\n**Envia:** no modo real, cria o lead no funil da unidade (Avaliação agendada, com origem, cirurgião e convênio copiados) e marca o da triagem como ganho; o contato ganha nome completo, código do iGut, e-mail, CPF e nascimento (como na Nexo, decisão do Jorge de 18/11/2026); preenche particular ou convênio e o convênio pela agenda, e a etiqueta retorno (já teve sessão antes, BMH_financeiro_paciente); grava a conversão agendou em BMH_conversoes (só as novas); devolve da etapa Remarcar o lead cujo novo horário entrou no iGut\n**Limites:** casa pelo celular (DDD + 8 últimos dígitos); retorno, troca de unidade e quem marcou sem conversar ficam só registrados (a recepção resolve); 5 chamadas por segundo ao Kommo; BMH_passagens sem nome nem celular\n\nModo na chave `passagem_modo` de BMH_config (ensaio | real). Teste: /webhook/bmh-kommo-passagem-47fcfbe786ca",
+    "width": 620,
+    "height": 260
+   }
+  },
+  {
+   "parameters": {
+    "jsCode": "// 19/11/2026 (igual ao conserto da Nexo, nº 152): as páginas do Kommo chegam como arquivo, e a página vazia do fim da lista (204) não\n// quebra mais o fluxo. Este nó tem o nome que os outros nós leem e devolve uma página por item, no mesmo formato de antes.\nconst it = $input.all(); const out = []; let fimVazio = false;\nfor (let k = 0; k < it.length; k++) {\n  const b = it[k].binary && it[k].binary.data;\n  if (!b) { if (it[k].json && it[k].json._embedded) out.push({ json: it[k].json, pairedItem: k }); continue; }\n  const t = (await this.helpers.getBinaryDataBuffer(k, 'data')).toString('utf8').trim();\n  if (!t) { if (k === it.length - 1) fimVazio = true; continue; }   // a página depois da última (204, sem corpo)\n  let j; try { j = JSON.parse(t); } catch (e) { throw new Error('Kommo devolveu uma página que não é JSON (página ' + (k + 1) + '): ' + t.slice(0, 120)); }\n  out.push({ json: j, pairedItem: k });\n}\nif (it.length >= 40 && !fimVazio) throw new Error('Kommo: chegou ao teto de 40 páginas; aumentar o teto antes de seguir.');\nreturn out.length ? out : [{ json: {}, pairedItem: 0 }];"
+   },
+   "name": "Leads no Kommo",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    2980,
+    160
+   ],
+   "id": "7324fa75-e17b-5dfc-b57f-0ca58b8a6e8f",
+   "alwaysOutputData": true
+  }
+ ],
+ "connections": {
+  "A cada 30 min (7h às 19h)": {
+   "main": [
+    [
+     {
+      "node": "Janela",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Rodar agora": {
+   "main": [
+    [
+     {
+      "node": "Janela",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Janela": {
+   "main": [
+    [
+     {
+      "node": "Config",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Config": {
+   "main": [
+    [
+     {
+      "node": "Já feitas",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Já feitas": {
+   "main": [
+    [
+     {
+      "node": "Histórico de pacientes",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Histórico de pacientes": {
+   "main": [
+    [
+     {
+      "node": "Agenda",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Agenda": {
+   "main": [
+    [
+     {
+      "node": "Avaliações novas",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Avaliações novas": {
+   "main": [
+    [
+     {
+      "node": "Leads no Kommo (páginas)",
+      "type": "main",
+      "index": 0
+     },
+     {
+      "node": "Conversões (tabela)",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Contatos a buscar": {
+   "main": [
+    [
+     {
+      "node": "Contatos no Kommo",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Contatos no Kommo": {
+   "main": [
+    [
+     {
+      "node": "Decide a passagem",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Decide a passagem": {
+   "main": [
+    [
+     {
+      "node": "Só no modo real",
+      "type": "main",
+      "index": 0
+     },
+     {
+      "node": "Voltas de Remarcar (modo real)",
+      "type": "main",
+      "index": 0
+     },
+     {
+      "node": "Decisões sem envio",
+      "type": "main",
+      "index": 0
+     },
+     {
+      "node": "Resumo",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Conversões (tabela)": {
+   "main": [
+    [
+     {
+      "node": "Agendou (conversões novas)",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Agendou (conversões novas)": {
+   "main": [
+    [
+     {
+      "node": "Grava o agendou",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Voltas de Remarcar (modo real)": {
+   "main": [
+    [
+     {
+      "node": "Devolve à etapa",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Devolve à etapa": {
+   "main": [
+    [
+     {
+      "node": "Nota da volta",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Decisões sem envio": {
+   "main": [
+    [
+     {
+      "node": "Grava a decisão",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Só no modo real": {
+   "main": [
+    [
+     {
+      "node": "Cria o lead na unidade",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Cria o lead na unidade": {
+   "main": [
+    [
+     {
+      "node": "Ganha na triagem",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Ganha na triagem": {
+   "main": [
+    [
+     {
+      "node": "Marca como feito",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Marca como feito": {
+   "main": [
+    [
+     {
+      "node": "Grava a passagem feita",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Grava a passagem feita": {
+   "main": [
+    [
+     {
+      "node": "Contatos a atualizar",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Contatos a atualizar": {
+   "main": [
+    [
+     {
+      "node": "Atualiza o contato",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Leads no Kommo (páginas)": {
+   "main": [
+    [
+     {
+      "node": "Leads no Kommo",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Leads no Kommo": {
+   "main": [
+    [
+     {
+      "node": "Contatos a buscar",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  }
+ }
+}
