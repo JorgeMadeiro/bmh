@@ -373,3 +373,9 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
   responder (Kommo ou WhatsApp Web, por causa do texto para o SDR) se decide antes dessa data.
 - **Envio pelo Kommo confirmado no celular** (19/11/2026, 06h34): a mensagem do Jorge pelo Kommo e o "Teste 2" do salesbot
   chegaram ao celular dele. Envio pelo Kommo funcionando de ponta a ponta.
+- **Importados em Perdido** (19/11/2026, ok do Jorge): os 690 importados que sobraram em Em qualificação foram para Perdido com
+  o motivo "Só dúvida / agora não" e a etiqueta "importado" (`scripts/kommo/importados-perdido.js`; conferido: 690 de 690).
+  Lição da API: `tags_to_add` é ignorado no PATCH de lead; mandar a lista inteira de etiquetas (as que já tinha + a nova).
+- **Leitura semanal do atendimento na VPS** (19/11/2026, "VPS como Nexa"): rota `n8n-bmh-conversas` no cofre (mascarada) e
+  rotinas `bmh-atendimento-*` toda segunda às 9h, de 23/11 a 11/01, que atualizam `marketing/atendimento/como-a-recepcao-atende.md`
+  e mandam o resumo no Telegram. A rota vale depois do `subir-na-vps.sh`.
