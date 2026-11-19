@@ -371,3 +371,5 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
      (o texto chega pelo eco da coexistência).
 - **Início do uso do Kommo pela equipe: 24/11/2026** (Jorge, 19/11/2026). Até lá a equipe termina as configurações; a forma de
   responder (Kommo ou WhatsApp Web, por causa do texto para o SDR) se decide antes dessa data.
+- **Envio pelo Kommo confirmado no celular** (19/11/2026, 06h34): a mensagem do Jorge pelo Kommo e o "Teste 2" do salesbot
+  chegaram ao celular dele. Envio pelo Kommo funcionando de ponta a ponta.
