@@ -413,3 +413,7 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
   continua livre para o modo real (o paciente recebe a dele quando ligar). Avaliações ficam de fora até
   `confirmacao_avaliacao = ligada` (depois da aprovação do modelo). Primeira rodada: 3 mensagens, todas para o número de
   teste (conferido pelo destino do id da mensagem).
+- **Respostas no espelho testadas** (19/11/2026, 09h49): o Jorge tocou "Confirmo" e "Preciso remarcar" em duas mensagens do
+  espelho. As duas chegaram ao recebedor citando a mensagem e foram ligadas ao paciente certo pela citação (status "espelho:
+  confirmaria no iGut" e "espelho: desmarcaria e levaria para Remarcar"). Conferido depois: os dois agendamentos seguem "Nao
+  Confirmado / Agendado" no iGut e a coluna Remarcar do Kommo está vazia. Nenhuma falha no n8n.
