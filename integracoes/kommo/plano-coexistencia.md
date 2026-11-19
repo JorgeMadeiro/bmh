@@ -379,3 +379,11 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
 - **Leitura semanal do atendimento na VPS** (19/11/2026, "VPS como Nexa"): rota `n8n-bmh-conversas` no cofre (mascarada) e
   rotinas `bmh-atendimento-*` toda segunda às 9h, de 23/11 a 11/01, que atualizam `marketing/atendimento/como-a-recepcao-atende.md`
   e mandam o resumo no Telegram. A rota vale depois do `subir-na-vps.sh`.
+- **"Preciso remarcar" com etapa "Remarcar"** (19/11/2026, decisão do Jorge: "pode marcar sozinho" e "adicionar uma etapa no
+  funil com essas pendências"): etapa "Remarcar" no começo dos funis Asa Sul (114327279) e Taguatinga (114327283). No modo
+  real da confirmação, a resposta "Preciso remarcar" desmarca no iGut (status 3) os agendamentos do dia, leva o lead (achado
+  pelo código do iGut) para "Remarcar" e deixa nota; quando o novo horário entra no iGut, a passagem devolve o lead para
+  "Avaliação agendada" ou "Em tratamento", com nota. Código: `integracoes/agenda/confirmacao-resposta.js`,
+  `integracoes/agenda/remarcar-lead.js` e o fim de `integracoes/kommo/passagem-decide.js`. **Testado** no lead do Jorge com
+  nós copiados e entradas simuladas (ida para Remarcar e volta para Em tratamento, com as notas); o desmarcar no iGut não
+  foi testado (mexeria em agenda real). Liga junto com a confirmação (`confirmacao_modo = real`).

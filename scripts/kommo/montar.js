@@ -25,7 +25,7 @@ const FRASES = JSON.parse(fs.readFileSync(path.join(RAIZ, 'integracoes', 'origem
 // três funis (Jorge, 17/11/2026): a triagem recebe todo contato do número único; o ganho dela é a avaliação agendada, que abre
 // um lead novo no funil da unidade (mesmo contato). Na unidade, o ganho é o fim do tratamento. "Avaliou" e "pedido a enviar
 // ao convênio" são a mesma etapa (o particular passa direto para Em tratamento).
-const UNIDADE = ['Avaliação agendada', 'Avaliou · pedido a enviar', 'Aguardando convênio', 'Em tratamento'];
+const UNIDADE = ['Remarcar', 'Avaliação agendada', 'Avaliou · pedido a enviar', 'Aguardando convênio', 'Em tratamento'];   // Remarcar (19/11/2026): pediu para remarcar na confirmação
 const FUNIS = [
   { chave: 'triagem', nome: 'Triagem e conversão', antigo: 'Atendimento BMH', principal: true, etapas: ['Em qualificação', 'Orçamento enviado', 'Follow-up'] },
   { chave: 'asa_sul', nome: 'Asa Sul', etapas: UNIDADE },
