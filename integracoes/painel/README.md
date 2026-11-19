@@ -130,3 +130,15 @@ Depois disso o Claude cria as credenciais do Google no usuário da BMH, o fluxo 
   Teste: `/webhook/bmh-google-organico-semana?teste=1`.
 - Cópias dos fluxos antes dessas mudanças: `dados/n8n-copias/20261015-antes-vigia/`.
 
+
+## Funil comercial (19/11/2026, pedido do Jorge)
+
+Seção "Funil comercial" no painel de marketing, logo depois do custo por contato. Uma linha por conversa nova no WhatsApp da
+recepção (`BMH_origem_conversas`, desde 17/11/2026, quando o recebedor oficial começou) com a origem do último clique: gclid do
+site = Google Ads; código do anúncio de clique para WhatsApp = Meta Ads; frase pronta = site, Instagram, Perfil do Google ou QR
+do cirurgião; sem nada = sem origem marcada. As etapas vêm de `BMH_conversoes` pelo telefone em código (com e sem o 9), até 60
+dias depois da conversa: avaliação agendada (passagem do Kommo; as 31 gravadas às 19h13 de 17/11 ficam de fora), avaliou e
+iniciou tratamento (iGut). Mostra os totais, a tabela por canal (taxas, gasto, custo por avaliação e por paciente novo; meta
+R$ 200), a tabela por unidade e o mapa de horas das conversas. Código em `n8n/monta-os-dados.js` (bloco "funil comercial") e
+`pagina.html` (`blocoFunil`). **Falta:** a tabela por cirurgião, que depende do campo "Cirurgião que indicou" do Kommo.
+Conferido no celular (quadro de 390 px, sem passar da tela; as tabelas rolam para o lado).
