@@ -358,3 +358,14 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
 - **CPF e nascimento no contato** (18/11/2026, decisão do Jorge: "igual à Nexo, com CPF", trocando a regra de 22/10): campos
   do contato "CPF" (663106) e "Data de nascimento" (663108, tipo aniversário), preenchidos só se vazios. Feito nos 68 contatos
   das unidades (conferido: 68 com CPF de 11 dígitos, 68 com nascimento) e ligado na passagem.
+- **Testes de 19/11/2026 (pedido do Jorge, "teste os não testados"):**
+  1. Nascimento e CPF dos 68 contatos iguais aos do iGut (68 de 68; a conta do Kommo está em America/Sao_Paulo).
+  2. Os nós "Contatos a atualizar" e "Atualiza o contato" da passagem, copiados para um fluxo temporário, atualizaram o
+     contato do Jorge pelo Kommo (resposta 200, contato devolvido); fluxo apagado.
+  3. Origem em modo real: mensagem simulada "Vim pelo site da BMH" no lead do Jorge gravou Origem = site, utm_source,
+     utm_medium, utm_content e a etiqueta "site"; desfeito depois (fica uma linha de teste em BMH_origem_leads, conversa
+     "teste", que nenhum painel lê).
+  4. Mensagem enviada pelo Kommo (salesbot no lead do Jorge, 06h26): o webhook de conta (`add_message`) **não disparou** em
+     20 s, e o recebedor oficial só grava "enviada" sem texto. Conclusão: o texto das respostas mandadas pelo Kommo não chega
+     a nenhum dos dois caminhos. Para a leitura do atendimento e o SDR, a recepção responde pelo WhatsApp Web ou pelo celular
+     (o texto chega pelo eco da coexistência).
