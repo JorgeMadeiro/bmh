@@ -369,3 +369,5 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
      20 s, e o recebedor oficial só grava "enviada" sem texto. Conclusão: o texto das respostas mandadas pelo Kommo não chega
      a nenhum dos dois caminhos. Para a leitura do atendimento e o SDR, a recepção responde pelo WhatsApp Web ou pelo celular
      (o texto chega pelo eco da coexistência).
+- **Início do uso do Kommo pela equipe: 24/11/2026** (Jorge, 19/11/2026). Até lá a equipe termina as configurações; a forma de
+  responder (Kommo ou WhatsApp Web, por causa do texto para o SDR) se decide antes dessa data.
