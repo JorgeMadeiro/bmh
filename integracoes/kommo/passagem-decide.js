@@ -65,4 +65,41 @@ for (const a of AV) {
   if (acao !== 'passar') r.detalhe = [pagamento(a.convenio) || 'sem pagamento na agenda', jaFez.has(a.pid) ? 'retorno' : '', r.detalhe].filter(Boolean).join(' · ');
   out.push({ json: r });
 }
+// Avanço de etapa pelo iGut, como reserva da recepção (19/11/2026, "pode montar assim e vemos para frente"). Só para a frente,
+// nunca em lead que a recepção já moveu mais adiante, em Remarcar nem em lead fechado:
+//   - avaliação "Finalizado" (ontem ou hoje): Avaliação agendada → Avaliou · pedido a enviar;
+//   - sessão "Finalizado" (ontem ou hoje): Avaliação agendada, Avaliou ou Aguardando convênio → Em tratamento (o particular que
+//     espera o convênio volta sozinho quando a sessão do convênio acontece);
+//   - Em tratamento com mais de 10 dias sem sessão e nenhuma marcada: tarefa para a recepção decidir entre Concluiu e
+//     Perdido · Interrompeu o tratamento, com a pista pelo número de sessões (5, 10, 15, 20: provável pacote completo). Uma
+//     tarefa por fim de sequência (chave fim|lead|última sessão). Aguardando convênio não recebe tarefa.
+const ETP = { 'Asa Sul': { ag: 114237079, av: 114237083, conv: 114237087, trat: 114237091, pipe: 14783519 }, Taguatinga: { ag: 114237099, av: 114237103, conv: 114237107, trat: 114237111, pipe: 14783523 } };
+const UN_DO_PIPE = { 14783519: 'Asa Sul', 14783523: 'Taguatinga' };
+const sA = (x) => String(x ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').trim().toLowerCase();
+const hojeE = $now.setZone('America/Sao_Paulo').toISODate(), ontemE = $now.setZone('America/Sao_Paulo').minus({ days: 1 }).toISODate();
+const SESS = { 111: 1, 112: 1, 121: 1 }, CONS = { 113: 1, 120: 1 };
+const fezSessao = new Set(), fezAvaliacao = new Set(), marcada = new Set(), diasDe = {};
+for (const x of ($('Agenda').first().json.data || [])) { const id = Number(x.Profissional?.id), pid = String(x.Paciente?.id || ''), d = String(x.Agendamento?.data || '').slice(0, 10); if (!pid) continue;
+  const fim = sA(x.Agendamento?.status) === 'finalizado', faltou = ['faltou', 'desmarcado', 'desistiu'].includes(sA(x.Agendamento?.confirmado));
+  if (SESS[id]) { if (fim && (d === hojeE || d === ontemE)) { fezSessao.add(pid); (diasDe[pid] ||= new Set()).add(d); } if (!faltou && !fim && d >= hojeE) marcada.add(pid); }
+  if (CONS[id] && sA(x.Agendamento?.tipodeatendimento).includes('avaliac') && fim && (d === hojeE || d === ontemE)) fezAvaliacao.add(pid); }
+const meses3 = new Set([0, 1, 2].map((k) => $now.setZone('America/Sao_Paulo').minus({ months: k }).toFormat('yyyy-MM')));
+for (const i of $('Histórico de pacientes').all()) { const r = i.json || {}; if (!r.paciente_id || !meses3.has(r.mes) || !(Number(r.sessoes) > 0)) continue;
+  for (const x of String(r.dias || '').split(',').map(Number).filter(Boolean)) (diasDe[r.paciente_id] ||= new Set()).add(r.mes + '-' + String(x).padStart(2, '0')); }
+const tarefasFeitas = new Set($('Já feitas').all().map((i) => i.json || {}).filter((r) => r.chave && r.chave.startsWith('fim|') && r.status === 'tarefa criada').map((r) => r.chave));
+const linhaE = (l, pid, u, extra) => ({ paciente_id: pid, unidade: u, avaliacao_dia: '', avaliacao_hora: '', contato_id: '', lead_triagem: '', lead_unidade: String(l.id), modo, atualizado_em: agora, telefone_hash: '', ...extra });
+for (const l of leads) { const u = UN_DO_PIPE[l.pipeline_id]; if (!u) continue; const E = ETP[u], pid = String((l.custom_fields_values || []).find((f) => f.field_id === ID_IGUT)?.values?.[0]?.value || ''); if (!pid) continue;
+  let alvo = null, porque = '';
+  if (fezSessao.has(pid) && [E.ag, E.av, E.conv].includes(l.status_id)) { alvo = E.trat; porque = 'sessão finalizada no iGut'; }
+  else if (fezAvaliacao.has(pid) && l.status_id === E.ag) { alvo = E.av; porque = 'avaliação finalizada no iGut'; }
+  if (alvo) { out.push({ json: linhaE(l, pid, u, { chave: 'avanca|' + l.id + '|' + alvo, acao: 'avançar etapa', status: modo === 'real' ? 'a fazer' : 'ensaio', detalhe: porque, avanco: { id: l.id, pipeline_id: E.pipe, status_id: alvo } }) }); continue; }
+  if (l.status_id !== E.trat || marcada.has(pid)) continue;
+  const ds = [...(diasDe[pid] || [])].sort(); if (!ds.length) continue;
+  const ult = ds[ds.length - 1], parado = DateTime.fromISO(hojeE).diff(DateTime.fromISO(ult), 'days').days; if (parado <= 10) continue;
+  const k = 'fim|' + l.id + '|' + ult; if (tarefasFeitas.has(k)) continue;
+  const seq = [ult]; for (let i = ds.length - 2; i >= 0; i--) { if (DateTime.fromISO(seq[0]).diff(DateTime.fromISO(ds[i]), 'days').days <= 10) seq.unshift(ds[i]); else break; }
+  const n = seq.length, pista = n % 5 === 0 ? `fez ${n} sessões: provável tratamento concluído (pacote completo)` : `fez ${n} sessões: provável interrupção`;
+  const [, mm, dd] = ult.split('-');
+  out.push({ json: linhaE(l, pid, u, { chave: k, acao: 'tarefa de fim de tratamento', status: modo === 'real' ? 'tarefa criada' : 'ensaio: criaria tarefa', detalhe: pista,
+    tarefa_fim: modo === 'real' ? { text: `Sem sessão desde ${dd}/${mm} e nenhuma marcada (${pista}). Mover para Concluiu ou para Perdido · Interrompeu o tratamento; se estiver esperando o convênio, mover para Aguardando convênio.`, complete_till: Math.floor(Date.now() / 1000) + 24 * 3600, entity_id: l.id, entity_type: 'leads', task_type_id: 1 } : null }) }); }
 return out;

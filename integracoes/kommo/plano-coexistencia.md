@@ -442,3 +442,12 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
   nascimento e e-mail, e lead), todos em "Em tratamento" com a etiqueta "criado pelo iGut"
   (`scripts/kommo/em-tratamento-sem-lead.js`). 1 ficou de fora: o telefone dele está num contato com outro nome (parente ou
   apelido), para a recepção conferir. Depois: 66 em Em tratamento, todos com código do iGut e contato.
+- **Avanço de etapa e fim de tratamento pelo iGut** (19/11/2026, "pode montar assim e vemos para frente"), na passagem, em modo
+  real (`passagem_modo`), como reserva da recepção, só para a frente: avaliação finalizada (ontem ou hoje) → Avaliou · pedido a
+  enviar; sessão finalizada → Em tratamento (de Avaliação agendada, Avaliou ou Aguardando convênio: o particular que espera o
+  convênio volta sozinho); Em tratamento com mais de 10 dias sem sessão e nenhuma marcada → tarefa para a recepção (Concluiu ou
+  Perdido · Interrompeu), com a pista pelo número de sessões (múltiplo de 5 = provável pacote completo), uma por fim de
+  sequência (chave fim|lead|última sessão em BMH_passagens); Aguardando convênio não recebe tarefa. A agenda da passagem passou a
+  começar ontem (as avaliações novas continuam contando de hoje). Primeiro giro (12h14): 3 leads da Asa Sul foram para
+  Avaliou. Obs.: a trava de ensaio anunciada não entrou (o script de edição parou numa conferência) e o fluxo foi publicado já
+  em real; mantido assim por estar dentro do que o Jorge autorizou.
