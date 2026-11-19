@@ -406,3 +406,10 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
   conferidos: o iGut não tem o médico que encaminhou (observação da agenda em 10 de 1.323, nenhuma citando indicação).
   Decisão do Jorge: pelo Kommo. Campos do lead novos: "CRM do cirurgião" (667908, número) e "UF do CRM" (667910, lista
   com as 27 UFs), ao lado de "Cirurgião que indicou" (nome). O painel vai agrupar por CRM + UF.
+- **Confirmação em modo espelho** (19/11/2026, 09h47, "pode ligar o espelho"): `confirmacao_modo = espelho`. Roda como o
+  real (quem, quando, modelo `confirmacao_sessao_v2`), mas toda mensagem vai só ao telefone de teste
+  (`confirmacao_telefone_teste` em BMH_config, o número do Jorge); a resposta registra "espelho: confirmaria no iGut" ou
+  "espelho: desmarcaria e levaria para Remarcar", sem mexer no iGut nem no Kommo. A linha "espelho: enviada ao teste"
+  continua livre para o modo real (o paciente recebe a dele quando ligar). Avaliações ficam de fora até
+  `confirmacao_avaliacao = ligada` (depois da aprovação do modelo). Primeira rodada: 3 mensagens, todas para o número de
+  teste (conferido pelo destino do id da mensagem).

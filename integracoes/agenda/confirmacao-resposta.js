@@ -7,7 +7,7 @@
 // Modo: o mesmo da confirmação (`confirmacao_modo`); em ensaio só registra o que faria.
 const norm = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').trim().toLowerCase();
 const cfg = {}; try { for (const i of $('Config da resposta').all()) if (i.json && i.json.chave) cfg[i.json.chave] = i.json.valor; } catch (e) {}
-const modo = cfg.confirmacao_modo === 'real' ? 'real' : 'ensaio';
+const modo = ['real', 'espelho'].includes(cfg.confirmacao_modo) ? cfg.confirmacao_modo : 'ensaio';   // espelho: registra o que faria, sem iGut nem Kommo
 const hoje = $now.setZone('America/Sao_Paulo').toISODate(), amanha = $now.setZone('America/Sao_Paulo').plus({ days: 1 }).toISODate();
 const conf = $('Confirmações (tabela)').all().map((i) => i.json).filter((r) => r && r.chave);
 const out = [];
@@ -17,6 +17,6 @@ for (const i of $('Monta a linha').all()) {
   if (!resp) continue;
   const c = conf.find((r) => m.respondendo && r.wamid === m.respondendo) || conf.filter((r) => r.telefone_hash === m.telefone_hash && (r.dia === hoje || r.dia === amanha)).sort((a, b) => a.dia.localeCompare(b.dia))[0];
   if (!c) continue;   // resposta sem confirmação conhecida: a recepção vê no WhatsApp
-  out.push({ json: { ...c, resposta: resp, respondido_em: m.momento, status: resp === 'confirmou' ? (modo === 'real' ? 'confirmando no iGut' : 'ensaio: confirmaria no iGut') : (modo === 'real' ? 'pediu para remarcar: desmarcada no iGut' : 'ensaio: desmarcaria e levaria para Remarcar'), confirmar_igut: modo === 'real' && resp === 'confirmou', desmarcar_igut: modo === 'real' && resp === 'pediu para remarcar', agendamento_lista: String(c.agendamentos || '').split(',').filter(Boolean) } });
+  out.push({ json: { ...c, resposta: resp, respondido_em: m.momento, status: (modo === 'espelho' ? 'espelho: ' : '') + (resp === 'confirmou' ? (modo === 'real' ? 'confirmando no iGut' : 'confirmaria no iGut') : (modo === 'real' ? 'pediu para remarcar: desmarcada no iGut' : 'desmarcaria e levaria para Remarcar')), confirmar_igut: modo === 'real' && resp === 'confirmou', desmarcar_igut: modo === 'real' && resp === 'pediu para remarcar', agendamento_lista: String(c.agendamentos || '').split(',').filter(Boolean) } });
 }
 return out;

@@ -18,17 +18,22 @@ const AGENDAS = { 111: { u: 'Asa Sul', t: 'sessao', c: 'monoplace' }, 112: { u: 
 const NAO_VEIO = ['faltou', 'desmarcado', 'desistiu'];
 const norm = (s) => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').trim().toLowerCase();
 const cfg = {}; try { for (const i of $('Config').all()) if (i.json && i.json.chave) cfg[i.json.chave] = i.json.valor; } catch (e) {}
-const modo = cfg.confirmacao_modo === 'real' ? 'real' : 'ensaio';
+// modo espelho (19/11/2026, pedido do Jorge: "ligar oculto para testar sem disparo para o paciente"): tudo igual ao real, mas a
+// mensagem vai só para o telefone de teste (confirmacao_telefone_teste em BMH_config), e a resposta não mexe no iGut nem no Kommo
+const modo = ['real', 'espelho'].includes(cfg.confirmacao_modo) ? cfg.confirmacao_modo : 'ensaio', TESTE = String(cfg.confirmacao_telefone_teste || '').replace(/\D/g, '');
+if (modo === 'espelho' && TESTE.length < 12) throw new Error('modo espelho sem confirmacao_telefone_teste em BMH_config');
+const avaliacaoLigada = cfg.confirmacao_avaliacao === 'ligada';   // só depois de a Meta aprovar confirmacao_avaliacao_v1
 const { hoje, dia, agora: agoraISO } = $('Amanhã').first().json;   // dia = amanhã; agora pode vir simulado (?agora=) no teste
 const Z = 'America/Sao_Paulo', agora = DateTime.fromISO(agoraISO, { zone: Z });
 const lista = $('Agenda de hoje e amanhã').first().json.data;
 if (!Array.isArray(lista)) throw new Error('o iGut não devolveu a agenda de ' + hoje + ' e ' + dia);   // vira alerta de falha
 const ja = {}; for (const i of $('Confirmações (tabela)').all()) { const r = i.json || {}; if (r.chave) ja[r.chave] = r.status || ''; }
-const livre = (s) => !s || /^ensaio|^aguardando|^recep|^não envia/.test(s);   // linha que ainda pode ser regravada
+// linha que ainda pode ser regravada; a do espelho continua livre para o real (o paciente não recebeu)
+const livre = (s) => !s || /^ensaio|^aguardando|^recep|^não envia/.test(s) || (modo === 'real' && /^espelho/.test(s));
 const vistaEm = {}; for (const i of $('Conversões (tabela)').all()) { const r = i.json || {}; if (r.evento === 'agendou' && r.chave) vistaEm[r.chave] = String(r.criado_em || ''); }
 const celular = (s) => { let d = String(s || '').replace(/\D/g, ''); if (d.startsWith('55') && d.length >= 12) d = d.slice(2); if (d.length === 10 && /[6-9]/.test(d[2])) d = d.slice(0, 2) + '9' + d.slice(2); return d.length === 11 ? '55' + d : ''; };
 const MES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
-const fora = { falta: 0, bloqueado: 0, sem_paciente: 0, sem_celular: 0, outra_agenda: 0, consulta_sem_avaliacao: 0, avaliacao_marcada_hoje: 0, ja_confirmado: 0, ja_enviada: 0 };
+const fora = { avaliacao_sem_modelo: 0, falta: 0, bloqueado: 0, sem_paciente: 0, sem_celular: 0, outra_agenda: 0, consulta_sem_avaliacao: 0, avaliacao_marcada_hoje: 0, ja_confirmado: 0, ja_enviada: 0 };
 const sessaoHoje = {}, amanha = {};
 for (const x of lista) {
   const ag = AGENDAS[Number(x.Profissional?.id)]; if (!ag) { fora.outra_agenda++; continue; }
@@ -62,13 +67,14 @@ for (const p of Object.values(amanha).sort((a, b) => a.hora.localeCompare(b.hora
   quando = limita(quando);
   if (p.confirmado) { fora.ja_confirmado++; if (antes) out.push({ chave, status: 'recepção confirmou', p, regra, quando }); continue; }   // só atualiza a linha que já existia
   const vence = agora >= quando;
-  out.push({ chave, p, regra, quando, status: !vence ? 'aguardando ' + hh(quando) : modo === 'real' ? 'a enviar' : 'ensaio: enviaria às ' + hh(quando) });
+  if (p.tipo === 'avaliação' && !avaliacaoLigada && modo !== 'ensaio') { fora.avaliacao_sem_modelo++; continue; }
+  out.push({ chave, p, regra, quando, status: !vence ? 'aguardando ' + hh(quando) : modo === 'ensaio' ? 'ensaio: enviaria às ' + hh(quando) : 'a enviar' });
 }
 return out.map(({ chave, p, regra, quando, status }) => ({ json: {
   chave, dia, paciente_id: p.pid, unidade: p.unidade, hora: p.hora, tipo: p.tipo, agendamentos: [...new Set(p.agendamentos)].join(','), telefone_hash: sha256(p.fone), wamid: '', resposta: '', respondido_em: '', modo, status, criado_em: agora.toISO(),
   regra, envia_em: hh(quando), fora_hoje: JSON.stringify(fora),
   // só para o envio (modo real e vencido); não vai para a tabela
   // modelos aprovados pela Meta (19/11/2026): sessão v2 com a câmara e a unidade; avaliação v1 com a unidade
-  ...(status === 'a enviar' ? { envio: { telefone: p.fone, modelo: p.tipo === 'avaliação' ? 'confirmacao_avaliacao_v1' : 'confirmacao_sessao_v2',
+  ...(status === 'a enviar' ? { envio: { telefone: modo === 'espelho' ? TESTE : p.fone, modelo: p.tipo === 'avaliação' ? 'confirmacao_avaliacao_v1' : 'confirmacao_sessao_v2',
     params: p.tipo === 'avaliação' ? [nomeProprio(p.nome), p.unidade, diaTexto, p.hora.replace(':', 'h')] : [nomeProprio(p.nome), p.camara || 'hiperbárica', p.unidade, diaTexto, p.hora.replace(':', 'h')] } } : {}),
 } }));
