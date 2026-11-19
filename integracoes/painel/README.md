@@ -150,3 +150,13 @@ formato da Nexo: "Todas as origens" com pessoas que procuraram (conversas novas)
 agenda e realizadas (`BMH_operacao_dia`, até ontem) e sessões; "De onde vieram os agendamentos" (origem da última conversa até
 60 dias antes da avaliação marcada); o passo 5 das métricas de tráfego (conversas de anúncio que marcaram avaliação e o custo);
 o gráfico "Contatos e leads" com as conversas novas e a linha das avaliações marcadas; e o mapa de horas das conversas.
+
+## Base do funil: leads que chegam na triagem do Kommo (19/11/2026)
+
+Pedido do Jorge ("é para vermos quantos leads estão chegando no funil principal e não clientes em tratamento", como na Nexo,
+onde "Pessoas que procuraram" conta quem abriu lead no funil comercial). A base do funil comercial, de "Todas as origens", do
+gráfico do dia a dia e do mapa de horas passou de "conversa nova no WhatsApp" para **lead que chega no funil Triagem e conversão**
+desde a conexão (17/11, 18h20): os aceitos e os da entrada não triada (o contato novo cai primeiro ali). Paciente em tratamento
+escreve no lead da unidade e não conta; os importados ficam de fora pela data. O fluxo da página lê o Kommo a cada abertura
+(nós "Kommo · leads da triagem", "Kommo · não triados" e "Kommo · contatos", lidos como texto) e liga cada lead à conversa e aos
+eventos pelo telefone em código. De 17 a 18/11: 45 leads (antes eram 140 conversas, cerca de 40% pacientes já em tratamento).

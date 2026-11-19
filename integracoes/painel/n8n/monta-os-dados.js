@@ -64,49 +64,61 @@ let operacao = []; try { operacao = linhas('Operação (tabela)'); } catch (e) {
 const avalEntre = (a, b) => { const r = { ag: 0, feitas: 0, unidades: {} }; for (const x of operacao) { if (!entre(x.dia, a, b)) continue; const u = (r.unidades[x.unidade] ||= { ag: 0, feitas: 0 });
   r.ag += num(x.avaliacoes_agendadas); r.feitas += num(x.avaliacoes_feitas); u.ag += num(x.avaliacoes_agendadas); u.feitas += num(x.avaliacoes_feitas); } return r; };
 const avaliacoes = operacao.length ? { atual: avalEntre(P.inicio, P.fim), anterior: avalEntre(P.ant.inicio, P.ant.fim), ate: operacao.map((x) => x.dia).sort().pop() } : null;
-// ---------- funil comercial (19/11/2026, pedido do Jorge: "o painel do funil comercial, como na Nexo") ----------
-// Uma linha por conversa nova no WhatsApp (BMH_origem_conversas, desde 17/11/2026, quando o recebedor oficial começou), com a
-// origem do último clique (gclid do site = Google Ads; código do anúncio = Meta; frase pronta = site, Instagram, Perfil, QR do
-// cirurgião; sem nada = sem origem marcada). As etapas vêm de BMH_conversoes pelo telefone em código (com e sem o 9), até 60
-// dias depois da conversa: avaliação agendada (passagem do Kommo), avaliou e iniciou tratamento (iGut). Custo = gasto dos dias
-// medidos (desde 17/11) ÷ etapa. Sem nome, telefone ou dado de paciente.
-const FUNIL_DESDE = '2026-11-17', CORTE_AG = Date.parse('2026-11-17T19:15:00-03:00');   // as 31 avaliações de 17/11 às 19h13 foram marcadas antes
+// ---------- funil comercial (19/11/2026; base trocada no mesmo dia: Jorge, "é para vermos quantos leads estão chegando no
+// funil principal e não clientes em tratamento", como na Nexo) ----------
+// Base = cada lead que CHEGA no funil Triagem e conversão do Kommo desde a conexão do WhatsApp (17/11/2026, 18h20): os leads
+// criados na triagem (aceitos) e os da entrada não triada. Paciente em tratamento que escreve cai no lead dele no funil da
+// unidade e não conta; os importados (histórico) ficam de fora pela data. A origem vem da conversa daquele telefone
+// (BMH_origem_conversas: gclid do site = Google Ads; código do anúncio = Meta; frase pronta = site, Instagram, Perfil, QR do
+// cirurgião; nada = sem origem marcada). As etapas vêm de BMH_conversoes pelo telefone em código, até 60 dias depois da chegada:
+// avaliação agendada (passagem do Kommo), avaliou e iniciou tratamento (iGut). Sem nome, telefone ou dado de paciente na saída.
+/*__SHA256__*/
+const FUNIL_DESDE = '2026-11-17', CHEGADA_DESDE = Date.parse('2026-11-17T18:20:00-03:00') / 1000, CORTE_AG = Date.parse('2026-11-17T19:15:00-03:00');
 let conversas = [], eventos = [];
 try { conversas = linhas('Conversas (tabela)'); } catch (e) {}
 try { eventos = linhas('Conversões (tabela)'); } catch (e) {}
+const corpoK = (j) => { if (j && j._embedded) return j; try { return j && typeof j.data === 'string' && j.data ? JSON.parse(j.data) : {}; } catch (e) { return {}; } };
+const pegaK = (no, campo) => { const r = []; try { for (const i of $(no).all()) r.push(...(corpoK(i.json)._embedded?.[campo] || [])); } catch (e) {} return r; };
 const diaSP = (iso) => { const t = DateTime.fromISO(String(iso || '')); return t.isValid ? t.setZone('America/Sao_Paulo').toISODate() : ''; };
+const diaTs = (ts) => DateTime.fromSeconds(Number(ts)).setZone('America/Sao_Paulo');
+// telefone do contato no Kommo → códigos com e sem o 9 (o WhatsApp às vezes entrega o número sem o 9)
+const hashesDe = (v) => { let d = String(v || '').replace(/\D/g, ''); if (d.startsWith('55') && d.length >= 12) d = d.slice(2); if (d.length < 10 || d.length > 11) return [];
+  const c9 = d.length === 10 ? d.slice(0, 2) + '9' + d.slice(2) : d, s9 = c9.slice(0, 2) + c9.slice(3); return [sha256('55' + c9), sha256('55' + s9)]; };
+const telDe = {}; for (const c of pegaK('Kommo · contatos', 'contacts')) telDe[c.id] = (c.custom_fields_values || []).filter((f) => f.field_code === 'PHONE').flatMap((f) => (f.values || []).flatMap((v) => hashesDe(v.value)));
+const vistos = new Set(), chegadas = [];
+const somaChegada = (leadId, ts, contato) => { if (!leadId || vistos.has(leadId) || !(ts >= CHEGADA_DESDE)) return; vistos.add(leadId); const t = diaTs(ts); chegadas.push({ d0: t.toISODate(), t, hashes: telDe[contato] || [] }); };
+for (const l of pegaK('Kommo · leads da triagem', 'leads')) somaChegada(l.id, l.created_at, l._embedded?.contacts?.[0]?.id);
+for (const u of pegaK('Kommo · não triados', 'unsorted')) somaChegada(u._embedded?.leads?.[0]?.id || u.uid, u.created_at, u._embedded?.contacts?.[0]?.id);
+const convDe = {}; for (const c of conversas) if (c.telefone_hash) convDe[c.telefone_hash] = c;
+const canalDe = (c) => { if (!c) return ['sem', 'Sem origem marcada']; const o = String(c.origem || ''); if (c.gclid || /an[uú]ncio google/i.test(o)) return ['google', 'Google Ads']; if (/meta/i.test(o) || c.ctwa_clid) return ['meta', 'Meta Ads'];
+  if (!o) return ['sem', 'Sem origem marcada']; if (/cirurgi/i.test(o)) return ['organico', 'Indicação de cirurgião (QR)']; if (o === 'site') return ['organico', 'Site, sem anúncio']; return ['organico', o]; };
+for (const x of chegadas) { const c = x.hashes.map((h) => convDe[h]).find(Boolean); x.canal = canalDe(c); }
 const evDe = {};
 for (const e of eventos) { if (!['agendou', 'avaliou', 'iniciou'].includes(e.evento)) continue; if (e.evento === 'agendou' && !(Date.parse(e.criado_em) > CORTE_AG)) continue;
   for (const h of new Set([e.telefone_hash, e.telefone_hash_sem9].filter(Boolean))) (evDe[h] ||= []).push(e); }
-const canalDe = (c) => { const o = String(c.origem || ''); if (c.gclid || /an[uú]ncio google/i.test(o)) return ['google', 'Google Ads']; if (/meta/i.test(o) || c.ctwa_clid) return ['meta', 'Meta Ads'];
-  if (!o) return ['sem', 'Sem origem marcada']; if (/cirurgi/i.test(o)) return ['organico', 'Indicação de cirurgião (QR)']; if (o === 'site') return ['organico', 'Site, sem anúncio']; return ['organico', o]; };
+const evDaChegada = (x) => { const lim = DateTime.fromISO(x.d0).plus({ days: 60 }).toISODate(), r = []; for (const h of x.hashes) for (const e of evDe[h] || []) if (e.dia >= x.d0 && e.dia <= lim && !r.includes(e)) r.push(e); return r; };
 const ETAPAS = [['ag', 'agendou'], ['av', 'avaliou'], ['ini', 'iniciou']];
-const funilDe = (a, b) => { const can = {}, uni = {}, tot = { conversas: 0, ag: 0, av: 0, ini: 0 }, grade = Array.from({ length: 7 }, () => Array(24).fill(0)), dias = {};
-  for (const c of conversas) { const d0 = diaSP(c.primeira_msg_em); if (!d0 || d0 < FUNIL_DESDE || !entre(d0, a, b)) continue;
-    const [p, nome] = canalDe(c), lim = DateTime.fromISO(d0).plus({ days: 60 }).toISODate(), ev = (evDe[c.telefone_hash] || []).filter((e) => e.dia >= d0 && e.dia <= lim);
-    const L = (can[nome] ||= { p, canal: nome, conversas: 0, ag: 0, av: 0, ini: 0 }); L.conversas++; tot.conversas++; (dias[d0] ||= { d: d0, conversas: 0, ag: 0 }).conversas++;
-    const t = DateTime.fromISO(String(c.primeira_msg_em)).setZone('America/Sao_Paulo'); if (t.isValid) grade[t.weekday - 1][t.hour]++;
-    for (const [k, nomeEv] of ETAPAS) { const e = ev.find((x) => x.evento === nomeEv); if (!e) continue; L[k]++; tot[k]++; const u = e.unidade || 'sem unidade'; (uni[u] ||= { unidade: u, ag: 0, av: 0, ini: 0 })[k]++; if (k === 'ag') (dias[e.dia] ||= { d: e.dia, conversas: 0, ag: 0 }).ag++; } }
+const funilDe = (a, b) => { const can = {}, uni = {}, tot = { conversas: 0, ag: 0, av: 0, ini: 0 };
+  for (const x of chegadas) { if (!entre(x.d0, a, b)) continue; const [p, nome] = x.canal, ev = evDaChegada(x);
+    const L = (can[nome] ||= { p, canal: nome, conversas: 0, ag: 0, av: 0, ini: 0 }); L.conversas++; tot.conversas++;
+    for (const [k, nomeEv] of ETAPAS) { const e = ev.find((y) => y.evento === nomeEv); if (!e) continue; L[k]++; tot[k]++; const u = e.unidade || 'sem unidade'; (uni[u] ||= { unidade: u, ag: 0, av: 0, ini: 0 })[k]++; } }
   const medidos = [...anuncios, ...anuncios_ant].filter((r) => r.d >= FUNIL_DESDE && entre(r.d, a, b));
   const gasto = { google: medidos.filter((r) => r.p === 'google').reduce((s, r) => s + r.gasto, 0), meta: medidos.filter((r) => r.p === 'meta').reduce((s, r) => s + r.gasto, 0) };
-  return { canais: Object.values(can).sort((x, y) => y.conversas - x.conversas), unidades: Object.values(uni), tot, gasto, horas: { grade, total: tot.conversas }, dias: Object.values(dias).sort((x, y) => x.d.localeCompare(y.d)) }; };
-// ---------- "Todas as origens" e "Dia a dia" no formato da Nexo (19/11/2026, Jorge: "o painel não está como o da Nexo") ----------
-// Pessoas que procuraram = conversas novas; agendaram = avaliação marcada (agendou); de onde vieram = origem da última conversa até
-// 60 dias antes do agendamento (sem conversa com origem = sem origem marcada); por dia; mapa de horas das conversas. Desde 17/11.
-const PLAT = (c) => { const [p] = canalDe(c); return p === 'google' || p === 'meta' ? p : p === 'organico' ? 'organico' : 'sem'; };
-const convPorHash = {}; for (const c of conversas) { const d0 = diaSP(c.primeira_msg_em); if (d0 && d0 >= FUNIL_DESDE) (convPorHash[c.telefone_hash] ||= []).push({ d0, c }); }
-const origemDoEvento = (e) => { let melhor = null; for (const h of [e.telefone_hash, e.telefone_hash_sem9]) for (const x of convPorHash[h] || []) {
-  if (x.d0 <= e.dia && DateTime.fromISO(x.d0).plus({ days: 60 }).toISODate() >= e.dia && (!melhor || x.d0 > melhor.d0)) melhor = x; } return melhor ? PLAT(melhor.c) : 'sem'; };
-const eventosDe = (tipo, a, b) => { const vistos = new Set(), r = []; for (const e of eventos) { if (e.evento !== tipo || !entre(e.dia, a, b) || e.dia < FUNIL_DESDE) continue;
-  if (tipo === 'agendou' && !(Date.parse(e.criado_em) > CORTE_AG)) continue; const k = e.paciente_id + '|' + e.dia; if (vistos.has(k)) continue; vistos.add(k); r.push(e); } return r; };
+  return { canais: Object.values(can).sort((x, y) => y.conversas - x.conversas), unidades: Object.values(uni), tot, gasto }; };
+// "Todas as origens" e "Dia a dia" no formato da Nexo: pessoas que procuraram = leads que chegaram; de onde vieram os
+// agendamentos = canal da última chegada até 60 dias antes da avaliação marcada (sem chegada = sem origem marcada)
+const PLAT = (x) => x.canal[0];
+const chegPorHash = {}; for (const x of chegadas) for (const h of x.hashes) (chegPorHash[h] ||= []).push(x);
+const origemDoEvento = (e) => { let m = null; for (const h of [e.telefone_hash, e.telefone_hash_sem9]) for (const x of chegPorHash[h] || []) if (x.d0 <= e.dia && DateTime.fromISO(x.d0).plus({ days: 60 }).toISODate() >= e.dia && (!m || x.d0 > m.d0)) m = x; return m ? PLAT(m) : 'sem'; };
+const eventosDe = (tipo, a, b) => { const v = new Set(), r = []; for (const e of eventos) { if (e.evento !== tipo || !entre(e.dia, a, b) || e.dia < FUNIL_DESDE) continue;
+  if (tipo === 'agendou' && !(Date.parse(e.criado_em) > CORTE_AG)) continue; const k = e.paciente_id + '|' + e.dia; if (v.has(k)) continue; v.add(k); r.push(e); } return r; };
 const geralDe = (a, b) => { const z = () => ({ google: 0, meta: 0, organico: 0, sem: 0 }), ag = z(), cp = z(); for (const e of eventosDe('agendou', a, b)) ag[origemDoEvento(e)]++; for (const e of eventosDe('iniciou', a, b)) cp[origemDoEvento(e)]++; return { agendou: ag, compareceu: cp }; };
-const kommoDe = (a, b) => { const dias = {}; let entraram = 0; for (const c of conversas) { const d0 = diaSP(c.primeira_msg_em); if (!d0 || d0 < FUNIL_DESDE || !entre(d0, a, b)) continue; entraram++; (dias[d0] ||= { d: d0, entraram: 0, agendados: 0 }).entraram++; }
+const kommoDe = (a, b) => { const dias = {}; let entraram = 0; for (const x of chegadas) { if (!entre(x.d0, a, b)) continue; entraram++; (dias[x.d0] ||= { d: x.d0, entraram: 0, agendados: 0 }).entraram++; }
   const ag = eventosDe('agendou', a, b); for (const e of ag) (dias[e.dia] ||= { d: e.dia, entraram: 0, agendados: 0 }).agendados++;
   return { dias: Object.values(dias).sort((x, y) => x.d.localeCompare(y.d)), entraram, agendados: ag.length, pessoas: { pessoas: entraram, novas: entraram, agendaram: new Set(ag.map((e) => e.paciente_id)).size } }; };
-const comFunil = conversas.length > 0;
-const gradeConversas = (a, b) => { const g = Array.from({ length: 7 }, () => Array(24).fill(0)); let t = 0; for (const c of conversas) { const d0 = diaSP(c.primeira_msg_em); if (!d0 || d0 < FUNIL_DESDE || !entre(d0, a, b)) continue;
-  const x = DateTime.fromISO(String(c.primeira_msg_em)).setZone('America/Sao_Paulo'); if (x.isValid) { g[x.weekday - 1][x.hour]++; t++; } } return { grade: g, total: t }; };
-const funil = conversas.length ? { desde: FUNIL_DESDE, atual: funilDe(P.inicio, P.fim), anterior: funilDe(P.ant.inicio, P.ant.fim), inicio_medido: P.inicio < FUNIL_DESDE } : null;
+const comFunil = chegadas.length > 0 || conversas.length > 0;
+const gradeConversas = (a, b) => { const g = Array.from({ length: 7 }, () => Array(24).fill(0)); let t = 0; for (const x of chegadas) { if (!entre(x.d0, a, b)) continue; g[x.t.weekday - 1][x.t.hour]++; t++; } return { grade: g, total: t }; };
+const funil = comFunil ? { desde: FUNIL_DESDE, atual: { ...funilDe(P.inicio, P.fim), horas: gradeConversas(P.inicio, P.fim) }, anterior: { ...funilDe(P.ant.inicio, P.ant.fim) }, inicio_medido: P.inicio < FUNIL_DESDE } : null;
 return [{ json: {
   ok: true, gerado_em: $now.toISO(), inicio: P.inicio, fim: P.fim, conta: { id: 'bmh', nome: 'BMH · Brasília Medicina Hiperbárica' }, contas: [{ id: 'bmh', nome: 'BMH · Brasília Medicina Hiperbárica' }],
   anuncios, anuncios_ant, origens, origens_ant, atendidos_total: igutEntre(P.inicio, P.fim), atendidos_total_ant: igutEntre(P.ant.inicio, P.ant.fim), produzido_total: produzidoEntre(P.inicio, P.fim), produzido_total_ant: produzidoEntre(P.ant.inicio, P.ant.fim), geral: comFunil ? { atual: geralDe(P.inicio, P.fim), anterior: geralDe(P.ant.inicio, P.ant.fim) } : null,

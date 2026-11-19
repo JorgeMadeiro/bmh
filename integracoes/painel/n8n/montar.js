@@ -181,7 +181,19 @@ function fluxoPagina() {
     meta: le('Meta (tabela)', 'BMH_meta_anuncios_dia'),
     conv: le('Conversas (tabela)', 'BMH_origem_conversas'), evt: le('Conversões (tabela)', 'BMH_conversoes'),   // funil comercial (19/11/2026)
     oper: le('Operação (tabela)', 'BMH_operacao_dia'),   // avaliações agendadas e realizadas (19/11/2026)   // gravada às 6h05 por "BMH · Meta · números do dia" (0FskpyELgh7nBqF0), desde 01/10/2026
-    monta: codigo('Monta os dados', 'monta-os-dados.js'),
+    // leads que chegam no funil Triagem e conversão do Kommo (19/11/2026): aceitos e não triados, e os contatos deles (texto, 5 por segundo)
+    kL: no('Kommo · leads da triagem', 'n8n-nodes-base.httpRequest', 4.2, { method: 'GET', url: 'https://bmh.kommo.com/api/v4/leads', authentication: 'genericCredentialType', genericAuthType: 'httpHeaderAuth', sendQuery: true, specifyQuery: 'keypair',
+      queryParameters: { parameters: [{ name: 'with', value: 'contacts' }, { name: 'limit', value: '250' }, { name: 'filter[pipeline_id][0]', value: '14783287' }, { name: 'filter[created_at][from]', value: String(Date.parse('2026-11-17T18:20:00-03:00') / 1000) }] },
+      options: { pagination: { pagination: { parameters: { parameters: [{ type: 'qs', name: 'page', value: '={{ $pageCount + 1 }}' }] }, paginationCompleteWhen: 'receiveSpecificStatusCodes', statusCodesWhenComplete: '204', limitPagesFetched: true, maxRequests: 40, requestInterval: 300 } } } },
+      { credentials: cred('httpHeaderAuth', 'BMH · Kommo (token)'), executeOnce: true, alwaysOutputData: true }),
+    kU: no('Kommo · não triados', 'n8n-nodes-base.httpRequest', 4.2, { method: 'GET', url: 'https://bmh.kommo.com/api/v4/leads/unsorted', authentication: 'genericCredentialType', genericAuthType: 'httpHeaderAuth', sendQuery: true, specifyQuery: 'keypair',
+      queryParameters: { parameters: [{ name: 'limit', value: '250' }, { name: 'filter[pipeline_id]', value: '14783287' }] },
+      options: { pagination: { pagination: { parameters: { parameters: [{ type: 'qs', name: 'page', value: '={{ $pageCount + 1 }}' }] }, paginationCompleteWhen: 'receiveSpecificStatusCodes', statusCodesWhenComplete: '204', limitPagesFetched: true, maxRequests: 20, requestInterval: 300 } } } },
+      { credentials: cred('httpHeaderAuth', 'BMH · Kommo (token)'), executeOnce: true, alwaysOutputData: true }),
+    kQ: no('Contatos a buscar (Kommo)', 'n8n-nodes-base.code', 2, { jsCode: "const corpo = (j) => { if (j && j._embedded) return j; try { return j && typeof j.data === 'string' && j.data ? JSON.parse(j.data) : {}; } catch (e) { return {}; } };\nconst ids = new Set();\nfor (const p of $('Kommo · leads da triagem').all()) for (const l of (corpo(p.json)._embedded?.leads || [])) for (const c of (l._embedded?.contacts || [])) ids.add(c.id);\nfor (const p of $('Kommo · não triados').all()) for (const u of (corpo(p.json)._embedded?.unsorted || [])) for (const c of (u._embedded?.contacts || [])) ids.add(c.id);\nconst t = [...ids], out = []; for (let i = 0; i < t.length; i += 200) out.push({ json: { qs: t.slice(i, i + 200).map((id) => 'filter[id][]=' + id).join('&') } });\nreturn out.length ? out : [{ json: { qs: 'filter[id][]=0' } }];" }, { executeOnce: true }),
+    kC: no('Kommo · contatos', 'n8n-nodes-base.httpRequest', 4.2, { method: 'GET', url: "={{ 'https://bmh.kommo.com/api/v4/contacts?limit=250&' + $json.qs }}", authentication: 'genericCredentialType', genericAuthType: 'httpHeaderAuth',
+      options: { batching: { batch: { batchSize: 5, batchInterval: 1000 } } } }, { credentials: cred('httpHeaderAuth', 'BMH · Kommo (token)'), alwaysOutputData: true }),
+    monta: no('Monta os dados', 'n8n-nodes-base.code', 2, { jsCode: ler('monta-os-dados.js').replace('/*__SHA256__*/', ler('../../comum/sha256.js')) }),
     json: no('Pede JSON?', 'n8n-nodes-base.if', 2.2, { conditions: { options: { caseSensitive: true, leftValue: '', typeValidation: 'loose', version: 2 }, combinator: 'and',
       conditions: [{ id: crypto.randomUUID(), leftValue: "={{ $('Painel').first().json.query.formato }}", rightValue: 'json', operator: { type: 'string', operation: 'equals' } }] }, options: {} }),
     entregaJson: no('Entrega os dados (JSON)', 'n8n-nodes-base.respondToWebhook', 1.1, { respondWith: 'firstIncomingItem', options: { responseHeaders: { entries: [{ name: 'Cache-Control', value: 'no-store' }] } } }),
@@ -189,7 +201,7 @@ function fluxoPagina() {
     nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Painel (página)\n**Traz:** tabelas do painel\n**Envia:** a página do painel, com login\n**Limites:** só lê\n\nPágina do painel da BMH, igual à da Nexo (fluxo bKst8atLrI4rB2DM). Login: credencial "BMH · Painel (login)". ?formato=json devolve só os dados.\nLê as tabelas BMH_* gravadas às 6h10 (BMH · Painel · grava o dia). Página e código em integracoes/painel/ no workspace da BMH (montar.js reenvia).', width: 520, height: 200 }),
   };
   const cx = {};
-  const ordem = [n.painel, n.config, n.periodo, n.ads, n.parc, n.site, n.org, n.hor, n.igut, n.guard, n.meta, n.conv, n.evt, n.oper, n.monta, n.json];
+  const ordem = [n.painel, n.config, n.periodo, n.ads, n.parc, n.site, n.org, n.hor, n.igut, n.guard, n.meta, n.conv, n.evt, n.oper, n.kL, n.kU, n.kQ, n.kC, n.monta, n.json];
   for (let i = 0; i < ordem.length - 1; i++) liga(cx, ordem[i].name, ordem[i + 1].name);
   cx[n.json.name] = { main: [[{ node: n.entregaJson.name, type: 'main', index: 0 }], [{ node: n.entrega.name, type: 'main', index: 0 }]] };
   return { name: 'BMH · Painel (página)', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none' }) };
