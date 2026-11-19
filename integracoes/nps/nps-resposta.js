@@ -1,8 +1,8 @@
 // Resposta ao NPS da 5ª sessão (19/11/2026), vinda pelo recebedor oficial da Meta. Liga a resposta ao pedido pelo id da
 // mensagem citada (wamid) ou, sem ele, pelo telefone em código (pedido enviado nos últimos 3 dias).
 //   "Está ótima" ou "Está boa" → responde com o link de avaliação no Google da unidade;
-//   "Podia ser melhor"        → responde pedindo detalhes; no modo real, tarefa no Kommo para a recepção; o link vai entre 18 e
-//                               23 h depois (fluxo do NPS), dentro da janela de 24 h, porque o Google não aceita pedir só a quem gostou.
+//   "Podia ser melhor"        → responde pedindo detalhes; no modo real, tarefa no Kommo para a recepção. Nunca recebe o link
+//                               (decisão do Jorge, 19/11/2026, sabendo que o Google proíbe pedir avaliação só a quem gostou).
 // Modo: `nps_modo` (ensaio só registra; espelho responde ao número de teste, sem Kommo; real faz tudo).
 const norm = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').trim().toLowerCase();
 const cfg = {}; try { for (const i of $('Config do NPS').all()) if (i.json && i.json.chave) cfg[i.json.chave] = i.json.valor; } catch (e) {}
