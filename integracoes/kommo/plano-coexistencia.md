@@ -336,3 +336,11 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
   página vazia (204). Solução: leitura como texto e conversão no código (`corpo()`), JSON só na criação e no ganho. Depois
   da correção, ensaio de 18/11, 22h: 36 avaliações, **22 passariam** (17 Asa Sul, 5 Taguatinga) e 14 sem conversa no Kommo.
   **Lição para todo nó HTTP que lê o Kommo no n8n.**
+- **Importados em tratamento** (18/11/2026, 22h20, ok do Jorge): 52 leads importados de quem tem sessão marcada no iGut de
+  19 a 25/11 foram movidos para "Em tratamento" (40 Asa Sul, 12 Taguatinga), com unidade, código do iGut, particular ou
+  convênio e as etiquetas "importado" e "particular"/"convênio" (`scripts/kommo/mover-tratamento.js`; conferido lendo de
+  volta). O resto dos importados (706) segue em Em qualificação até decisão.
+- **Teste do "Envia mensagem"** (18/11/2026, 22h11): mensagem disparada no lead do Jorge (4152970); o Kommo registrou o envio
+  (`outgoing_chat_message`). No recebedor oficial, a mensagem mandada pelo Kommo chega só como status "enviada", **sem
+  texto** (a Meta não repassa o texto a outro app). Para a leitura do atendimento/SDR, ver se o webhook do Kommo entrega o
+  texto das mensagens enviadas.
