@@ -395,3 +395,14 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
   em sequência e já têm os próximos horários marcados; o "remarcar" muitas vezes é só pular o dia. A volta automática (que
   devolveria o lead na hora, pela sessão seguinte já marcada) foi tirada da passagem; a nota do lead pede para a recepção
   mover o lead de volta depois de remarcar. O resto do "Preciso remarcar" segue: desmarca no iGut e leva para "Remarcar".
+- **Modelos novos enviados à Meta** (19/11/2026, "pode" do Jorge): `confirmacao_sessao_v2` ("Sua sessão de oxigenoterapia
+  hiperbárica na câmara {monoplace|multiplace} da BMH {unidade}...", 5 variáveis) e `confirmacao_avaliacao_v1` ("Sua
+  avaliação na BMH {unidade}..."), utilidade, botões Confirmo e Preciso remarcar; em análise. A confirmação já monta o
+  envio com eles (câmara: 111 monoplace e 112 multiplace na Asa Sul, 121 monoplace em Taguatinga). Ligar só depois de
+  aprovados.
+- **Cirurgião que indicou** (19/11/2026): o "profissional solicitante" do iGut é o médico da BMH que prescreve as sessões
+  (levantamento de set a nov: Alberto Jorge Madeiro Leite, Lee Marvin, Alexia Hannesch, Igor Gifoni, Guilherme Ramos, o
+  Jorge e outros; 1 em 4 vazio ou com o nome da câmara), não o cirurgião. Cadastro do paciente, BI da produção e agenda
+  conferidos: o iGut não tem o médico que encaminhou (observação da agenda em 10 de 1.323, nenhuma citando indicação).
+  Decisão do Jorge: pelo Kommo. Campos do lead novos: "CRM do cirurgião" (667908, número) e "UF do CRM" (667910, lista
+  com as 27 UFs), ao lado de "Cirurgião que indicou" (nome). O painel vai agrupar por CRM + UF.

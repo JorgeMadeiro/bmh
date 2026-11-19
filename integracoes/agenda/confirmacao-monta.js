@@ -10,10 +10,11 @@
 // mensagem por paciente por dia (o primeiro horário de amanhã). Horário de envio entre 7h e 21h. Não regrava a linha de
 // quem já recebeu (status diferente de ensaio e aguardando): a resposta "Confirmo" ou "Preciso remarcar" depende dela.
 // Modo (chave `confirmacao_modo` em BMH_config): "ensaio" (padrão) só grava a lista; "real" também manda a mensagem pela
-// API oficial do WhatsApp da recepção (modelo confirmacao_sessao_v1). Nome e celular só saem no modo real, para o envio;
+// API oficial do WhatsApp da recepção (modelos confirmacao_sessao_v2, com a câmara, e confirmacao_avaliacao_v1). Nome e celular só saem no modo real, para o envio;
 // na tabela fica o código do paciente, a unidade, o horário, os agendamentos de amanhã e o telefone em código.
 /*__SHA256__*/
-const AGENDAS = { 111: { u: 'Asa Sul', t: 'sessao' }, 112: { u: 'Asa Sul', t: 'sessao' }, 113: { u: 'Asa Sul', t: 'consulta' }, 120: { u: 'Taguatinga', t: 'consulta' }, 121: { u: 'Taguatinga', t: 'sessao' } };
+// câmara (19/11/2026): Asa Sul tem monoplace (111) e multiplace (112); Taguatinga só monoplace (121). Vai no modelo de sessão
+const AGENDAS = { 111: { u: 'Asa Sul', t: 'sessao', c: 'monoplace' }, 112: { u: 'Asa Sul', t: 'sessao', c: 'multiplace' }, 113: { u: 'Asa Sul', t: 'consulta' }, 120: { u: 'Taguatinga', t: 'consulta' }, 121: { u: 'Taguatinga', t: 'sessao', c: 'monoplace' } };
 const NAO_VEIO = ['faltou', 'desmarcado', 'desistiu'];
 const norm = (s) => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').trim().toLowerCase();
 const cfg = {}; try { for (const i of $('Config').all()) if (i.json && i.json.chave) cfg[i.json.chave] = i.json.valor; } catch (e) {}
@@ -42,7 +43,7 @@ for (const x of lista) {
   const p = (amanha[pid] ||= { pid: String(pid), agendamentos: [], confirmado: true });
   p.agendamentos.push(String(x.Agendamento?.id || ''));
   if (norm(x.Agendamento?.confirmado) !== 'confirmado') p.confirmado = false;
-  if (!p.hora || hora < p.hora) Object.assign(p, { hora, unidade: ag.u, tipo: avaliacao ? 'avaliação' : 'sessão', fone: celular(x.Paciente?.celular), nome: String(x.Paciente?.nome || '').trim().split(/\s+/)[0] || '' });
+  if (!p.hora || hora < p.hora) Object.assign(p, { hora, unidade: ag.u, camara: ag.c || '', tipo: avaliacao ? 'avaliação' : 'sessão', fone: celular(x.Paciente?.celular), nome: String(x.Paciente?.nome || '').trim().split(/\s+/)[0] || '' });
 }
 const [, m, dd] = dia.split('-'), diaTexto = Number(dd) + ' de ' + MES[Number(m) - 1];
 const nomeProprio = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : '';
@@ -67,5 +68,7 @@ return out.map(({ chave, p, regra, quando, status }) => ({ json: {
   chave, dia, paciente_id: p.pid, unidade: p.unidade, hora: p.hora, tipo: p.tipo, agendamentos: [...new Set(p.agendamentos)].join(','), telefone_hash: sha256(p.fone), wamid: '', resposta: '', respondido_em: '', modo, status, criado_em: agora.toISO(),
   regra, envia_em: hh(quando), fora_hoje: JSON.stringify(fora),
   // só para o envio (modo real e vencido); não vai para a tabela
-  ...(status === 'a enviar' ? { envio: { telefone: p.fone, nome: nomeProprio(p.nome), unidade: p.unidade, dia: diaTexto, hora: p.hora.replace(':', 'h') } } : {}),
+  // modelos aprovados pela Meta (19/11/2026): sessão v2 com a câmara e a unidade; avaliação v1 com a unidade
+  ...(status === 'a enviar' ? { envio: { telefone: p.fone, modelo: p.tipo === 'avaliação' ? 'confirmacao_avaliacao_v1' : 'confirmacao_sessao_v2',
+    params: p.tipo === 'avaliação' ? [nomeProprio(p.nome), p.unidade, diaTexto, p.hora.replace(':', 'h')] : [nomeProprio(p.nome), p.camara || 'hiperbárica', p.unidade, diaTexto, p.hora.replace(':', 'h')] } } : {}),
 } }));
