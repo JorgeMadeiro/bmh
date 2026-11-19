@@ -179,7 +179,8 @@ function fluxoPagina() {
     ads: le('Anúncios (tabela)', 'BMH_google_anuncios_dia'), parc: le('Parcela (tabela)', 'BMH_google_parcela_dia'), site: le('Site · cliques (tabela)', 'BMH_site_cliques_dia'),
     org: le('Orgânico (tabela)', 'BMH_organico_diario'), hor: le('Horas (tabela)', 'BMH_horas'), igut: le('iGut (tabela)', 'BMH_igut_dia'), guard: le('Guardião (tabela)', 'BMH_guardiao_registro'),
     meta: le('Meta (tabela)', 'BMH_meta_anuncios_dia'),
-    conv: le('Conversas (tabela)', 'BMH_origem_conversas'), evt: le('Conversões (tabela)', 'BMH_conversoes'),   // funil comercial (19/11/2026)   // gravada às 6h05 por "BMH · Meta · números do dia" (0FskpyELgh7nBqF0), desde 01/10/2026
+    conv: le('Conversas (tabela)', 'BMH_origem_conversas'), evt: le('Conversões (tabela)', 'BMH_conversoes'),   // funil comercial (19/11/2026)
+    oper: le('Operação (tabela)', 'BMH_operacao_dia'),   // avaliações agendadas e realizadas (19/11/2026)   // gravada às 6h05 por "BMH · Meta · números do dia" (0FskpyELgh7nBqF0), desde 01/10/2026
     monta: codigo('Monta os dados', 'monta-os-dados.js'),
     json: no('Pede JSON?', 'n8n-nodes-base.if', 2.2, { conditions: { options: { caseSensitive: true, leftValue: '', typeValidation: 'loose', version: 2 }, combinator: 'and',
       conditions: [{ id: crypto.randomUUID(), leftValue: "={{ $('Painel').first().json.query.formato }}", rightValue: 'json', operator: { type: 'string', operation: 'equals' } }] }, options: {} }),
@@ -188,7 +189,7 @@ function fluxoPagina() {
     nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Painel (página)\n**Traz:** tabelas do painel\n**Envia:** a página do painel, com login\n**Limites:** só lê\n\nPágina do painel da BMH, igual à da Nexo (fluxo bKst8atLrI4rB2DM). Login: credencial "BMH · Painel (login)". ?formato=json devolve só os dados.\nLê as tabelas BMH_* gravadas às 6h10 (BMH · Painel · grava o dia). Página e código em integracoes/painel/ no workspace da BMH (montar.js reenvia).', width: 520, height: 200 }),
   };
   const cx = {};
-  const ordem = [n.painel, n.config, n.periodo, n.ads, n.parc, n.site, n.org, n.hor, n.igut, n.guard, n.meta, n.conv, n.evt, n.monta, n.json];
+  const ordem = [n.painel, n.config, n.periodo, n.ads, n.parc, n.site, n.org, n.hor, n.igut, n.guard, n.meta, n.conv, n.evt, n.oper, n.monta, n.json];
   for (let i = 0; i < ordem.length - 1; i++) liga(cx, ordem[i].name, ordem[i + 1].name);
   cx[n.json.name] = { main: [[{ node: n.entregaJson.name, type: 'main', index: 0 }], [{ node: n.entrega.name, type: 'main', index: 0 }]] };
   return { name: 'BMH · Painel (página)', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none' }) };

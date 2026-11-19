@@ -58,6 +58,12 @@ const teto = num(cfg['teto_mes_' + P.mes_inicio.slice(0, 7)] || cfg.teto_mes);  
 const gFim = P.fim >= P.ontem ? P.hoje : P.fim, desde3 = DateTime.fromISO(gFim).minus({ days: 2 }).toISODate();
 const avisos = [];
 if (ultimaGravacao && ultimaGravacao.slice(0, 10) < P.hoje && P.fim >= P.ontem) avisos.push('Os números foram gravados pela última vez em ' + ultimaGravacao.slice(8, 10) + '/' + ultimaGravacao.slice(5, 7) + ': a gravação das 6h10 não rodou hoje. Ontem pode estar incompleto.');
+// ---------- avaliações do período (19/11/2026, pedido do Jorge: "senti falta dos agendamentos das consultas") ----------
+// BMH_operacao_dia, gravada toda noite pela diretoria: avaliações marcadas para o dia e as realizadas, por unidade (até ontem)
+let operacao = []; try { operacao = linhas('Operação (tabela)'); } catch (e) {}
+const avalEntre = (a, b) => { const r = { ag: 0, feitas: 0, unidades: {} }; for (const x of operacao) { if (!entre(x.dia, a, b)) continue; const u = (r.unidades[x.unidade] ||= { ag: 0, feitas: 0 });
+  r.ag += num(x.avaliacoes_agendadas); r.feitas += num(x.avaliacoes_feitas); u.ag += num(x.avaliacoes_agendadas); u.feitas += num(x.avaliacoes_feitas); } return r; };
+const avaliacoes = operacao.length ? { atual: avalEntre(P.inicio, P.fim), anterior: avalEntre(P.ant.inicio, P.ant.fim), ate: operacao.map((x) => x.dia).sort().pop() } : null;
 // ---------- funil comercial (19/11/2026, pedido do Jorge: "o painel do funil comercial, como na Nexo") ----------
 // Uma linha por conversa nova no WhatsApp (BMH_origem_conversas, desde 17/11/2026, quando o recebedor oficial começou), com a
 // origem do último clique (gclid do site = Google Ads; código do anúncio = Meta; frase pronta = site, Instagram, Perfil, QR do
@@ -94,7 +100,7 @@ return [{ json: {
   guardiao: { modo: cfg.guardiao_modo_teto === 'real' || cfg.guardiao_modo_pausa === 'real' ? 'real' : 'simulacao', acoes: linhas('Guardião (tabela)').filter(r => r.data >= desde3 && r.data <= gFim).sort((a, b) => b.data.localeCompare(a.data))
     .map(r => ({ data: r.data, regra: r.regra, plataforma: r.plataforma, alvo: r.alvo, acao: r.acao, valor_antes: r.valor_antes, valor_novo: r.valor_novo, modo: r.modo, resultado: r.resultado, detalhe: r.detalhe })) }, horas: { grade, total: totalH }, organico: orgLinhas(P.inicio, P.fim, origens), organico_ant: orgLinhas(P.ant.inicio, P.ant.fim, origens_ant), organico_tot,
   meta_alcance: [], google_parcela, avisos, anuncios_atualizado: ultimaGravacao,
-  funil, bmh: true, mede_agendamento: cfg.mede_agendamento === 'sim', mede_atendimento: cfg.mede_atendimento === 'sim',
+  funil, avaliacoes, bmh: true, mede_agendamento: cfg.mede_agendamento === 'sim', mede_atendimento: cfg.mede_atendimento === 'sim',
   site: { visitas: visitas(TA), visitas_ant: visitas(TB), rotas: rotas.atual, rotas_ant: rotas.anterior },
   avisos_fontes: [
     'Botões por caso e por lugar (evento clique_whatsapp) medidos desde 08/10/2026; o painel conta o clique do Analytics, que tem histórico.',
