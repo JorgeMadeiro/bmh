@@ -1,7 +1,7 @@
 // Confirmação da sessão de amanhã (regras do Jorge, 17/11/2026; a primeira versão, de 22/10, mandava a todos às 18h03).
-// Roda a cada 15 min, das 7h às 21h, e só manda para quem a recepção ainda não confirmou no iGut ("Nao Confirmado"):
-//   - sessão amanhã de quem TEVE sessão hoje (sem falta): 2 h depois do início da sessão de hoje (a recepção costuma
-//     confirmar a de amanhã quando o paciente chega; se não confirmou até lá, vai a mensagem);
+// Roda a cada 15 min, das 7h às 21h, e manda para todos, inclusive quem a recepção já confirmou no iGut (19/11/2026: o paciente
+// que confirmou de boca e não recebe a mensagem costuma faltar). Quando:
+//   - sessão amanhã de quem TEVE sessão hoje (sem falta): 2 h depois do início da sessão de hoje;
 //   - sessão amanhã de quem NÃO teve sessão hoje (primeira sessão, faltou ou pulou o dia): 24 h antes da sessão;
 //   - avaliação amanhã marcada antes de hoje: 24 h antes; marcada hoje para amanhã: não manda. O dia em que foi marcada é o
 //     dia em que a passagem do Kommo a viu pela primeira vez (conversão "agendou" em BMH_conversoes; o iGut não traz a data
@@ -65,7 +65,9 @@ for (const p of Object.values(amanha).sort((a, b) => a.hora.localeCompare(b.hora
     if (!v || DateTime.fromISO(v, { zone: Z }).toISODate() >= hoje) { fora.avaliacao_marcada_hoje++; if (antes) out.push({ chave, p, regra: 'avaliação marcada hoje', quando: limita(agora), status: 'não envia: avaliação marcada hoje' }); continue; }
     regra = '24 h antes (avaliação marcada antes de hoje)'; quando = DateTime.fromISO(dia + 'T' + p.hora, { zone: Z }).minus({ days: 1 }); }
   quando = limita(quando);
-  if (p.confirmado) { fora.ja_confirmado++; if (antes) out.push({ chave, status: 'recepção confirmou', p, regra, quando }); continue; }   // só atualiza a linha que já existia
+  // já confirmado no iGut também recebe (19/11/2026, recepção pelo Jorge: "mesmo confirmando oral tem que mandar a
+  // confirmação ao paciente porque se não eles não vêm"); só conta, para o resumo
+  if (p.confirmado) { fora.ja_confirmado++; regra += ' · já confirmado no iGut'; }
   const vence = agora >= quando;
   if (p.tipo === 'avaliação' && !avaliacaoLigada && modo !== 'ensaio') { fora.avaliacao_sem_modelo++; continue; }
   out.push({ chave, p, regra, quando, status: !vence ? 'aguardando ' + hh(quando) : modo === 'ensaio' ? 'ensaio: enviaria às ' + hh(quando) : 'a enviar' });

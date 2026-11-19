@@ -455,3 +455,10 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
   foi apagado e reenviado como `confirmacao_avaliacao_v2`, mesmo texto. A confirmação já usa o nome novo.
 - **Modelo da avaliação aprovado** (19/11/2026, 12h37, `confirmacao_avaliacao_v2`, utilidade). Avaliações ligadas no espelho da
   confirmação (`confirmacao_avaliacao = ligada`): 2 mensagens de avaliação ao número de teste na primeira rodada, 1 aguardando.
+- **Confirmação para todos e recado depois do "Confirmo"** (19/11/2026, 18h55, decisão do Jorge a partir da recepção: "mesmo
+  confirmando oral tem que mandar a confirmação ao paciente porque se não eles não vêm"): a confirmação passa a ir também para
+  quem já está confirmado no iGut (a regra ganha " · já confirmado no iGut"). Depois do "Confirmo", o recebedor responde em texto
+  livre (a janela de 24 h abre com o toque no botão): "Confirmado, obrigado! Chegue de 5 a 10 minutos antes do horário. Como
+  chegar à BMH {unidade}: {mapa do Perfil do Google}", uma vez só por confirmação, para quem tocou (no espelho, o número de
+  teste; em ensaio, nada). A mensagem manual do iGut (com link) que a recepção manda às 18h30 continua até o robô estar provado
+  no real (Jorge: "só quando você aprender"). Cópias antes: `dados/n8n-copias/{j9fKHps4n9xGDGL8,YES97ES0JdBQW4bt}-antes-recado-20261119.json`.
