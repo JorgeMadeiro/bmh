@@ -27,6 +27,9 @@ for (const x of lista) {
 // para a conversão "agendou" (mesmo formato do eventos-igut.js): telefone com e sem o 9 (Meta), com "+" (Google), e-mail
 const sem9 = (f) => f.slice(0, 4) + f.slice(5);
 const emailDe = {}; for (const x of lista) { const e = String(x.Paciente?.email || '').trim().toLowerCase(); if (x.Paciente?.id && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)) emailDe[x.Paciente.id] = e; }
-return Object.values(porPaciente).map((p) => ({ chave: p.pid + '|' + p.dia, ...p, telefone_hash: sha256(p.fone),
+// nome completo (iniciais maiúsculas, "da/de/do" em minúsculas) para o contato e o lead do Kommo (18/11/2026, como na Nexo)
+const MIN = ['da', 'de', 'do', 'das', 'dos', 'e'], nomeDe = {};
+for (const x of lista) if (x.Paciente?.id && x.Paciente?.nome) nomeDe[x.Paciente.id] = String(x.Paciente.nome).toLowerCase().replace(/\s+/g, ' ').trim().split(' ').map((w, i) => (i && MIN.includes(w) ? w : w.charAt(0).toUpperCase() + w.slice(1))).join(' ');
+return Object.values(porPaciente).map((p) => ({ chave: p.pid + '|' + p.dia, ...p, telefone_hash: sha256(p.fone), nome: nomeDe[p.pid] || '', email: emailDe[p.pid] || '',
   conv: { telefone_hash_sem9: sha256(sem9(p.fone)), telefone_hash_google: sha256('+' + p.fone), email_hash: emailDe[p.pid] ? sha256(emailDe[p.pid]) : '' } }))
   .filter((p) => !feitas.has(p.chave)).map((json) => ({ json }));

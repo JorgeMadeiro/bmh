@@ -50,7 +50,12 @@ for (const a of AV) {
     const ids_ = new Set(doIgut.map((f) => f.field_id));
     const campos = [...copia(tri.l).filter((f) => !ids_.has(f.field_id)), ...doIgut];
     r.detalhe = [pg || 'sem pagamento na agenda', retorno ? 'retorno' : '', r.detalhe].filter(Boolean).join(' · ');
-    r.novo = { name: tri.l.name || 'Avaliação ' + a.unidade, pipeline_id: FUNIL[a.unidade], status_id: ETAPA[a.unidade], custom_fields_values: campos,
+    // contato com nome completo, código do iGut e e-mail (só se vazio), como na Nexo; nunca em contato de OUTRO paciente
+    const c = contatos[tri.contato] || {}, cod = String((c.custom_fields_values || []).find((f) => f.field_id === 662778)?.values?.[0]?.value || '');
+    if (cod && cod !== a.pid) r.detalhe = [r.detalhe, 'contato com outro código do iGut: nome não trocado'].filter(Boolean).join(' · ');
+    else if (a.nome) { const temEmail = (c.custom_fields_values || []).some((f) => f.field_code === 'EMAIL');
+      r.contato_patch = { id: tri.contato, name: a.nome, custom_fields_values: [{ field_id: 662778, values: [{ value: a.pid }] }, ...(a.email && !temEmail ? [{ field_id: 624502, values: [{ value: a.email, enum_code: 'WORK' }] }] : [])] }; }
+    r.novo = { name: a.nome || tri.l.name || 'Avaliação ' + a.unidade, pipeline_id: FUNIL[a.unidade], status_id: ETAPA[a.unidade], custom_fields_values: campos,
       _embedded: { contacts: [{ id: tri.contato }], tags: [...(tri.l._embedded?.tags || []).map((t) => ({ id: t.id })), ...novas] } };
     r.ganha = { id: tri.l.id, pipeline_id: FUNIL.triagem, status_id: 142, custom_fields_values: doIgut };
   }

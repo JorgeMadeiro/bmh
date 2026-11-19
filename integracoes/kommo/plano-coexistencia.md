@@ -344,3 +344,12 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
   (`outgoing_chat_message`). No recebedor oficial, a mensagem mandada pelo Kommo chega só como status "enviada", **sem
   texto** (a Meta não repassa o texto a outro app). Para a leitura do atendimento/SDR, ver se o webhook do Kommo entrega o
   texto das mensagens enviadas.
+- **Passagem e origem em modo real** (18/11/2026, 22h15, ok do Jorge; `passagem_modo` e `origem_modo` = real). Primeira
+  rodada real: 16 avaliações passaram (13 Asa Sul, 3 Taguatinga; 16 ganhos na triagem), conferido no Kommo. Defeito: a
+  gravação da decisão rodava depois da do resultado e escrevia "a fazer" por cima de "feito" (sem duplicar no Kommo, porque a
+  rodada seguinte vê o lead na unidade); corrigido com o passo "Decisões sem envio".
+- **Nome completo e código do iGut no contato** (18/11/2026, pedido do Jorge, como o "NEXO · iGut → Kommo · cadastro do
+  paciente"): campo do contato "Código do iGut" (662778); contato e lead com o nome completo do iGut, e-mail só se vazio,
+  **sem CPF** (regra de LGPD do Kommo da BMH). Feito nos 68 leads das unidades (`scripts/kommo/nome-do-igut.js`, conferido:
+  68 com código, 64 com e-mail, nenhum "Lead #") e ligado na passagem (passo "Atualiza o contato", nunca em contato com
+  outro código do iGut).

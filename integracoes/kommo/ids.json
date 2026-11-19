@@ -69,5 +69,10 @@
  },
  "bots": {
   "envia_mensagem": 15128
+ },
+ "campos_contato": {
+  "id_igut": 662778,
+  "email": 624502,
+  "telefone": 624500
  }
 }
