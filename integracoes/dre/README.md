@@ -44,3 +44,25 @@
   de costume; linha 40% e R$ 1.500 acima da média; "A classificar" do mês. A regra da Nexo de "2 favorecidos no aluguel"
   não vale (a BMH tem duas unidades e vários contratos). Marcar como conferido: fica riscado e some às 23h59.
 - Nenhum dado de paciente é gravado; os dois fluxos não guardam execução.
+
+## Particular por forma de pagamento (17/11/2026)
+
+- Pedido do Jorge: no painel da diretoria, "Financeiro da produção", com o filtro **PARTICULAR**, cada mês (e o "Período") ganha a
+  seta ▸ com o pago no caixa do iGut no mês por forma: crédito à vista, 2x a 10x (a BMH parcela até 10x; acima disso entra
+  com o número real, "Crédito 12x"), débito, débito em conta, PIX, transferência, dinheiro e "Outras" (forma nova nunca some).
+- Fonte: `receitasedespesas/financeiro`, campo `lancamento_forma` (o BI da produção não traz a forma). Só recebimento sem
+  categoria (paciente); cada lançamento é um pagamento com o valor inteiro. O total é o pago no mês: pacote pago num mês é
+  usado nos seguintes, então pode diferir do produzido (out/2026: R$ 110.960 no caixa, R$ 105.840 produzidos).
+- Gravado pelo fluxo "BMH · DRE · atualiza do iGut" (nó `particular-forma.js`) na `BMH_particular_forma`
+  (`JirKt7WQq5MsB4CZ`, `chave` = `mes|unidade|forma`), mesma rotina das 4h05; histórico desde jan/2024. Lido pela página da
+  diretoria (não vai para o painel do faturamento, que não leva R$).
+- **Ordem fixa na tela** (Jorge, 17/11/2026): Dinheiro, PIX, Débito, Crédito 1x (o "à vista" gravado) a 12x; débito em conta,
+  transferência, crédito sem número de parcelas e outras no fim.
+- **Por que só o pago no caixa** (conferido em 17/11/2026, decisão do Jorge: "só o pago no caixa"): a API do iGut não liga o
+  pagamento à sessão. O lançamento do caixa vem sem favorecido, e `lancamento_origem` e `lancamento_fatura` não batem com
+  `agendamento_id`, `id` nem `paciente_id` do BI, nem com nenhum campo de `consultas/buscar` (2.203 agendamentos de out/2026);
+  os outros 17 endpoints da documentação não tratam de pagamento. Por isso Produzido e Faturado não se dividem por forma.
+  Ex.: nov/2026 até o dia 17, R$ 69 mil produzidos e R$ 21 mil pagos (sessões de pacotes pagos antes).
+- **17/11/2026, a seta saiu do painel** (Jorge: "ficou ruim, melhor solicitar a liberação ao iGut"): o pago no caixa não bate com a
+  produção do mês e confundia. O painel voltou a como era; a `BMH_particular_forma` continua sendo gravada toda noite pela DRE,
+  pronta para quando o iGut liberar a ligação pagamento × sessão. Pedido ao iGut: `saidas/igut-solicitacao-forma-pagamento-por-sessao-2026-11-17.md`.

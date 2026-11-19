@@ -1,9 +1,11 @@
 // Financeiro da produção por mês, unidade e convênio (painel da diretoria, 09/10/2026). Fonte: BI do iGut, uma chamada
 // por mês, só as linhas de sessão (a linha de fatura repete a sessão). Regra combinada com o Jorge:
 //   Produzido = Faturado + A faturar;  Faturado = Recebido + A receber + Glosado.
-//   Particular: faturado e recebido no ato (cartão, D+1). Convênio: pago → recebido (menos glosa); em lote e não pago →
+//   Particular: faturado no ato; recebido só quando o iGut marca a sessão como paga (pago = S), senão a receber (Jorge,
+//   17/11/2026: a recepção dá baixa uns 7 a 10 dias depois). Antes de PART_DESDE a marca não era usada: recebido no ato. Convênio: pago → recebido (menos glosa); em lote e não pago →
 //   a receber (menos glosa); sem lote → a faturar. Só totais: nenhum dado de paciente sai deste nó.
 const n = (v) => Number(v) || 0;
+const PART_DESDE = '__PART_DESDE__';   // primeiro mês em que a recepção marca o pagamento do particular no iGut
 // sessão = oxigenoterapia (tipo ou descrição) ou item lançado numa agenda de câmara (10/11/2026): consulta, retorno,
 // telemedicina, guia e avaliação da agenda CONSULTAS entram no valor, mas não contam como sessão
 const ehSessao = (x) => /oxigenoterapia/i.test(String(x.TIPO || '') + ' ' + String(x.descricao || '')) || /multiplace|monoplace/i.test(String(x.profissional || ''));
@@ -25,7 +27,7 @@ meses.forEach((mes, k) => {
     const v = n(x.totalproduzido), g = particular ? 0 : n(x.total_glosa);
     const r = (out[mes + '|' + u + '|' + conv] ||= { chave: mes + '|' + u + '|' + conv, mes, unidade: u, convenio: conv, sessoes: 0, produzido: 0, faturado: 0, a_faturar: 0, recebido: 0, a_receber: 0, glosado: 0, atualizado_em: agora });
     if (ehSessao(x)) r.sessoes++; r.produzido += v;
-    if (particular) { r.faturado += v; r.recebido += v; }
+    if (particular) { r.faturado += v; if (x.pago === 'S' || mes < PART_DESDE) r.recebido += v; else r.a_receber += v; }
     else if (x.pago === 'S') { r.faturado += v; r.recebido += v - g; r.glosado += g; }
     else if (x.lote) { r.faturado += v; r.a_receber += v - g; r.glosado += g; }
     else r.a_faturar += v;

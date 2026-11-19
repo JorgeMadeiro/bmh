@@ -69,7 +69,9 @@ fora do perfil.
     BMH, não serve para marketing nem disparo.
 - **Ligação:** `id_igut`.
 
-Sem CPF, sem diagnóstico e sem foto no Kommo (LGPD do esboço). O elo com o iGut é o id.
+Sem CPF, sem diagnóstico e sem foto no Kommo (LGPD do esboço). O elo com o iGut é o id. **Mudou em 18/11/2026 (decisão do
+Jorge, "igual à Nexo, com CPF"):** o contato leva nome completo, código do iGut, CPF, nascimento e e-mail; diagnóstico e foto
+continuam fora.
 
 **Etiquetas:** `anúncio meta`, `google`, `site`, `cirurgião`, `instagram dr jorge`, `fora do horário`, `não é
 oportunidade`.
@@ -248,3 +250,144 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
 - Kommo, anúncio com UTM: https://support.kommo.com/docs/track-whatsapp-ad-campaigns-with-utms
 - Meta, preços: https://developers.facebook.com/docs/whatsapp/pricing
 - Meta, conversões de mensagens: https://developers.facebook.com/docs/marketing-api/conversions-api/business-messaging
+
+## 6. Montado em 17/11/2026 (conta bmh.kommo.com, id 37193891)
+
+- **Token:** integração privada "BMH · n8n e Claude", token de longa duração até 17/11/2031, no `.env` (`KOMMO_BMH_TOKEN`,
+  1.150 caracteres: o `read` comum do Terminal trava acima de ~1.000; gravar com `stty -icanon`).
+- **Três funis** (decisão do Jorge, 17/11/2026), montados por `scripts/kommo/montar.js --real --limpar`, ids em `ids.json`:
+  - **Triagem e conversão** (principal, recebe todo contato do número único): Em qualificação › Orçamento
+    enviado (só particular) › Follow-up (recebeu orçamento ou informação e não agendou). Ganho = avaliação agendada.
+  - **Asa Sul** e **Taguatinga**: Avaliação agendada › Avaliou · pedido a enviar (o médico finaliza e entrega o relatório;
+    a recepção pede ao convênio) › Aguardando convênio (tarefa de cobrança em 3 dias úteis) › Em tratamento. Ganho =
+    concluiu. O particular vai de "Avaliou" direto para "Em tratamento". A avaliação é gratuita.
+  - **Passagem:** ganho na triagem e lead novo no funil da unidade, mesmo contato, levando origem e cirurgião.
+  - Retorno de paciente antigo entra pela triagem (etiqueta "retorno"); troca de unidade no meio é rara: a recepção move.
+  - Nomes de ganho e perda (etapas de sistema) só pela tela.
+- **Modelo do Kommo apagado** (funil, 12 campos e 4 motivos de exemplo), com o ok do Jorge.
+- **Webhook "Mensagem recebida"** cadastrado na tela (fica na conta, não na integração) para o fluxo "BMH · Kommo ·
+  origem do lead", ainda em ensaio.
+- **Salesbot "Envia mensagem"** (id 15128): manda o texto do campo "Mensagem para enviar" (627592), como o "Envia Mensagem
+  IA" da Nexa.
+- **App da BMH assinado** na conta de WhatsApp (coexistência já ligada): o recebedor oficial grava mensagens do paciente e
+  da equipe pelo celular desde 17/11/2026, 10h30.
+- **Um usuário** nos 13 dias restantes do teste; depois decide.
+- **Reavaliação** (5 a 10 sessões, depois reavalia): se precisar de mais e for convênio, a recepção volta o lead para
+  "Avaliou · pedido a enviar" › Aguardando convênio › Em tratamento; só a alta é ganho (Concluiu). Manual: no iGut a
+  reavaliação aparece quase sempre como retorno, que também acontece por intercorrência no meio do tratamento.
+- **Motivo de perda novo:** "Interrompeu o tratamento" (criado pelo Jorge na tela, 17/11/2026).
+
+## 7. WhatsApp conectado no Kommo (17/11/2026, 18h20)
+
+- **O que travava:** na conexão, a Meta mostrava o número como "Não qualificado: este número não pode ser compartilhado
+  com este app", nas opções "Aplicativo WhatsApp Business" e "WhatsApp". A causa real só apareceu ao digitar o número:
+  **"Seu número está vinculado aos eventos automáticos"** (erro 3441106). As **listas automáticas** do app
+  (Ferramentas comerciais › Listas) tinham feito a Meta criar sozinha a conta de mensagens 198826156641686, tipo
+  "Aplicativo WhatsApp Business", no portfólio da BMH, sem parceiro nenhum. Por isso o número já estava na API em
+  22/10 sem app assinado.
+- **O que resolveu:** desligar as listas automáticas no celular da Asa Sul e conectar de novo pela opção do app no Kommo.
+  Mensagem de saudação, ausência e respostas rápidas não têm nada a ver com isso.
+- **Conferido pela API às 18h26:** o número ficou na **mesma** conta (198826156641686), em coexistência; dois apps
+  assinados (Kommo 1022173854571346 e BMH 1104609048722893); modelo `confirmacao_sessao_v1` aprovado; o recebedor
+  oficial seguiu gravando (teste do Jorge às 18h27).
+- **Cuidado:** a tela de conexão que pede SMS ou ligação é o cadastro só na API e pode tirar o número do app do celular.
+  O caminho da coexistência pede QR ou confirmação no celular.
+- **No Kommo:** fonte "Brasília Medicina Hiperbárica" no funil Triagem e conversão; "Importar contatos" desligado (o
+  contato nasce quando conversa). A configuração do Kommo leva alguns minutos depois de conectar.
+- **Fluxo de origem:** ganhou o PATCH no lead (credencial n8n "BMH · Kommo (token)", `xpwKz2vMUxgqhNBo`, lote de 5 por
+  segundo), ainda em ensaio até a primeira mensagem real cair certa.
+- **Passagem da triagem para a unidade** (17/11/2026): fluxo "BMH · Kommo · passagem para a unidade" (`YSJaUQMQffVcfmra`,
+  a cada 30 min das 7h às 19h; código em `integracoes/kommo/passagem-avaliacoes.js` e `passagem-decide.js`; tabela
+  `BMH_passagens`, sem nome nem celular). Avaliação marcada no iGut (agendas 113 e 120, próximos 14 dias) → contato do Kommo
+  pelo celular (DDD + 8 últimos dígitos) → no modo real cria o lead na unidade ("Avaliação agendada", copiando origem,
+  UTMs, cirurgião, pagamento, convênio, tipo de caso e etiquetas) e depois marca o da triagem como ganho. Retorno, troca de
+  unidade e quem marcou sem conversar no WhatsApp ficam só registrados. Modo `passagem_modo` (ensaio | real). Ensaio de
+  17/11, 18h50: 31 avaliações até 28/11, todas "sem contato no Kommo" (o Kommo ainda vazio).
+- **Particular, convênio e retorno** (17/11/2026, na passagem): convênio pela agenda do iGut ("PARTICULAR" = Particular;
+  cortesia e voucher em branco; o resto = Convênio, com o nome no campo "Convênio"); retorno = já teve sessão com valor antes
+  do mês (BMH_financeiro_paciente, desde nov/2024); etiquetas "particular", "convênio" e "retorno" no lead da unidade.
+  Ensaio de 17/11: 21 convênio, 3 convênio com retorno, 5 particular, 2 em branco.
+- **Conversão "agendou"** (17/11/2026): a passagem grava em `BMH_conversoes` a avaliação marcada na primeira vez que a vê
+  (chave `agendou|paciente|dia da avaliação`, só as novas, telefone e e-mail em código; código em
+  `integracoes/kommo/passagem-agendou.js`). **Ainda não é enviada:** o `envio-monta.js` só manda avaliou e iniciou. Para
+  ligar: criar no Google Ads a conversão secundária "BMH · Agendou avaliação (iGut)" e pôr `agendou` em ACOES e META
+  (na Meta, o evento padrão `Schedule`), com o ok do Jorge. As 31 da primeira rodada (17/11) foram marcadas antes e estão
+  com o dia 17/11: não enviar essas.
+- **BMH_config:** `kommo_campos` com `mensagem_enviar` (627592) e `kommo_bot_envia_mensagem` = 15128 (17/11/2026, por fluxo
+  temporário, porque a API pública do n8n não altera linha).
+- **Envio do "agendou" ligado** (17/11/2026, 19h30, ok do Jorge): conversão secundária no Google Ads "BMH · Agendou
+  avaliação (iGut)" `7907222094` (UPLOAD_CLICKS, BOOK_APPOINTMENT, fora do lance e da coluna Conversões) e evento `Schedule`
+  na Meta, no `envio-monta.js` (fluxo de envio das 8h17, modo real). As 31 da primeira rodada ficam de fora (gravadas antes
+  das 19h15 de 17/11). Teste com `?modo=teste&antigos=1`: o Google respondeu "Resource not found" no destino novo, a mesma
+  demora de propagação de outubro (umas horas). O que não vai fica para o dia seguinte (até 55 dias), sem perder evento.
+- **Confirmação da sessão de amanhã, regras novas** (17/11/2026, pedido do Jorge; não existe outra confirmação automática):
+  fluxo "BMH · Agenda · confirmação da véspera" (`j9fKHps4n9xGDGL8`) a cada 15 min, das 7h às 21h, só para quem está
+  "Nao Confirmado" no iGut: sessão amanhã de quem teve sessão hoje → 2 h depois do início da sessão de hoje; sem sessão hoje
+  (primeira, faltou ou pulou) → 24 h antes; avaliação marcada antes de hoje → 24 h antes; avaliação marcada hoje para amanhã
+  → não manda (o dia em que foi marcada = primeira vez que a passagem a viu, `agendou` em BMH_conversoes). Envio entre 7h e
+  21h; quem a recepção confirma sai da fila. Teste com `?agora=AAAA-MM-DDTHH:MM`. Ensaio de 17/11, 19h35, para 18/11:
+  38 já confirmadas pela recepção, 15 receberiam, 8 avaliações marcadas hoje (não recebem). **Em ensaio** até o Jorge
+  mandar ligar (`confirmacao_modo = real`). O modelo diz "Sua sessão": para avaliação, um modelo próprio precisa de nova
+  aprovação da Meta.
+- **Guarda das conversas (17/11/2026, decisão do Jorge):** as mensagens do recebedor oficial (`BMH_whatsapp_meta`, texto
+  mascarado) ficam guardadas até analisarmos e implantarmos 100% o SDR, no lugar de 1 mês. Passo "Apaga as vencidas
+  (Meta)" do fluxo de limpeza desligado; religar quando o SDR estiver pronto.
+- **18/11/2026, WhatsApp chegando no Kommo:** o Kommo importou o histórico e criou **758 leads** (conversas de 19/10 a 17/11),
+  todos no Triagem › Em qualificação, mais 45 na entrada não triada. **Defeito achado e corrigido na passagem:** o Kommo
+  responde `application/hal+json`, que o n8n não lê sozinho como JSON (vinha como texto em `data`); forçar JSON quebra na
+  página vazia (204). Solução: leitura como texto e conversão no código (`corpo()`), JSON só na criação e no ganho. Depois
+  da correção, ensaio de 18/11, 22h: 36 avaliações, **22 passariam** (17 Asa Sul, 5 Taguatinga) e 14 sem conversa no Kommo.
+  **Lição para todo nó HTTP que lê o Kommo no n8n.**
+- **Importados em tratamento** (18/11/2026, 22h20, ok do Jorge): 52 leads importados de quem tem sessão marcada no iGut de
+  19 a 25/11 foram movidos para "Em tratamento" (40 Asa Sul, 12 Taguatinga), com unidade, código do iGut, particular ou
+  convênio e as etiquetas "importado" e "particular"/"convênio" (`scripts/kommo/mover-tratamento.js`; conferido lendo de
+  volta). O resto dos importados (706) segue em Em qualificação até decisão.
+- **Teste do "Envia mensagem"** (18/11/2026, 22h11): mensagem disparada no lead do Jorge (4152970); o Kommo registrou o envio
+  (`outgoing_chat_message`). No recebedor oficial, a mensagem mandada pelo Kommo chega só como status "enviada", **sem
+  texto** (a Meta não repassa o texto a outro app). Para a leitura do atendimento/SDR, ver se o webhook do Kommo entrega o
+  texto das mensagens enviadas.
+- **Passagem e origem em modo real** (18/11/2026, 22h15, ok do Jorge; `passagem_modo` e `origem_modo` = real). Primeira
+  rodada real: 16 avaliações passaram (13 Asa Sul, 3 Taguatinga; 16 ganhos na triagem), conferido no Kommo. Defeito: a
+  gravação da decisão rodava depois da do resultado e escrevia "a fazer" por cima de "feito" (sem duplicar no Kommo, porque a
+  rodada seguinte vê o lead na unidade); corrigido com o passo "Decisões sem envio".
+- **Nome completo e código do iGut no contato** (18/11/2026, pedido do Jorge, como o "NEXO · iGut → Kommo · cadastro do
+  paciente"): campo do contato "Código do iGut" (662778); contato e lead com o nome completo do iGut, e-mail só se vazio,
+  **sem CPF** (regra de LGPD do Kommo da BMH). Feito nos 68 leads das unidades (`scripts/kommo/nome-do-igut.js`, conferido:
+  68 com código, 64 com e-mail, nenhum "Lead #") e ligado na passagem (passo "Atualiza o contato", nunca em contato com
+  outro código do iGut).
+- **CPF e nascimento no contato** (18/11/2026, decisão do Jorge: "igual à Nexo, com CPF", trocando a regra de 22/10): campos
+  do contato "CPF" (663106) e "Data de nascimento" (663108, tipo aniversário), preenchidos só se vazios. Feito nos 68 contatos
+  das unidades (conferido: 68 com CPF de 11 dígitos, 68 com nascimento) e ligado na passagem.
+- **Testes de 19/11/2026 (pedido do Jorge, "teste os não testados"):**
+  1. Nascimento e CPF dos 68 contatos iguais aos do iGut (68 de 68; a conta do Kommo está em America/Sao_Paulo).
+  2. Os nós "Contatos a atualizar" e "Atualiza o contato" da passagem, copiados para um fluxo temporário, atualizaram o
+     contato do Jorge pelo Kommo (resposta 200, contato devolvido); fluxo apagado.
+  3. Origem em modo real: mensagem simulada "Vim pelo site da BMH" no lead do Jorge gravou Origem = site, utm_source,
+     utm_medium, utm_content e a etiqueta "site"; desfeito depois (fica uma linha de teste em BMH_origem_leads, conversa
+     "teste", que nenhum painel lê).
+  4. Mensagem enviada pelo Kommo (salesbot no lead do Jorge, 06h26): o webhook de conta (`add_message`) **não disparou** em
+     20 s, e o recebedor oficial só grava "enviada" sem texto. Conclusão: o texto das respostas mandadas pelo Kommo não chega
+     a nenhum dos dois caminhos. Para a leitura do atendimento e o SDR, a recepção responde pelo WhatsApp Web ou pelo celular
+     (o texto chega pelo eco da coexistência).
+- **Início do uso do Kommo pela equipe: 24/11/2026** (Jorge, 19/11/2026). Até lá a equipe termina as configurações; a forma de
+  responder (Kommo ou WhatsApp Web, por causa do texto para o SDR) se decide antes dessa data.
+- **Envio pelo Kommo confirmado no celular** (19/11/2026, 06h34): a mensagem do Jorge pelo Kommo e o "Teste 2" do salesbot
+  chegaram ao celular dele. Envio pelo Kommo funcionando de ponta a ponta.
+- **Importados em Perdido** (19/11/2026, ok do Jorge): os 690 importados que sobraram em Em qualificação foram para Perdido com
+  o motivo "Só dúvida / agora não" e a etiqueta "importado" (`scripts/kommo/importados-perdido.js`; conferido: 690 de 690).
+  Lição da API: `tags_to_add` é ignorado no PATCH de lead; mandar a lista inteira de etiquetas (as que já tinha + a nova).
+- **Leitura semanal do atendimento na VPS** (19/11/2026, "VPS como Nexa"): rota `n8n-bmh-conversas` no cofre (mascarada) e
+  rotinas `bmh-atendimento-*` toda segunda às 9h, de 23/11 a 11/01, que atualizam `marketing/atendimento/como-a-recepcao-atende.md`
+  e mandam o resumo no Telegram. A rota vale depois do `subir-na-vps.sh`.
+- **"Preciso remarcar" com etapa "Remarcar"** (19/11/2026, decisão do Jorge: "pode marcar sozinho" e "adicionar uma etapa no
+  funil com essas pendências"): etapa "Remarcar" no começo dos funis Asa Sul (114327279) e Taguatinga (114327283). No modo
+  real da confirmação, a resposta "Preciso remarcar" desmarca no iGut (status 3) os agendamentos do dia, leva o lead (achado
+  pelo código do iGut) para "Remarcar" e deixa nota; quando o novo horário entra no iGut, a passagem devolve o lead para
+  "Avaliação agendada" ou "Em tratamento", com nota. Código: `integracoes/agenda/confirmacao-resposta.js`,
+  `integracoes/agenda/remarcar-lead.js` e o fim de `integracoes/kommo/passagem-decide.js`. **Testado** no lead do Jorge com
+  nós copiados e entradas simuladas (ida para Remarcar e volta para Em tratamento, com as notas); o desmarcar no iGut não
+  foi testado (mexeria em agenda real). Liga junto com a confirmação (`confirmacao_modo = real`).
+- **Desmarcar no iGut testado** (19/11/2026, pedido do Jorge): agendamento de teste 608274 (paciente de teste 4770 "TESTE
+  FATURA", hoje 18h, multiplace Asa Sul, particular) criado por `callcenters/agendar`; os nós "Um por agendamento
+  (desmarca)" e "iGut · desmarca", copiados do recebedor, mudaram de "Nao Confirmado" para "Desmarcado" (conferido pela busca).
+  O agendamento de teste fica na agenda como desmarcado.

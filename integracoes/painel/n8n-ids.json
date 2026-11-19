@@ -14,7 +14,8 @@
   "BMH · Google (conta de serviço) · Planilha de plantões": "E42Jp1xYUO9zrwNK",
   "BMH · Evolution · instância BMH Recepção": "GYuNAwU2LuHEWwav",
   "BMH · OpenAI · transcrição de áudio": "BCQHYmA4sTMnylir",
-  "BMH · Painel do faturamento (login)": "RVFzm3Lmx9LCg9Z9"
+  "BMH · Painel do faturamento (login)": "RVFzm3Lmx9LCg9Z9",
+  "BMH · Kommo (token)": "xpwKz2vMUxgqhNBo"
  },
  "tabelas": {
   "BMH_config": "V4NRHS9mc1kvigix",
@@ -52,7 +53,9 @@
   "BMH_origem_conversas": "L4MBOv0WNGS7UBZN",
   "BMH_meta_anuncios_dia": "JMvvyiF8uT6iqgQL",
   "BMH_dre_mensal": "5kDb2bEbOHvU1btu",
-  "BMH_dre_conferidos": "57orfVtY2DnNysmH"
+  "BMH_dre_conferidos": "57orfVtY2DnNysmH",
+  "BMH_particular_forma": "JirKt7WQq5MsB4CZ",
+  "BMH_passagens": "W42mHjSf6OpvXomF"
  },
  "fluxos": {
   "grava": "AeQIImClkXtRrWIf",
@@ -86,7 +89,8 @@
   "celular": "y15BzNHpuNDUyL93",
   "faturamento": "5mh4lPPJv17bEC7N",
   "dre": "oOkY8CylGSLRrh4N",
-  "drePagina": "lgPuqETovK8yAFNe"
+  "drePagina": "lgPuqETovK8yAFNe",
+  "passagem": "YSJaUQMQffVcfmra"
  },
  "whatsapp": {
   "caminho": "bmh-whatsapp-daeff8542cee5cef6c6a8832",
@@ -115,5 +119,8 @@
   "atualiza": "bmh-dre-atualiza-d3c6a31da83413ee",
   "conferido": "bmh-dre-conferido-9ad2d6aedf07d15b",
   "chave": "2bde83c9aac36ce512856c9a398a15e2"
+ },
+ "kommo": {
+  "passagem": "bmh-kommo-passagem-47fcfbe786ca"
  }
 }

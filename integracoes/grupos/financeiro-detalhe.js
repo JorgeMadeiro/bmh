@@ -3,7 +3,8 @@
 // mês × unidade × convênio × situação × lote, com quantas sessões, valor, glosa e os dias das sessões. Sem nome de
 // paciente (a senha do painel circula no grupo): o lote e os dias bastam para achar no iGut.
 // Situação de cada sessão: pago → recebido (valor menos glosa); em lote e não pago → a_receber (menos glosa); sem lote →
-// a_faturar; glosa > 0 → também uma linha "glosado" com o valor da glosa.
+// a_faturar; glosa > 0 → também uma linha "glosado" com o valor da glosa. Particular (17/11/2026): só a sessão que o iGut
+// ainda não marcou como paga, numa linha "a_receber" sem lote (a paga entra no recebido pelo financeiro do mês).
 // Linha que existia e não aparece mais (lote que foi pago, por exemplo) volta zerada: o painel ignora valor zero.
 const n = (v) => Number(v) || 0, CONTROLE = '2024-11';
 // sessão = oxigenoterapia (tipo ou descrição) ou item lançado numa agenda de câmara (10/11/2026): consulta, retorno,
@@ -21,10 +22,11 @@ meses.forEach((mes, k) => {
   for (const x of lista) {
     if (x.e_fatura_sessao) continue;
     const u = UNI(x.nome); if (!u) continue;
-    const conv = String(x.convenio || nomeConv[String(x.convenio_id)] || '').trim() || 'Sem convênio no iGut';
-    if (/particular/i.test(conv)) continue;
-    const v = n(x.totalproduzido), g = n(x.total_glosa), lote = x.lote ? String(x.lote).trim() : '';
-    const sit = x.pago === 'S' ? 'recebido' : lote ? 'a_receber' : 'a_faturar';
+    const conv0 = String(x.convenio || nomeConv[String(x.convenio_id)] || '').trim() || 'Sem convênio no iGut', part = /particular/i.test(conv0);
+    if (part && (x.pago === 'S' || mes < '__PART_DESDE__')) continue;
+    const conv = part ? 'PARTICULAR' : conv0;
+    const v = n(x.totalproduzido), g = part ? 0 : n(x.total_glosa), lote = !part && x.lote ? String(x.lote).trim() : '';
+    const sit = part ? 'a_receber' : x.pago === 'S' ? 'recebido' : lote ? 'a_receber' : 'a_faturar';
     const dia = String(x.data || '').slice(8, 10).replace(/^0/, '');
     const soma = (situacao, valor, glosa) => {
       const chave = [mes, u, conv, situacao, lote || '-'].join('|');

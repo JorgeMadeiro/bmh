@@ -22,7 +22,16 @@ const ARQ_IDS = path.join(RAIZ, 'integracoes', 'kommo', 'ids.json');
 const FRASES = JSON.parse(fs.readFileSync(path.join(RAIZ, 'integracoes', 'origem', 'frases.json'), 'utf8')).frases;
 
 // ---------- o desenho aprovado ----------
-const FUNIL = { nome: 'Atendimento BMH', etapas: ['Novo contato', 'Em conversa', 'Aguardando convênio', 'Avaliação agendada', 'Em tratamento'] };
+// três funis (Jorge, 17/11/2026): a triagem recebe todo contato do número único; o ganho dela é a avaliação agendada, que abre
+// um lead novo no funil da unidade (mesmo contato). Na unidade, o ganho é o fim do tratamento. "Avaliou" e "pedido a enviar
+// ao convênio" são a mesma etapa (o particular passa direto para Em tratamento).
+const UNIDADE = ['Remarcar', 'Avaliação agendada', 'Avaliou · pedido a enviar', 'Aguardando convênio', 'Em tratamento'];   // Remarcar (19/11/2026): pediu para remarcar na confirmação
+const FUNIS = [
+  { chave: 'triagem', nome: 'Triagem e conversão', antigo: 'Atendimento BMH', principal: true, etapas: ['Em qualificação', 'Orçamento enviado', 'Follow-up'] },
+  { chave: 'asa_sul', nome: 'Asa Sul', etapas: UNIDADE },
+  { chave: 'taguatinga', nome: 'Taguatinga', etapas: UNIDADE },
+];
+const LIMPAR = process.argv.includes('--limpar');   // apaga etapas que sobraram (só em funil sem lead)
 const ORIGENS = [...new Set(FRASES.map((f) => f.origem)), 'anúncio Meta', 'outro'];
 const CAMPOS = [
   { chave: 'origem', nome: 'Origem', tipo: 'select', opcoes: ORIGENS },
@@ -39,7 +48,7 @@ const CAMPOS = [
   { chave: 'id_igut', nome: 'Código do iGut', tipo: 'text' },
 ];
 const ETIQUETAS = ['anúncio meta', 'google', 'site', 'cirurgião', 'instagram dr jorge', 'instagram bmh', 'fora do horário', 'não é oportunidade', 'confirmado'];
-const MOTIVOS = ['Convênio não cobre', 'Preço', 'Sem indicação médica', 'Sumiu', 'Só dúvida / agora não', 'Escolheu outro lugar', 'Fora do perfil'];
+const MOTIVOS = ['Convênio não cobre', 'Preço', 'Sem indicação médica', 'Sumiu', 'Só dúvida / agora não', 'Escolheu outro lugar', 'Fora do perfil', 'Interrompeu o tratamento'];
 
 // ---------- API ----------
 const { KOMMO_BMH_DOMINIO: DOM, KOMMO_BMH_TOKEN: TOKEN } = process.env;
@@ -58,7 +67,7 @@ const todos = async (rota, chave) => { const out = []; for (let p = 1; p < 50; p
 async function main() {
   if (!REAL) {
     console.log('ENSAIO (nada é criado; use --real no primeiro dia do teste grátis)\n');
-    console.log(`Funil "${FUNIL.nome}": ${FUNIL.etapas.join(' › ')} › [ganho: renomear para "Concluiu" na tela] / [perdido]`);
+    for (const F of FUNIS) console.log(`Funil "${F.nome}": ${F.etapas.join(' › ')} › [ganho] / [perdido]`);
     console.log(`Campos do lead (${CAMPOS.length}):`); for (const c of CAMPOS) console.log(`  - ${c.nome} (${c.tipo}${c.opcoes ? ': ' + c.opcoes.join(', ') : ''})`);
     console.log(`Etiquetas (${ETIQUETAS.length}): ${ETIQUETAS.join(', ')}`);
     console.log(`Motivos de perda (${MOTIVOS.length}): ${MOTIVOS.join(' · ')}`);
@@ -71,17 +80,30 @@ async function main() {
   if (/centromediconexo|nexo/i.test(DOM)) throw new Error('domínio parece ser o da Nexo: a chave de uma empresa não vai para a outra');
   const ids = fs.existsSync(ARQ_IDS) ? JSON.parse(fs.readFileSync(ARQ_IDS, 'utf8')) : {};
 
-  // funil e etapas
-  const funis = (await api('leads/pipelines'))?._embedded?.pipelines || [];
-  let funil = funis.find((f) => f.name === FUNIL.nome);
-  if (!funil) {
-    const r = await api('leads/pipelines', 'POST', [{ name: FUNIL.nome, sort: 10, is_main: true, _embedded: { statuses: FUNIL.etapas.map((name, i) => ({ name, sort: (i + 1) * 10 })) } }]);
-    funil = r._embedded.pipelines[0]; console.log('funil criado:', funil.id);
-  } else console.log('funil já existia:', funil.id);
-  const etapas = (await api(`leads/pipelines/${funil.id}/statuses`))?._embedded?.statuses || [];
-  for (const [i, nome] of FUNIL.etapas.entries()) if (!etapas.find((e) => e.name === nome)) { await api(`leads/pipelines/${funil.id}/statuses`, 'POST', [{ name: nome, sort: (i + 1) * 10 }]); console.log('etapa criada:', nome); }
-  const etapasAgora = (await api(`leads/pipelines/${funil.id}/statuses`))?._embedded?.statuses || [];
-  ids.funil = funil.id; ids.etapas = Object.fromEntries(etapasAgora.map((e) => [e.name, e.id]));
+  // funis e etapas (ordem e nome vão juntos no PATCH: lição da Nexo)
+  let funis = (await api('leads/pipelines'))?._embedded?.pipelines || []; ids.funis = {};
+  for (const [k, F] of FUNIS.entries()) {
+    let funil = funis.find((x) => x.name === F.nome) || (F.antigo && funis.find((x) => x.name === F.antigo));
+    if (!funil) {
+      const r = await api('leads/pipelines', 'POST', [{ name: F.nome, sort: (k + 1) * 10, is_main: !!F.principal, is_unsorted_on: !!F.principal, _embedded: { statuses: F.etapas.map((name, i) => ({ name, sort: (i + 1) * 10 })) } }]);
+      funil = r._embedded.pipelines[0]; console.log('funil criado:', F.nome, funil.id);
+    } else {
+      if (funil.name !== F.nome || funil.sort !== (k + 1) * 10) { await api(`leads/pipelines/${funil.id}`, 'PATCH', { name: F.nome, sort: (k + 1) * 10 }); console.log('funil ajustado:', funil.name, '→', F.nome); }
+      else console.log('funil já existia:', F.nome, funil.id);
+    }
+    let etapas = ((await api(`leads/pipelines/${funil.id}/statuses`))?._embedded?.statuses || []).filter((e) => e.type === 0 && ![142, 143].includes(e.id));
+    const sobra = etapas.filter((e) => !F.etapas.includes(e.name));
+    for (const [i, nome] of F.etapas.entries()) {
+      let e = etapas.find((x) => x.name === nome);
+      if (!e && sobra.length) { e = sobra.shift(); await api(`leads/pipelines/${funil.id}/statuses/${e.id}`, 'PATCH', { name: nome, sort: (i + 1) * 10 }); console.log('  etapa renomeada:', e.name, '→', nome); e.name = nome; }
+      else if (!e) { await api(`leads/pipelines/${funil.id}/statuses`, 'POST', [{ name: nome, sort: (i + 1) * 10 }]); console.log('  etapa criada:', nome); }
+      else if (e.sort !== (i + 1) * 10) await api(`leads/pipelines/${funil.id}/statuses/${e.id}`, 'PATCH', { name: nome, sort: (i + 1) * 10 });
+    }
+    for (const e of sobra) { if (LIMPAR) { await api(`leads/pipelines/${funil.id}/statuses/${e.id}`, 'DELETE'); console.log('  etapa apagada:', e.name); } else console.log('  etapa sobrando (rode com --limpar):', e.name); }
+    const agora = (await api(`leads/pipelines/${funil.id}/statuses`))?._embedded?.statuses || [];
+    ids.funis[F.chave] = { id: funil.id, nome: F.nome, etapas: Object.fromEntries(agora.map((e) => [e.name, e.id])) };
+  }
+  ids.funil = ids.funis.triagem.id; ids.etapas = ids.funis.triagem.etapas;   // compatível com o que já lia o funil único
 
   // campos do lead
   const campos = await todos('leads/custom_fields', 'custom_fields'); ids.campos = ids.campos || {};

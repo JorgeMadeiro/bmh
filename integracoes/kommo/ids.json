@@ -1,0 +1,82 @@
+{
+ "funil": 14783287,
+ "etapas": {
+  "Incoming leads": 114235343,
+  "Em qualificação": 114235347,
+  "Orçamento enviado": 114235355,
+  "Follow-up": 114235359,
+  "Avaliação Agendada": 142,
+  "Perdido": 143
+ },
+ "campos": {
+  "origem": 626668,
+  "utm_source": 624514,
+  "utm_medium": 624510,
+  "utm_campaign": 624512,
+  "utm_content": 624508,
+  "utm_term": 624516,
+  "gclid": 624524,
+  "fbclid": 624526,
+  "ctwa_clid": 626670,
+  "id_anuncio": 626672,
+  "cirurgiao_indicou": 626674,
+  "unidade": 626676,
+  "pagamento": 626678,
+  "convenio": 626680,
+  "tipo_caso": 626682,
+  "id_igut": 626684,
+  "mensagem_enviar": 627592
+ },
+ "funis": {
+  "triagem": {
+   "id": 14783287,
+   "nome": "Triagem e conversão",
+   "etapas": {
+    "Incoming leads": 114235343,
+    "Em qualificação": 114235347,
+    "Orçamento enviado": 114235355,
+    "Follow-up": 114235359,
+    "Avaliação Agendada": 142,
+    "Perdido": 143
+   }
+  },
+  "asa_sul": {
+   "id": 14783519,
+   "nome": "Asa Sul",
+   "etapas": {
+    "Incoming leads": 114237075,
+    "Avaliação agendada": 114237079,
+    "Avaliou · pedido a enviar": 114237083,
+    "Aguardando convênio": 114237087,
+    "Em tratamento": 114237091,
+    "Closed - won": 142,
+    "Closed - lost": 143,
+    "Remarcar": 114327279
+   }
+  },
+  "taguatinga": {
+   "id": 14783523,
+   "nome": "Taguatinga",
+   "etapas": {
+    "Incoming leads": 114237095,
+    "Avaliação agendada": 114237099,
+    "Avaliou · pedido a enviar": 114237103,
+    "Aguardando convênio": 114237107,
+    "Em tratamento": 114237111,
+    "Closed - won": 142,
+    "Closed - lost": 143,
+    "Remarcar": 114327283
+   }
+  }
+ },
+ "bots": {
+  "envia_mensagem": 15128
+ },
+ "campos_contato": {
+  "id_igut": 662778,
+  "email": 624502,
+  "telefone": 624500,
+  "cpf": 663106,
+  "nascimento": 663108
+ }
+}

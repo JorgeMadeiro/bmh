@@ -205,6 +205,8 @@ até o plano ficar claro) e `prospeccao` (lista de empresas com contato público
 - Alerta: `BMH · Alerta de falha` (`7u3CuyjESsHmCtMW`), **ativo** (estava desligado e nunca tinha avisado nada), grava em
   `BMH_falhas` e manda no Telegram do Jorge com máscara de dado pessoal. 27 chamadas HTTP em 11 fluxos com nova tentativa.
 - Novo: `BMH · WhatsApp · apaga conversas vencidas` (`sm7uaiRPM5G5gAhO`, todo dia 4h37, registro em `BMH_limpeza_registro`).
+  Desde 17/11/2026 o passo das mensagens da Meta (`BMH_whatsapp_meta`) está desligado: guardar até o SDR ficar 100% pronto
+  (decisão do Jorge).
 - Novo e **desligado**: `BMH · Instagram · fila de publicação` (`r6Rib8PXJ0zlSo4z`, tabela `BMH_fila_publicacao`). Desde
   20/10/2026 tem o id do Instagram e a credencial `BMH · Meta Instagram (token)` (`HXdesRATFOJkYxhK`, tipo `httpQueryAuth`)
   nos 7 nós da Graph; continua desligado até o Jorge dizer "publica".

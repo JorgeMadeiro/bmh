@@ -18,6 +18,9 @@ Um mês olhando como a recepção atende hoje (61 3346-6005) antes de desenhar o
   às 4h37, apaga as linhas com `apagar_em` até hoje (Brasília) e grava só a contagem em `BMH_limpeza_registro`. Não guarda
   execução. Rodar à mão: o caminho do "Rodar agora" está na nota do fluxo. Linha de teste só com `apagar_em` vencido ou do
   dia seguinte (a limpeza tira).
+- **Guarda do recebedor oficial (17/11/2026, decisão do Jorge):** as mensagens de `BMH_whatsapp_meta` ficam guardadas até
+  analisarmos e implantarmos 100% o SDR. O passo "Apaga as vencidas (Meta)" do fluxo de limpeza está desligado (cópia de
+  antes em `dados/n8n-copias/`); cada linha mantém o `apagar_em` de 1 mês, e religar o passo volta a limpeza normal.
 - Regras de dado e credenciais: `~/.claude/skills/seguranca-credenciais/SKILL.md`.
 - **Origem do contato (15/10/2026):** o "Monta a linha" reconhece o começo da mensagem pronta e o fluxo grava em
   `BMH_whatsapp_origens` (`chave`, `dia`, `momento`, `origem`; sem telefone nem texto). Origens: `instagram_dr_jorge`
