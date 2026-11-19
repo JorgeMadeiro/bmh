@@ -30,6 +30,10 @@ const emailDe = {}; for (const x of lista) { const e = String(x.Paciente?.email 
 // nome completo (iniciais maiúsculas, "da/de/do" em minúsculas) para o contato e o lead do Kommo (18/11/2026, como na Nexo)
 const MIN = ['da', 'de', 'do', 'das', 'dos', 'e'], nomeDe = {};
 for (const x of lista) if (x.Paciente?.id && x.Paciente?.nome) nomeDe[x.Paciente.id] = String(x.Paciente.nome).toLowerCase().replace(/\s+/g, ' ').trim().split(' ').map((w, i) => (i && MIN.includes(w) ? w : w.charAt(0).toUpperCase() + w.slice(1))).join(' ');
-return Object.values(porPaciente).map((p) => ({ chave: p.pid + '|' + p.dia, ...p, telefone_hash: sha256(p.fone), nome: nomeDe[p.pid] || '', email: emailDe[p.pid] || '',
+// CPF e nascimento para o contato do Kommo (18/11/2026, decisão do Jorge: "igual à Nexo, com CPF"); só seguem no item, não vão para tabela
+const cpfDe = {}, nascDe = {};
+for (const x of lista) { const id = x.Paciente?.id; if (!id) continue; const c = String(x.Paciente.cpf || '').replace(/\D/g, ''); if (c.length === 11) cpfDe[id] = c;
+  const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(String(x.Paciente.datadenascimento || '').trim()); if (m && Number(m[3]) > 1900) nascDe[id] = Math.round(DateTime.fromISO(`${m[3]}-${m[2]}-${m[1]}`, { zone: 'America/Sao_Paulo' }).toSeconds()); }
+return Object.values(porPaciente).map((p) => ({ chave: p.pid + '|' + p.dia, ...p, telefone_hash: sha256(p.fone), nome: nomeDe[p.pid] || '', email: emailDe[p.pid] || '', cpf: cpfDe[p.pid] || '', nasc: nascDe[p.pid] || null,
   conv: { telefone_hash_sem9: sha256(sem9(p.fone)), telefone_hash_google: sha256('+' + p.fone), email_hash: emailDe[p.pid] ? sha256(emailDe[p.pid]) : '' } }))
   .filter((p) => !feitas.has(p.chave)).map((json) => ({ json }));

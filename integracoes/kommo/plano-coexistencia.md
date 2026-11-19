@@ -69,7 +69,9 @@ fora do perfil.
     BMH, não serve para marketing nem disparo.
 - **Ligação:** `id_igut`.
 
-Sem CPF, sem diagnóstico e sem foto no Kommo (LGPD do esboço). O elo com o iGut é o id.
+Sem CPF, sem diagnóstico e sem foto no Kommo (LGPD do esboço). O elo com o iGut é o id. **Mudou em 18/11/2026 (decisão do
+Jorge, "igual à Nexo, com CPF"):** o contato leva nome completo, código do iGut, CPF, nascimento e e-mail; diagnóstico e foto
+continuam fora.
 
 **Etiquetas:** `anúncio meta`, `google`, `site`, `cirurgião`, `instagram dr jorge`, `fora do horário`, `não é
 oportunidade`.
@@ -353,3 +355,6 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
   **sem CPF** (regra de LGPD do Kommo da BMH). Feito nos 68 leads das unidades (`scripts/kommo/nome-do-igut.js`, conferido:
   68 com código, 64 com e-mail, nenhum "Lead #") e ligado na passagem (passo "Atualiza o contato", nunca em contato com
   outro código do iGut).
+- **CPF e nascimento no contato** (18/11/2026, decisão do Jorge: "igual à Nexo, com CPF", trocando a regra de 22/10): campos
+  do contato "CPF" (663106) e "Data de nascimento" (663108, tipo aniversário), preenchidos só se vazios. Feito nos 68 contatos
+  das unidades (conferido: 68 com CPF de 11 dígitos, 68 com nascimento) e ligado na passagem.

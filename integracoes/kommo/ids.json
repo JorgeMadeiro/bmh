@@ -73,6 +73,8 @@
  "campos_contato": {
   "id_igut": 662778,
   "email": 624502,
-  "telefone": 624500
+  "telefone": 624500,
+  "cpf": 663106,
+  "nascimento": 663108
  }
 }
