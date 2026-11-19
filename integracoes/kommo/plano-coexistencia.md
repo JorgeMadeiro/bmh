@@ -330,3 +330,9 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
 - **Guarda das conversas (17/11/2026, decisão do Jorge):** as mensagens do recebedor oficial (`BMH_whatsapp_meta`, texto
   mascarado) ficam guardadas até analisarmos e implantarmos 100% o SDR, no lugar de 1 mês. Passo "Apaga as vencidas
   (Meta)" do fluxo de limpeza desligado; religar quando o SDR estiver pronto.
+- **18/11/2026, WhatsApp chegando no Kommo:** o Kommo importou o histórico e criou **758 leads** (conversas de 19/10 a 17/11),
+  todos no Triagem › Em qualificação, mais 45 na entrada não triada. **Defeito achado e corrigido na passagem:** o Kommo
+  responde `application/hal+json`, que o n8n não lê sozinho como JSON (vinha como texto em `data`); forçar JSON quebra na
+  página vazia (204). Solução: leitura como texto e conversão no código (`corpo()`), JSON só na criação e no ganho. Depois
+  da correção, ensaio de 18/11, 22h: 36 avaliações, **22 passariam** (17 Asa Sul, 5 Taguatinga) e 14 sem conversa no Kommo.
+  **Lição para todo nó HTTP que lê o Kommo no n8n.**

@@ -10,8 +10,10 @@
 const cfg = {}; try { for (const i of $('Config').all()) if (i.json && i.json.chave) cfg[i.json.chave] = i.json.valor; } catch (e) {}
 const modo = cfg.passagem_modo === 'real' ? 'real' : 'ensaio', agora = $now.toISO();
 const AV = $('Avaliações novas').all().map((i) => i.json);
-const leads = []; for (const p of $('Leads no Kommo').all()) leads.push(...(p.json?._embedded?.leads || []));
-const contatos = {}; for (const p of $('Contatos no Kommo').all()) for (const c of (p.json?._embedded?.contacts || [])) contatos[c.id] = c;
+// o Kommo responde hal+json: a leitura chega como texto em "data" (204 sem corpo = vazio)
+const corpo = (j) => { if (j && j._embedded) return j; try { return j && typeof j.data === 'string' && j.data ? JSON.parse(j.data) : {}; } catch (e) { return {}; } };
+const leads = []; for (const p of $('Leads no Kommo').all()) leads.push(...(corpo(p.json)._embedded?.leads || []));
+const contatos = {}; for (const p of $('Contatos no Kommo').all()) for (const c of (corpo(p.json)._embedded?.contacts || [])) contatos[c.id] = c;
 const FUNIL = { triagem: 14783287, 'Asa Sul': 14783519, Taguatinga: 14783523 };
 const ETAPA = { 'Asa Sul': 114237079, Taguatinga: 114237099 };
 const UNIDADE = { campo: 626676, 'Asa Sul': 463116, Taguatinga: 463118 }, ID_IGUT = 626684;
