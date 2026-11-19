@@ -90,15 +90,33 @@ const funilDe = (a, b) => { const can = {}, uni = {}, tot = { conversas: 0, ag: 
   const medidos = [...anuncios, ...anuncios_ant].filter((r) => r.d >= FUNIL_DESDE && entre(r.d, a, b));
   const gasto = { google: medidos.filter((r) => r.p === 'google').reduce((s, r) => s + r.gasto, 0), meta: medidos.filter((r) => r.p === 'meta').reduce((s, r) => s + r.gasto, 0) };
   return { canais: Object.values(can).sort((x, y) => y.conversas - x.conversas), unidades: Object.values(uni), tot, gasto, horas: { grade, total: tot.conversas }, dias: Object.values(dias).sort((x, y) => x.d.localeCompare(y.d)) }; };
+// ---------- "Todas as origens" e "Dia a dia" no formato da Nexo (19/11/2026, Jorge: "o painel não está como o da Nexo") ----------
+// Pessoas que procuraram = conversas novas; agendaram = avaliação marcada (agendou); de onde vieram = origem da última conversa até
+// 60 dias antes do agendamento (sem conversa com origem = sem origem marcada); por dia; mapa de horas das conversas. Desde 17/11.
+const PLAT = (c) => { const [p] = canalDe(c); return p === 'google' || p === 'meta' ? p : p === 'organico' ? 'organico' : 'sem'; };
+const convPorHash = {}; for (const c of conversas) { const d0 = diaSP(c.primeira_msg_em); if (d0 && d0 >= FUNIL_DESDE) (convPorHash[c.telefone_hash] ||= []).push({ d0, c }); }
+const origemDoEvento = (e) => { let melhor = null; for (const h of [e.telefone_hash, e.telefone_hash_sem9]) for (const x of convPorHash[h] || []) {
+  if (x.d0 <= e.dia && DateTime.fromISO(x.d0).plus({ days: 60 }).toISODate() >= e.dia && (!melhor || x.d0 > melhor.d0)) melhor = x; } return melhor ? PLAT(melhor.c) : 'sem'; };
+const eventosDe = (tipo, a, b) => { const vistos = new Set(), r = []; for (const e of eventos) { if (e.evento !== tipo || !entre(e.dia, a, b) || e.dia < FUNIL_DESDE) continue;
+  if (tipo === 'agendou' && !(Date.parse(e.criado_em) > CORTE_AG)) continue; const k = e.paciente_id + '|' + e.dia; if (vistos.has(k)) continue; vistos.add(k); r.push(e); } return r; };
+const geralDe = (a, b) => { const z = () => ({ google: 0, meta: 0, organico: 0, sem: 0 }), ag = z(), cp = z(); for (const e of eventosDe('agendou', a, b)) ag[origemDoEvento(e)]++; for (const e of eventosDe('iniciou', a, b)) cp[origemDoEvento(e)]++; return { agendou: ag, compareceu: cp }; };
+const kommoDe = (a, b) => { const dias = {}; let entraram = 0; for (const c of conversas) { const d0 = diaSP(c.primeira_msg_em); if (!d0 || d0 < FUNIL_DESDE || !entre(d0, a, b)) continue; entraram++; (dias[d0] ||= { d: d0, entraram: 0, agendados: 0 }).entraram++; }
+  const ag = eventosDe('agendou', a, b); for (const e of ag) (dias[e.dia] ||= { d: e.dia, entraram: 0, agendados: 0 }).agendados++;
+  return { dias: Object.values(dias).sort((x, y) => x.d.localeCompare(y.d)), entraram, agendados: ag.length, pessoas: { pessoas: entraram, novas: entraram, agendaram: new Set(ag.map((e) => e.paciente_id)).size } }; };
+const comFunil = conversas.length > 0;
+const gradeConversas = (a, b) => { const g = Array.from({ length: 7 }, () => Array(24).fill(0)); let t = 0; for (const c of conversas) { const d0 = diaSP(c.primeira_msg_em); if (!d0 || d0 < FUNIL_DESDE || !entre(d0, a, b)) continue;
+  const x = DateTime.fromISO(String(c.primeira_msg_em)).setZone('America/Sao_Paulo'); if (x.isValid) { g[x.weekday - 1][x.hour]++; t++; } } return { grade: g, total: t }; };
 const funil = conversas.length ? { desde: FUNIL_DESDE, atual: funilDe(P.inicio, P.fim), anterior: funilDe(P.ant.inicio, P.ant.fim), inicio_medido: P.inicio < FUNIL_DESDE } : null;
 return [{ json: {
   ok: true, gerado_em: $now.toISO(), inicio: P.inicio, fim: P.fim, conta: { id: 'bmh', nome: 'BMH · Brasília Medicina Hiperbárica' }, contas: [{ id: 'bmh', nome: 'BMH · Brasília Medicina Hiperbárica' }],
-  anuncios, anuncios_ant, origens, origens_ant, atendidos_total: igutEntre(P.inicio, P.fim), atendidos_total_ant: igutEntre(P.ant.inicio, P.ant.fim), produzido_total: produzidoEntre(P.inicio, P.fim), produzido_total_ant: produzidoEntre(P.ant.inicio, P.ant.fim), geral: null,
-  cobertura: { origem: '2023-12-01', organico: organico_tot.medido_desde }, kommo: { dias: Object.entries(porDiaOrg).map(([d, n]) => ({ d, entraram: n, agendados: 0 })), entraram: 0, agendados: 0 }, kommo_ant: null,
+  anuncios, anuncios_ant, origens, origens_ant, atendidos_total: igutEntre(P.inicio, P.fim), atendidos_total_ant: igutEntre(P.ant.inicio, P.ant.fim), produzido_total: produzidoEntre(P.inicio, P.fim), produzido_total_ant: produzidoEntre(P.ant.inicio, P.ant.fim), geral: comFunil ? { atual: geralDe(P.inicio, P.fim), anterior: geralDe(P.ant.inicio, P.ant.fim) } : null,
+  cobertura: { origem: '2023-12-01', organico: organico_tot.medido_desde, ...(comFunil ? { pessoas: FUNIL_DESDE, agendou: FUNIL_DESDE } : {}) },
+  kommo: comFunil ? kommoDe(P.inicio, P.fim) : { dias: Object.entries(porDiaOrg).map(([d, n]) => ({ d, entraram: n, agendados: 0 })), entraram: 0, agendados: 0 }, kommo_ant: comFunil ? kommoDe(P.ant.inicio, P.ant.fim) : null,
+  kommo_pessoas_ant: comFunil ? kommoDe(P.ant.inicio, P.ant.fim).pessoas : null,
   medicao: '', medido_desde: '2099-01-01', receita_desde: null, carimbo: null, sem_medicao: null, anterior: P.ant, ticket_medio: null,
   mes: { inicio: P.mes_inicio, gasto: mesGasto, teto, dia: P.mes_dia, dias: P.mes_dias, fim: P.fim, hoje: P.fim >= P.ontem, projecao: mesGasto / P.mes_dia * P.mes_dias, plataformas: [] },
   guardiao: { modo: cfg.guardiao_modo_teto === 'real' || cfg.guardiao_modo_pausa === 'real' ? 'real' : 'simulacao', acoes: linhas('Guardião (tabela)').filter(r => r.data >= desde3 && r.data <= gFim).sort((a, b) => b.data.localeCompare(a.data))
-    .map(r => ({ data: r.data, regra: r.regra, plataforma: r.plataforma, alvo: r.alvo, acao: r.acao, valor_antes: r.valor_antes, valor_novo: r.valor_novo, modo: r.modo, resultado: r.resultado, detalhe: r.detalhe })) }, horas: { grade, total: totalH }, organico: orgLinhas(P.inicio, P.fim, origens), organico_ant: orgLinhas(P.ant.inicio, P.ant.fim, origens_ant), organico_tot,
+    .map(r => ({ data: r.data, regra: r.regra, plataforma: r.plataforma, alvo: r.alvo, acao: r.acao, valor_antes: r.valor_antes, valor_novo: r.valor_novo, modo: r.modo, resultado: r.resultado, detalhe: r.detalhe })) }, horas: comFunil ? gradeConversas(P.inicio, P.fim) : { grade, total: totalH }, organico: orgLinhas(P.inicio, P.fim, origens), organico_ant: orgLinhas(P.ant.inicio, P.ant.fim, origens_ant), organico_tot,
   meta_alcance: [], google_parcela, avisos, anuncios_atualizado: ultimaGravacao,
   funil, avaliacoes, bmh: true, mede_agendamento: cfg.mede_agendamento === 'sim', mede_atendimento: cfg.mede_atendimento === 'sim',
   site: { visitas: visitas(TA), visitas_ant: visitas(TB), rotas: rotas.atual, rotas_ant: rotas.anterior },

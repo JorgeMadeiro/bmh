@@ -321,7 +321,7 @@ function blocoOrigens(G, GA) {
     <div class="origem-leg">${OR.map(([k, n, c]) => `<span><i style="background:var(${c})"></i>${n} <b>${int(t[k])}</b>${t.total ? ` <small>${pct(t[k] / t.total)}</small>` : ''}</span>`).join('')}</div></div>`;
   return `<section class="bloco"><div class="cab"><h3>De onde vieram os agendamentos</h3><span class="sub fino">pela data em que aconteceram</span></div>
     ${barra(G.ag, desde('agendou', 'Agendaram'))}
-    <div class="sub fino">A origem é a última marcada até 60 dias antes (anúncio, site, bio do Instagram, perfil do Google, formulário). "Sem origem marcada" é quem escreveu direto: já tinha o número, paciente antigo, indicação, ou apagou a mensagem pronta do anúncio. Os agendamentos aqui são os do funil Atendimento Comercial, por isso o total pode diferir um pouco do Kommo.</div></section>`;
+    <div class="sub fino">A origem é a última marcada até 60 dias antes (anúncio, site, bio do Instagram, perfil do Google, formulário). "Sem origem marcada" é quem escreveu direto: já tinha o número, paciente antigo, indicação, ou apagou a mensagem pronta do anúncio. ${E.dados.bmh ? 'Na BMH, agendamento é a avaliação marcada no iGut, medida desde ' + br(E.dados.funil?.desde || '2026-11-17') + '; a origem vem da conversa no WhatsApp.' : 'Os agendamentos aqui são os do funil Atendimento Comercial, por isso o total pode diferir um pouco do Kommo.'}</div></section>`;
 }
 
 // Comparação com o período anterior (mesmo tamanho). "menorMelhor" para custos.
@@ -408,7 +408,9 @@ function desenhar() {
       ${num('Contatos', int(soma(d.anuncios, 'contatos') + soma(d.anuncios, 'ligacoes') + (d.origens || []).filter(o => o.p === 'organico').length), 'anúncio + cliques no WhatsApp sem anúncio', delta(soma(d.anuncios, 'contatos') + soma(d.anuncios, 'ligacoes') + (d.origens || []).filter(o => o.p === 'organico').length, soma(d.anuncios_ant, 'contatos') + soma(d.anuncios_ant, 'ligacoes') + (d.origens_ant || []).filter(o => o.p === 'organico').length, false, int))}
       ${num('Visitas ao site', int(d.site.visitas), 'todas as origens (Analytics)', delta(d.site.visitas, d.site.visitas_ant, false, int))}
       ${num('Pedidos de rota', int(d.site.rotas), '"como chegar" no site', delta(d.site.rotas, d.site.rotas_ant, false, int))}
-      ${d.avaliacoes ? num('Avaliações agendadas', int(d.avaliacoes.atual.ag), Object.entries(d.avaliacoes.atual.unidades).map(([u, x]) => u + ' ' + int(x.ag)).join(' · ') + (d.fim > d.avaliacoes.ate ? ' · até ' + br(d.avaliacoes.ate) : ''), delta(d.avaliacoes.atual.ag, d.avaliacoes.anterior.ag, false, int)) : ''}
+      ${d.funil ? num('Pessoas que procuraram', int((k.pessoas || {}).pessoas), 'conversas novas no WhatsApp · medido desde ' + br(d.funil.desde), cobre('pessoas') ? delta((k.pessoas || {}).pessoas, (d.kommo_pessoas_ant || {}).pessoas, false, int) : '') : ''}
+      ${d.funil ? num('Marcaram avaliação', int((k.pessoas || {}).agendaram), pct(div((k.pessoas || {}).agendaram, (k.pessoas || {}).pessoas)) + ' de quem procurou · avaliação marcada no iGut no período', cobre('pessoas') ? delta((k.pessoas || {}).agendaram, (d.kommo_pessoas_ant || {}).agendaram, false, int) : '') : ''}
+      ${d.avaliacoes ? num('Avaliações na agenda', int(d.avaliacoes.atual.ag), 'marcadas para os dias do período · ' + Object.entries(d.avaliacoes.atual.unidades).map(([u, x]) => u + ' ' + int(x.ag)).join(' · ') + (d.fim > d.avaliacoes.ate ? ' · até ' + br(d.avaliacoes.ate) : ''), delta(d.avaliacoes.atual.ag, d.avaliacoes.anterior.ag, false, int)) : ''}
       ${d.avaliacoes ? num('Avaliações realizadas', int(d.avaliacoes.atual.feitas), pct(div(d.avaliacoes.atual.feitas, d.avaliacoes.atual.ag)) + ' das agendadas · ' + Object.entries(d.avaliacoes.atual.unidades).map(([u, x]) => u + ' ' + int(x.feitas)).join(' · '), delta(d.avaliacoes.atual.feitas, d.avaliacoes.anterior.feitas, false, int)) : ''}
       ${num('Sessões no iGut', d.atendidos_total == null ? '—' : int(d.atendidos_total), d.atendidos_total == null ? 'entra com o iGut no n8n' : 'sessões realizadas, todas as origens' + (d.produzido_total != null ? ' · produzido ' + brl0(d.produzido_total) + (d.produzido_total_ant ? ' (' + brl0(d.produzido_total_ant) + ' antes)' : '') : ''), d.atendidos_total == null ? '' : delta(d.atendidos_total, d.atendidos_total_ant, false, int))}
     </div>` : `<section class="grupo"><div class="cab"><h2>Todas as origens</h2><span class="sub fino">anúncio, orgânico e quem chega sem origem marcada · não muda com os filtros</span></div><div class="nums">
@@ -424,10 +426,10 @@ function desenhar() {
 
     <section class="grupo"><div class="cab"><h2>Dia a dia</h2><span class="sub fino">toque na legenda para esconder ou mostrar cada série</span></div><div class="duas">
       <section class="bloco"><h3>Investimento</h3><div class="sub fino">por dia, Google e Meta</div><div class="grafico"><canvas id="g-gasto"></canvas></div></section>
-      <section class="bloco"><h3>Contatos e leads</h3><div class="sub fino">${d.bmh ? 'contatos do anúncio e cliques no WhatsApp do site sem anúncio' : 'contatos dos anúncios (Google e Meta) e leads no Kommo de todas as origens'}</div><div class="grafico"><canvas id="g-contatos"></canvas></div></section>
+      <section class="bloco"><h3>Contatos e leads</h3><div class="sub fino">${d.bmh ? (d.funil ? 'contatos do anúncio, conversas novas no WhatsApp e avaliações marcadas' : 'contatos do anúncio e cliques no WhatsApp do site sem anúncio') : 'contatos dos anúncios (Google e Meta) e leads no Kommo de todas as origens'}</div><div class="grafico"><canvas id="g-contatos"></canvas></div></section>
     </div></section>
 
-    <section class="bloco"><div class="cab"><h2>${d.bmh ? 'Quando os contatos chegam' : 'Quando os leads chegam'}</h2><span class="sub fino">${d.bmh ? 'cliques no WhatsApp do site por dia da semana e hora · todas as origens' : 'leads novos no Kommo por dia da semana e hora · todas as origens'}</span></div>${mapaHoras(d.horas)}</section>
+    <section class="bloco"><div class="cab"><h2>${d.bmh ? (d.funil ? 'Quando as conversas chegam' : 'Quando os contatos chegam') : 'Quando os leads chegam'}</h2><span class="sub fino">${d.bmh ? (d.funil ? 'conversas novas no WhatsApp por dia da semana e hora · todas as origens · desde ' + br(d.funil.desde) : 'cliques no WhatsApp do site por dia da semana e hora · todas as origens') : 'leads novos no Kommo por dia da semana e hora · todas as origens'}</span></div>${mapaHoras(d.horas)}</section>
 
     <section class="bloco lista"><div class="cab"><h2>Campanhas</h2><div class="opcoes"><button class="link" data-abre="camp" aria-expanded="${!!(E.abre || {}).camp}">${(E.abre || {}).camp ? 'Esconder' : 'Mostrar'}</button></div></div>
       <div id="corpo-camp" ${(E.abre || {}).camp ? '' : 'hidden'}><div class="opcoes" style="margin-bottom:8px"><button class="link" id="ver-detalhes">${E.detalhes ? 'Esconder exibições e cliques' : 'Mostrar exibições e cliques'}</button></div>
@@ -674,7 +676,13 @@ function secaoMetricas(x) {
       ${num('Contatos', int(contatos), 'conversas, cliques no WhatsApp e ligações', delta(contatos, contatosA, false, int))}
       ${num('Clique → contato', pct(txC), 'contatos ÷ cliques', delta(txC, txCA, false, pct))}
       ${num('Custo por contato (CPL)', brl(cpl), 'investimento ÷ contatos', delta(cpl, cplA, true, brl))}`)}
-    ${et(5, 'Agendaram', 'conversas de anúncio que marcaram', `
+    ${E.dados.bmh && E.dados.funil ? (() => {   // BMH (19/11/2026): pelo funil comercial, conversas de anúncio (Google e Meta) que marcaram avaliação
+      const F = E.dados.funil.atual, pago = F.canais.filter((r) => (r.p === 'google' || r.p === 'meta') && naPlat(r.p)), cv = pago.reduce((t, r) => t + r.conversas, 0), ag5 = pago.reduce((t, r) => t + r.ag, 0);
+      const g5 = (naPlat('google') ? F.gasto.google : 0) + (naPlat('meta') ? F.gasto.meta : 0);
+      return et(5, 'Agendaram', 'conversas de anúncio que marcaram avaliação', `
+      ${num('Marcaram avaliação', int(ag5), 'das conversas de anúncio · desde ' + br(E.dados.funil.desde))}
+      ${num('Conversa → avaliação', cv ? pct(div(ag5, cv)) : '—', 'marcaram ÷ ' + int(cv) + ' conversas de anúncio')}
+      ${num('Custo por avaliação marcada', ag5 ? brl(g5 / ag5) : '—', ag5 ? 'investimento ÷ marcaram · só dias medidos' : g5 ? brl0(g5) + ' investidos; nenhuma avaliação de anúncio ainda' : 'sem investimento nos dias medidos')}`); })() : et(5, 'Agendaram', 'conversas de anúncio que marcaram', `
       ${num('Agendaram', !E.dados.bmh || E.dados.mede_agendamento ? int(ag) : '—', !E.dados.bmh || E.dados.mede_agendamento ? 'com origem de anúncio marcada' : 'precisa de sistema no WhatsApp', semSeta ?? dm(delta(M.ag, MA.ag * CM.f, false, v => int(Math.round(v)))))}
       ${num('Contato → agendou', pagos.length && (!E.dados.bmh || E.dados.mede_agendamento) ? pct(txAg) : '—', 'agendaram ÷ conversas de anúncio', semSeta ?? dm(delta(div(M.ag, M.pagos.length), div(MA.ag, MA.pagos.length), false, pct)))}
       ${num('Custo por agendamento', M.ag ? brl(cpAg) : '—', !M.ag && ag ? 'nenhum agendamento nos dias com medição completa' : 'investimento ÷ agendaram' + soMedidos, semSeta ?? dm(delta(cpAg, cpAgA, true, brl)))}`)}
@@ -732,7 +740,6 @@ function blocoFunil(F) {
     <section class="bloco"><h3>Por unidade</h3><div class="sub fino">das conversas do período</div>
         <div class="rolagem"><table class="tabela-funil"><thead><tr><th>Unidade</th><th>Avaliação agendada</th><th>Avaliaram</th><th>Iniciaram</th></tr></thead>
       <tbody>${A.unidades.length ? A.unidades.sort((x, y) => x.unidade.localeCompare(y.unidade)).map((u) => `<tr><td>${esc(u.unidade)}</td><td>${int(u.ag)}</td><td>${int(u.av)}</td><td>${int(u.ini)}</td></tr>`).join('') : '<tr><td colspan="4">Nenhuma avaliação agendada ainda.</td></tr>'}</tbody></table></div></section>
-    <section class="bloco"><h3>Quando as conversas chegam</h3><div class="sub fino">conversas novas por dia da semana e hora · todas as origens</div>${mapaHoras(A.horas)}</section>
   </section>`;
 }
 function mapaHoras(h) {
@@ -807,8 +814,8 @@ function desenhaGrafico(ads) {
   // Contatos dos anúncios (empilhados) ao lado dos leads do Kommo (outra pilha); a legenda liga e desliga cada série
   const contatos = plat(['contatos', 'ligacoes']).map(d => ({ ...d, label: 'Contatos ' + d.label }));
   graficos.push(new Chart($('g-contatos'), { data: { labels, datasets: [...contatos,
-    { type: 'bar', label: E.dados.bmh ? 'Sem anúncio (WhatsApp do site)' : 'Leads no Kommo', data: dias.map(dd => kd[dd]?.entraram || 0), backgroundColor: cor('--lima'), stack: 'k', borderRadius: 3 },
-    ...(E.dados.bmh ? [] : [{ type: 'line', label: 'Agendaram no Kommo', data: dias.map(dd => kd[dd]?.agendados || 0), borderColor: cor('--alerta'), backgroundColor: cor('--alerta'), tension: .3, pointRadius: 2 }]),
+    { type: 'bar', label: E.dados.bmh ? (E.dados.funil ? 'Conversas novas (WhatsApp)' : 'Sem anúncio (WhatsApp do site)') : 'Leads no Kommo', data: dias.map(dd => kd[dd]?.entraram || 0), backgroundColor: cor('--lima'), stack: 'k', borderRadius: 3 },
+    ...(E.dados.bmh && !E.dados.funil ? [] : [{ type: 'line', label: E.dados.bmh ? 'Marcaram avaliação' : 'Agendaram no Kommo', data: dias.map(dd => kd[dd]?.agendados || 0), borderColor: cor('--alerta'), backgroundColor: cor('--alerta'), tension: .3, pointRadius: 2 }]),
     ...(((E.dados.igut_marcados || {}).dias || []).length ? [{ type: 'line', label: 'Marcaram no iGut (horário novo)', data: dias.map(dd => (Object.fromEntries(E.dados.igut_marcados.dias.map(x => [x.d, x.novo])))[dd] ?? null), borderColor: cor('--google'), backgroundColor: cor('--google'), borderDash: [5, 4], tension: .3, pointRadius: 2, spanGaps: false, hidden: true }] : [])] }, options: base(false) }));
 }
 

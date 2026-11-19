@@ -142,3 +142,11 @@ iniciou tratamento (iGut). Mostra os totais, a tabela por canal (taxas, gasto, c
 R$ 200), a tabela por unidade e o mapa de horas das conversas. Código em `n8n/monta-os-dados.js` (bloco "funil comercial") e
 `pagina.html` (`blocoFunil`). **Falta:** a tabela por cirurgião, que depende do campo "Cirurgião que indicou" do Kommo.
 Conferido no celular (quadro de 390 px, sem passar da tela; as tabelas rolam para o lado).
+
+## Todas as origens e dia a dia como na Nexo (19/11/2026)
+
+Com as conversas e os agendamentos gravados desde 17/11, as partes que mostravam só cliques no WhatsApp do site passaram ao
+formato da Nexo: "Todas as origens" com pessoas que procuraram (conversas novas), marcaram avaliação (com a taxa), avaliações na
+agenda e realizadas (`BMH_operacao_dia`, até ontem) e sessões; "De onde vieram os agendamentos" (origem da última conversa até
+60 dias antes da avaliação marcada); o passo 5 das métricas de tráfego (conversas de anúncio que marcaram avaliação e o custo);
+o gráfico "Contatos e leads" com as conversas novas e a linha das avaliações marcadas; e o mapa de horas das conversas.
