@@ -436,3 +436,9 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
 - **NPS ligado de verdade** (19/11/2026, 11h06, "pode ligar o NPS"; `nps_modo = real`). Primeira rodada (mutirão da opção A):
   26 mensagens para 26 pacientes diferentes, nenhuma para o número de teste; 9 aguardando o horário da sessão de hoje.
   Primeira resposta de paciente ("Está ótima") veio em minutos, com o link enviado.
+- **Pacientes em tratamento sem lead** (19/11/2026, "pode criar, mas checar antes no Kommo"): dos 66 pacientes com sessão de 19
+  a 26/11, 15 não tinham lead nas unidades. Conferido no Kommo (827 contatos, pelo código do iGut e pelo telefone com nome
+  compatível): 4 já tinham contato (ganharam lead novo), 10 eram novos (contato com nome completo, telefone, código, CPF,
+  nascimento e e-mail, e lead), todos em "Em tratamento" com a etiqueta "criado pelo iGut"
+  (`scripts/kommo/em-tratamento-sem-lead.js`). 1 ficou de fora: o telefone dele está num contato com outro nome (parente ou
+  apelido), para a recepção conferir. Depois: 66 em Em tratamento, todos com código do iGut e contato.
