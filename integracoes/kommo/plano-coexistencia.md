@@ -391,3 +391,7 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
   FATURA", hoje 18h, multiplace Asa Sul, particular) criado por `callcenters/agendar`; os nós "Um por agendamento
   (desmarca)" e "iGut · desmarca", copiados do recebedor, mudaram de "Nao Confirmado" para "Desmarcado" (conferido pela busca).
   O agendamento de teste fica na agenda como desmarcado.
+- **Volta de "Remarcar" é manual** (19/11/2026, decisão do Jorge: "melhor deixar manual"). Os pacientes fazem 5 a 10 sessões
+  em sequência e já têm os próximos horários marcados; o "remarcar" muitas vezes é só pular o dia. A volta automática (que
+  devolveria o lead na hora, pela sessão seguinte já marcada) foi tirada da passagem; a nota do lead pede para a recepção
+  mover o lead de volta depois de remarcar. O resto do "Preciso remarcar" segue: desmarca no iGut e leva para "Remarcar".

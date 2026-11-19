@@ -65,20 +65,4 @@ for (const a of AV) {
   if (acao !== 'passar') r.detalhe = [pagamento(a.convenio) || 'sem pagamento na agenda', jaFez.has(a.pid) ? 'retorno' : '', r.detalhe].filter(Boolean).join(' · ');
   out.push({ json: r });
 }
-// Volta da etapa "Remarcar" (19/11/2026): lead que pediu para remarcar pela confirmação volta sozinho quando o novo horário
-// entra no iGut (próximos 14 dias, sem falta nem bloqueio): avaliação → "Avaliação agendada"; sessão → "Em tratamento".
-const REM = { 114327279: 'Asa Sul', 114327283: 'Taguatinga' }, VOLTA = { 'Asa Sul': { avaliacao: 114237079, sessao: 114237091 }, Taguatinga: { avaliacao: 114237099, sessao: 114237111 } };
-const AG = { 111: ['Asa Sul', 'sessao'], 112: ['Asa Sul', 'sessao'], 121: ['Taguatinga', 'sessao'], 113: ['Asa Sul', 'avaliacao'], 120: ['Taguatinga', 'avaliacao'] };
-const semAc = (x) => String(x ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase();
-const hojeV = $now.setZone('America/Sao_Paulo').toISODate(), proximo = {};
-for (const x of ($('Agenda').first().json.data || [])) { const a = AG[Number(x.Profissional?.id)], pid = String(x.Paciente?.id || ''), d = String(x.Agendamento?.data || '').slice(0, 10);
-  if (!a || !pid || d < hojeV || String(x.Agendamento?.bloqueado || '') === '1' || ['faltou', 'desmarcado', 'desistiu'].includes(semAc(x.Agendamento?.confirmado))) continue;
-  if (a[1] === 'avaliacao' && !semAc(x.Agendamento?.tipodeatendimento).includes('avaliac')) continue;
-  const h = String(x.Agendamento?.horario || '').slice(0, 5); if (!proximo[pid] || d + h < proximo[pid].d + proximo[pid].h) proximo[pid] = { d, h, u: a[0], t: a[1] }; }
-for (const l of leads) { const u = REM[l.status_id]; if (!u) continue;
-  const pid = String((l.custom_fields_values || []).find((f) => f.field_id === ID_IGUT)?.values?.[0]?.value || ''), p = proximo[pid]; if (!p) continue;
-  const alvo = VOLTA[u][p.t], [, mm, dd] = p.d.split('-');
-  out.push({ json: { chave: 'volta|' + l.id + '|' + p.d, paciente_id: pid, unidade: u, avaliacao_dia: p.d, avaliacao_hora: p.h, contato_id: '', lead_triagem: '', lead_unidade: String(l.id), acao: 'voltar de Remarcar', modo,
-    status: modo === 'real' ? 'a fazer' : 'ensaio', detalhe: p.t === 'avaliacao' ? 'avaliação' : 'sessão', atualizado_em: agora, telefone_hash: '',
-    volta: { id: l.id, pipeline_id: l.pipeline_id, status_id: alvo }, nota_volta: { entity_id: l.id, note_type: 'common', params: { text: `Remarcado no iGut: ${p.t === 'avaliacao' ? 'avaliação' : 'sessão'} em ${dd}/${mm} às ${p.h}. O lead voltou sozinho da etapa Remarcar.` } } } }); }
 return out;

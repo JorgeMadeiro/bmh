@@ -2,8 +2,8 @@
 // confirmação pelo id da mensagem citada (wamid) ou, sem ele, pelo telefone em código (confirmação de hoje ou amanhã).
 //   "Confirmo"          → marca confirmado no iGut (statusatendimento 1) em todos os agendamentos do dia, no modo real
 //   "Preciso remarcar"  → no modo real (decisão do Jorge, 19/11/2026: "pode marcar sozinho") desmarca no iGut (status 3) os
-//                          agendamentos do dia e leva o lead para a etapa "Remarcar" do funil da unidade, com nota; quando o
-//                          novo horário entra no iGut, a passagem do Kommo devolve o lead para a etapa certa
+//                          agendamentos do dia e leva o lead para a etapa "Remarcar" do funil da unidade, com nota; a
+//                          volta é manual: a recepção move o lead depois de remarcar (decisão do Jorge, 19/11/2026)
 // Modo: o mesmo da confirmação (`confirmacao_modo`); em ensaio só registra o que faria.
 const norm = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').trim().toLowerCase();
 const cfg = {}; try { for (const i of $('Config da resposta').all()) if (i.json && i.json.chave) cfg[i.json.chave] = i.json.valor; } catch (e) {}

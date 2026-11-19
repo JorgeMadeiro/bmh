@@ -1,5 +1,6 @@
 // "Preciso remarcar" (19/11/2026): acha o lead do paciente no Kommo pelo código do iGut (campo do lead 626684, busca exata) e
-// monta a ida para a etapa "Remarcar" do funil da unidade, com a nota para a recepção. Sem lead (paciente que não conversou
+// monta a ida para a etapa "Remarcar" do funil da unidade, com a nota para a recepção. A volta é manual (decisão do Jorge,
+// 19/11/2026: os pacientes fazem sessões em sequência e o remarcar muitas vezes é só pular o dia). Sem lead (paciente que não conversou
 // pelo WhatsApp), não faz nada no Kommo: a resposta dele aparece na conversa do mesmo jeito.
 const corpo = (j) => { if (j && j._embedded) return j; try { return j && typeof j.data === 'string' && j.data ? JSON.parse(j.data) : {}; } catch (e) { return {}; } };
 const FUNIL = { 'Asa Sul': 14783519, Taguatinga: 14783523 }, REMARCAR = { 'Asa Sul': 114327279, Taguatinga: 114327283 };
@@ -11,6 +12,6 @@ pedidos.forEach((c, k) => {
   if (!l || !FUNIL[c.unidade]) return;
   const [, mm, dd] = String(c.dia).split('-');
   out.push({ json: { lead: l.id, patch: { id: l.id, pipeline_id: FUNIL[c.unidade], status_id: REMARCAR[c.unidade] },
-    nota: { entity_id: l.id, note_type: 'common', params: { text: `Pediu para remarcar pela confirmação automática: ${c.tipo || 'sessão'} de ${dd}/${mm} às ${String(c.hora || '').slice(0, 5)} desmarcada no iGut. Quando o novo horário entrar no iGut, o lead volta sozinho para a etapa.` } } } });
+    nota: { entity_id: l.id, note_type: 'common', params: { text: `Pediu para remarcar pela confirmação automática: ${c.tipo || 'sessão'} de ${dd}/${mm} às ${String(c.hora || '').slice(0, 5)} desmarcada no iGut. Depois de remarcar (ou se o paciente só pulou o dia), mova o lead de volta para a etapa em que estava.` } } } });
 });
 return out;
