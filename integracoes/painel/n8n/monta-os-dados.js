@@ -58,6 +58,33 @@ const teto = num(cfg['teto_mes_' + P.mes_inicio.slice(0, 7)] || cfg.teto_mes);  
 const gFim = P.fim >= P.ontem ? P.hoje : P.fim, desde3 = DateTime.fromISO(gFim).minus({ days: 2 }).toISODate();
 const avisos = [];
 if (ultimaGravacao && ultimaGravacao.slice(0, 10) < P.hoje && P.fim >= P.ontem) avisos.push('Os números foram gravados pela última vez em ' + ultimaGravacao.slice(8, 10) + '/' + ultimaGravacao.slice(5, 7) + ': a gravação das 6h10 não rodou hoje. Ontem pode estar incompleto.');
+// ---------- funil comercial (19/11/2026, pedido do Jorge: "o painel do funil comercial, como na Nexo") ----------
+// Uma linha por conversa nova no WhatsApp (BMH_origem_conversas, desde 17/11/2026, quando o recebedor oficial começou), com a
+// origem do último clique (gclid do site = Google Ads; código do anúncio = Meta; frase pronta = site, Instagram, Perfil, QR do
+// cirurgião; sem nada = sem origem marcada). As etapas vêm de BMH_conversoes pelo telefone em código (com e sem o 9), até 60
+// dias depois da conversa: avaliação agendada (passagem do Kommo), avaliou e iniciou tratamento (iGut). Custo = gasto dos dias
+// medidos (desde 17/11) ÷ etapa. Sem nome, telefone ou dado de paciente.
+const FUNIL_DESDE = '2026-11-17', CORTE_AG = Date.parse('2026-11-17T19:15:00-03:00');   // as 31 avaliações de 17/11 às 19h13 foram marcadas antes
+let conversas = [], eventos = [];
+try { conversas = linhas('Conversas (tabela)'); } catch (e) {}
+try { eventos = linhas('Conversões (tabela)'); } catch (e) {}
+const diaSP = (iso) => { const t = DateTime.fromISO(String(iso || '')); return t.isValid ? t.setZone('America/Sao_Paulo').toISODate() : ''; };
+const evDe = {};
+for (const e of eventos) { if (!['agendou', 'avaliou', 'iniciou'].includes(e.evento)) continue; if (e.evento === 'agendou' && !(Date.parse(e.criado_em) > CORTE_AG)) continue;
+  for (const h of new Set([e.telefone_hash, e.telefone_hash_sem9].filter(Boolean))) (evDe[h] ||= []).push(e); }
+const canalDe = (c) => { const o = String(c.origem || ''); if (c.gclid || /an[uú]ncio google/i.test(o)) return ['google', 'Google Ads']; if (/meta/i.test(o) || c.ctwa_clid) return ['meta', 'Meta Ads'];
+  if (!o) return ['sem', 'Sem origem marcada']; if (/cirurgi/i.test(o)) return ['organico', 'Indicação de cirurgião (QR)']; if (o === 'site') return ['organico', 'Site, sem anúncio']; return ['organico', o]; };
+const ETAPAS = [['ag', 'agendou'], ['av', 'avaliou'], ['ini', 'iniciou']];
+const funilDe = (a, b) => { const can = {}, uni = {}, tot = { conversas: 0, ag: 0, av: 0, ini: 0 }, grade = Array.from({ length: 7 }, () => Array(24).fill(0)), dias = {};
+  for (const c of conversas) { const d0 = diaSP(c.primeira_msg_em); if (!d0 || d0 < FUNIL_DESDE || !entre(d0, a, b)) continue;
+    const [p, nome] = canalDe(c), lim = DateTime.fromISO(d0).plus({ days: 60 }).toISODate(), ev = (evDe[c.telefone_hash] || []).filter((e) => e.dia >= d0 && e.dia <= lim);
+    const L = (can[nome] ||= { p, canal: nome, conversas: 0, ag: 0, av: 0, ini: 0 }); L.conversas++; tot.conversas++; (dias[d0] ||= { d: d0, conversas: 0, ag: 0 }).conversas++;
+    const t = DateTime.fromISO(String(c.primeira_msg_em)).setZone('America/Sao_Paulo'); if (t.isValid) grade[t.weekday - 1][t.hour]++;
+    for (const [k, nomeEv] of ETAPAS) { const e = ev.find((x) => x.evento === nomeEv); if (!e) continue; L[k]++; tot[k]++; const u = e.unidade || 'sem unidade'; (uni[u] ||= { unidade: u, ag: 0, av: 0, ini: 0 })[k]++; if (k === 'ag') (dias[e.dia] ||= { d: e.dia, conversas: 0, ag: 0 }).ag++; } }
+  const medidos = [...anuncios, ...anuncios_ant].filter((r) => r.d >= FUNIL_DESDE && entre(r.d, a, b));
+  const gasto = { google: medidos.filter((r) => r.p === 'google').reduce((s, r) => s + r.gasto, 0), meta: medidos.filter((r) => r.p === 'meta').reduce((s, r) => s + r.gasto, 0) };
+  return { canais: Object.values(can).sort((x, y) => y.conversas - x.conversas), unidades: Object.values(uni), tot, gasto, horas: { grade, total: tot.conversas }, dias: Object.values(dias).sort((x, y) => x.d.localeCompare(y.d)) }; };
+const funil = conversas.length ? { desde: FUNIL_DESDE, atual: funilDe(P.inicio, P.fim), anterior: funilDe(P.ant.inicio, P.ant.fim), inicio_medido: P.inicio < FUNIL_DESDE } : null;
 return [{ json: {
   ok: true, gerado_em: $now.toISO(), inicio: P.inicio, fim: P.fim, conta: { id: 'bmh', nome: 'BMH · Brasília Medicina Hiperbárica' }, contas: [{ id: 'bmh', nome: 'BMH · Brasília Medicina Hiperbárica' }],
   anuncios, anuncios_ant, origens, origens_ant, atendidos_total: igutEntre(P.inicio, P.fim), atendidos_total_ant: igutEntre(P.ant.inicio, P.ant.fim), produzido_total: produzidoEntre(P.inicio, P.fim), produzido_total_ant: produzidoEntre(P.ant.inicio, P.ant.fim), geral: null,
@@ -67,7 +94,7 @@ return [{ json: {
   guardiao: { modo: cfg.guardiao_modo_teto === 'real' || cfg.guardiao_modo_pausa === 'real' ? 'real' : 'simulacao', acoes: linhas('Guardião (tabela)').filter(r => r.data >= desde3 && r.data <= gFim).sort((a, b) => b.data.localeCompare(a.data))
     .map(r => ({ data: r.data, regra: r.regra, plataforma: r.plataforma, alvo: r.alvo, acao: r.acao, valor_antes: r.valor_antes, valor_novo: r.valor_novo, modo: r.modo, resultado: r.resultado, detalhe: r.detalhe })) }, horas: { grade, total: totalH }, organico: orgLinhas(P.inicio, P.fim, origens), organico_ant: orgLinhas(P.ant.inicio, P.ant.fim, origens_ant), organico_tot,
   meta_alcance: [], google_parcela, avisos, anuncios_atualizado: ultimaGravacao,
-  bmh: true, mede_agendamento: cfg.mede_agendamento === 'sim', mede_atendimento: cfg.mede_atendimento === 'sim',
+  funil, bmh: true, mede_agendamento: cfg.mede_agendamento === 'sim', mede_atendimento: cfg.mede_atendimento === 'sim',
   site: { visitas: visitas(TA), visitas_ant: visitas(TB), rotas: rotas.atual, rotas_ant: rotas.anterior },
   avisos_fontes: [
     'Botões por caso e por lugar (evento clique_whatsapp) medidos desde 08/10/2026; o painel conta o clique do Analytics, que tem histórico.',

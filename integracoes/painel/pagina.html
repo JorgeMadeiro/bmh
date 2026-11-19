@@ -114,6 +114,7 @@ details.datas[open] summary{margin-bottom:10px}
 .et-rot span:not(.et-n){display:block;font-size:13px;color:var(--muted);line-height:1.3}
 .et-n{flex:none;width:28px;height:28px;border-radius:50%;background:var(--verde-soft);color:var(--verde);font-weight:700;font-size:14px;display:grid;place-items:center}
 @media (max-width:820px){.et-linha{grid-template-columns:1fr;gap:6px}}
+.tabela-funil{width:100%;border-collapse:collapse;font-size:13px}.tabela-funil th,.tabela-funil td{padding:6px 8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}.tabela-funil th:first-child,.tabela-funil td:first-child{text-align:left}.tabela-funil th{font-weight:600;color:var(--muted)}.ponto{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
 /* Funil da jornada */
 .jornadas{display:flex;flex-direction:column;gap:22px}
 .jornada h3{font-size:15px;font-weight:700;margin-bottom:8px}
@@ -399,6 +400,8 @@ function desenhar() {
     </section>
 
 
+    ${d.bmh ? blocoFunil(d.funil) : ''}
+
     ${secaoMetricas({ ads, adsA, pagos, pagosA, gasto, gastoA, contatos, contatosA, ag, agA, cp, cpA, M, MA, dias, naLacuna: naLacuna || lacunaAnt || !cobre('origem'), num, d })}
 
     ${d.bmh ? `<section class="grupo"><div class="cab"><h2>Todas as origens</h2><span class="sub fino">anúncio e orgânico juntos · não muda com os filtros</span></div><div class="nums">
@@ -438,7 +441,8 @@ function desenhar() {
       <li>As setas comparam com o período anterior: mesmo trecho do mês anterior quando o período começa no dia 1; senão, o mesmo número de dias logo antes. Verde é bom (custo caiu ou resultado subiu); diferença abaixo de 3% aparece como igual.</li>
       <li>Filtros: "Todas" inclui o orgânico como linhas nas tabelas; "Anúncios" mostra só o pago.</li>
       <li>Métricas de tráfego: CPM = investimento ÷ exibições × 1000 · CTR = cliques ÷ exibições · CPC = investimento ÷ cliques · clique → contato = contatos ÷ cliques · CPL = investimento ÷ contatos. A parcela de impressões vem do Google (busca).</li>
-      <li>Agendou e atendido por canal: a recepção usa o WhatsApp no celular, então ainda não há como ligar cada conversa ao paciente. Os atendimentos do período entram pelo iGut.</li>
+      <li>Funil comercial (desde 17/11/2026): cada conversa nova no WhatsApp da recepção (recebedor oficial da Meta) com a origem do último clique: código do clique do Google no site (gclid) = Google Ads; código do anúncio de clique para WhatsApp = Meta Ads; frase pronta = site, Instagram, Perfil do Google ou QR do cirurgião; sem nada = sem origem marcada (quem já tinha o número, indicação, paciente antigo).</li>
+      <li>As etapas vêm do Kommo e do iGut, ligadas pelo telefone em código, até 60 dias depois da conversa: avaliação agendada (avaliação marcada no iGut), avaliou (avaliação finalizada) e iniciou tratamento (primeira sessão de quem nunca fez sessão). Custo por avaliação e por paciente novo = gasto do canal nos dias medidos ÷ a etapa.</li>
 ` : `
       <li>Investimento, contatos e dados de cada anúncio vêm do Google Ads e do Meta, na hora em que a página abre.</li>
       <li>Agendaram e atendidos contam quem chegou com a origem de um anúncio marcada (mensagem pronta do anúncio, clique no site ou, desde 05/10/2026, o carimbo que a Meta põe na mensagem de quem veio de anúncio de WhatsApp, mesmo sem o texto pronto), ligados ao Kommo e ao iGut até 60 dias depois da conversa. ${esc(d.medicao || '')}</li>
@@ -693,6 +697,41 @@ function secaoMetricas(x) {
 }
 
 // Mapa de calor: dia da semana × hora (6h a 22h). Quanto mais escuro, mais leads chegaram naquela hora.
+// Funil comercial da BMH (19/11/2026): conversa nova no WhatsApp → avaliação agendada → avaliou → iniciou tratamento, por canal
+// (origem do último clique) e por unidade, com o custo do anúncio. Dados em d.funil (monta-os-dados.js).
+function blocoFunil(F) {
+  if (!F) return '';
+  const A = F.atual, B = F.anterior, temB = B && B.tot.conversas && E.dados.anterior && E.dados.anterior.inicio >= F.desde;
+  const cab = `<div class="cab"><h2>Funil comercial</h2><span class="sub fino">conversas novas no WhatsApp e o que cada uma virou · medido desde ${br(F.desde)}</span></div>`;
+  if (!A.tot.conversas) return `<section class="grupo">${cab}<div class="sub">Sem conversas novas neste período. A medição começou em ${br(F.desde)}.</div></section>`;
+  const gA = A.gasto.google + A.gasto.meta, gB = B ? B.gasto.google + B.gasto.meta : 0;
+  const pago = (x) => x.canais.filter((r) => r.p === 'google' || r.p === 'meta').reduce((t, r) => ({ ag: t.ag + r.ag, ini: t.ini + r.ini }), { ag: 0, ini: 0 });
+  const pA = pago(A), pB = B ? pago(B) : { ag: 0, ini: 0 };
+  const dl = (a, b, menor, fmt) => temB ? delta(a, b, menor, fmt) : '';
+  const caixa = (r, v, dt, dlt) => `<div class="num"><div class="rot">${r}</div><div class="val">${v}</div>${dt ? `<div class="det">${dt}</div>` : ''}${dlt || ''}</div>`;
+  const gastoDe = (r) => r.p === 'google' ? A.gasto.google : r.p === 'meta' ? A.gasto.meta : null;
+  const custo = (g, n) => g == null ? '—' : n ? brl0(g / n) : g ? 'nenhum ainda' : '—';
+  const linha = (r) => { const g = gastoDe(r); return `<tr><td><i class="ponto" style="background:var(--${r.p === 'sem' ? 'muted' : r.p})"></i>${esc(r.canal)}</td><td>${int(r.conversas)}</td><td>${int(r.ag)}</td><td>${int(r.av)}</td><td>${int(r.ini)}</td>
+    <td>${pct(div(r.ag, r.conversas))}</td><td>${pct(div(r.ini, r.ag))}</td><td>${g == null ? '—' : brl0(g)}</td><td>${custo(g, r.ag)}</td><td>${custo(g, r.ini)}</td></tr>`; };
+  const T = A.tot;
+  return `<section class="grupo">${cab}
+    ${E.dados.inicio < F.desde ? `<div class="sub fino">O período começa antes de ${br(F.desde)}: o funil conta só a partir dessa data, quando as conversas passaram a ser gravadas.</div>` : ''}
+    <div class="nums">
+      ${caixa('Conversas novas', int(T.conversas), 'pessoas que escreveram no WhatsApp pela primeira vez no período', dl(T.conversas, B?.tot.conversas, false, int))}
+      ${caixa('Avaliações agendadas', int(T.ag), pct(div(T.ag, T.conversas)) + ' das conversas', dl(T.ag, B?.tot.ag, false, int))}
+      ${caixa('Avaliaram', int(T.av), pct(div(T.av, T.ag)) + ' das avaliações agendadas', dl(T.av, B?.tot.av, false, int))}
+      ${caixa('Iniciaram tratamento', int(T.ini), 'pacientes novos · ' + pct(div(T.ini, T.av)) + ' de quem avaliou', dl(T.ini, B?.tot.ini, false, int))}
+      ${caixa('Custo por paciente novo (anúncio)', pA.ini ? brl0(gA / pA.ini) : '—', pA.ini ? `${brl0(gA)} em anúncios ÷ ${int(pA.ini)} que vieram de anúncio e iniciaram · meta R$ 200` : gA ? `${brl0(gA)} em anúncios; nenhum paciente de anúncio iniciou ainda` : 'sem gasto em anúncio', pA.ini && pB.ini ? dl(gA / pA.ini, gB / pB.ini, true, brl0) : '')}
+    </div>
+    <section class="bloco"><h3>Por canal</h3><div class="sub fino">origem do último clique antes da conversa · as etapas contam até 60 dias depois da conversa</div>
+      <div class="rolagem"><table class="tabela-funil"><thead><tr><th>Canal</th><th>Conversas</th><th>Avaliação agendada</th><th>Avaliaram</th><th>Iniciaram</th><th>Conversa → avaliação</th><th>Avaliação → início</th><th>Gasto</th><th>Custo por avaliação</th><th>Custo por paciente novo</th></tr></thead>
+      <tbody>${A.canais.map(linha).join('')}</tbody></table></div></section>
+    <section class="bloco"><h3>Por unidade</h3><div class="sub fino">das conversas do período</div>
+        <div class="rolagem"><table class="tabela-funil"><thead><tr><th>Unidade</th><th>Avaliação agendada</th><th>Avaliaram</th><th>Iniciaram</th></tr></thead>
+      <tbody>${A.unidades.length ? A.unidades.sort((x, y) => x.unidade.localeCompare(y.unidade)).map((u) => `<tr><td>${esc(u.unidade)}</td><td>${int(u.ag)}</td><td>${int(u.av)}</td><td>${int(u.ini)}</td></tr>`).join('') : '<tr><td colspan="4">Nenhuma avaliação agendada ainda.</td></tr>'}</tbody></table></div></section>
+    <section class="bloco"><h3>Quando as conversas chegam</h3><div class="sub fino">conversas novas por dia da semana e hora · todas as origens</div>${mapaHoras(A.horas)}</section>
+  </section>`;
+}
 function mapaHoras(h) {
   if (!h || !h.total) return '<div class="sub">Ainda não há leads por hora neste período (a contagem por hora começou em 28/09/2026, com histórico de 90 dias).</div>';
   const DIAS = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'], H0 = 6, H1 = 22, horas = []; for (let x = H0; x <= H1; x++) horas.push(x);
