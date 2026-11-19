@@ -417,3 +417,13 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
   espelho. As duas chegaram ao recebedor citando a mensagem e foram ligadas ao paciente certo pela citação (status "espelho:
   confirmaria no iGut" e "espelho: desmarcaria e levaria para Remarcar"). Conferido depois: os dois agendamentos seguem "Nao
   Confirmado / Agendado" no iGut e a coluna Remarcar do Kommo está vazia. Nenhuma falha no n8n.
+- **NPS da 5ª sessão** (19/11/2026, decisões do Jorge; objetivo: avaliações no Google): fluxo "BMH · Pós-sessão · NPS da 5ª
+  sessão" (`GtbHC35MgQHi7ZO6`, a cada 30 min das 9h às 20h; código em `integracoes/nps/`; tabela `BMH_nps`, sem nome nem
+  celular). Quem completou a 5ª sessão da sequência de uma unidade (pausa de até 10 dias zera; levantamento de 3.849
+  tratamentos: 1 sessão por dia, 85% dos intervalos de 1 dia, picos em 5 e 10 sessões), cerca de 1 h depois da sessão;
+  uma vez por paciente por unidade, para sempre. **Opção A:** no primeiro dia vale para todos que já passaram da 5ª (ensaio de
+  19/11: 36, sendo 4 exatamente na 5ª). Modelo `nps_sessoes_v1` (opção B: "Como estão sendo as suas sessões na BMH...?",
+  botões Está ótima, Está boa, Podia ser melhor), em análise na Meta. Resposta no recebedor: ótima ou boa → link de avaliação
+  no Google da unidade; podia ser melhor → pede detalhes e, no real, tarefa no Kommo para a recepção (sem aviso no Telegram
+  por enquanto); o link vai 18 a 23 h depois (o Google não aceita pedir só a quem gostou). Modo `nps_modo`: ensaio hoje;
+  depois espelho (telefone de teste) e real, com o "pode" do Jorge.
