@@ -433,3 +433,6 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
 - **NPS: "Podia ser melhor" nunca recebe o link** (19/11/2026, decisão do Jorge, avisado de que o Google proíbe pedir avaliação
   só a quem gostou). O envio do link do dia seguinte foi tirado do fluxo (`nps-link.js` apagado). Espelho testado às 10h54 com
   os três botões: ótima e boa receberam o link da unidade certa em segundos; podia ser melhor recebeu o pedido de detalhes.
+- **NPS ligado de verdade** (19/11/2026, 11h06, "pode ligar o NPS"; `nps_modo = real`). Primeira rodada (mutirão da opção A):
+  26 mensagens para 26 pacientes diferentes, nenhuma para o número de teste; 9 aguardando o horário da sessão de hoje.
+  Primeira resposta de paciente ("Está ótima") veio em minutos, com o link enviado.
