@@ -2,4 +2,4 @@
 // resposta do paciente cita) ou "falhou" com o motivo. Falha não reenvia sozinha: a recepção confirma pelo jeito de hoje.
 const enviados = $('Manda a confirmação').all(), itens = $('Só no modo real').all();
 return itens.map((i, k) => { const r = enviados[k]?.json || {}, wamid = r.messages?.[0]?.id || '';
-  return { json: { ...i.json, wamid, status: wamid ? (i.json.modo === 'espelho' ? 'espelho: enviada ao teste' : 'enviada') : 'falhou: ' + JSON.stringify(r.error?.message || r.error || r).slice(0, 120) } }; });
+  return { json: { ...i.json, wamid, status: wamid ? (i.json.modo === 'espelho' ? 'espelho: enviada ao teste' : 'enviada') + (i.json.reenvio ? ' (horário alterado)' : '') :'falhou: ' + JSON.stringify(r.error?.message || r.error || r).slice(0, 120) } }; });

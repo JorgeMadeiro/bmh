@@ -468,3 +468,8 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
   na câmara") até o Jorge definir o horário de chegada da avaliação. Espelho de 19/11: 60 pacientes, 59 mensagens ao número de
   teste, 4 respostas do Jorge ligadas certo, iGut e Kommo intactos. Cópia do recebedor antes:
   `dados/n8n-copias/YES97ES0JdBQW4bt-antes-recado-avaliacao-20261120.json`.
+- **Horário alterado depois do envio** (20/11/2026, 06h51, pedido do Jorge): se a recepção muda o horário de amanhã depois que a
+  confirmação saiu, a rodada seguinte manda de novo com o horário novo (status "enviada (horário alterado)"), zerando a resposta,
+  para o recado do "Confirmo" sair de novo; o "Confirmo" da mensagem antiga cai no telefone e confirma os agendamentos novos.
+  Agendamento trocado no mesmo horário só atualiza a linha (guarda id da mensagem e resposta). Envio que falhou e modo ensaio não
+  reenviam. Testado no Mac com agenda simulada nos três modos. Cópia antes: `dados/n8n-copias/j9fKHps4n9xGDGL8-antes-reenvio-20261120.json`.
