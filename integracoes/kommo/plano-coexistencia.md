@@ -462,3 +462,9 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
   chegar à BMH {unidade}: {mapa do Perfil do Google}", uma vez só por confirmação, para quem tocou (no espelho, o número de
   teste; em ensaio, nada). A mensagem manual do iGut (com link) que a recepção manda às 18h30 continua até o robô estar provado
   no real (Jorge: "só quando você aprender"). Cópias antes: `dados/n8n-copias/{j9fKHps4n9xGDGL8,YES97ES0JdBQW4bt}-antes-recado-20261119.json`.
+- **Confirmação no modo real** (20/11/2026, 06h10, "pode ligar a confirmação"): `confirmacao_modo = real`. Ligada de madrugada para
+  não mandar de uma vez as 59 linhas do espelho de 20/11 (essas já são "hoje" e não saem mais); a primeira rodada de verdade é a
+  das 7h04, com as sessões e avaliações de 21/11. O recado depois do "Confirmo" da avaliação ficou só com o mapa (sem "embarque
+  na câmara") até o Jorge definir o horário de chegada da avaliação. Espelho de 19/11: 60 pacientes, 59 mensagens ao número de
+  teste, 4 respostas do Jorge ligadas certo, iGut e Kommo intactos. Cópia do recebedor antes:
+  `dados/n8n-copias/YES97ES0JdBQW4bt-antes-recado-avaliacao-20261120.json`.

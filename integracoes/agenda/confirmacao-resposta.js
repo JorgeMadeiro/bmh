@@ -23,7 +23,9 @@ for (const [k, i] of $('Monta a linha').all().entries()) {
   if (!c) continue;   // resposta sem confirmação conhecida: a recepção vê no WhatsApp
   const fone = String(prep[k]?.telefone || '').replace(/\D/g, '');
   const responder = modo !== 'ensaio' && resp === 'confirmou' && c.resposta !== 'confirmou' && fone   // um recado só, mesmo se tocar duas vezes
-    ? { telefone: fone, texto: `Confirmado, obrigado! Chegue com 20 a 30 minutos de antecedência: o embarque na câmara é de 5 a 10 minutos antes do horário marcado. Como chegar à BMH ${c.unidade}: ${MAPA[c.unidade] || MAPA['Asa Sul']}` } : null;
+    ? { telefone: fone, texto: c.tipo === 'avaliação'   // avaliação não tem câmara: só o mapa, até o Jorge definir o horário de chegada
+      ? `Confirmado, obrigado! Como chegar à BMH ${c.unidade}: ${MAPA[c.unidade] || MAPA['Asa Sul']}`
+      : `Confirmado, obrigado! Chegue com 20 a 30 minutos de antecedência: o embarque na câmara é de 5 a 10 minutos antes do horário marcado. Como chegar à BMH ${c.unidade}: ${MAPA[c.unidade] || MAPA['Asa Sul']}` } : null;
   out.push({ json: { ...c, responder, resposta: resp, respondido_em: m.momento, status: (modo === 'espelho' ? 'espelho: ' : '') + (resp === 'confirmou' ? (modo === 'real' ? 'confirmando no iGut' : 'confirmaria no iGut') : (modo === 'real' ? 'pediu para remarcar: desmarcada no iGut' : 'desmarcaria e levaria para Remarcar')), confirmar_igut: modo === 'real' && resp === 'confirmou', desmarcar_igut: modo === 'real' && resp === 'pediu para remarcar', agendamento_lista: String(c.agendamentos || '').split(',').filter(Boolean) } });
 }
 return out;
