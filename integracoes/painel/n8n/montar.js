@@ -647,6 +647,13 @@ function fluxoConfirmacao() {
       sendBody: true, specifyBody: 'json', jsonBody: "={{ JSON.stringify({ 'Agendamento.data': $('Amanhã').first().json.hoje, 'Agendamento.data_fim': $('Amanhã').first().json.dia }) }}", options: { timeout: 120000 } },
       { credentials: IGUT, executeOnce: true }),
     monta: no('Monta as confirmações', 'n8n-nodes-base.code', 2, { jsCode: ler('../../agenda/confirmacao-monta.js').replace('/*__SHA256__*/', ler('../../comum/sha256.js')) }, { executeOnce: true }),
+    // (antes do Grava: o ramo roda primeiro e o "Rodar agora" continua devolvendo o Resumo)
+    // agendamento refeito no mesmo horário de quem já tocou "Confirmo" (21/11/2026): confirma o novo no iGut, só no modo real
+    reconf: no('Refeito de quem confirmou?', 'n8n-nodes-base.filter', 2.2, { conditions: { options: { caseSensitive: true, leftValue: '', typeValidation: 'loose', version: 2 }, combinator: 'and',
+      conditions: [{ id: crypto.randomUUID(), leftValue: '={{ ($json.confirmar_igut_ids || []).length > 0 }}', rightValue: '', operator: { type: 'boolean', operation: 'true', singleValue: true } }] }, options: {} }),
+    reconfSepara: no('Um por agendamento refeito', 'n8n-nodes-base.code', 2, { jsCode: "return $input.all().flatMap((i) => (i.json.confirmar_igut_ids || []).map((id) => ({ json: { id } })));" }),
+    reconfIgut: no('iGut · confirma o refeito', 'n8n-nodes-base.httpRequest', 4.2, { method: 'POST', url: 'https://api.igut.med.br/v2/consultas/statusatendimento', authentication: 'genericCredentialType', genericAuthType: 'httpCustomAuth',
+      sendBody: true, specifyBody: 'json', jsonBody: "={{ JSON.stringify({ 'Agendamento.id': $json.id, 'Agendamento.status': 1 }) }}", options: { timeout: 60000 } }, { credentials: IGUT }),
     grava: grava('Grava as confirmações', 'BMH_confirmacoes'),
     // envio pela API oficial (22/10/2026): só no modo real, com o modelo confirmacao_sessao_v1 aprovado pela Meta
     real: no('Só no modo real', 'n8n-nodes-base.filter', 2.2, { conditions: { options: { caseSensitive: true, leftValue: '', typeValidation: 'loose', version: 2 }, combinator: 'and',
@@ -660,7 +667,7 @@ function fluxoConfirmacao() {
     nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · Agenda · confirmação da véspera\n**Traz:** a agenda de hoje e de amanhã no iGut, as confirmações já feitas e o dia em que cada avaliação foi vista (agendou, BMH_conversoes)\n**Envia:** no modo real, a mensagem de confirmação (modelos confirmacao_sessao_v2, com câmara e unidade, e confirmacao_avaliacao_v1) pela API oficial do WhatsApp da recepção, só para quem a recepção não confirmou no iGut: 2 h depois da sessão de hoje; sem sessão hoje, 24 h antes; avaliação marcada antes de hoje, 24 h antes (marcada hoje para amanhã não recebe). Regras do Jorge, 17/11/2026\n**Limites:** a cada 15 min, envio entre 7h e 21h; uma por paciente por dia (o primeiro horário); fora: falta já marcada, horário bloqueado, celular inválido e consulta que não é avaliação\n\nModo na chave `confirmacao_modo` de BMH_config (ensaio | real). Na tabela fica só o código do paciente, a unidade e o horário; nome e celular só passam no modo real, para o envio. Execução com sucesso não é guardada.', width: 620, height: 240 }),
   };
   const cx = {}; liga(cx, n.agenda.name, n.amanha.name); liga(cx, n.manual.name, n.amanha.name);
-  for (const [a, b] of [[n.amanha, n.config], [n.config, n.tab], [n.tab, n.conv], [n.conv, n.ag], [n.ag, n.monta], [n.monta, n.grava], [n.grava, n.resumo], [n.monta, n.real], [n.real, n.envia], [n.envia, n.resultado], [n.resultado, n.gravaEnvio]]) liga(cx, a.name, b.name);
+  for (const [a, b] of [[n.amanha, n.config], [n.config, n.tab], [n.tab, n.conv], [n.conv, n.ag], [n.ag, n.monta], [n.monta, n.grava], [n.grava, n.resumo], [n.monta, n.real], [n.real, n.envia], [n.envia, n.resultado], [n.resultado, n.gravaEnvio], [n.monta, n.reconf], [n.reconf, n.reconfSepara], [n.reconfSepara, n.reconfIgut]]) liga(cx, a.name, b.name);
   return { name: 'BMH · Agenda · confirmação da véspera', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none' }) };   // no modo real passa nome e celular
 }
 
