@@ -10,6 +10,7 @@ grava nesses fluxos nem na BMH_config, e não tem a chave do Google Ads.
        "revisar": não entram)
   158  (08/11) nova tentativa no nó que lê as avaliações do Perfil do Google (yNozxi1jNwRbLhFR): só entra se o pedido for
        nomeado no comando ("grava 158"), depois do toque do Jorge
+  212  (22/11) nova tentativa no nó "Buscar Agendamentos BMH" da agenda das 17h (EkmBucG5LoEutBUa): só com "grava 212"
 Cada fluxo só é gravado se ainda estiver na versão de que o arquivo partiu (updatedAt abaixo). Se mudou, aquele item fica de fora
 e os outros seguem; se já está igual ao arquivo, aparece como "já gravado". Antes de gravar, cópia em dados/n8n-copias/ (fora do
 git); depois, leitura de volta. Os itens de 07/11 (117, 138, 136, 116 e 132) foram gravados nesse dia.
@@ -31,7 +32,7 @@ U, H = ENV['N8N_URL'].rstrip('/'), {'X-N8N-API-KEY': ENV['N8N_API_KEY'], 'Conten
 MODO = sys.argv[1] if len(sys.argv) > 1 else 'confere'
 if MODO not in ('confere', 'grava', 'reenvia'): sys.exit('uso: aplica-bmh-mac.py [grava [158]|reenvia]')
 NOMEADOS = set(sys.argv[2:])          # pedidos que só entram quando nomeados no comando
-SO_NOMEADO = {'158'}
+SO_NOMEADO = {'158', '212'}
 HOJE = datetime.date.today().isoformat()
 COPIAS = os.path.join('dados', 'n8n-copias'); os.makedirs(COPIAS, exist_ok=True)
 OK = ('executionOrder', 'saveDataErrorExecution', 'saveDataSuccessExecution', 'saveManualExecutions', 'saveExecutionProgress',
@@ -39,7 +40,8 @@ OK = ('executionOrder', 'saveDataErrorExecution', 'saveDataSuccessExecution', 's
 MENSAL, MENSAL_UP = 'fvEYln7d2wWi4N2S', '2026-10-15T20:52:00.519Z'
 MENSAL_ARQ = os.path.join(COPIAS, f'{MENSAL}-conserto-136-e-ano-anterior.json')
 FLUXOS = [  # (pedido, id, updatedAt de que o arquivo partiu, arquivo)
-    ('117', 'EkmBucG5LoEutBUa', '2026-10-09T15:51:32.683Z', 'scripts/n8n/bmh-producao-diaria-conserto.json'),
+    # 117 (EkmB) gravado em 07/11; o arquivo de agora é o 212, que parte dessa versão
+    ('212', 'EkmBucG5LoEutBUa', '2026-11-07T22:55:29.454Z', 'scripts/n8n/bmh-agenda-tentativa.json'),
     ('138', '0FskpyELgh7nBqF0', '2026-10-21T09:25:02.939Z', 'scripts/n8n/bmh-meta-numeros-dia.json'),
     ('138', 'UUYRg6GlEOlupbnW', '2026-10-21T00:59:35.660Z', 'scripts/n8n/bmh-resumo-manha-homologacao.json'),
     ('138', 'K4UckCbHkrqr8sc6', '2026-11-01T17:20:06.074Z', 'scripts/n8n/bmh-meta-guardiao.json'),
@@ -80,7 +82,7 @@ if MODO == 'reenvia':
     sys.exit(0)
 
 # ---------- 117 e 138: fluxos montados pelo Gerente BMH ----------
-print('== Fluxos (117, 138, 158) ==')
+print('== Fluxos (138, 158, 212) ==')
 rp = le(RESUMO_PROD)
 for ped, i, up, arq in FLUXOS:
     atual = le(i); f = json.load(open(arq, encoding='utf8'))
