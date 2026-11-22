@@ -17,10 +17,12 @@ const contatos = {}; for (const p of $('Contatos no Kommo').all()) for (const c 
 const FUNIL = { triagem: 14783287, 'Asa Sul': 14783519, Taguatinga: 14783523 };
 const ETAPA = { 'Asa Sul': 114237079, Taguatinga: 114237099 };
 const UNIDADE = { campo: 626676, 'Asa Sul': 463116, Taguatinga: 463118 }, ID_IGUT = 626684;
-const COPIAR = [626668, 624514, 624510, 624512, 624508, 624516, 624524, 624526, 626670, 626672, 626674, 626678, 626680, 626682];
+// 626680 (Convênio, texto) e 626682 (tipo de caso) foram apagados no Kommo em 21/11/2026: mandar campo que não existe faz o
+// Kommo recusar o lead inteiro (400 NotSupportedChoice). O nome do convênio fica no detalhe de BMH_passagens e na etiqueta.
+const COPIAR = [626668, 624514, 624510, 624512, 624508, 624516, 624524, 624526, 626670, 626672, 626674, 626678];
 // particular, convênio e retorno (17/11/2026): convênio pela agenda do iGut ("PARTICULAR" = particular; cortesia e voucher
 // ficam em branco); retorno = já teve sessão com valor antes deste mês (BMH_financeiro_paciente, desde nov/2024)
-const PAG = { campo: 626678, Particular: 463120, 'Convênio': 463122 }, CONVENIO = 626680;
+const PAG = { campo: 626678, Particular: 463120, 'Convênio': 463122 };
 const mesAtual = $now.setZone('America/Sao_Paulo').toFormat('yyyy-MM'), jaFez = new Set();
 for (const i of $('Histórico de pacientes').all()) { const r = i.json || {}; if (r.paciente_id && r.mes < mesAtual && Number(r.valor) > 0) jaFez.add(String(r.paciente_id)); }
 const pagamento = (c) => { const n = String(c || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); return !n || /cortesia|voucher/.test(n) ? '' : /particular/.test(n) ? 'Particular' : 'Convênio'; };
@@ -45,11 +47,11 @@ for (const a of AV) {
   if (acao === 'passar') {
     const pg = pagamento(a.convenio), retorno = jaFez.has(a.pid);
     const doIgut = [{ field_id: UNIDADE.campo, values: [{ enum_id: UNIDADE[a.unidade] }] }, { field_id: ID_IGUT, values: [{ value: a.pid }] },
-      ...(pg ? [{ field_id: PAG.campo, values: [{ enum_id: PAG[pg] }] }] : []), ...(pg === 'Convênio' ? [{ field_id: CONVENIO, values: [{ value: a.convenio }] }] : [])];
+      ...(pg ? [{ field_id: PAG.campo, values: [{ enum_id: PAG[pg] }] }] : [])];
     const novas = [pg === 'Particular' ? 'particular' : pg === 'Convênio' ? 'convênio' : '', retorno ? 'retorno' : ''].filter(Boolean).map((name) => ({ name }));
     const ids_ = new Set(doIgut.map((f) => f.field_id));
     const campos = [...copia(tri.l).filter((f) => !ids_.has(f.field_id)), ...doIgut];
-    r.detalhe = [pg || 'sem pagamento na agenda', retorno ? 'retorno' : '', r.detalhe].filter(Boolean).join(' · ');
+    r.detalhe = [pg === 'Convênio' && a.convenio ? 'Convênio: ' + a.convenio : pg || 'sem pagamento na agenda', retorno ? 'retorno' : '', r.detalhe].filter(Boolean).join(' · ');
     // contato com nome completo, código do iGut, e-mail, CPF e nascimento (só se vazios), como na Nexo; nunca em contato de OUTRO paciente
     const c = contatos[tri.contato] || {}, cod = String((c.custom_fields_values || []).find((f) => f.field_id === 662778)?.values?.[0]?.value || '');
     if (cod && cod !== a.pid) r.detalhe = [r.detalhe, 'contato com outro código do iGut: nome não trocado'].filter(Boolean).join(' · ');

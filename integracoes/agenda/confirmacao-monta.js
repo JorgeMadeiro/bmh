@@ -12,6 +12,8 @@
 // Exceção (20/11/2026, pedido do Jorge): se o horário de amanhã mudou depois do envio (o paciente pediu outro horário na
 // recepção), manda de novo na hora com o horário novo ("horário alterado"); se só mudaram os agendamentos (mesmo horário),
 // atualiza a linha sem mandar, guardando o id da mensagem e a resposta. Envio que falhou continua sem reenvio.
+// Agendamento refeito (21/11/2026, pedido do Jorge): se o paciente já tocou "Confirmo" e a recepção refez o agendamento no
+// mesmo horário, o agendamento novo nasce "Não confirmado"; no modo real o fluxo confirma no iGut os novos (confirmar_igut_ids).
 // Modo (chave `confirmacao_modo` em BMH_config): "ensaio" (padrão) só grava a lista; "real" também manda a mensagem pela
 // API oficial do WhatsApp da recepção (modelos confirmacao_sessao_v2, com a câmara, e confirmacao_avaliacao_v2). Nome e celular só saem no modo real, para o envio;
 // na tabela fica o código do paciente, a unidade, o horário, os agendamentos de amanhã e o telefone em código.
@@ -48,9 +50,9 @@ for (const x of lista) {
   if (d !== dia) continue;
   const avaliacao = ag.t === 'consulta';
   if (avaliacao && !norm(x.Agendamento?.tipodeatendimento).includes('avaliac')) { fora.consulta_sem_avaliacao++; continue; }
-  const p = (amanha[pid] ||= { pid: String(pid), agendamentos: [], confirmado: true });
+  const p = (amanha[pid] ||= { pid: String(pid), agendamentos: [], pendentes: [], confirmado: true });
   p.agendamentos.push(String(x.Agendamento?.id || ''));
-  if (norm(x.Agendamento?.confirmado) !== 'confirmado') p.confirmado = false;
+  if (norm(x.Agendamento?.confirmado) !== 'confirmado') { p.confirmado = false; p.pendentes.push(String(x.Agendamento?.id || '')); }
   if (!p.hora || hora < p.hora) Object.assign(p, { hora, unidade: ag.u, camara: ag.c || '', tipo: avaliacao ? 'avaliação' : 'sessão', fone: celular(x.Paciente?.celular), nome: String(x.Paciente?.nome || '').trim().split(/\s+/)[0] || '' });
 }
 const [, m, dd] = dia.split('-'), diaTexto = Number(dd) + ' de ' + MES[Number(m) - 1];
@@ -63,7 +65,9 @@ for (const p of Object.values(amanha).sort((a, b) => a.hora.localeCompare(b.hora
     const ags = [...new Set(p.agendamentos)].join(',');
     if (/^falhou/.test(antes) || !p.fone || modo === 'ensaio') { fora.ja_enviada++; continue; }
     if (linha.hora && p.hora !== linha.hora) { out.push({ chave, p, regra: 'horário alterado de ' + linha.hora + ' para ' + p.hora, quando: limita(agora), status: 'a enviar', reenvio: true }); continue; }
-    if (ags !== String(linha.agendamentos || '')) { out.push({ chave, p, regra: 'agendamentos atualizados, mesmo horário', quando: limita(agora), status: antes, guarda: linha }); continue; }
+    if (ags !== String(linha.agendamentos || '')) {
+      const velhos = String(linha.agendamentos || '').split(','), reconfirma = modo === 'real' && linha.resposta === 'confirmou' ? p.pendentes.filter((id) => id && !velhos.includes(id)) : [];
+      out.push({ chave, p, regra: 'agendamentos atualizados, mesmo horário' + (reconfirma.length ? ' · confirmando no iGut o agendamento refeito' : ''), quando: limita(agora), status: antes, guarda: linha, reconfirma }); continue; }
     fora.ja_enviada++; continue;
   }
   if (!p.fone) { fora.sem_celular++; continue; }
@@ -81,10 +85,10 @@ for (const p of Object.values(amanha).sort((a, b) => a.hora.localeCompare(b.hora
   if (p.tipo === 'avaliação' && !avaliacaoLigada && modo !== 'ensaio') { fora.avaliacao_sem_modelo++; continue; }
   out.push({ chave, p, regra, quando, status: !vence ? 'aguardando ' + hh(quando) : modo === 'ensaio' ? 'ensaio: enviaria às ' + hh(quando) : 'a enviar' });
 }
-return out.map(({ chave, p, regra, quando, status, reenvio, guarda }) => ({ json: {
+return out.map(({ chave, p, regra, quando, status, reenvio, guarda, reconfirma }) => ({ json: {
   chave, dia, paciente_id: p.pid, unidade: p.unidade, hora: p.hora, tipo: p.tipo, agendamentos: [...new Set(p.agendamentos)].join(','), telefone_hash: sha256(p.fone),
   wamid: guarda ? guarda.wamid || '' : '', resposta: guarda ? guarda.resposta || '' : '', respondido_em: guarda ? guarda.respondido_em || '' : '', modo, status, criado_em: agora.toISO(),
-  regra, envia_em: hh(quando), fora_hoje: JSON.stringify(fora), ...(reenvio ? { reenvio: true } : {}),
+  regra, envia_em: hh(quando), fora_hoje: JSON.stringify(fora), ...(reenvio ? { reenvio: true } : {}), ...(reconfirma?.length ? { confirmar_igut_ids: [...new Set(reconfirma)] } : {}),
   // só para o envio (modo real e vencido); não vai para a tabela
   // modelos aprovados pela Meta (19/11/2026): sessão v2 com a câmara e a unidade; avaliação v1 com a unidade
   ...(status === 'a enviar' ? { envio: { telefone: modo === 'espelho' ? TESTE : p.fone, modelo: p.tipo === 'avaliação' ? 'confirmacao_avaliacao_v2' : 'confirmacao_sessao_v2',

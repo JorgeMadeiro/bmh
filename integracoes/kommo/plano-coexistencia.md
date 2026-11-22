@@ -473,3 +473,11 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
   para o recado do "Confirmo" sair de novo; o "Confirmo" da mensagem antiga cai no telefone e confirma os agendamentos novos.
   Agendamento trocado no mesmo horário só atualiza a linha (guarda id da mensagem e resposta). Envio que falhou e modo ensaio não
   reenviam. Testado no Mac com agenda simulada nos três modos. Cópia antes: `dados/n8n-copias/j9fKHps4n9xGDGL8-antes-reenvio-20261120.json`.
+- **Agendamento refeito de quem já confirmou** (21/11/2026, pedido do Jorge): se o paciente tocou "Confirmo" e a recepção refaz
+  o agendamento no mesmo horário, o agendamento novo nascia "Não confirmado" no iGut (1 caso em 21/11). Agora a confirmação da
+  véspera confirma no iGut só os agendamentos novos e ainda não confirmados desse paciente (modo real; espelho e ensaio não mexem).
+  Vale até as 21h da véspera, como o reenvio. Testado no Mac com agenda simulada nos três modos. Cópia antes:
+  `dados/n8n-copias/j9fKHps4n9xGDGL8-antes-refeito-20261121.json`.
+- **Passagem e campo Convênio** (21/11/2026): os campos "Convênio" (626680) e "Tipo de caso" (626682) foram apagados no Kommo e a
+  passagem falhou das 14h11 às 19h41 (o Kommo recusa o lead inteiro). A passagem não manda mais o campo; o nome do convênio fica
+  no detalhe de BMH_passagens. Cópia antes: `dados/n8n-copias/YSJaUQMQffVcfmra-antes-campo-convenio-20261121.json`.
