@@ -960,6 +960,41 @@ function fluxoLembreteCelular() {
   return { name: 'BMH · WhatsApp · lembrete do celular', nodes: Object.values(n), connections: cx, settings: ajustes() };
 }
 
+// ---------------- texto do que saiu pelo Kommo (22/11/2026, pedido do Jorge) ----------------
+// O recebedor da Meta só vê o status do que sai pelo Kommo (sem o texto). A cada 30 min, das 7h às 22h: eventos de mensagem
+// enviada do Kommo → texto na conversa → casa com a linha sem texto de BMH_whatsapp_meta pelo telefone em código e pelo horário.
+// O que o robô do n8n manda direto pela API (confirmação e recado) ganha uma descrição. Só lê o Kommo; só grava o texto.
+function fluxoTextoKommo() {
+  x = 0;
+  IDS.whatsapp ||= {}; IDS.whatsapp.textoKommo ||= 'bmh-texto-kommo-' + crypto.randomBytes(6).toString('hex');
+  const KOMMO = cred('httpHeaderAuth', 'BMH · Kommo (token)');
+  const get = (name, url, extra = {}) => no(name, 'n8n-nodes-base.httpRequest', 4.2, { method: 'GET', url, authentication: 'genericCredentialType', genericAuthType: 'httpHeaderAuth',
+    options: { response: { response: { responseFormat: 'text' } }, batching: { batch: { batchSize: 5, batchInterval: 1000 } } } }, { credentials: KOMMO, alwaysOutputData: true, ...extra });
+  const n = {
+    agenda: no('A cada 30 min (7h às 22h)', 'n8n-nodes-base.scheduleTrigger', 1.2, { rule: { interval: [{ field: 'cronExpression', expression: '23,53 7-22 * * *' }] } }),
+    manual: no('Rodar agora', 'n8n-nodes-base.webhook', 2, { path: IDS.whatsapp.textoKommo, responseMode: 'lastNode', options: {} }, { webhookId: crypto.randomUUID() }),
+    janela: no('Janela', 'n8n-nodes-base.code', 2, { jsCode: "// à mão: ?horas=N (até 72) para buscar mais para trás; padrão: 3 h\nlet q = {}; try { q = $('Rodar agora').first().json.query || {}; } catch (e) {}\nconst horas = Math.min(72, Math.max(1, Number(q.horas) || 3)), ate = Math.floor(Date.now() / 1000);\nreturn [{ json: { horas, de: ate - horas * 3600, ate } }];" }),
+    msgs: le('Mensagens (tabela)', 'BMH_whatsapp_meta'),
+    conf: le('Confirmações (tabela)', 'BMH_confirmacoes'),
+    robo: codigo('Texto do robô', '../../whatsapp/texto-robo.js', { executeOnce: true }),
+    gravaRobo: grava('Grava o texto do robô', 'BMH_whatsapp_meta'),
+    paginas: no('Páginas', 'n8n-nodes-base.code', 2, { jsCode: "// 250 eventos por página; uma página a cada 6 h de janela (página vazia volta sem corpo)\nconst { horas, de, ate } = $('Janela').first().json;\nreturn Array.from({ length: Math.ceil(horas / 6) }, (_, k) => ({ json: { page: k + 1, de, ate } }));" }, { executeOnce: true }),
+    ev: get('Eventos (Kommo)', "={{ 'https://bmh.kommo.com/api/v4/events?limit=250&page=' + $json.page + '&filter[type][]=outgoing_chat_message&filter[created_at][from]=' + $json.de + '&filter[created_at][to]=' + $json.ate }}"),
+    talks: no('Conversas a ler', 'n8n-nodes-base.code', 2, { jsCode: "const corpo = (j) => { const t = j && typeof j.data === 'string' ? j.data : j; if (!t) return {}; if (typeof t === 'object') return t; try { return JSON.parse(t); } catch (e) { return {}; } };\nconst ids = new Set(); for (const p of $input.all()) for (const e of (corpo(p.json)._embedded?.events || [])) for (const v of e.value_after || []) if (v.message?.talk_id) ids.add(v.message.talk_id);\nreturn [...ids].map((talk_id) => ({ json: { talk_id } }));" }, { executeOnce: true }),
+    conv: get('Conversa (Kommo)', "={{ 'https://bmh.kommo.com/api/v4/talks/' + $json.talk_id }}"),
+    mens: get('Mensagens da conversa', "={{ 'https://bmh.kommo.com/api/v4/talks/' + $('Conversas a ler').item.json.talk_id + '/messages?limit=250&filter[created_at][from]=' + ($('Janela').first().json.de - 600) }}"),
+    contQ: no('Contatos a ler', 'n8n-nodes-base.code', 2, { jsCode: "const corpo = (j) => { const t = j && typeof j.data === 'string' ? j.data : j; if (!t) return {}; if (typeof t === 'object') return t; try { return JSON.parse(t); } catch (e) { return {}; } };\nconst ids = [...new Set($('Conversa (Kommo)').all().map((p) => corpo(p.json).contact_id).filter(Boolean))], out = [];\nfor (let i = 0; i < ids.length; i += 50) out.push({ json: { q: ids.slice(i, i + 50).map((id) => 'filter[id][]=' + id).join('&') } });\nreturn out;" }, { executeOnce: true }),
+    cont: get('Contatos (Kommo)', "={{ 'https://bmh.kommo.com/api/v4/contacts?limit=250&' + $json.q }}"),
+    casa: no('Casa as mensagens', 'n8n-nodes-base.code', 2, { jsCode: ler('../../whatsapp/texto-kommo.js').replace('/*__SHA256__*/', ler('../../comum/sha256.js')) }, { executeOnce: true }),
+    gravaK: grava('Grava o texto do Kommo', 'BMH_whatsapp_meta'),
+    resumo: no('Resumo', 'n8n-nodes-base.code', 2, { jsCode: "// só contagens (é o que o \"Rodar agora\" devolve)\nconst n = (k) => { try { return $(k).all().length; } catch (e) { return 0; } };\nreturn [{ json: { horas: $('Janela').first().json.horas, conversas: n('Conversas a ler'), texto_do_kommo: n('Casa as mensagens'), texto_do_robo: n('Texto do robô') } }];" }, { executeOnce: true }),
+    nota: no('Sobre este fluxo', 'n8n-nodes-base.stickyNote', 1, { content: '## BMH · WhatsApp · texto do que saiu pelo Kommo\n**Traz:** eventos de mensagem enviada do Kommo, o texto de cada conversa e o telefone do contato; BMH_whatsapp_meta e BMH_confirmacoes\n**Envia:** nada para fora; grava o texto nas linhas sem texto de BMH_whatsapp_meta\n**Limites:** casa pelo telefone em código e pelo horário (até 3 min); texto mascarado (CPF, telefone, e-mail); o que o robô manda direto pela API ganha só uma descrição; 5 chamadas por segundo ao Kommo\n\nA cada 30 min, das 7h às 22h, olhando as últimas 3 h. À mão: /webhook/' + IDS.whatsapp.textoKommo + '?horas=72 para buscar até 3 dias.', width: 620, height: 240 }),
+  };
+  const cx = {}; liga(cx, n.agenda.name, n.janela.name); liga(cx, n.manual.name, n.janela.name);
+  for (const [a, b] of [[n.janela, n.msgs], [n.msgs, n.conf], [n.conf, n.robo], [n.robo, n.gravaRobo], [n.conf, n.paginas], [n.paginas, n.ev], [n.ev, n.talks], [n.talks, n.conv], [n.conv, n.mens], [n.mens, n.contQ], [n.contQ, n.cont], [n.cont, n.casa], [n.casa, n.gravaK], [n.gravaK, n.resumo]]) liga(cx, a.name, b.name);
+  return { name: 'BMH · WhatsApp · texto do que saiu pelo Kommo', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none' }) };
+}
+
 function fluxoSearchConsole() {
   x = 0;
   const GSC = 'https://www.googleapis.com/webmasters/v3/sites/https%3A%2F%2Fhiperbaricabrasilia.com.br%2F/searchAnalytics/query';
@@ -1092,7 +1127,7 @@ function fluxoAvaliacoes() {
   const tags = (await api('tags?limit=100', 'GET')).data || []; const tagBMH = tags.find((t) => t.name === 'BMH');
     const so = process.argv.slice(2);   // ex.: node montar.js pagina guardiao (só esses)
   // o alerta vem primeiro: os outros precisam do id dele (errorWorkflow)
-  const fluxos = { alerta: fluxoAlerta, grava: fluxoGrava, pagina: fluxoPagina, igut: fluxoIgut, guardiao: fluxoGuardiao, botoes: fluxoBotoes, resumo: fluxoResumo, medicao: fluxoMedicao, mensal: fluxoMensal, numeros: fluxoNumeros, diretoria: fluxoPainelDiretoria, faturamento: () => fluxoPainelDiretoria('faturamento'), dre: fluxoDreAtualiza, drePagina: fluxoDrePagina, plantoes: fluxoPlantoes, plantoesEmails: fluxoPlantoesEmails, avaliacoes: fluxoAvaliacoes, nota: fluxoNota, vigia: fluxoVigia, organico: fluxoSearchConsole, radar: fluxoRadar, confirmacao: fluxoConfirmacao, origem: fluxoOrigem, passagem: fluxoPassagem, nps: fluxoNps, recebedor: fluxoRecebedor, conversoes: fluxoConversoes, cliques: fluxoCliques, envio: fluxoEnvioConversoes, conversas: fluxoOrigemConversas, celular: fluxoLembreteCelular };
+  const fluxos = { alerta: fluxoAlerta, grava: fluxoGrava, pagina: fluxoPagina, igut: fluxoIgut, guardiao: fluxoGuardiao, botoes: fluxoBotoes, resumo: fluxoResumo, medicao: fluxoMedicao, mensal: fluxoMensal, numeros: fluxoNumeros, diretoria: fluxoPainelDiretoria, faturamento: () => fluxoPainelDiretoria('faturamento'), dre: fluxoDreAtualiza, drePagina: fluxoDrePagina, plantoes: fluxoPlantoes, plantoesEmails: fluxoPlantoesEmails, avaliacoes: fluxoAvaliacoes, nota: fluxoNota, vigia: fluxoVigia, organico: fluxoSearchConsole, radar: fluxoRadar, confirmacao: fluxoConfirmacao, origem: fluxoOrigem, passagem: fluxoPassagem, nps: fluxoNps, recebedor: fluxoRecebedor, conversoes: fluxoConversoes, cliques: fluxoCliques, envio: fluxoEnvioConversoes, conversas: fluxoOrigemConversas, celular: fluxoLembreteCelular, textoKommo: fluxoTextoKommo };
   for (const [chave, monta] of Object.entries(fluxos).filter(([k]) => !so.length || so.includes(k))) {
     const f = comVigia(chave, monta());
     if (!/^BMH · /.test(f.name)) throw new Error('nome sem BMH');

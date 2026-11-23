@@ -481,3 +481,9 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
 - **Passagem e campo Convênio** (21/11/2026): os campos "Convênio" (626680) e "Tipo de caso" (626682) foram apagados no Kommo e a
   passagem falhou das 14h11 às 19h41 (o Kommo recusa o lead inteiro). A passagem não manda mais o campo; o nome do convênio fica
   no detalhe de BMH_passagens. Cópia antes: `dados/n8n-copias/YSJaUQMQffVcfmra-antes-campo-convenio-20261121.json`.
+- **Texto do que saiu pelo Kommo** (22/11/2026, pedido do Jorge): o recebedor da Meta não recebe o que sai pelo Kommo (162
+  mensagens do salesbot em 24 h, nenhuma na tabela); as linhas "sem texto" eram do robô do n8n (confirmação, recado do
+  "Confirmo", NPS). Fluxo novo `BMH · WhatsApp · texto do que saiu pelo Kommo` (`V1kmaPiSLKtZKc05`, a cada 30 min das 7h às
+  22h, últimas 3 h): grava em BMH_whatsapp_meta cada mensagem do Kommo com o texto mascarado (chave `kommo:<id>`, telefone em
+  código pelo contato do Kommo) e põe uma descrição nas do robô. Primeira carga de 72 h: 447 linhas novas do Kommo, 7
+  preenchidas e 305 do robô descritas; segunda rodada sem repetir. Só lê o Kommo.
