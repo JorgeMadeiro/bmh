@@ -10,8 +10,10 @@ grava nesses fluxos nem na BMH_config, e não tem a chave do Google Ads.
        "revisar": não entram)
   158  (08/11) nova tentativa no nó que lê as avaliações do Perfil do Google (yNozxi1jNwRbLhFR): só entra se o pedido for
        nomeado no comando ("grava 158"), depois do toque do Jorge
-  212  (22/11) nova tentativa no nó "Buscar Agendamentos BMH" da agenda das 17h (EkmBucG5LoEutBUa): só com "grava 212"
-  219  (25/11) nova tentativa no nó "Mensagens (tabela)" do texto das mensagens do Kommo (V1kmaPiSLKtZKc05): só com "grava 219"
+  212  (22/11) nova tentativa no nó "Buscar Agendamentos BMH" da agenda das 17h (EkmBucG5LoEutBUa): FEITO NO MAC em 26/11/2026,
+       mais forte (5 tentativas e, se falhar, 2ª rodada 15 min depois), depois de a produção de 25/11 não sair; não gravar o arquivo
+  219  (25/11) nova tentativa no nó "Mensagens (tabela)" do texto das mensagens do Kommo (V1kmaPiSLKtZKc05): FEITO NO MAC em
+       26/11/2026 (montar.js, leMensagens); não gravar o arquivo
 Cada fluxo só é gravado se ainda estiver na versão de que o arquivo partiu (updatedAt abaixo). Se mudou, aquele item fica de fora
 e os outros seguem; se já está igual ao arquivo, aparece como "já gravado". Antes de gravar, cópia em dados/n8n-copias/ (fora do
 git); depois, leitura de volta. Os itens de 07/11 (117, 138, 136, 116 e 132) foram gravados nesse dia.
