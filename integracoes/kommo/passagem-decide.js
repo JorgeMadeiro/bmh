@@ -19,7 +19,8 @@ const ETAPA = { 'Asa Sul': 114237079, Taguatinga: 114237099 };
 const UNIDADE = { campo: 626676, 'Asa Sul': 463116, Taguatinga: 463118 }, ID_IGUT = 626684;
 // 626680 (Convênio, texto) e 626682 (tipo de caso) foram apagados no Kommo em 21/11/2026: mandar campo que não existe faz o
 // Kommo recusar o lead inteiro (400 NotSupportedChoice). O nome do convênio fica no detalhe de BMH_passagens e na etiqueta.
-const COPIAR = [626668, 624514, 624510, 624512, 624508, 624516, 624524, 624526, 626670, 626672, 626674, 626678];
+// 626674 (nome do cirurgião) também foi apagado; o cirurgião vai por CRM (667908) e UF (667910), copiados para a unidade (26/11/2026)
+const COPIAR = [626668, 624514, 624510, 624512, 624508, 624516, 624524, 624526, 626670, 626672, 626678, 667908, 667910];
 // particular, convênio e retorno (17/11/2026): convênio pela agenda do iGut ("PARTICULAR" = particular; cortesia e voucher
 // ficam em branco); retorno = já teve sessão com valor antes deste mês (BMH_financeiro_paciente, desde nov/2024)
 const PAG = { campo: 626678, Particular: 463120, 'Convênio': 463122 };

@@ -487,3 +487,9 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
   22h, últimas 3 h): grava em BMH_whatsapp_meta cada mensagem do Kommo com o texto mascarado (chave `kommo:<id>`, telefone em
   código pelo contato do Kommo) e põe uma descrição nas do robô. Primeira carga de 72 h: 447 linhas novas do Kommo, 7
   preenchidas e 305 do robô descritas; segunda rodada sem repetir. Só lê o Kommo.
+- **Cirurgião por CRM na passagem e roteiro da recepção** (26/11/2026): o campo "Cirurgião que indicou" (626674) também foi
+  apagado no Kommo; a passagem deixou de copiá-lo e passou a levar "CRM do cirurgião" (667908) e "UF do CRM" (667910) para o
+  lead da unidade (antes não levava). Cópia antes: `dados/n8n-copias/YSJaUQMQffVcfmra-antes-crm-cirurgiao-20261126.json`.
+  Roteiro da recepção com prints (nomes trocados e mensagens borradas): https://claude.ai/artifact/CFBdxzoKY8SNE4vianqFoa.
+  Retrato do uso em 26/11: 170 conversas paradas na entrada sem aceitar, Orçamento enviado e Follow-up vazios, CRM vazio nos
+  12 leads novos desde 24/11, 12 leads em Remarcar (até 5 dias), 1 usuário só na conta.
