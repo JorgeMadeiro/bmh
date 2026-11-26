@@ -493,3 +493,11 @@ uma semana sem falha, desligar o aparelho que confirma hoje.
   Roteiro da recepção com prints (nomes trocados e mensagens borradas): https://claude.ai/artifact/CFBdxzoKY8SNE4vianqFoa.
   Retrato do uso em 26/11: 170 conversas paradas na entrada sem aceitar, Orçamento enviado e Follow-up vazios, CRM vazio nos
   12 leads novos desde 24/11, 12 leads em Remarcar (até 5 dias), 1 usuário só na conta.
+- **Avaliação Agendada pela recepção** (26/11/2026, decisão do Jorge: "a própria equipe move e o robô abre o lead na unidade
+  para contabilizar a venda"): a passagem aceita o lead da triagem já ganho nos últimos 10 dias (além do aberto) e, nesse caso,
+  só abre o lead na unidade, sem mexer no ganho (o PATCH grava unidade e código do iGut). Se a recepção esquecer, o robô marca o
+  ganho como antes. Trava: ganho há 2 dias ou mais sem avaliação no iGut com o celular do contato e sem lead novo na unidade vira
+  tarefa ("ganhosemav|lead" em BMH_passagens, uma por lead). Simulado com 5 casos (todos certos); com os dados do dia, 21 ganhos
+  dos últimos 10 dias, todos com lead na unidade (nenhuma tarefa à toa). Rodada real às 16h: sem erro. POP REC01 e fluxograma
+  atualizados. Cópia antes: `dados/n8n-copias/YSJaUQMQffVcfmra-antes-ganho-recepcao-20261126.json`.
+  Venda por atendente só é medível com um usuário do Kommo por atendente (hoje 1).

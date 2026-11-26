@@ -33,6 +33,8 @@ for (const c of Object.values(contatos)) for (const f of (c.custom_fields_values
   for (const v of f.values || []) { const k = chaveFone(v.value); if (k) (porFone[k] ||= new Set()).add(c.id); }
 const leadsDo = {}; for (const l of leads) for (const c of (l._embedded?.contacts || [])) (leadsDo[c.id] ||= []).push(l);
 const aberto = (l) => l.status_id !== 142 && l.status_id !== 143;
+const agoraS = Math.floor(Date.now() / 1000), GANHO_DIAS = 10;
+const ganhoRecente = (l) => l.status_id === 142 && l.closed_at && agoraS - l.closed_at <= GANHO_DIAS * 86400;
 const copia = (l) => (l.custom_fields_values || []).filter((f) => COPIAR.includes(f.field_id))
   .map((f) => ({ field_id: f.field_id, values: (f.values || []).map((v) => (v.enum_id ? { enum_id: v.enum_id } : { value: v.value })) }));
 const out = [];
@@ -40,7 +42,11 @@ for (const a of AV) {
   const ids = [...(porFone[chaveFone(a.fone)] || [])];
   const doContato = ids.flatMap((id) => (leadsDo[id] || []).map((l) => ({ l, contato: id })));
   const naUnidade = doContato.find((x) => x.l.pipeline_id === FUNIL[a.unidade] && aberto(x.l));
-  const tri = doContato.filter((x) => x.l.pipeline_id === FUNIL.triagem && aberto(x.l)).sort((p, q) => q.l.updated_at - p.l.updated_at)[0];
+  // a recepção pode marcar o ganho na hora em que fecha a avaliação (26/11/2026, decisão do Jorge): vale o lead aberto ou,
+  // se não houver, o ganho na triagem dos últimos 10 dias; nesse caso o robô só abre o lead na unidade e não mexe no ganho
+  const triAberto = doContato.filter((x) => x.l.pipeline_id === FUNIL.triagem && aberto(x.l)).sort((p, q) => q.l.updated_at - p.l.updated_at)[0];
+  const triGanho = doContato.filter((x) => x.l.pipeline_id === FUNIL.triagem && ganhoRecente(x.l)).sort((p, q) => q.l.closed_at - p.l.closed_at)[0];
+  const tri = triAberto || triGanho, jaGanho = !triAberto && !!triGanho;
   const acao = !ids.length ? 'sem contato no Kommo' : naUnidade ? 'já no funil da unidade' : !tri ? 'sem lead aberto na triagem' : 'passar';
   const r = { chave: a.chave, paciente_id: a.pid, unidade: a.unidade, avaliacao_dia: a.dia, avaliacao_hora: a.hora, telefone_hash: a.telefone_hash,
     contato_id: String(tri?.contato || naUnidade?.contato || ids[0] || ''), lead_triagem: String(tri?.l.id || ''), lead_unidade: String(naUnidade?.l.id || ''),
@@ -63,10 +69,29 @@ for (const a of AV) {
         ...(a.nasc && !tem(663108) ? [{ field_id: 663108, values: [{ value: a.nasc }] }] : [])] }; }
     r.novo = { name: a.nome || tri.l.name || 'Avaliação ' + a.unidade, pipeline_id: FUNIL[a.unidade], status_id: ETAPA[a.unidade], custom_fields_values: campos,
       _embedded: { contacts: [{ id: tri.contato }], tags: [...(tri.l._embedded?.tags || []).map((t) => ({ id: t.id })), ...novas] } };
-    r.ganha = { id: tri.l.id, pipeline_id: FUNIL.triagem, status_id: 142, custom_fields_values: doIgut };
+    // ganho já marcado pela recepção: o PATCH só grava unidade e código do iGut, sem mudar a etapa
+    r.ganha = jaGanho ? { id: tri.l.id, custom_fields_values: doIgut } : { id: tri.l.id, pipeline_id: FUNIL.triagem, status_id: 142, custom_fields_values: doIgut };
+    if (jaGanho) r.detalhe = [r.detalhe, 'ganho marcado pela recepção'].filter(Boolean).join(' · ');
   }
   if (acao !== 'passar') r.detalhe = [pagamento(a.convenio) || 'sem pagamento na agenda', jaFez.has(a.pid) ? 'retorno' : '', r.detalhe].filter(Boolean).join(' · ');
   out.push({ json: r });
+}
+// Ganho sem avaliação no iGut (26/11/2026): a recepção marcou "Avaliação Agendada" na triagem há 2 dias ou mais e o robô não
+// achou avaliação no iGut com o celular desse contato (nem lead aberto depois disso na unidade): uma tarefa por lead, para conferir
+// se a avaliação foi marcada e se o celular do iGut é o do WhatsApp. Evita contar venda que não aconteceu.
+const foneAv = new Set(AV.map((a) => chaveFone(a.fone)).filter(Boolean));
+const jaAvisados = new Set($('Já feitas').all().map((i) => i.json || {}).filter((r) => r.chave && r.chave.startsWith('ganhosemav|')).map((r) => r.chave));
+for (const l of leads) {
+  if (l.pipeline_id !== FUNIL.triagem || !ganhoRecente(l) || agoraS - l.closed_at < 2 * 86400) continue;
+  const k = 'ganhosemav|' + l.id; if (jaAvisados.has(k)) continue;
+  const cts = (l._embedded?.contacts || []).map((c) => c.id); if (!cts.length) continue;
+  const naUn = cts.some((id) => (leadsDo[id] || []).some((x) => x.pipeline_id !== FUNIL.triagem && x.created_at >= l.closed_at - 86400));
+  if (naUn) continue;
+  const fones = cts.flatMap((id) => (contatos[id]?.custom_fields_values || []).filter((f) => f.field_code === 'PHONE').flatMap((f) => (f.values || []).map((v) => chaveFone(v.value))));
+  if (fones.some((f) => foneAv.has(f))) continue;
+  out.push({ json: { chave: k, paciente_id: '', unidade: '', avaliacao_dia: '', avaliacao_hora: '', telefone_hash: '', contato_id: String(cts[0]), lead_triagem: String(l.id), lead_unidade: '',
+    acao: 'ganho sem avaliação no iGut', modo, status: modo === 'real' ? 'tarefa criada' : 'ensaio: criaria tarefa', detalhe: 'ganho marcado há ' + Math.floor((agoraS - l.closed_at) / 86400) + ' dias', atualizado_em: agora,
+    tarefa_fim: modo === 'real' ? { text: 'Marcado como Avaliação Agendada, mas não achei a avaliação no iGut com o celular deste paciente. Conferir se a avaliação foi marcada no iGut e se o celular do iGut é o mesmo do WhatsApp. Se não foi marcada, voltar o lead para Em qualificação ou Follow-up.', complete_till: agoraS + 24 * 3600, entity_id: l.id, entity_type: 'leads', task_type_id: 1 } : null } });
 }
 // Avanço de etapa pelo iGut, como reserva da recepção (19/11/2026, "pode montar assim e vemos para frente"). Só para a frente,
 // nunca em lead que a recepção já moveu mais adiante, em Remarcar nem em lead fechado:
