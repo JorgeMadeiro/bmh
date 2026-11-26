@@ -24,7 +24,7 @@ for (const x of lista) {
   if (String(x.Agendamento?.data || '').slice(0, 10) !== dia) continue;
   if (norm(x.Agendamento?.status) !== 'finalizado' || NAO_VEIO.includes(norm(x.Agendamento?.confirmado))) continue;
   const pid = String(x.Paciente?.id || ''); if (!pid) continue;
-  const evento = tipo === 'consulta' ? (norm(x.Agendamento?.tipodeatendimento).includes('avaliac') ? 'avaliou' : '') : (antes.has(pid) ? '' : 'iniciou');
+  const evento = tipo === 'consulta' ? (/avaliac|telemedic/.test(norm(x.Agendamento?.tipodeatendimento)) ? 'avaliou' : '')   // telemedicina é avaliação (Jorge, 26/11/2026) : (antes.has(pid) ? '' : 'iniciou');
   if (!evento) continue;
   const chave = evento + '|' + pid + '|' + dia; if (out[chave]) continue;
   const [t1, t2] = tel(x.Paciente?.celular), email = String(x.Paciente?.email || '').trim().toLowerCase();

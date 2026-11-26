@@ -715,13 +715,18 @@ function fluxoPassagem() {
   const n = {
     agenda: no('A cada 30 min (7h às 19h)', 'n8n-nodes-base.scheduleTrigger', 1.2, { rule: { interval: [{ field: 'cronExpression', expression: '11,41 7-19 * * *' }] } }),
     manual: no('Rodar agora', 'n8n-nodes-base.webhook', 2, { path: IDS.kommo.passagem, responseMode: 'lastNode', options: {} }, { webhookId: crypto.randomUUID() }),
-    janela: no('Janela', 'n8n-nodes-base.code', 2, { jsCode: "// de hoje até 14 dias à frente (a busca começa ontem: sessão e avaliação finalizadas depois do último giro, 19/11/2026)\nconst h = $now.setZone('America/Sao_Paulo');\nreturn [{ json: { ini: h.toISODate(), busca_ini: h.minus({ days: 1 }).toISODate(), fim: h.plus({ days: 14 }).toISODate() } }];" }, { executeOnce: true }),
+    janela: no('Janela', 'n8n-nodes-base.code', 2, { jsCode: "// de hoje até 14 dias à frente (a busca começa ontem: sessão e avaliação finalizadas depois do último giro, 19/11/2026);\n// as avaliações olham 90 dias (26/11/2026: avaliação marcada para depois de 14 dias não virava passagem)\nconst h = $now.setZone('America/Sao_Paulo');\nreturn [{ json: { ini: h.toISODate(), busca_ini: h.minus({ days: 1 }).toISODate(), fim: h.plus({ days: 14 }).toISODate(), fim_aval: h.plus({ days: 90 }).toISODate() } }];" }, { executeOnce: true }),
     config: le('Config', 'BMH_config'),
     feitas: le('Já feitas', 'BMH_passagens'),
     hist: le('Histórico de pacientes', 'BMH_financeiro_paciente'),
     ag: no('Agenda', 'n8n-nodes-base.httpRequest', 4.2, { method: 'POST', url: 'https://api.igut.med.br/v2/consultas/buscar', authentication: 'genericCredentialType', genericAuthType: 'httpCustomAuth',
       sendBody: true, specifyBody: 'json', jsonBody: "={{ JSON.stringify({ 'Agendamento.data': $('Janela').first().json.busca_ini, 'Agendamento.data_fim': $('Janela').first().json.fim }) }}", options: { timeout: 180000 } },
       { credentials: IGUT, executeOnce: true }),
+    // avaliações dos próximos 90 dias, só nas agendas de consulta (o iGut filtra por Profissional.id: 2 semanas = 0,2 MB contra 18 MB)
+    consultas: no('Agendas de consulta', 'n8n-nodes-base.code', 2, { jsCode: "return [{ json: { prof: 113 } }, { json: { prof: 120 } }];" }, { executeOnce: true }),
+    agAval: no('Avaliações (90 dias)', 'n8n-nodes-base.httpRequest', 4.2, { method: 'POST', url: 'https://api.igut.med.br/v2/consultas/buscar', authentication: 'genericCredentialType', genericAuthType: 'httpCustomAuth',
+      sendBody: true, specifyBody: 'json', jsonBody: "={{ JSON.stringify({ 'Agendamento.data': $('Janela').first().json.ini, 'Agendamento.data_fim': $('Janela').first().json.fim_aval, 'Profissional.id': $json.prof }) }}", options: { timeout: 180000 } },
+      { credentials: IGUT }),
     av: no('Avaliações novas', 'n8n-nodes-base.code', 2, { jsCode: ler('../../kommo/passagem-avaliacoes.js').replace('/*__SHA256__*/', ler('../../comum/sha256.js')) }, { executeOnce: true }),
     convTab: le('Conversões (tabela)', 'BMH_conversoes'),
     agendou: codigo('Agendou (conversões novas)', '../../kommo/passagem-agendou.js', { executeOnce: true }),
@@ -753,7 +758,7 @@ function fluxoPassagem() {
   };
   const cx = {};
   liga(cx, n.agenda.name, n.janela.name); liga(cx, n.manual.name, n.janela.name);
-  for (const [a, b] of [[n.janela, n.config], [n.config, n.feitas], [n.feitas, n.hist], [n.hist, n.ag], [n.ag, n.av], [n.av, n.leads], [n.leads, n.quais], [n.quais, n.contatos], [n.contatos, n.decide], [n.decide, n.real], [n.av, n.convTab], [n.convTab, n.agendou], [n.agendou, n.gravaConv], [n.decide, n.avancos], [n.avancos, n.avanca], [n.decide, n.tarefasFim], [n.tarefasFim, n.criaTarefa], [n.decide, n.semReal], [n.semReal, n.grava], [n.decide, n.resumo], [n.real, n.cria], [n.cria, n.ganha], [n.ganha, n.feito], [n.feito, n.gravaFeito], [n.gravaFeito, n.quaisC], [n.quaisC, n.contato]]) liga(cx, a.name, b.name);
+  for (const [a, b] of [[n.janela, n.config], [n.config, n.feitas], [n.feitas, n.hist], [n.hist, n.ag], [n.ag, n.consultas], [n.consultas, n.agAval], [n.agAval, n.av], [n.av, n.leads], [n.leads, n.quais], [n.quais, n.contatos], [n.contatos, n.decide], [n.decide, n.real], [n.av, n.convTab], [n.convTab, n.agendou], [n.agendou, n.gravaConv], [n.decide, n.avancos], [n.avancos, n.avanca], [n.decide, n.tarefasFim], [n.tarefasFim, n.criaTarefa], [n.decide, n.semReal], [n.semReal, n.grava], [n.decide, n.resumo], [n.real, n.cria], [n.cria, n.ganha], [n.ganha, n.feito], [n.feito, n.gravaFeito], [n.gravaFeito, n.quaisC], [n.quaisC, n.contato]]) liga(cx, a.name, b.name);
   return { name: 'BMH · Kommo · passagem para a unidade', nodes: Object.values(n), connections: cx, settings: ajustes({ saveDataSuccessExecution: 'none' }) };
 }
 

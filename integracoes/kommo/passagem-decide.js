@@ -84,7 +84,7 @@ const fezSessao = new Set(), fezAvaliacao = new Set(), marcada = new Set(), dias
 for (const x of ($('Agenda').first().json.data || [])) { const id = Number(x.Profissional?.id), pid = String(x.Paciente?.id || ''), d = String(x.Agendamento?.data || '').slice(0, 10); if (!pid) continue;
   const fim = sA(x.Agendamento?.status) === 'finalizado', faltou = ['faltou', 'desmarcado', 'desistiu'].includes(sA(x.Agendamento?.confirmado));
   if (SESS[id]) { if (fim && (d === hojeE || d === ontemE)) { fezSessao.add(pid); (diasDe[pid] ||= new Set()).add(d); } if (!faltou && !fim && d >= hojeE) marcada.add(pid); }
-  if (CONS[id] && sA(x.Agendamento?.tipodeatendimento).includes('avaliac') && fim && (d === hojeE || d === ontemE)) fezAvaliacao.add(pid); }
+  if (CONS[id] && /avaliac|telemedic/.test(sA(x.Agendamento?.tipodeatendimento)) && fim && (d === hojeE || d === ontemE)) fezAvaliacao.add(pid); }
 const meses3 = new Set([0, 1, 2].map((k) => $now.setZone('America/Sao_Paulo').minus({ months: k }).toFormat('yyyy-MM')));
 for (const i of $('Histórico de pacientes').all()) { const r = i.json || {}; if (!r.paciente_id || !meses3.has(r.mes) || !(Number(r.sessoes) > 0)) continue;
   for (const x of String(r.dias || '').split(',').map(Number).filter(Boolean)) (diasDe[r.paciente_id] ||= new Set()).add(r.mes + '-' + String(x).padStart(2, '0')); }
