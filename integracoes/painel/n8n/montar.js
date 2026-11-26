@@ -76,7 +76,10 @@ const grava = (name, nome) => no(name, 'n8n-nodes-base.dataTable', 1.1, {
   columns: { mappingMode: 'defineBelow', value: Object.fromEntries(Object.keys(COLUNAS[nome]).map((k) => [k, `={{ $json.${k} }}`])), matchingColumns: [],
     schema: Object.entries(COLUNAS[nome]).map(([k, t]) => ({ id: k, displayName: k, required: false, defaultMatch: false, display: true, type: t === 'n' ? 'number' : 'string', readOnly: false, removed: false })) },
   options: {} });
-const le = (name, nome) => no(name, 'n8n-nodes-base.dataTable', 1.1, { operation: 'get', dataTableId: tabela(nome), returnAll: true }, { alwaysOutputData: true, executeOnce: true });
+const le = (name, nome, extra = {}) => no(name, 'n8n-nodes-base.dataTable', 1.1, { operation: 'get', dataTableId: tabela(nome), returnAll: true }, { alwaysOutputData: true, executeOnce: true, ...extra });
+// BMH_whatsapp_meta recebe linha nova a todo momento: a leitura em páginas às vezes falha com "result count changed during
+// pagination" (25/11/2026, 4 avisos falsos no Telegram). Nova tentativa antes de virar alerta.
+const leMensagens = () => le('Mensagens (tabela)', 'BMH_whatsapp_meta', REDE);
 const http = (name, url, corpoExpr, extra = {}) => no(name, 'n8n-nodes-base.httpRequest', 4.2, { method: 'POST', url, authentication: 'predefinedCredentialType', nodeCredentialType: 'googleApi', sendBody: true, specifyBody: 'json', jsonBody: corpoExpr, options: { timeout: 120000 } },
   { credentials: GOOGLE, executeOnce: true, alwaysOutputData: true, onError: 'continueRegularOutput', ...extra });
 const liga = (cx, de, para) => { (cx[de] ||= { main: [[]] }).main[0].push({ node: para, type: 'main', index: 0 }); };
@@ -936,7 +939,7 @@ function fluxoOrigemConversas() {
     conditions: [{ id: crypto.randomUUID(), leftValue: '={{ $json.tipo }}', rightValue: valor, operator: { type: 'string', operation: 'equals' } }] }, options: {} });
   const n = {
     agenda: no('A cada 10 minutos', 'n8n-nodes-base.scheduleTrigger', 1.2, { rule: { interval: [{ field: 'cronExpression', expression: '4,14,24,34,44,54 * * * *' }] } }),
-    msgs: le('Mensagens (tabela)', 'BMH_whatsapp_meta'), cliques: le('Cliques (tabela)', 'BMH_cliques_site'), feitas: le('Origem das conversas (tabela)', 'BMH_origem_conversas'),
+    msgs: leMensagens(), cliques: le('Cliques (tabela)', 'BMH_cliques_site'), feitas: le('Origem das conversas (tabela)', 'BMH_origem_conversas'),
     liga_: codigo('Liga cliques e conversas', '../../origem/liga-conversas.js', { executeOnce: true }),
     soConv: filtro('Só as conversas', 'conversa'), gravaConv: grava('Grava a origem da conversa', 'BMH_origem_conversas'),
     soClique: filtro('Só os cliques ligados', 'clique'), gravaClique: grava('Marca o clique ligado', 'BMH_cliques_site'),
@@ -974,7 +977,7 @@ function fluxoTextoKommo() {
     agenda: no('A cada 30 min (7h às 22h)', 'n8n-nodes-base.scheduleTrigger', 1.2, { rule: { interval: [{ field: 'cronExpression', expression: '23,53 7-22 * * *' }] } }),
     manual: no('Rodar agora', 'n8n-nodes-base.webhook', 2, { path: IDS.whatsapp.textoKommo, responseMode: 'lastNode', options: {} }, { webhookId: crypto.randomUUID() }),
     janela: no('Janela', 'n8n-nodes-base.code', 2, { jsCode: "// à mão: ?horas=N (até 72) para buscar mais para trás; padrão: 3 h\nlet q = {}; try { q = $('Rodar agora').first().json.query || {}; } catch (e) {}\nconst horas = Math.min(72, Math.max(1, Number(q.horas) || 3)), ate = Math.floor(Date.now() / 1000);\nreturn [{ json: { horas, de: ate - horas * 3600, ate } }];" }),
-    msgs: le('Mensagens (tabela)', 'BMH_whatsapp_meta'),
+    msgs: leMensagens(),
     conf: le('Confirmações (tabela)', 'BMH_confirmacoes'),
     robo: codigo('Texto do robô', '../../whatsapp/texto-robo.js', { executeOnce: true }),
     gravaRobo: grava('Grava o texto do robô', 'BMH_whatsapp_meta'),
