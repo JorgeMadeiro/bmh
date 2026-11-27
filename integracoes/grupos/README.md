@@ -5,6 +5,7 @@
 
 ## O que sai e quando (09/10/2026)
 
+- **Vigia (27/11/2026, Jorge):** a marca "producao_diaria" na BMH_vigia sai da saída de **sucesso** dos 3 envios do dia (ADM Taguatinga, ADM Asa Sul, Diretoria), não mais do gatilho das 17h: ela prova que a mensagem saiu. Envio que falha continua indo para "Avisa envio que falhou". Cópia antes em `dados/n8n-copias/EkmBucG5LoEutBUa-antes-vigia-pos-envio-20261127.json`.
 - **Horário:** o fluxo começa às 17h, lê a agenda do dia e espera o fim estimado da última sessão (início + 1h30 de sessão
   + 20 min para finalizar no iGut; consulta + 40 min), entre 18h30 e 21h30 (sem agenda: 19h05). Pedido do Jorge: "ao
   término estimado dessas sessões, inclusive no grupo ADM, fica fidedigno e ainda no dia". Antes: 19h05 fixo.
