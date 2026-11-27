@@ -24,7 +24,9 @@ for (const x of lista) {
   if (String(x.Agendamento?.data || '').slice(0, 10) !== dia) continue;
   if (norm(x.Agendamento?.status) !== 'finalizado' || NAO_VEIO.includes(norm(x.Agendamento?.confirmado))) continue;
   const pid = String(x.Paciente?.id || ''); if (!pid) continue;
-  const evento = tipo === 'consulta' ? (/avaliac|telemedic/.test(norm(x.Agendamento?.tipodeatendimento)) ? 'avaliou' : '')   // telemedicina é avaliação (Jorge, 26/11/2026) : (antes.has(pid) ? '' : 'iniciou');
+  // telemedicina é avaliação (Jorge, 26/11/2026). 27/11: o comentário estava no meio da linha e apagava o ": (antes.has(pid) ...",
+  // o que deixou o nó com erro de sintaxe e parou as conversões de 26/11
+  const evento = tipo === 'consulta' ? (/avaliac|telemedic/.test(norm(x.Agendamento?.tipodeatendimento)) ? 'avaliou' : '') : (antes.has(pid) ? '' : 'iniciou');
   if (!evento) continue;
   const chave = evento + '|' + pid + '|' + dia; if (out[chave]) continue;
   const [t1, t2] = tel(x.Paciente?.celular), email = String(x.Paciente?.email || '').trim().toLowerCase();
