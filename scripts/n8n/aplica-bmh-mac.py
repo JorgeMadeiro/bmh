@@ -14,6 +14,7 @@ grava nesses fluxos nem na BMH_config, e não tem a chave do Google Ads.
        mais forte (5 tentativas e, se falhar, 2ª rodada 15 min depois), depois de a produção de 25/11 não sair; não gravar o arquivo
   219  (25/11) nova tentativa no nó "Mensagens (tabela)" do texto das mensagens do Kommo (V1kmaPiSLKtZKc05): FEITO NO MAC em
        26/11/2026 (montar.js, leMensagens); não gravar o arquivo
+  226  (28/11) nova tentativa no "Envia no Telegram" do resumo da manhã (QGDceUjADbnNINb3): só com "grava 226"
 Cada fluxo só é gravado se ainda estiver na versão de que o arquivo partiu (updatedAt abaixo). Se mudou, aquele item fica de fora
 e os outros seguem; se já está igual ao arquivo, aparece como "já gravado". Antes de gravar, cópia em dados/n8n-copias/ (fora do
 git); depois, leitura de volta. Os itens de 07/11 (117, 138, 136, 116 e 132) foram gravados nesse dia.
@@ -35,7 +36,7 @@ U, H = ENV['N8N_URL'].rstrip('/'), {'X-N8N-API-KEY': ENV['N8N_API_KEY'], 'Conten
 MODO = sys.argv[1] if len(sys.argv) > 1 else 'confere'
 if MODO not in ('confere', 'grava', 'reenvia'): sys.exit('uso: aplica-bmh-mac.py [grava [158]|reenvia]')
 NOMEADOS = set(sys.argv[2:])          # pedidos que só entram quando nomeados no comando
-SO_NOMEADO = {'158'}
+SO_NOMEADO = {'158', '226'}
 HOJE = datetime.date.today().isoformat()
 COPIAS = os.path.join('dados', 'n8n-copias'); os.makedirs(COPIAS, exist_ok=True)
 OK = ('executionOrder', 'saveDataErrorExecution', 'saveDataSuccessExecution', 'saveManualExecutions', 'saveExecutionProgress',
@@ -50,6 +51,7 @@ FLUXOS = [  # (pedido, id, updatedAt de que o arquivo partiu, arquivo)
     ('138', 'UUYRg6GlEOlupbnW', '2026-10-21T00:59:35.660Z', 'scripts/n8n/bmh-resumo-manha-homologacao.json'),
     ('138', 'K4UckCbHkrqr8sc6', '2026-11-01T17:20:06.074Z', 'scripts/n8n/bmh-meta-guardiao.json'),
     ('158', 'yNozxi1jNwRbLhFR', '2026-10-15T20:52:06.672Z', 'scripts/n8n/bmh-avaliacoes-tentativa.json'),
+    ('226', 'QGDceUjADbnNINb3', '2026-11-10T16:42:34.052Z', 'scripts/n8n/bmh-resumo-tentativa.json'),
 ]
 RESUMO_PROD, RESUMO_PROD_UP = 'QGDceUjADbnNINb3', '2026-11-04T00:03:29.352Z'   # a cópia do 138 foi montada desta versão
 CONFIG = 'V4NRHS9mc1kvigix'
@@ -86,7 +88,7 @@ if MODO == 'reenvia':
     sys.exit(0)
 
 # ---------- 117 e 138: fluxos montados pelo Gerente BMH ----------
-print('== Fluxos (138, 158) ==')
+print('== Fluxos (138, 158, 226) ==')
 rp = le(RESUMO_PROD)
 for ped, i, up, arq in FLUXOS:
     atual = le(i); f = json.load(open(arq, encoding='utf8'))

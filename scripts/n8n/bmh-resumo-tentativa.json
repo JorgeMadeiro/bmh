@@ -1,0 +1,614 @@
+{
+ "name": "BMH · Telegram · resumo da manhã",
+ "nodes": [
+  {
+   "id": "0855aea0-b1ad-4ce1-a584-696c0b6f9de0",
+   "name": "Todo dia às 8h",
+   "type": "n8n-nodes-base.scheduleTrigger",
+   "typeVersion": 1.2,
+   "position": [
+    260,
+    0
+   ],
+   "parameters": {
+    "rule": {
+     "interval": [
+      {
+       "field": "cronExpression",
+       "expression": "0 8 * * *"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "ebbe3eab-d167-485c-a32d-e651d18c2218",
+   "name": "Manual",
+   "type": "n8n-nodes-base.webhook",
+   "typeVersion": 2,
+   "position": [
+    520,
+    0
+   ],
+   "parameters": {
+    "path": "bmh-resumo-manha",
+    "options": {}
+   },
+   "webhookId": "19bdb8bf-ff1e-4186-8bcb-7d89ffc6d906"
+  },
+  {
+   "id": "511c1104-48be-41cc-9bf0-493b465efd5f",
+   "name": "Config",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    780,
+    0
+   ],
+   "parameters": {
+    "operation": "get",
+    "dataTableId": {
+     "__rl": true,
+     "value": "V4NRHS9mc1kvigix",
+     "mode": "id",
+     "cachedResultName": "BMH_config"
+    },
+    "returnAll": true
+   },
+   "alwaysOutputData": true,
+   "executeOnce": true
+  },
+  {
+   "id": "748f6a7e-3f21-41bc-bb41-7d5008f7e3d5",
+   "name": "Anúncios (tabela)",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    1040,
+    0
+   ],
+   "parameters": {
+    "operation": "get",
+    "dataTableId": {
+     "__rl": true,
+     "value": "1TSLyd68TBzYajYq",
+     "mode": "id",
+     "cachedResultName": "BMH_google_anuncios_dia"
+    },
+    "returnAll": true
+   },
+   "alwaysOutputData": true,
+   "executeOnce": true
+  },
+  {
+   "id": "00b22ee2-6612-446e-811d-b79045d8ff6e",
+   "name": "Site · cliques (tabela)",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    1300,
+    0
+   ],
+   "parameters": {
+    "operation": "get",
+    "dataTableId": {
+     "__rl": true,
+     "value": "RzSGWyyyutU0N9V9",
+     "mode": "id",
+     "cachedResultName": "BMH_site_cliques_dia"
+    },
+    "returnAll": true
+   },
+   "alwaysOutputData": true,
+   "executeOnce": true
+  },
+  {
+   "id": "e8bd93e3-7516-4253-b142-744dd6b81346",
+   "name": "iGut (tabela)",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    1560,
+    0
+   ],
+   "parameters": {
+    "operation": "get",
+    "dataTableId": {
+     "__rl": true,
+     "value": "KOrlT3JXdspKlBSo",
+     "mode": "id",
+     "cachedResultName": "BMH_igut_dia"
+    },
+    "returnAll": true
+   },
+   "alwaysOutputData": true,
+   "executeOnce": true
+  },
+  {
+   "id": "fffd7638-dfce-4f88-befc-2d98b247bb75",
+   "name": "Guardião (tabela)",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    1820,
+    0
+   ],
+   "parameters": {
+    "operation": "get",
+    "dataTableId": {
+     "__rl": true,
+     "value": "E1ewiB9pcohZpSfw",
+     "mode": "id",
+     "cachedResultName": "BMH_guardiao_registro"
+    },
+    "returnAll": true
+   },
+   "alwaysOutputData": true,
+   "executeOnce": true
+  },
+  {
+   "id": "33c4aefa-3388-47d7-8b4e-b83bccf57b2f",
+   "name": "Google · renova o acesso",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    2080,
+    0
+   ],
+   "parameters": {
+    "method": "POST",
+    "url": "https://oauth2.googleapis.com/token",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpCustomAuth",
+    "sendBody": true,
+    "contentType": "json",
+    "specifyBody": "json",
+    "jsonBody": "{}",
+    "options": {}
+   },
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000,
+   "credentials": {
+    "httpCustomAuth": {
+     "id": "Qewvtjz9JokCUvNy",
+     "name": "BMH · Google Ads (renovação do acesso)"
+    }
+   },
+   "executeOnce": true,
+   "onError": "continueRegularOutput",
+   "alwaysOutputData": true
+  },
+  {
+   "id": "e1e7bfe6-a779-44c3-92dc-47c6d8b665af",
+   "name": "Meta · saldo da conta",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    2340,
+    0
+   ],
+   "parameters": {
+    "method": "GET",
+    "url": "https://graph.facebook.com/v23.0/act_327952129944258",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpQueryAuth",
+    "sendQuery": true,
+    "queryParameters": {
+     "parameters": [
+      {
+       "name": "fields",
+       "value": "is_prepay_account,spend_cap,amount_spent,funding_source_details{display_string},insights.date_preset(last_7d){spend}"
+      }
+     ]
+    },
+    "options": {
+     "timeout": 30000
+    }
+   },
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000,
+   "credentials": {
+    "httpQueryAuth": {
+     "id": "HXdesRATFOJkYxhK",
+     "name": "BMH · Meta Instagram (token)"
+    }
+   },
+   "executeOnce": true,
+   "onError": "continueRegularOutput",
+   "alwaysOutputData": true
+  },
+  {
+   "id": "0f28b1c4-7b47-488b-9b70-3af09670afbb",
+   "name": "Monta o resumo",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    0,
+    0
+   ],
+   "parameters": {
+    "jsCode": "// Resumo da manhã da BMH no Telegram (8h): ontem e o mês até ontem, com os mesmos números do painel (anúncios gravados às\n// 6h10, iGut às 3h20, cliques no WhatsApp do Analytics). Só números, sem dado de paciente.\nconst linhas = n => $(n).all().map(i => i.json).filter(r => r && r.chave);\nconst cfg = Object.fromEntries(linhas('Config').map(r => [r.chave, r.valor]));\nconst ads = linhas('Anúncios (tabela)'), site = linhas('Site · cliques (tabela)'), igut = linhas('iGut (tabela)'), guard = linhas('Guardião (tabela)');\nconst num = v => Number(v) || 0, entre = (d, a, b) => d >= a && d <= b;\nconst brl = v => 'R$ ' + Math.round(num(v)).toLocaleString('pt-BR'), int = v => Math.round(num(v)).toLocaleString('pt-BR');\nconst pct = (a, b) => b ? (a >= b ? '+' : '') + Math.round((a / b - 1) * 100) + '%' : '';\nconst hoje = $now.setZone('America/Sao_Paulo').startOf('day'), ontem = hoje.minus({ days: 1 }).setLocale('pt-BR');\nconst O = ontem.toISODate(), M0 = ontem.startOf('month').toISODate();\nconst ant = ontem.minus({ months: 1 }), A0 = ant.startOf('month').toISODate(), A1 = ant.set({ day: Math.min(ontem.day, ant.daysInMonth) }).toISODate();\nconst mesNome = d => d.setLocale('pt-BR').toFormat('LLLL');\n// mesmo período do ano anterior (pedido do Jorge, 28/10/2026): a BMH tem sazonalidade, o mês anterior sozinho engana\nconst ano = ontem.minus({ years: 1 }), Y0 = ano.startOf('month').toISODate(), Y1 = ano.set({ day: Math.min(ontem.day, ano.daysInMonth) }).toISODate();\nconst soma = (rs, f) => rs.reduce((s, r) => s + num(r[f]), 0);\n// anúncios\nconst adsO = ads.filter(r => r.dia === O), adsM = ads.filter(r => entre(r.dia, M0, O));\nconst gO = soma(adsO, 'gasto'), cO = soma(adsO, 'contatos') + soma(adsO, 'ligacoes'), gM = soma(adsM, 'gasto'), cM = soma(adsM, 'contatos') + soma(adsM, 'ligacoes');\n// projeção igual à do guardião: gasto até ontem + orçamento diário de hoje × dias que faltam (com hoje)\nconst teto = num(cfg['teto_mes_' + M0.slice(0, 7)] || cfg.teto_mes), restantes = ontem.daysInMonth - ontem.day;\nlet B = null;\ntry {\n  const tok = $('Google · renova o acesso').first().json.access_token;\n  const r = await this.helpers.httpRequest({ method: 'POST', url: 'https://googleads.googleapis.com/v25/customers/5066798424/googleAds:search', headers: { Authorization: 'Bearer ' + tok },\n    body: { query: \"SELECT campaign_budget.resource_name, campaign_budget.amount_micros FROM campaign WHERE campaign.status = 'ENABLED' AND campaign.experiment_type = 'BASE'\" }, json: true, timeout: 60000 });\n  const orc = {}; for (const x of r.results || []) orc[x.campaignBudget.resourceName] = Number(x.campaignBudget.amountMicros) / 1e6;\n  B = Object.values(orc).reduce((s, v) => s + v, 0);\n} catch (e) {}\n// saldo da conta pré-paga (pedido do Jorge, 03/11/2026: \"sempre avisar se estiver próximo de terminar\"): crédito aprovado\n// menos o já gasto (o Google atualiza com algumas horas de atraso); os dias saem da média real dos últimos 7 dias\nlet saldo = null;\ntry {\n  const tok = $('Google · renova o acesso').first().json.access_token;\n  const r = await this.helpers.httpRequest({ method: 'POST', url: 'https://googleads.googleapis.com/v25/customers/5066798424/googleAds:search', headers: { Authorization: 'Bearer ' + tok },\n    body: { query: \"SELECT account_budget.status, account_budget.approved_spending_limit_micros, account_budget.adjusted_spending_limit_micros, account_budget.amount_served_micros, account_budget.approved_end_time_type, account_budget.approved_end_date_time FROM account_budget WHERE account_budget.status = 'APPROVED'\" }, json: true, timeout: 60000 });\n  const vigente = (r.results || []).map(x => x.accountBudget).filter(b => (b.approvedSpendingLimitMicros || b.adjustedSpendingLimitMicros) && (b.approvedEndTimeType === 'FOREVER' || String(b.approvedEndDateTime || '') > hoje.toFormat('yyyy-MM-dd HH:mm:ss')));\n  if (vigente.length) saldo = vigente.reduce((s, b) => s + (Number(b.adjustedSpendingLimitMicros || b.approvedSpendingLimitMicros) - Number(b.amountServedMicros || 0)) / 1e6, 0);\n} catch (e) {}\nconst S7 = hoje.minus({ days: 7 }).toISODate(), media7 = soma(ads.filter(r => entre(r.dia, S7, O)), 'gasto') / 7;\nconst diasSaldo = saldo !== null && media7 > 0 ? Math.floor(saldo / media7) : null;\n// Meta pré-paga (mesmo pedido): o que acaba primeiro, o saldo pago ou o limite de gastos da conta, e a média dos últimos 7 dias\nlet meta = null;\ntry {\n  const m = $('Meta · saldo da conta').first().json;\n  const txt = String(m.funding_source_details?.display_string || '').match(/R\\$\\s*([\\d.,]+)/), cap = num(m.spend_cap) / 100;\n  const pago = txt ? Number(/,\\d{2}$/.test(txt[1]) ? txt[1].replace(/\\./g, '').replace(',', '.') : txt[1].replace(/,/g, '')) : null;\n  const limite = cap > 0 ? cap - num(m.amount_spent) / 100 : null;\n  const resta = [pago, limite].filter(v => v !== null && Number.isFinite(v));\n  if (m.is_prepay_account && resta.length) {\n    const dia = num(m.insights?.data?.[0]?.spend) / 7, v = Math.min(...resta);\n    meta = { v, dia, pelo: limite !== null && limite <= v && (pago === null || limite < pago) ? 'limite' : 'saldo', dias: dia > 0 ? Math.floor(v / dia) : null };\n  }\n} catch (e) {}\nconst proj = B === null ? gM / ontem.day * ontem.daysInMonth : gM + B * (restantes || 0);\nconst cada = (g, c) => c >= 0.5 ? ` (${brl(g / c)} cada)` : '';\n// WhatsApp pelo site\nconst wO = site.filter(r => r.dia === O && r.tipo === 'whatsapp'), PAGO = c => /Paid|Cross-network/.test(c || '');\nconst wTot = soma(wO, 'cliques'), wAds = soma(wO.filter(r => PAGO(r.canal)), 'cliques');\n// iGut\nconst igO = igut.filter(r => r.dia === O), igM = igut.filter(r => entre(r.dia, M0, O)), igA = igut.filter(r => entre(r.dia, A0, A1)), igY = igut.filter(r => entre(r.dia, Y0, Y1));\nconst porUn = igO.map(r => r.unidade + ' ' + int(r.atendimentos)).join(' · ');\nconst sM = soma(igM, 'atendimentos'), vM = soma(igM, 'valor'), sA = soma(igA, 'atendimentos'), vA = soma(igA, 'valor'), sY = soma(igY, 'atendimentos'), vY = soma(igY, 'valor');\n// guardião de hoje\nconst gHoje = guard.filter(r => r.data === hoje.toISODate());\nconst pendentes = gHoje.filter(r => r.acao !== 'avisar' && r.resultado === 'simulado').length;\n// avisos de dado atrasado\nconst atraso = [];\nconst ultima = ads.map(r => r.atualizado_em || '').sort().pop() || '';\nif (ultima.slice(0, 10) < hoje.toISODate()) atraso.push('⚠️ A gravação dos anúncios das 6h10 não rodou hoje: os números do Google Ads podem estar incompletos.');\nif (!igO.length) atraso.push('⚠️ O iGut de ontem ainda não chegou (a busca é às 3h20).');\nconst t = [];\nt.push('☀️ BMH · resumo de ontem, ' + ontem.toFormat('cccc, dd/LL'));\nt.push('');\nt.push('📣 Google Ads: ' + brl(gO) + ' · ' + (cO >= 0.5 ? int(cO) + (Math.round(cO) === 1 ? ' contato' : ' contatos') + cada(gO, cO) : 'nenhum contato'));\nt.push('💬 WhatsApp pelo site: ' + int(wTot) + (wTot === 1 ? ' clique' : ' cliques') + (wTot ? ` (${int(wAds)} de anúncio, ${int(wTot - wAds)} de busca e outros)` : ''));\nif (igO.length) t.push('🏥 iGut: ' + int(soma(igO, 'atendimentos')) + ' sessões (' + porUn + ') · ' + brl(soma(igO, 'valor')) + ' produzidos');\nt.push('');\nt.push('📅 ' + mesNome(ontem).replace(/^./, c => c.toUpperCase()) + ' até ontem (' + ontem.day + ' de ' + ontem.daysInMonth + ' dias)');\nconst ritmo = B === null ? ' · no ritmo, fecha em ' : ' · com ' + brl(B) + '/dia, fecha em ';\nt.push('• Anúncios: ' + brl(gM) + (teto ? ' de ' + brl(teto) : '') + ritmo + brl(proj) + (teto && proj > teto * 1.02 ? ' ⚠️ acima do teto' : ''));\nt.push('• Contatos do Google Ads: ' + int(cM) + cada(gM, cM));\nif (saldo !== null) t.push('• Saldo da conta do Google Ads: ' + brl(saldo) + (diasSaldo === null ? '' : diasSaldo <= 0 ? ' ⚠️ acabando hoje: faça o pagamento já'\n  : ' · dá uns ' + diasSaldo + (diasSaldo === 1 ? ' dia' : ' dias') + ' (' + brl(media7) + '/dia), até ~' + hoje.plus({ days: diasSaldo }).toFormat('dd/LL') + (diasSaldo <= 7 ? ' ⚠️ faça o pagamento até ' + hoje.plus({ days: Math.max(diasSaldo - 2, 0) }).toFormat('dd/LL') : '')));\nif (meta) t.push('• Saldo da Meta: ' + brl(meta.v) + (meta.pelo === 'limite' ? ' (limite de gastos da conta)' : '') + (meta.dias === null ? '' : meta.dias <= 0 ? ' ⚠️ acabando hoje: ' + (meta.pelo === 'limite' ? 'aumente o limite de gastos já' : 'faça o pagamento já')\n  : ' · dá uns ' + meta.dias + (meta.dias === 1 ? ' dia' : ' dias') + ' (' + brl(meta.dia) + '/dia), até ~' + hoje.plus({ days: meta.dias }).toFormat('dd/LL') + (meta.dias <= 7 ? ' ⚠️ ' + (meta.pelo === 'limite' ? 'aumente o limite de gastos' : 'faça o pagamento') + ' até ' + hoje.plus({ days: Math.max(meta.dias - 2, 0) }).toFormat('dd/LL') : '')));\nif (igM.length) t.push('• iGut: ' + int(sM) + ' sessões · ' + brl(vM) + ' produzidos');\nif (igA.length) t.push('• Mesmo período de ' + mesNome(ant) + ': ' + int(sA) + ' sessões (' + pct(sM, sA) + ') · ' + brl(vA) + ' (' + pct(vM, vA) + ')');\nif (igY.length) t.push('• Mesmo período de ' + mesNome(ano) + ' de ' + ano.year + ': ' + int(sY) + ' sessões (' + pct(sM, sY) + ') · ' + brl(vY) + ' (' + pct(vM, vY) + ')');\nt.push('');\nt.push('🛡️ Guardião: ' + (pendentes ? pendentes + (pendentes === 1 ? ' proposta esperando' : ' propostas esperando') + ' o seu Aplicar ou Ignorar (mensagens acima).' : gHoje.length ? 'só avisos hoje (mensagem acima).' : 'nada a corrigir hoje.'));\nif (atraso.length) { t.push(''); t.push(...atraso); }\nt.push('');\nt.push('Painel: https://automacao.cannlink.com.br/webhook/bmh-painel');\nreturn [{ json: { texto: t.join('\\n') } }];\n"
+   }
+  },
+  {
+   "id": "881a6559-38e1-4fcc-82e1-0b6cff129287",
+   "name": "Envia no Telegram",
+   "type": "n8n-nodes-base.telegram",
+   "typeVersion": 1.2,
+   "position": [
+    2600,
+    0
+   ],
+   "parameters": {
+    "chatId": "8708228589",
+    "text": "={{ $json.texto }}",
+    "additionalFields": {
+     "appendAttribution": false
+    }
+   },
+   "credentials": {
+    "telegramApi": {
+     "id": "SgQHWuJOuMWeVbPi",
+     "name": "BMH · Telegram (robô BMH alertas)"
+    }
+   },
+   "webhookId": "21a81d0d-e364-4b93-964f-203a2e82b147",
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 10000
+  },
+  {
+   "id": "6d067a67-40e0-4091-9a92-988e5a8297bc",
+   "name": "Sobre este fluxo",
+   "type": "n8n-nodes-base.stickyNote",
+   "typeVersion": 1,
+   "position": [
+    2860,
+    0
+   ],
+   "parameters": {
+    "content": "## BMH · Telegram · resumo da manhã\n**Traz:** tabelas do painel e do iGut\n**Envia:** resumo das 8h no Telegram\n**Limites:** uma mensagem por dia; só números\n\nTodo dia às 8h, no robô BMH alertas: Google Ads, WhatsApp pelo site e iGut de ontem; o mês até ontem contra o teto e contra o mesmo período do mês anterior; saldo pré-pago do Google Ads e da Meta, com ⚠️ quando faltar 7 dias ou menos; propostas do guardião esperando decisão. Lê as mesmas tabelas do painel. Manual: /webhook/bmh-resumo-manha.",
+    "width": 560,
+    "height": 220
+   }
+  },
+  {
+   "id": "6b61b394-c65d-4dd8-8ef1-d2fb5ba25c99",
+   "name": "Vigia · marca que rodou",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    520,
+    420
+   ],
+   "parameters": {
+    "jsCode": "return [{ json: { chave: 'resumo', nome: \"BMH · Telegram · resumo da manhã\", ultima_vez: $now.toISO(), max_horas: 26, avisado_em: '' } }];"
+   }
+  },
+  {
+   "id": "e7b73dce-3753-4308-a59e-8e10ea11f8a7",
+   "name": "Vigia · grava",
+   "type": "n8n-nodes-base.dataTable",
+   "typeVersion": 1.1,
+   "position": [
+    780,
+    420
+   ],
+   "parameters": {
+    "operation": "upsert",
+    "dataTableId": {
+     "__rl": true,
+     "value": "0kBTGpt8EjCjmR9t",
+     "mode": "id",
+     "cachedResultName": "BMH_vigia"
+    },
+    "filters": {
+     "conditions": [
+      {
+       "keyName": "chave",
+       "keyValue": "={{ $json.chave }}"
+      }
+     ]
+    },
+    "columns": {
+     "mappingMode": "defineBelow",
+     "value": {
+      "chave": "={{ $json.chave }}",
+      "nome": "={{ $json.nome }}",
+      "ultima_vez": "={{ $json.ultima_vez }}",
+      "max_horas": "={{ $json.max_horas }}",
+      "avisado_em": "={{ $json.avisado_em }}"
+     },
+     "matchingColumns": [],
+     "schema": [
+      {
+       "id": "chave",
+       "displayName": "chave",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "nome",
+       "displayName": "nome",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "ultima_vez",
+       "displayName": "ultima_vez",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "max_horas",
+       "displayName": "max_horas",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "number",
+       "readOnly": false,
+       "removed": false
+      },
+      {
+       "id": "avisado_em",
+       "displayName": "avisado_em",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "readOnly": false,
+       "removed": false
+      }
+     ]
+    },
+    "options": {}
+   },
+   "onError": "continueRegularOutput"
+  },
+  {
+   "id": "7b934508-ce80-46ef-9ad6-c5a7f109095c",
+   "name": "Central · cópia do Telegram",
+   "type": "n8n-nodes-base.executeWorkflow",
+   "typeVersion": 1.2,
+   "position": [
+    2616,
+    176
+   ],
+   "parameters": {
+    "workflowId": {
+     "__rl": true,
+     "value": "qtXOHlo8ciaGPXwS",
+     "mode": "id",
+     "cachedResultName": "JORGE · Central · cópia do Telegram"
+    },
+    "workflowInputs": {
+     "mappingMode": "defineBelow",
+     "value": {
+      "fluxo": "={{ String($workflow.name) }}",
+      "fluxo_id": "={{ String($workflow.id) }}",
+      "execucao": "={{ String($execution.id) }}",
+      "texto": "={{ String($json.result?.text ?? $json.text ?? $json.result?.caption ?? $json.caption ?? '') }}",
+      "chat": "={{ String($json.result?.chat?.id ?? $json.chat?.id ?? '') }}"
+     },
+     "matchingColumns": [],
+     "schema": [
+      {
+       "id": "fluxo",
+       "displayName": "fluxo",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "canBeUsedToMatch": true
+      },
+      {
+       "id": "fluxo_id",
+       "displayName": "fluxo_id",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "canBeUsedToMatch": true
+      },
+      {
+       "id": "execucao",
+       "displayName": "execucao",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "canBeUsedToMatch": true
+      },
+      {
+       "id": "texto",
+       "displayName": "texto",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "canBeUsedToMatch": true
+      },
+      {
+       "id": "chat",
+       "displayName": "chat",
+       "required": false,
+       "defaultMatch": false,
+       "display": true,
+       "type": "string",
+       "canBeUsedToMatch": true
+      }
+     ],
+     "attemptToConvertTypes": true,
+     "convertFieldsToString": true
+    },
+    "mode": "each",
+    "options": {
+     "waitForSubWorkflow": false
+    }
+   },
+   "notes": "Cópia para a Central (pedido 159). Não espera e segue no erro: nunca segura o envio.",
+   "onError": "continueRegularOutput"
+  }
+ ],
+ "connections": {
+  "Manual": {
+   "main": [
+    [
+     {
+      "node": "Config",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Todo dia às 8h": {
+   "main": [
+    [
+     {
+      "node": "Config",
+      "type": "main",
+      "index": 0
+     },
+     {
+      "node": "Vigia · marca que rodou",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Config": {
+   "main": [
+    [
+     {
+      "node": "Anúncios (tabela)",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Anúncios (tabela)": {
+   "main": [
+    [
+     {
+      "node": "Site · cliques (tabela)",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Site · cliques (tabela)": {
+   "main": [
+    [
+     {
+      "node": "iGut (tabela)",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "iGut (tabela)": {
+   "main": [
+    [
+     {
+      "node": "Guardião (tabela)",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Guardião (tabela)": {
+   "main": [
+    [
+     {
+      "node": "Google · renova o acesso",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Google · renova o acesso": {
+   "main": [
+    [
+     {
+      "node": "Meta · saldo da conta",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Meta · saldo da conta": {
+   "main": [
+    [
+     {
+      "node": "Monta o resumo",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Monta o resumo": {
+   "main": [
+    [
+     {
+      "node": "Envia no Telegram",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Vigia · marca que rodou": {
+   "main": [
+    [
+     {
+      "node": "Vigia · grava",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Envia no Telegram": {
+   "main": [
+    [
+     {
+      "node": "Central · cópia do Telegram",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  }
+ },
+ "settings": {
+  "executionOrder": "v1",
+  "timezone": "America/Sao_Paulo",
+  "saveDataErrorExecution": "all",
+  "errorWorkflow": "7u3CuyjESsHmCtMW",
+  "saveDataSuccessExecution": "all",
+  "executionTimeout": 3600
+ }
+}
